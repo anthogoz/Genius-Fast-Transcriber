@@ -1,0 +1,257 @@
+/* styles.css - Pour l'extension Genius Fast Transcriber */
+
+/* ----- Conteneur Principal du Panneau ----- */
+#genius-lyrics-shortcuts-container {
+  background-color: rgb(255, 255, 100); /* Ta couleur de fond jaune */
+  padding: 10px;
+  border: 1px solid #000000;
+  border-radius: 6px;
+  margin-bottom: 30px;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: Programme, sans-serif;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+}
+
+#gftPanelTitle {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #111;
+  display: flex; /* Pour aligner le contenu du titre (logo+texte et bouton dark mode) */
+  align-items: center; /* Aligner verticalement au centre */
+}
+
+/* Span contenant le logo et le texte du titre principal */
+#gftPanelTitle > span:first-child {
+  flex-grow: 1; /* Permet au titre de prendre l'espace, poussant le bouton à droite */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centre le logo et le texte à l'intérieur de ce span */
+}
+
+#gftPanelLogo {
+  height: 16px;
+  width: 16px;
+  margin-right: 6px;
+}
+
+/* Bouton spécifique pour le Dark Mode */
+#gftDarkModeButton {
+  margin-left: auto; /* Pousse le bouton à l'extrême droite */
+  padding: 4px 8px; /* Ajustement du padding */
+  font-size: 10px;  /* Ajustement de la taille de police */
+  flex-shrink: 0; /* Empêche le bouton de rétrécir si le titre est long */
+}
+
+
+/* Option B: Si tu ne veux pas ajouter de classe aux divs de groupe */
+#gftButtonGroupsContainer > div { /* Cible les divs enfants directes (chaque groupe de boutons) */
+    display: flex;
+    flex-wrap: wrap; /* Important pour que les boutons passent à la ligne si besoin */
+    align-items: center;
+    /* margin-bottom: 5px; */ /* Peut-être plus nécessaire si on n'a qu'un seul grand groupe pour la structure */
+    margin-top: 10px; /* Espace avant le groupe de boutons structuraux */
+    gap: 5px; /* Ajoute un petit espace entre les boutons eux-mêmes */
+}
+/* ----- Message de Feedback Temporaire ----- */
+#gft-feedback-message {
+  visibility: hidden;
+  opacity: 0;
+  max-height: 0; /* Hauteur nulle initialement */
+  background-color: #0e0e0e;
+  color: #f9ff55;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 12px;
+  padding-right: 12px;
+  margin-top: 0;
+  margin-bottom: 0;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: normal;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden; /* Important pour la transition de max-height */
+  
+  transition: opacity 0.3s ease-in-out,
+              max-height 0.3s ease-in-out,
+              padding-top 0.3s ease-in-out,
+              padding-bottom 0.3s ease-in-out,
+              margin-top 0.3s ease-in-out,
+              margin-bottom 0.3s ease-in-out,
+              visibility 0s linear 0.3s;
+}
+
+#gft-feedback-message.gft-visible {
+  visibility: visible;
+  opacity: 1;
+  max-height: 70px; /* Hauteur suffisante pour le contenu (ajuster si besoin) */
+  padding-top: 8px;
+  padding-bottom: 8px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  transition: opacity 0.3s ease-in-out,
+              max-height 0.3s ease-in-out,
+              padding-top 0.3s ease-in-out,
+              padding-bottom 0.3s ease-in-out,
+              margin-top 0.3s ease-in-out,
+              margin-bottom 0.3s ease-in-out,
+              visibility 0s linear 0s;
+}
+
+
+/* ----- Section de Sélection des Artistes ----- */
+#artistSelectorContainerLyricsHelper {
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+#artistSelectorContainerLyricsHelper p {
+  margin: 0 0 8px 0;
+  font-weight: bold;
+  font-size: 13px;
+  color: #333;
+}
+
+#artistSelectorContainerLyricsHelper input[type="checkbox"] {
+  margin-right: 4px;
+  vertical-align: middle;
+  accent-color: #0e0e0e;
+}
+
+#artistSelectorContainerLyricsHelper label {
+  margin-right: 10px;
+  cursor: pointer;
+  font-size: 12px;
+  vertical-align: middle;
+  color: #333;
+}
+
+/* ----- Séparateurs Horizontaux ----- */
+#genius-lyrics-shortcuts-container > hr {
+  margin: 10px 0;
+  border: none;
+  border-top: 1px solid rgba(14, 14, 14, 0.406);
+}
+
+/* ----- Boutons de Raccourci ----- */
+.genius-lyrics-shortcut-button {
+  margin-right: 5px;
+  margin-bottom: 5px;
+  padding: 6px 10px;
+  border: 1px solid #adadad;
+  border-radius: 100px;
+  background-color: #fffdef;
+  color: #212529;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: Programme, sans-serif;
+  min-width: 35px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  text-align: center;
+  vertical-align: middle;
+  height: auto;
+}
+
+.genius-lyrics-shortcut-button:hover {
+  border-color: #0e0e0e;
+  color: #f9ff55;
+  background-color: #0e0e0e;
+}
+
+.lyrics-helper-highlight {
+  background-color: #f9ff55;
+  animation: lyrics-helper-fadeout 2s ease-out forwards;
+  border-radius: 2px;
+  padding: 0 1px;
+  color: inherit !important;
+}
+
+@keyframes lyrics-helper-fadeout {
+  0% {
+    background-color: #f9ff55;
+    opacity: 0.8;
+  }
+  70% {
+    background-color: #f9ff55;
+    opacity: 0.5;
+  }
+  100% {
+    background-color: transparent;
+    opacity: 1;
+  }
+}
+
+/* ----- Dark Mode Styles ----- */
+
+/* Conteneur Principal */
+.gft-dark-mode#genius-lyrics-shortcuts-container {
+  background-color: #2a2a2a; /* Fond sombre */
+  border-color: #555;
+  color: #e0e0e0; /* Texte clair général */
+}
+
+/* Titre du panneau et logo en mode sombre */
+.gft-dark-mode #gftPanelTitle {
+  color: #f0f0f0; /* Texte du titre plus clair */
+}
+
+/* Paragraphes et labels dans le sélecteur d'artistes en mode sombre */
+.gft-dark-mode #artistSelectorContainerLyricsHelper p,
+.gft-dark-mode #artistSelectorContainerLyricsHelper label {
+  color: #c5c5c5; /* Texte des labels plus clair */
+}
+
+/* Checkboxes en mode sombre */
+.gft-dark-mode #artistSelectorContainerLyricsHelper input[type="checkbox"] {
+  accent-color: #f9ff55; /* Jaune Genius pour le check */
+}
+
+/* Séparateurs Horizontaux en mode sombre */
+.gft-dark-mode #genius-lyrics-shortcuts-container > hr {
+  border-top-color: rgba(220, 220, 220, 0.3); /* Séparateur plus clair */
+}
+
+/* Boutons de Raccourci en mode sombre */
+.gft-dark-mode .genius-lyrics-shortcut-button {
+  background-color: #404040; /* Fond de bouton sombre */
+  color: #e0e0e0; /* Texte de bouton clair */
+  border-color: #606060; /* Bordure de bouton */
+}
+
+.gft-dark-mode .genius-lyrics-shortcut-button:hover {
+  background-color: #f9ff55; /* Au survol, utiliser le jaune Genius */
+  color: #0e0e0e; /* Texte noir */
+  border-color: #f9ff55;
+}
+
+/* Style spécifique pour le bouton Dark Mode lui-même en mode sombre */
+/* (Peut être utilisé pour le distinguer légèrement des autres boutons si besoin) */
+.gft-dark-mode #gftDarkModeButton {
+  background-color: #484848; 
+  /* Le :hover est déjà géré par .gft-dark-mode .genius-lyrics-shortcut-button:hover */
+}
+
+
+/* Message de Feedback en mode sombre */
+.gft-dark-mode #gft-feedback-message {
+  background-color: #1e1e1e; /* Fond du feedback plus sombre */
+  color: #f9ff55; /* Texte du feedback en jaune */
+}
+
+/* Optionnel: Surlignage en mode sombre si vous voulez un look différent */
+/*
+.gft-dark-mode .lyrics-helper-highlight {
+  background-color: #b8b800; // Un jaune un peu moins vif pour fond sombre
+  animation: lyrics-helper-fadeout-dark 2s ease-out forwards;
+}
+
+@keyframes lyrics-helper-fadeout-dark {
+  0% { background-color: #b8b800; opacity: 0.8; }
+  70% { background-color: #b8b800; opacity: 0.5; }
+  100% { background-color: transparent; opacity: 1; }
+}
+*/
