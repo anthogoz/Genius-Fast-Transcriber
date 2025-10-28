@@ -66,6 +66,31 @@ cd genius-fast-transcriber
 - **MutationObserver** pour détecter les changements dynamiques sur Genius (SPA)
 - **CSS** personnalisé avec mode sombre
 
+## ⚠️ Avertissement - Développement Assisté par IA
+
+Cette extension a été entièrement développée avec l'assistance de **Gemini** (vibe coding). Bien que fonctionnelle, cela implique certaines considérations :
+
+### 🐛 Problèmes Potentiels
+
+- **Bugs non détectés** : Le code n'a pas été audité de manière exhaustive par des développeurs humains expérimentés
+- **Failles de sécurité possibles** : Aucun audit de sécurité professionnel n'a été effectué
+- **Solutions "hacky"** : Certaines implémentations peuvent être plus complexes que nécessaire pour accomplir des tâches simples
+- **Code non optimisé** : Certaines parties du code pourraient être refactorisées pour de meilleures performances
+- **Gestion d'erreurs incomplète** : Tous les cas limites (edge cases) n'ont peut-être pas été anticipés
+- **Dépendances aux sélecteurs CSS** : L'extension dépend fortement des sélecteurs CSS de Genius.com qui peuvent changer sans préavis
+- **Dette technique** : Le fichier principal (`content.js`) fait 1139 lignes et mériterait d'être modularisé
+
+### 🤝 Votre Aide est Précieuse !
+
+C'est pourquoi **vos contributions sont d'autant plus importantes** :
+- Audits de code et suggestions d'améliorations
+- Corrections de bugs et failles de sécurité
+- Refactorisation du code existant
+- Ajout de tests automatisés
+- Revues de code (code reviews)
+
+**Utilisez cette extension en connaissance de cause** et n'hésitez pas à signaler tout comportement suspect ou problème de sécurité via les Issues GitHub.
+
 ## 📁 Structure du Projet
 
 ```

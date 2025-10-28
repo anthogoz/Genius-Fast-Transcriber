@@ -22,6 +22,12 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
   - Fichier concerné : `content.js`, fonction `startObserver()`
   - Difficulté : Difficile
 
+- [ ] **Feedback imprécis du bouton "Tout Corriger"** : Le nombre d'erreurs corrigées affiché est incorrect (beaucoup trop élevé) et on ne sait pas exactement ce qui a été corrigé
+  - Le compteur cumule les corrections de manière incorrecte
+  - Manque de détails sur les types de corrections appliquées (ex: "3 apostrophes, 5 majuscules, 2 espacements")
+  - Fichier concerné : `content.js`, fonction `applyAllTextCorrectionsToString()` et affichage du feedback
+  - Difficulté : Moyenne
+
 #### ✨ Fonctionnalités Essentielles
 
 - [ ] **Raccourcis clavier** : Ajouter des raccourcis clavier pour les actions fréquentes
@@ -32,10 +38,6 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
 - [ ] **Undo/Redo local** : Historique des modifications pour revenir en arrière
   - Utile après un "Tout Corriger" qui fait trop de changements
   - Difficulté : Difficile
-
-- [ ] **Export/Import de templates** : Permettre de sauvegarder des templates personnalisés
-  - Exemple : "Structure Rap", "Structure Couplet-Refrain", etc.
-  - Difficulté : Moyenne
 
 ### 🟡 Priorité Moyenne
 
@@ -56,10 +58,6 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
   - Difficulté : Facile
 
 #### 🔧 Fonctionnalités Supplémentaires
-
-- [ ] **Détection automatique de la langue** : Adapter les corrections selon la langue détectée
-  - Exemple : Pas de correction "y'" si la langue n'est pas le français
-  - Difficulté : Moyenne
 
 - [ ] **Suggestions de corrections** : Mode "review" qui suggère au lieu d'appliquer automatiquement
   - Difficulté : Moyenne-Difficile
@@ -110,44 +108,6 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
 
 - [ ] **Mode Standalone** : Bookmarklet ou userscript pour ceux qui ne veulent pas d'extension
   - Difficulté : Moyenne
-
-## 🆕 Idées de Nouvelles Fonctionnalités
-
-Ces idées sont à discuter avant implémentation (créez une Issue pour en parler !) :
-
-### Idée 1 : Mode Collaboratif
-- Synchronisation en temps réel avec d'autres transcripteurs
-- Nécessite un backend
-- Difficulté : Très Difficile
-
-### Idée 2 : Intégration IA
-- Suggestions de corrections via API (OpenAI, Claude, etc.)
-- Auto-détection de la structure de la chanson
-- Difficulté : Difficile
-
-### Idée 3 : Intégration Spotify/YouTube
-- Importer les paroles depuis Spotify ou YouTube Music
-- Synchronisation du timestamp
-- Difficulté : Difficile
-
-### Idée 4 : Prévisualisation en Temps Réel
-- Vue côte à côte : brut vs. formaté
-- Difficulté : Moyenne
-
-### Idée 5 : Mode "Paroles Certifiées"
-- Vérification automatique selon les règles de Genius
-- Checklist des critères pour les paroles vérifiées
-- Difficulté : Moyenne
-
-### Idée 6 : Historique des Chansons Transcrites
-- Garder une trace des chansons travaillées
-- Statistiques personnelles (nombre de transcriptions, temps passé, etc.)
-- Difficulté : Moyenne
-
-### Idée 7 : Intégration Genius API
-- Récupérer automatiquement des infos manquantes
-- Push direct depuis l'extension
-- Difficulté : Difficile
 
 ## 🔧 Tâches de Maintenance
 
