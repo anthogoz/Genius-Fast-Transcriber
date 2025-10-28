@@ -22,22 +22,27 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
   - Fichier concerné : `content.js`, fonction `startObserver()`
   - Difficulté : Difficile
 
-#### ✨ Fonctionnalités Essentielles
-
-- [x] ~~**Raccourcis clavier** : Ajouter des raccourcis clavier pour les actions fréquentes~~ **[COMPLÉTÉ v1.6.0]**
-  - ✅ `Ctrl+1-5` pour tags structuraux
-  - ✅ `Ctrl+Shift+C` pour "Tout Corriger"
-  - ✅ `Ctrl+Z/Y` pour Undo/Redo
-  - ✅ `Ctrl+Shift+S` pour statistiques
-  
-- [x] ~~**Undo/Redo local** : Historique des modifications pour revenir en arrière~~ **[COMPLÉTÉ v1.6.0]**
-  - ✅ Historique des 10 dernières modifications
-  - ✅ Boutons dédiés dans le panneau
-  - ✅ Raccourcis Ctrl+Z/Y
 
 ### 🟡 Priorité Moyenne
 
 #### 🎨 Améliorations de l'Interface
+
+- [ ] **Améliorer le modal de prévisualisation "Tout Corriger"** : La prévisualisation actuelle n'est pas assez claire
+  - Problème : On ne voit pas tout le texte, l'aperçu est tronqué à 500 caractères
+  - Solution proposée : Modal plus grand, scroll vertical, possibilité de voir l'intégralité du texte
+  - Amélioration : Meilleure visualisation des différences (highlight des modifications)
+  - Fichier concerné : `content.js`, fonction `showCorrectionPreview()` (ligne ~1035)
+  - Fichier CSS : `styles.css` (section `.gft-preview-modal`)
+  - Difficulté : Moyenne
+
+- [ ] **Effet de surlignage vert pour les corrections individuelles** : Feedback visuel pour les corrections de texte
+  - Ajouter un surlignage vert qui apparaît quand on clique sur un bouton de correction
+  - Le surlignage doit durer quelques secondes (3-4s)
+  - Disparition en fondu progressif (fade-out)
+  - Actuellement : Surlignage jaune uniquement
+  - Fichier concerné : `content.js`, fonctions de correction individuelles
+  - Fichier CSS : `styles.css`, ajouter classe `.gft-correction-highlight-green`
+  - Difficulté : Facile
 
 - [ ] **Panneau redimensionnable** : Permettre à l'utilisateur de redimensionner le panneau
   - Difficulté : Moyenne
@@ -53,19 +58,8 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
 
 #### 🔧 Fonctionnalités Supplémentaires
 
-- [x] ~~**Prévisualisation des corrections** : Mode "review" qui suggère au lieu d'appliquer automatiquement~~ **[COMPLÉTÉ v1.6.0]**
-  - ✅ Modal avec aperçu avant/après
-  - ✅ Détails des corrections par type
-  - ✅ Validation avant application
-
 - [ ] **Support des annotations Genius** : Préparer le texte pour faciliter l'ajout d'annotations
   - Difficulté : Difficile
-
-- [x] ~~**Statistiques de transcription** : Afficher le nombre de mots, lignes, sections, etc.~~ **[COMPLÉTÉ v1.6.0]**
-  - ✅ Compteur en temps réel : lignes, mots, sections, caractères
-  - ✅ Activable/désactivable via `Ctrl+Shift+S`
-  - ✅ Préférence sauvegardée
-
 
 ### 🟢 Priorité Basse / Nice to Have
 
@@ -89,10 +83,6 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
 
 - [ ] **Performances** : Optimiser le MutationObserver pour limiter les rappels
   - Difficulté : Moyenne
-
-- [ ] **Tests automatisés** : Ajouter des tests unitaires et d'intégration
-  - Utiliser Jest ou Mocha
-  - Difficulté : Difficile
 
 #### 🌐 Compatibilité
 
