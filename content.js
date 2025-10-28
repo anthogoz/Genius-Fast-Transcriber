@@ -481,6 +481,7 @@ function createFloatingFormattingToolbar() {
         e.stopPropagation();
         applyFormattingToSelection('bold');
     });
+    addTooltip(boldButton, 'Mettre le texte sélectionné en gras');
     
     // Bouton Italique
     const italicButton = document.createElement('button');
@@ -493,6 +494,7 @@ function createFloatingFormattingToolbar() {
         e.stopPropagation();
         applyFormattingToSelection('italic');
     });
+    addTooltip(italicButton, 'Mettre le texte sélectionné en italique');
     
     toolbar.appendChild(boldButton);
     toolbar.appendChild(italicButton);
@@ -2246,23 +2248,24 @@ function initLyricsEditorEnhancer() {
     const SHORTCUTS = {
         TAGS_STRUCTURAUX: [ 
             { buttons: [
-                { label: "En-tête", getText: () => { let txt = `[Paroles de "${currentSongTitle}"`; const fts = formatArtistList(currentFeaturingArtists); if(fts) txt+=` ft. ${fts}`; txt+=']\n'; return txt;}},
+                { label: "En-tête", getText: () => { let txt = `[Paroles de "${currentSongTitle}"`; const fts = formatArtistList(currentFeaturingArtists); if(fts) txt+=` ft. ${fts}`; txt+=']\n'; return txt;}, tooltip: "Insérer l'en-tête de la chanson avec les artistes"},
                 { type: 'coupletManager', 
-                    prev: { label: '←', title: 'Couplet précédent' },
+                    prev: { label: '←', title: 'Couplet précédent', tooltip: 'Revenir au couplet précédent' },
                     main: { 
                         id: COUPLET_BUTTON_ID, 
                         getLabel: () => `[Couplet ${coupletCounter}]`, 
-                        getText: () => addArtistToText(`[Couplet ${coupletCounter}]`) 
+                        getText: () => addArtistToText(`[Couplet ${coupletCounter}]`),
+                        tooltip: 'Insérer un tag [Couplet] avec les artistes sélectionnés (Ctrl+1)'
                     },
-                    next: { label: '→', title: 'Couplet suivant' }
+                    next: { label: '→', title: 'Couplet suivant', tooltip: 'Passer au couplet suivant' }
                 },
-                {label:'[Intro]',getText:()=>addArtistToText('[Intro]')},
-                {label:'[Couplet unique]',getText:()=>addArtistToText('[Couplet unique]')},
-                {label:'[Pré-refrain]',getText:()=>addArtistToText('[Pré-refrain]')},
-                {label:'[Refrain]',getText:()=>addArtistToText('[Refrain]')},
-                {label:'[Pont]',getText:()=>addArtistToText('[Pont]')},
-                {label:'[Outro]',getText:()=>addArtistToText('[Outro]')},
-                {label:'[?]',text:'[?]\n'}
+                {label:'[Intro]',getText:()=>addArtistToText('[Intro]'), tooltip: 'Insérer un tag [Intro] avec les artistes (Ctrl+4)'},
+                {label:'[Couplet unique]',getText:()=>addArtistToText('[Couplet unique]'), tooltip: 'Insérer un tag [Couplet unique] avec les artistes'},
+                {label:'[Pré-refrain]',getText:()=>addArtistToText('[Pré-refrain]'), tooltip: 'Insérer un tag [Pré-refrain] avec les artistes'},
+                {label:'[Refrain]',getText:()=>addArtistToText('[Refrain]'), tooltip: 'Insérer un tag [Refrain] avec les artistes (Ctrl+2)'},
+                {label:'[Pont]',getText:()=>addArtistToText('[Pont]'), tooltip: 'Insérer un tag [Pont] avec les artistes (Ctrl+3)'},
+                {label:'[Outro]',getText:()=>addArtistToText('[Outro]'), tooltip: 'Insérer un tag [Outro] avec les artistes (Ctrl+5)'},
+                {label:'[?]',text:'[?]\n', tooltip: 'Insérer un tag [?] pour les paroles inconnues'}
               ]
             }
         ],
@@ -2272,15 +2275,16 @@ function initLyricsEditorEnhancer() {
                 action:'replaceText',
                 searchPattern:/\b(Y|y)'/g, 
                 replacementFunction:(match, firstLetter)=>(firstLetter === 'Y' ? 'Y ' : 'y '), 
-                highlightClass:LYRICS_HELPER_HIGHLIGHT_CLASS
+                highlightClass:LYRICS_HELPER_HIGHLIGHT_CLASS,
+                tooltip: "Corriger tous les y' en y (typique en français)"
             },
-            {label:"' → '",action:'replaceText',searchPattern:/'/g,replacementText:"'",highlightClass:LYRICS_HELPER_HIGHLIGHT_CLASS},
-            {label:"Maj. début ligne",action:'lineCorrection',correctionType:'capitalize',title:"Met en majuscule la première lettre de chaque ligne."},
-            {label:"Suppr. ., fin ligne",action:'lineCorrection',correctionType:'removePunctuation',title:"Supprime les points et virgules en fin de ligne."},
-            {label:"Corriger Espacement",action:'lineCorrection',correctionType:'spacing',title:"Corrige les espacements (lignes vides inutiles ou manquantes)."}
+            {label:"' → '",action:'replaceText',searchPattern:/'/g,replacementText:"'",highlightClass:LYRICS_HELPER_HIGHLIGHT_CLASS, tooltip: "Remplacer les apostrophes typographiques ' par des apostrophes standard '"},
+            {label:"Maj. début ligne",action:'lineCorrection',correctionType:'capitalize',title:"Met en majuscule la première lettre de chaque ligne.", tooltip: "Mettre en majuscule la première lettre de chaque ligne"},
+            {label:"Suppr. ., fin ligne",action:'lineCorrection',correctionType:'removePunctuation',title:"Supprime les points et virgules en fin de ligne.", tooltip: "Supprimer les points et virgules en fin de ligne"},
+            {label:"Corriger Espacement",action:'lineCorrection',correctionType:'spacing',title:"Corrige les espacements (lignes vides inutiles ou manquantes).", tooltip: "Corriger les espacements (lignes vides inutiles ou manquantes)"}
         ],
         GLOBAL_FIXES: [
-            {label:"Tout Corriger (Texte)", action:'globalTextFix', title:"Applique toutes les corrections de texte (y', apostrophes, majuscules, ponctuation, espacement)."}
+            {label:"Tout Corriger (Texte)", action:'globalTextFix', title:"Applique toutes les corrections de texte (y', apostrophes, majuscules, ponctuation, espacement).", tooltip: "Appliquer toutes les corrections automatiques avec prévisualisation (Ctrl+Shift+C)"}
         ]
     };
 
@@ -2384,6 +2388,7 @@ function initLyricsEditorEnhancer() {
                     toggleDarkMode();
                 });
                 panelTitle.appendChild(darkModeButton);
+                addTooltip(darkModeButton, 'Activer/Désactiver le mode sombre');
                 
                 // Bouton pour afficher/masquer les statistiques
                 const statsToggleButton = document.createElement('button');
@@ -2396,6 +2401,7 @@ function initLyricsEditorEnhancer() {
                     toggleStatsDisplay();
                 });
                 panelTitle.appendChild(statsToggleButton);
+                addTooltip(statsToggleButton, 'Afficher/Masquer les statistiques (Ctrl+Shift+S)');
                 
                 // Bouton Undo
                 const undoButton = document.createElement('button');
@@ -2410,6 +2416,7 @@ function initLyricsEditorEnhancer() {
                     undoLastChange();
                 });
                 panelTitle.appendChild(undoButton);
+                addTooltip(undoButton, 'Annuler la dernière modification (Ctrl+Z)');
                 
                 // Bouton Redo
                 const redoButton = document.createElement('button');
@@ -2424,6 +2431,7 @@ function initLyricsEditorEnhancer() {
                     redoLastChange();
                 });
                 panelTitle.appendChild(redoButton);
+                addTooltip(redoButton, 'Refaire la dernière modification annulée (Ctrl+Y)');
                 
                 // Bouton Paramètres/Aide
                 const settingsButton = document.createElement('button');
@@ -2436,6 +2444,7 @@ function initLyricsEditorEnhancer() {
                     showSettingsMenu();
                 });
                 panelTitle.appendChild(settingsButton);
+                addTooltip(settingsButton, 'Ouvrir les paramètres et le tutoriel');
                 
                 shortcutsContainerElement.appendChild(panelTitle);
                 loadDarkModePreference();
@@ -2468,6 +2477,11 @@ function initLyricsEditorEnhancer() {
                     button.classList.add('genius-lyrics-shortcut-button');
                     if (config.title) button.title = config.title;
                     button.type = 'button'; parentEl.appendChild(button);
+                    
+                    // Ajoute le tooltip si défini
+                    if (config.tooltip) {
+                        addTooltip(button, config.tooltip);
+                    }
                     // Ajoute l'écouteur d'événement principal qui déclenche l'action du bouton.
                     button.addEventListener('click', (event) => {
                         event.preventDefault();

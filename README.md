@@ -5,6 +5,21 @@ Une extension Chrome/Edge qui transforme l'expérience de transcription sur **Ge
 ![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
+## 🚀 Installation Facile
+
+L'extension est **très facilement installable** sur tous les navigateurs Chromium (Chrome, Edge, Brave, Opera, etc.) directement depuis le Chrome Web Store :
+
+**[📥 Installer Genius Fast Transcriber](https://chromewebstore.google.com/detail/genius-fast-transcriber-b/cbldlkiakadclpjfkkafpjomilmmgdjm?hl=fr)**
+
+> ⭐ **Note 5/5** avec **18 utilisateurs** actifs !
+
+### Installation en 3 clics :
+1. 🔗 Cliquez sur le lien ci-dessus
+2. ➕ Cliquez sur "Ajouter à Chrome/Edge"
+3. ✅ Confirmez l'installation
+
+L'extension sera immédiatement active sur toutes les pages d'édition de paroles de Genius.com !
+
 ## ✨ Fonctionnalités
 
 ### 🎯 Tags Structuraux Intelligents

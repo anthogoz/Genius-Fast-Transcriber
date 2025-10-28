@@ -4,13 +4,44 @@ Merci de votre intérêt pour contribuer à **Genius Fast Transcriber** ! Ce doc
 
 ## 📋 Table des Matières
 
-1. [Code de Conduite](#code-de-conduite)
-2. [Comment Contribuer](#comment-contribuer)
-3. [Signaler un Bug](#signaler-un-bug)
-4. [Proposer une Nouvelle Fonctionnalité](#proposer-une-nouvelle-fonctionnalité)
-5. [Soumettre une Pull Request](#soumettre-une-pull-request)
-6. [Guide de Style](#guide-de-style)
-7. [Architecture du Code](#architecture-du-code)
+1. [Tester l'Extension](#tester-lextension)
+2. [Code de Conduite](#code-de-conduite)
+3. [Comment Contribuer](#comment-contribuer)
+4. [Signaler un Bug](#signaler-un-bug)
+5. [Proposer une Nouvelle Fonctionnalité](#proposer-une-nouvelle-fonctionnalité)
+6. [Soumettre une Pull Request](#soumettre-une-pull-request)
+7. [Guide de Style](#guide-de-style)
+8. [Architecture du Code](#architecture-du-code)
+
+## 🧪 Tester l'Extension
+
+Avant de contribuer, nous vous recommandons de **tester l'extension** pour bien comprendre son fonctionnement !
+
+### Installation depuis le Chrome Web Store
+
+L'extension est **très facilement installable** sur tous les navigateurs Chromium (Chrome, Edge, Brave, Opera, etc.) :
+
+**[📥 Installer Genius Fast Transcriber](https://chromewebstore.google.com/detail/genius-fast-transcriber-b/cbldlkiakadclpjfkkafpjomilmmgdjm?hl=fr)**
+
+> ⭐ **Note 5/5** - Installation en 3 clics !
+
+### Installation en mode développement (pour contribuer)
+
+Si vous souhaitez tester vos modifications locales :
+
+1. **Clonez** le dépôt :
+   ```bash
+   git clone https://github.com/anthogoz/genius-fast-transcriber.git
+   cd genius-fast-transcriber
+   ```
+
+2. **Chargez l'extension** dans votre navigateur :
+   - Chrome/Edge : Allez dans `chrome://extensions/`
+   - Activez le "Mode développeur"
+   - Cliquez sur "Charger l'extension non empaquetée"
+   - Sélectionnez le dossier du projet
+
+3. **Testez** sur [Genius.com](https://genius.com) en éditant des paroles
 
 ## 📜 Code de Conduite
 
