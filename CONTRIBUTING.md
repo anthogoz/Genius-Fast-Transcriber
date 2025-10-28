@@ -167,42 +167,85 @@ function maFonction(paramName) {
 
 ### Fichiers Principaux
 
-#### `content.js` (1139 lignes)
+#### `content.js` (2787 lignes)
 
-**Section 1 : Variables Globales (lignes 14-28)**
-- État de l'extension (compteurs, éditeur actif, mode sombre)
+**Section 1 : Variables Globales (lignes 14-33)**
+- État de l'extension (compteurs, éditeur actif, mode sombre, historique Undo/Redo)
 
-**Section 2 : Utilitaires (lignes 66-169)**
+**Section 2 : Constantes et Sélecteurs (lignes 34-64)**
+- Sélecteurs CSS pour les éléments de Genius
+- IDs des composants de l'extension
+- Classes CSS utilitaires
+
+**Section 3 : Utilitaires (lignes 66-570)**
 - `decodeHtmlEntities()` : Décode les entités HTML
 - `cleanArtistName()` : Nettoie les noms d'artistes
 - `formatArtistList()` : Formate une liste d'artistes
 - `extractArtistsFromMetaContent()` : Extrait artistes depuis meta tags
+- `calculateStats()` : Calcule les statistiques (lignes, mots, sections, caractères)
 
-**Section 3 : Extraction de Données (lignes 175-264)**
+**Section 4 : Statistiques en Temps Réel (lignes 571-651)**
+- `updateStatsDisplay()` : Met à jour l'affichage des statistiques
+- `toggleStatsDisplay()` : Affiche/masque les statistiques
+- `createStatsDisplay()` : Crée l'élément d'affichage
+
+**Section 5 : Historique Undo/Redo (lignes 653-938)**
+- `saveToHistory()` : Sauvegarde l'état actuel
+- `undoLastChange()` : Annule la dernière modification
+- `redoLastChange()` : Refait la dernière modification annulée
+- `updateHistoryButtons()` : Met à jour l'état des boutons
+
+**Section 6 : Barre de Progression (lignes 940-1023)**
+- `createProgressBar()` : Crée l'élément de la barre
+- `showProgress()` : Affiche la progression
+- `hideProgress()` : Cache la barre de progression
+
+**Section 7 : Prévisualisation des Corrections (lignes 1025-1148)**
+- `showCorrectionPreview()` : Affiche le modal avant/après avec détails
+
+**Section 8 : Tutoriel et Tooltips (lignes 1150-1460)**
+- `showTutorial()` : Affiche le tutoriel guidé en 6 étapes
+- `renderTutorialStep()` : Affiche une étape spécifique
+- `isFirstLaunch()` : Détecte le premier lancement
+- `areTooltipsEnabled()` : Vérifie si les tooltips sont activés
+
+**Section 9 : Raccourcis Clavier (lignes 1462-1548)**
+- `KEYBOARD_SHORTCUTS` : Configuration des raccourcis
+- `handleKeyboardShortcut()` : Gestion des événements clavier
+- `insertTagViaShortcut()` : Insère un tag via raccourci
+
+**Section 10 : Barre d'Outils Flottante (lignes 1650-1850)**
+- `createFloatingFormattingToolbar()` : Crée la barre de formatage
+- `handleSelectionChange()` : Détecte la sélection de texte
+- `applyBoldToSelection()` / `applyItalicToSelection()` : Applique le formatage
+
+**Section 11 : Extraction de Données (lignes 175-264)**
 - `extractSongData()` : Fonction principale pour extraire titre et artistes
 
-**Section 4 : Interface Utilisateur (lignes 271-432)**
+**Section 12 : Interface Utilisateur (lignes 300-450)**
 - `createArtistSelectors()` : Crée les cases à cocher des artistes
 - `showFeedbackMessage()` : Affiche les messages temporaires
 - `applyDarkMode()` / `toggleDarkMode()` : Gestion du mode sombre
 
-**Section 5 : Corrections de Texte (lignes 436-767)**
+**Section 13 : Corrections de Texte (lignes 1900-2220)**
 - `capitalizeFirstLetterOfEachLine()`
 - `removeTrailingPunctuationFromLines()`
 - `correctLineSpacing()` : Logique complexe pour l'espacement
-- `applyAllTextCorrectionsToString()` : Chaîne toutes les corrections
+- `applyAllTextCorrectionsAsync()` : Chaîne toutes les corrections avec barre de progression
 
-**Section 6 : Éditeur Contenteditable (lignes 322-718)**
+**Section 14 : Éditeur Contenteditable (lignes 500-1000)**
 - `replaceAndHighlightInDiv()` : Remplacement avec surlignage dans un div
 - `applyTextTransformToDivEditor()` : Applique transformations dans un div
 
-**Section 7 : Initialisation Principale (lignes 774-1093)**
+**Section 15 : Initialisation Principale (lignes 2227-2680)**
 - `initLyricsEditorEnhancer()` : Fonction cœur qui crée le panneau
 - Gestion de la configuration des boutons (objet `SHORTCUTS`)
 - Factory de boutons avec événements
+- Création du panneau de paramètres
 
-**Section 8 : MutationObserver (lignes 1099-1121)**
+**Section 16 : MutationObserver (lignes 2717-2787)**
 - `startObserver()` : Surveille les changements DOM (SPA)
+- Écouteurs d'événements globaux (clavier, sélection, scroll)
 
 ### Points d'Extension Courants
 
@@ -216,12 +259,24 @@ Modifiez l'objet `SHORTCUTS.TAGS_STRUCTURAUX` (ligne ~778) :
 
 #### Ajouter une nouvelle correction
 
-1. Créez une fonction de correction (section 5)
-2. Ajoutez-la à `SHORTCUTS.TEXT_CLEANUP` (ligne ~801)
+1. Créez une fonction de correction (section 13, lignes 1900-2220)
+2. Ajoutez-la à `SHORTCUTS.TEXT_CLEANUP` dans `initLyricsEditorEnhancer()`
+3. Mettez à jour `applyAllTextCorrectionsAsync()` pour inclure la nouvelle correction
+
+#### Ajouter un raccourci clavier
+
+1. Ajoutez l'entrée dans l'objet `KEYBOARD_SHORTCUTS` (ligne ~1462)
+2. Ajoutez le cas correspondant dans `handleKeyboardShortcut()` (ligne ~1551)
+3. Créez la fonction d'action si nécessaire
 
 #### Modifier la détection des artistes
 
 Modifiez `extractSongData()` (ligne ~175) ou les `SELECTORS` (ligne ~42)
+
+#### Ajouter une statistique
+
+1. Modifiez `calculateStats()` (ligne ~571) pour calculer la nouvelle métrique
+2. Mettez à jour `updateStatsDisplay()` (ligne ~590) pour l'afficher
 
 ## 🧪 Tests
 
@@ -242,10 +297,15 @@ Avant de soumettre votre PR, testez sur Genius.com :
 
 - [ ] Le code fonctionne sur Genius.com
 - [ ] Aucune erreur dans la console (F12)
-- [ ] Le mode sombre fonctionne correctement
+- [ ] Le mode sombre fonctionne correctement sur tous les nouveaux éléments
+- [ ] Les raccourcis clavier fonctionnent (si modifiés/ajoutés)
+- [ ] L'historique Undo/Redo fonctionne correctement avec les nouvelles modifications
+- [ ] Les statistiques s'actualisent correctement (si modifiées)
+- [ ] Le tutoriel est à jour (si de nouvelles fonctionnalités sont ajoutées)
 - [ ] Les commentaires JSDoc sont à jour
 - [ ] Le code suit le guide de style
 - [ ] La version dans `manifest.json` est correcte (si applicable)
+- [ ] Le README.md et TODO.md sont à jour (si fonctionnalité majeure)
 
 ## 🔍 Processus de Review
 

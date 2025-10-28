@@ -22,22 +22,18 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
   - Fichier concerné : `content.js`, fonction `startObserver()`
   - Difficulté : Difficile
 
-- [ ] **Feedback imprécis du bouton "Tout Corriger"** : Le nombre d'erreurs corrigées affiché est incorrect (beaucoup trop élevé) et on ne sait pas exactement ce qui a été corrigé
-  - Le compteur cumule les corrections de manière incorrecte
-  - Manque de détails sur les types de corrections appliquées (ex: "3 apostrophes, 5 majuscules, 2 espacements")
-  - Fichier concerné : `content.js`, fonction `applyAllTextCorrectionsToString()` et affichage du feedback
-  - Difficulté : Moyenne
-
 #### ✨ Fonctionnalités Essentielles
 
-- [ ] **Raccourcis clavier** : Ajouter des raccourcis clavier pour les actions fréquentes
-  - Exemple : `Ctrl+1` pour `[Couplet]`, `Ctrl+2` pour `[Refrain]`, etc.
-  - Fichier à modifier : `content.js`
-  - Difficulté : Moyenne
+- [x] ~~**Raccourcis clavier** : Ajouter des raccourcis clavier pour les actions fréquentes~~ **[COMPLÉTÉ v1.6.0]**
+  - ✅ `Ctrl+1-5` pour tags structuraux
+  - ✅ `Ctrl+Shift+C` pour "Tout Corriger"
+  - ✅ `Ctrl+Z/Y` pour Undo/Redo
+  - ✅ `Ctrl+Shift+S` pour statistiques
   
-- [ ] **Undo/Redo local** : Historique des modifications pour revenir en arrière
-  - Utile après un "Tout Corriger" qui fait trop de changements
-  - Difficulté : Difficile
+- [x] ~~**Undo/Redo local** : Historique des modifications pour revenir en arrière~~ **[COMPLÉTÉ v1.6.0]**
+  - ✅ Historique des 10 dernières modifications
+  - ✅ Boutons dédiés dans le panneau
+  - ✅ Raccourcis Ctrl+Z/Y
 
 ### 🟡 Priorité Moyenne
 
@@ -50,8 +46,6 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
   - Stocker les préférences dans `chrome.storage`
   - Difficulté : Moyenne-Difficile
 
-- [ ] **Thèmes personnalisés** : Ajouter d'autres thèmes de couleurs (pas seulement clair/sombre)
-  - Difficulté : Facile
 
 - [ ] **Animations plus fluides** : Améliorer les transitions du panneau
   - Fichier concerné : `styles.css`
@@ -59,17 +53,19 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
 
 #### 🔧 Fonctionnalités Supplémentaires
 
-- [ ] **Suggestions de corrections** : Mode "review" qui suggère au lieu d'appliquer automatiquement
-  - Difficulté : Moyenne-Difficile
+- [x] ~~**Prévisualisation des corrections** : Mode "review" qui suggère au lieu d'appliquer automatiquement~~ **[COMPLÉTÉ v1.6.0]**
+  - ✅ Modal avec aperçu avant/après
+  - ✅ Détails des corrections par type
+  - ✅ Validation avant application
 
 - [ ] **Support des annotations Genius** : Préparer le texte pour faciliter l'ajout d'annotations
   - Difficulté : Difficile
 
-- [ ] **Statistiques de transcription** : Afficher le nombre de mots, lignes, sections, etc.
-  - Difficulté : Facile
+- [x] ~~**Statistiques de transcription** : Afficher le nombre de mots, lignes, sections, etc.~~ **[COMPLÉTÉ v1.6.0]**
+  - ✅ Compteur en temps réel : lignes, mots, sections, caractères
+  - ✅ Activable/désactivable via `Ctrl+Shift+S`
+  - ✅ Préférence sauvegardée
 
-- [ ] **Détection de doublons** : Avertir si une ligne est répétée (utile pour les refrains)
-  - Difficulté : Moyenne
 
 ### 🟢 Priorité Basse / Nice to Have
 
@@ -87,9 +83,9 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
 
 #### 🚀 Optimisations
 
-- [ ] **Refactorisation en modules** : Découper `content.js` (1139 lignes) en plusieurs fichiers
-  - Créer des modules : `utils.js`, `corrections.js`, `ui.js`, `observers.js`
-  - Difficulté : Moyenne
+- [ ] **Refactorisation en modules** : Découper `content.js` (2787 lignes) en plusieurs fichiers
+  - Créer des modules : `utils.js`, `corrections.js`, `ui.js`, `observers.js`, `keyboard.js`, `statistics.js`
+  - Difficulté : Moyenne-Difficile (le fichier a beaucoup grandi)
 
 - [ ] **Performances** : Optimiser le MutationObserver pour limiter les rappels
   - Difficulté : Moyenne
@@ -119,15 +115,18 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
 
 ## 📊 Statistiques du Projet
 
-- **Lignes de code** : ~1300 (JavaScript + CSS)
-- **Nombre de fonctions** : ~30
-- **Nombre de boutons** : 15+
+- **Lignes de code** : ~3000 (JavaScript + CSS)
+- **Nombre de fonctions** : ~60
+- **Nombre de boutons** : 20+
 - **Corrections automatiques** : 5 types
+- **Raccourcis clavier** : 9 raccourcis
+- **Fonctionnalités majeures** : 15+
 
 ## 🎉 Fonctionnalités Complétées
 
 Ces fonctionnalités ont été implémentées avec succès :
 
+### Version 1.0 - 1.5.1
 - ✅ Détection automatique des artistes (principaux + featurings)
 - ✅ Attribution des sections aux artistes
 - ✅ Gestionnaire de couplets avec navigation
@@ -139,6 +138,22 @@ Ces fonctionnalités ont été implémentées avec succès :
 - ✅ Gestion SPA avec MutationObserver
 - ✅ Formatage gras et italique
 - ✅ En-tête automatique avec titre et featurings
+- ✅ **[v1.5.1]** Feedback détaillé du bouton "Tout Corriger" avec comptage précis par type de correction
+
+### Version 2.0.0 (MAJEURE - ACTUELLE)
+- ✅ **Affichage de version** : Numéro de version visible en bas à droite du panneau
+- ✅ **Refonte complète** : Passage à la version 2.0 avec toutes les fonctionnalités de la v1.6.0
+
+### Version 1.6.0
+- ✅ **Raccourcis clavier complets** (`Ctrl+1-5`, `Ctrl+Shift+C`, `Ctrl+Z/Y`, `Ctrl+Shift+S`)
+- ✅ **Historique Undo/Redo** (10 dernières modifications)
+- ✅ **Prévisualisation des corrections** (modal avant/après avec détails)
+- ✅ **Statistiques en temps réel** (lignes, mots, sections, caractères)
+- ✅ **Tutoriel guidé** (6 étapes au premier lancement)
+- ✅ **Barre d'outils flottante** (formatage lors de la sélection de texte)
+- ✅ **Barre de progression** (pour les opérations longues)
+- ✅ **Tooltips configurables** (activables/désactivables)
+- ✅ **Bouton paramètres** (accès au tutoriel et options)
 
 ## 🤝 Comment Contribuer
 
@@ -160,5 +175,5 @@ Ces fonctionnalités ont été implémentées avec succès :
 - 🔧 Maintenance
 - 🚀 Optimisation
 
-**Dernière mise à jour** : Octobre 2025
+**Dernière mise à jour** : Octobre 2025 (Version 2.0.0)
 

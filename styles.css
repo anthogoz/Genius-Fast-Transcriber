@@ -255,3 +255,570 @@
   100% { background-color: transparent; opacity: 1; }
 }
 */
+
+/* ----- Barre d'outils flottante pour le formatage ----- */
+#gft-floating-formatting-toolbar,
+.gft-floating-toolbar {
+  position: fixed !important;
+  z-index: 10000 !important;
+  background-color: #fffdef !important;
+  border: 1px solid #adadad !important;
+  padding: 6px !important;
+  border-radius: 6px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
+  gap: 6px !important;
+  flex-direction: row !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+#gft-floating-formatting-toolbar[style*="display: none"],
+.gft-floating-toolbar[style*="display: none"] {
+  display: none !important;
+}
+
+#gft-floating-formatting-toolbar[style*="display: flex"],
+.gft-floating-toolbar[style*="display: flex"] {
+  display: flex !important;
+}
+
+@keyframes gft-toolbar-fadein {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.gft-floating-format-button {
+  padding: 5px 10px;
+  border: 1px solid #adadad;
+  border-radius: 4px;
+  background-color: #fffdef;
+  color: #212529;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: Programme, sans-serif;
+  font-weight: bold;
+  min-width: 50px;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.gft-floating-format-button:hover {
+  background-color: #0e0e0e;
+  color: #f9ff55;
+  border-color: #0e0e0e;
+}
+
+.gft-floating-format-button:active {
+  transform: scale(0.95);
+}
+
+/* ----- Barre d'outils flottante en mode sombre ----- */
+#gft-floating-formatting-toolbar.gft-dark-mode,
+.gft-floating-toolbar.gft-dark-mode {
+  background-color: #2a2a2a !important;
+  border-color: #555 !important;
+}
+
+#gft-floating-formatting-toolbar.gft-dark-mode .gft-floating-format-button,
+.gft-floating-toolbar.gft-dark-mode .gft-floating-format-button {
+  background-color: #404040 !important;
+  color: #e0e0e0 !important;
+  border-color: #606060 !important;
+}
+
+#gft-floating-formatting-toolbar.gft-dark-mode .gft-floating-format-button:hover,
+.gft-floating-toolbar.gft-dark-mode .gft-floating-format-button:hover {
+  background-color: #f9ff55 !important;
+  color: #0e0e0e !important;
+  border-color: #f9ff55 !important;
+}
+
+/* ----- Affichage des Statistiques ----- */
+#gft-stats-display,
+.gft-stats-display {
+  font-size: 11px;
+  color: #666;
+  padding: 0;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  text-align: center;
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: max-height 0.3s ease, padding 0.3s ease, margin 0.3s ease, opacity 0.3s ease;
+}
+
+#gft-stats-display.gft-stats-visible,
+.gft-stats-display.gft-stats-visible {
+  padding: 8px 10px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  max-height: 50px;
+  opacity: 1;
+}
+
+#gft-stats-display strong {
+  color: #000;
+  font-weight: bold;
+}
+
+/* Mode sombre pour les statistiques */
+.gft-dark-mode #gft-stats-display,
+.gft-dark-mode .gft-stats-display {
+  color: #aaa;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.gft-dark-mode #gft-stats-display strong,
+.gft-dark-mode .gft-stats-display strong {
+  color: #f9ff55;
+}
+
+/* Bouton toggle stats dans le titre */
+#gftStatsToggleButton {
+  margin-left: 5px !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+}
+
+/* ----- Barre de Progression ----- */
+#gft-progress-container,
+.gft-progress-container {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 8px 0;
+  display: none;
+}
+
+#gft-progress-bar,
+.gft-progress-bar {
+  height: 20px;
+  background: linear-gradient(90deg, #f9ff55, #e6ec00);
+  width: 0%;
+  transition: width 0.3s ease;
+  border-radius: 4px 0 0 4px;
+}
+
+#gft-progress-text,
+.gft-progress-text {
+  text-align: center;
+  font-size: 11px;
+  padding: 4px;
+  color: #333;
+  font-weight: bold;
+}
+
+/* Mode sombre pour la barre de progression */
+.gft-dark-mode #gft-progress-container,
+.gft-dark-mode .gft-progress-container {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.gft-dark-mode #gft-progress-text,
+.gft-dark-mode .gft-progress-text {
+  color: #e0e0e0;
+}
+
+/* ----- Modal de Prévisualisation ----- */
+#gft-preview-overlay,
+.gft-preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#gft-preview-modal,
+.gft-preview-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+  z-index: 10001;
+  max-width: 900px;
+  max-height: 85vh;
+  overflow-y: auto;
+  width: 90%;
+}
+
+.gft-preview-title {
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  color: #0e0e0e;
+  font-family: Programme, sans-serif;
+  font-weight: bold;
+}
+
+.gft-preview-summary {
+  background: rgba(249, 255, 85, 0.2);
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.gft-preview-comparison {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.gft-preview-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.gft-preview-column h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #333;
+  font-family: Programme, sans-serif;
+  font-weight: bold;
+}
+
+.gft-preview-content {
+  background: #f5f5f5;
+  padding: 12px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-x: auto;
+  max-height: 400px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+}
+
+.gft-preview-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.gft-preview-button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: Programme, sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gft-preview-button-cancel {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.gft-preview-button-cancel:hover {
+  background: #d0d0d0;
+}
+
+.gft-preview-button-apply {
+  background: #0e0e0e;
+  color: #f9ff55;
+}
+
+.gft-preview-button-apply:hover {
+  background: #f9ff55;
+  color: #0e0e0e;
+}
+
+/* Mode sombre pour le modal de prévisualisation */
+.gft-dark-mode#gft-preview-modal,
+.gft-dark-mode.gft-preview-modal {
+  background: #2a2a2a;
+}
+
+.gft-dark-mode .gft-preview-title {
+  color: #f0f0f0;
+}
+
+.gft-dark-mode .gft-preview-summary {
+  background: rgba(249, 255, 85, 0.1);
+  color: #e0e0e0;
+}
+
+.gft-dark-mode .gft-preview-column h3 {
+  color: #c5c5c5;
+}
+
+.gft-dark-mode .gft-preview-content {
+  background: #1a1a1a;
+  color: #e0e0e0;
+}
+
+.gft-dark-mode .gft-preview-button-cancel {
+  background: #404040;
+  color: #e0e0e0;
+}
+
+.gft-dark-mode .gft-preview-button-cancel:hover {
+  background: #505050;
+}
+
+.gft-dark-mode .gft-preview-button-apply {
+  background: #f9ff55;
+  color: #0e0e0e;
+}
+
+.gft-dark-mode .gft-preview-button-apply:hover {
+  background: #e6ec00;
+}
+
+/* ----- Tutoriel ----- */
+#gft-tutorial-overlay,
+.gft-tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#gft-tutorial-modal,
+.gft-tutorial-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  max-width: 550px;
+  width: 90%;
+  z-index: 100001;
+}
+
+.gft-tutorial-title {
+  font-size: 22px;
+  margin: 0 0 16px 0;
+  color: #0e0e0e;
+  font-family: Programme, sans-serif;
+  font-weight: bold;
+}
+
+.gft-tutorial-content {
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.gft-tutorial-content kbd {
+  background: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #ddd;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.gft-tutorial-progress {
+  text-align: center;
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 20px;
+  font-style: italic;
+}
+
+.gft-tutorial-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.gft-tutorial-button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: Programme, sans-serif;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gft-tutorial-button-skip {
+  background: #e0e0e0;
+  color: #666;
+}
+
+.gft-tutorial-button-skip:hover {
+  background: #d0d0d0;
+}
+
+.gft-tutorial-button-prev {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.gft-tutorial-button-prev:hover {
+  background: #e5e5e5;
+}
+
+.gft-tutorial-button-next {
+  background: #0e0e0e;
+  color: #f9ff55;
+  margin-left: auto;
+}
+
+.gft-tutorial-button-next:hover {
+  background: #f9ff55;
+  color: #0e0e0e;
+}
+
+/* Mode sombre pour le tutoriel */
+.gft-dark-mode#gft-tutorial-modal,
+.gft-dark-mode.gft-tutorial-modal {
+  background: #2a2a2a;
+}
+
+.gft-dark-mode .gft-tutorial-title {
+  color: #f0f0f0;
+}
+
+.gft-dark-mode .gft-tutorial-content {
+  color: #e0e0e0;
+}
+
+.gft-dark-mode .gft-tutorial-content kbd {
+  background: #404040;
+  border-color: #555;
+  color: #f9ff55;
+}
+
+.gft-dark-mode .gft-tutorial-progress {
+  color: #aaa;
+}
+
+/* ----- Tooltips ----- */
+.gft-tooltip {
+  position: fixed;
+  background: #0e0e0e;
+  color: #f9ff55;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  white-space: nowrap;
+  z-index: 99999;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.gft-tooltip.gft-tooltip-visible {
+  opacity: 1;
+}
+
+.gft-dark-mode.gft-tooltip {
+  background: #f9ff55;
+  color: #0e0e0e;
+}
+
+/* ----- Menu de Paramètres ----- */
+#gft-settings-menu,
+.gft-settings-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+  min-width: 200px;
+  overflow: hidden;
+}
+
+.gft-settings-menu-item {
+  display: block;
+  width: 100%;
+  padding: 12px 16px;
+  border: none;
+  background: white;
+  color: #333;
+  text-align: left;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: Programme, sans-serif;
+  transition: background 0.15s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.gft-settings-menu-item:last-child {
+  border-bottom: none;
+}
+
+.gft-settings-menu-item:hover {
+  background: #f5f5f5;
+}
+
+/* Mode sombre pour le menu de paramètres */
+.gft-dark-mode#gft-settings-menu,
+.gft-dark-mode.gft-settings-menu {
+  background: #2a2a2a;
+  border-color: #555;
+}
+
+.gft-dark-mode .gft-settings-menu-item {
+  background: #2a2a2a;
+  color: #e0e0e0;
+  border-bottom-color: #404040;
+}
+
+.gft-dark-mode .gft-settings-menu-item:hover {
+  background: #353535;
+}
+
+/* ----- Label de Version ----- */
+#gft-version-label {
+  font-size: 10px;
+  color: #888;
+  text-align: right;
+  padding: 4px 8px;
+  margin-top: 8px;
+  opacity: 0.6;
+  user-select: none;
+  transition: opacity 0.3s ease;
+}
+
+#gft-version-label:hover {
+  opacity: 0.9;
+}
+
+/* Mode sombre pour le label de version */
+.gft-dark-mode #gft-version-label {
+  color: #999;
+}

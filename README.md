@@ -2,7 +2,7 @@
 
 Une extension Chrome/Edge qui transforme l'expérience de transcription sur **Genius.com** en ajoutant des outils intelligents et des raccourcis puissants.
 
-![Version](https://img.shields.io/badge/version-1.5.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 ## ✨ Fonctionnalités
@@ -13,22 +13,52 @@ Une extension Chrome/Edge qui transforme l'expérience de transcription sur **Ge
 - **Attribution aux artistes** : Associez facilement chaque section aux artistes correspondants (ex: `[Couplet 1 : Artiste 1 & Artiste 2]`)
 - **Gestionnaire de couplets** : Navigation entre les couplets avec des boutons ← et →
 
+### ⌨️ Raccourcis Clavier
+- **`Ctrl+1`** : Insérer `[Couplet]` avec artistes sélectionnés
+- **`Ctrl+2`** : Insérer `[Refrain]` avec artistes sélectionnés
+- **`Ctrl+3`** : Insérer `[Pont]` avec artistes sélectionnés
+- **`Ctrl+4`** : Insérer `[Intro]` avec artistes sélectionnés
+- **`Ctrl+5`** : Insérer `[Outro]` avec artistes sélectionnés
+- **`Ctrl+Shift+C`** : Appliquer toutes les corrections (avec prévisualisation)
+- **`Ctrl+Z`** : Annuler la dernière modification
+- **`Ctrl+Y`** : Refaire la dernière modification annulée
+- **`Ctrl+Shift+S`** : Afficher/masquer les statistiques en temps réel
+
 ### 🔧 Corrections Automatiques
 - **Correction des apostrophes** : Remplace les apostrophes typographiques `'` par des apostrophes standard `'`
 - **Correction "y'"** : Transforme automatiquement `y'` en `y ` (pour les paroles en français)
 - **Majuscules automatiques** : Met en majuscule la première lettre de chaque ligne
 - **Suppression de la ponctuation finale** : Retire les points et virgules en fin de ligne
 - **Espacement intelligent** : Corrige les lignes vides (ajoute/supprime selon les besoins)
-- **Bouton "Tout Corriger"** : Applique toutes les corrections en un seul clic
+- **Bouton "Tout Corriger"** : Applique toutes les corrections avec **prévisualisation avant/après**
+- **Barre de progression** : Affichage visuel pendant les corrections longues
 
 ### 🎨 Formatage
 - **Gras** et **Italique** : Formatage rapide du texte sélectionné
+- **Barre d'outils flottante** : Apparaît automatiquement lors de la sélection de texte pour un formatage rapide
 - **Mode sombre** : Interface agréable pour les yeux, avec préférence sauvegardée
+
+### ↩️ Historique des Modifications
+- **Annuler/Refaire** : Historique des 10 dernières modifications
+- **Boutons dédiés** : Boutons `↩️ Annuler` et `↪️ Refaire` dans le panneau
+- **Sauvegarde automatique** : Capture automatique des états avant chaque modification importante
+
+### 📊 Statistiques en Temps Réel
+- **Compteur intelligent** : Lignes, mots, sections (tags), caractères
+- **Mise à jour dynamique** : S'actualise automatiquement pendant la saisie
+- **Affichage discret** : Activable/désactivable via `Ctrl+Shift+S` ou le bouton dédié
+- **Persistance** : Préférence d'affichage sauvegardée entre les sessions
+
+### 🎓 Tutoriel Guidé
+- **Premier lancement** : Tutoriel interactif en 6 étapes pour découvrir toutes les fonctionnalités
+- **Réactivable** : Accessible à tout moment via le bouton ⚙️ (paramètres)
+- **Tooltips** : Info-bulles sur les boutons (activables/désactivables dans les paramètres)
 
 ### 📊 Feedback Visuel
 - Messages de confirmation après chaque action
 - Surlignage temporaire des corrections effectuées
-- Compteur de corrections appliquées
+- Compteur détaillé de corrections appliquées par type
+- Prévisualisation avant/après pour les corrections globales
 
 ## 🚀 Installation
 
@@ -53,11 +83,32 @@ cd genius-fast-transcriber
 
 ## 📖 Utilisation
 
+### Démarrage Rapide
+
 1. **Accédez à une page d'édition** sur Genius.com
 2. **Le panneau d'outils apparaît** automatiquement au-dessus de l'éditeur
-3. **Sélectionnez les artistes** (cases à cocher) pour attribuer les sections
-4. **Cliquez sur les boutons** pour insérer des tags ou appliquer des corrections
-5. **Utilisez "Tout Corriger"** pour nettoyer rapidement toutes les paroles
+3. **Au premier lancement**, un tutoriel guidé vous présente les fonctionnalités (6 étapes)
+4. **Sélectionnez les artistes** (cases à cocher) pour attribuer les sections
+5. **Utilisez les boutons ou les raccourcis clavier** pour insérer des tags
+6. **Appliquez "Tout Corriger"** (bouton ou `Ctrl+Shift+C`) pour nettoyer les paroles avec prévisualisation
+
+### Raccourcis Essentiels
+
+| Raccourci | Action |
+|-----------|--------|
+| `Ctrl+1` | Insérer [Couplet] |
+| `Ctrl+2` | Insérer [Refrain] |
+| `Ctrl+Shift+C` | Tout Corriger (avec prévisualisation) |
+| `Ctrl+Z` | Annuler |
+| `Ctrl+Y` | Refaire |
+| `Ctrl+Shift+S` | Afficher/masquer les statistiques |
+
+### Fonctionnalités Avancées
+
+- **Formatage rapide** : Sélectionnez du texte et utilisez la barre d'outils flottante pour le mettre en **gras** ou en *italique*
+- **Statistiques** : Activez le compteur en temps réel pour suivre votre progression (lignes, mots, sections, caractères)
+- **Historique** : Annulez jusqu'à 10 modifications avec `Ctrl+Z` ou les boutons dédiés
+- **Prévisualisation** : Avant d'appliquer "Tout Corriger", visualisez un aperçu avant/après avec le détail des corrections
 
 ## 🛠️ Technologies Utilisées
 
@@ -78,7 +129,7 @@ Cette extension a été entièrement développée avec l'assistance de **Gemini*
 - **Code non optimisé** : Certaines parties du code pourraient être refactorisées pour de meilleures performances
 - **Gestion d'erreurs incomplète** : Tous les cas limites (edge cases) n'ont peut-être pas été anticipés
 - **Dépendances aux sélecteurs CSS** : L'extension dépend fortement des sélecteurs CSS de Genius.com qui peuvent changer sans préavis
-- **Dette technique** : Le fichier principal (`content.js`) fait 1139 lignes et mériterait d'être modularisé
+- **Dette technique** : Le fichier principal (`content.js`) fait 2787 lignes et mériterait d'être modularisé
 
 ### 🤝 Votre Aide est Précieuse !
 
@@ -96,7 +147,7 @@ C'est pourquoi **vos contributions sont d'autant plus importantes** :
 ```
 genius-fast-transcriber/
 ├── manifest.json          # Configuration de l'extension
-├── content.js             # Script principal (1139 lignes)
+├── content.js             # Script principal (2787 lignes)
 ├── styles.css             # Styles du panneau d'outils
 ├── images/                # Icônes de l'extension
 │   ├── icon16.png
@@ -121,7 +172,30 @@ Si vous rencontrez un bug ou avez une idée d'amélioration :
 
 ## 📝 Changelog
 
-### Version 1.5.0 (Actuelle)
+### Version 2.0.0 (Actuelle)
+- 🎨 **NOUVEAU** : Affichage du numéro de version en bas à droite du panneau
+- 📦 **Majeur** : Passage à la version 2.0 (refonte complète avec toutes les nouvelles fonctionnalités de la v1.6.0)
+
+### Version 1.6.0
+- ⌨️ **NOUVEAU** : Raccourcis clavier complets (`Ctrl+1-5` pour tags, `Ctrl+Shift+C` pour Tout Corriger, `Ctrl+Z/Y` pour Undo/Redo, `Ctrl+Shift+S` pour statistiques)
+- ↩️ **NOUVEAU** : Historique Undo/Redo avec sauvegarde des 10 dernières modifications
+- 🔍 **NOUVEAU** : Prévisualisation avant/après pour le bouton "Tout Corriger" avec détails des corrections
+- 📊 **NOUVEAU** : Affichage des statistiques en temps réel (lignes, mots, sections, caractères)
+- 🎓 **NOUVEAU** : Tutoriel guidé en 6 étapes au premier lancement
+- 🎨 **NOUVEAU** : Barre d'outils flottante pour formatage rapide (gras/italique) lors de la sélection de texte
+- ⏳ **NOUVEAU** : Barre de progression pour les opérations longues
+- 💡 **NOUVEAU** : Tooltips activables/désactivables sur les boutons
+- ⚙️ **NOUVEAU** : Bouton paramètres pour accéder au tutoriel et aux options
+- 🐛 **Fix** : Amélioration de la gestion du curseur et de la sauvegarde automatique
+- ⚡ **Optimisation** : Debouncing des mises à jour de statistiques pour meilleures performances
+
+### Version 1.5.1
+- 🐛 **Fix** : Correction du compteur inexact du bouton "Tout Corriger"
+- ✨ **Amélioration** : Feedback détaillé par type de correction (ex: "3 apostrophes, 5 majuscules")
+- ⚡ **Optimisation** : Comptage simplifié et plus précis pour les corrections d'espacement
+- 📊 **UX** : Message de feedback affiché plus longtemps (4,5s au lieu de 3s)
+
+### Version 1.5.0
 - ✅ Mode sombre avec préférence sauvegardée
 - ✅ Bouton "Tout Corriger" pour appliquer toutes les corrections
 - ✅ Feedback visuel amélioré avec messages temporaires
