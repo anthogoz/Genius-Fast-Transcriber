@@ -39,7 +39,7 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
   - Ajouter un surlignage vert qui apparaît quand on clique sur un bouton de correction
   - Le surlignage doit durer quelques secondes (3-4s)
   - Disparition en fondu progressif (fade-out)
-  - Actuellement : Surlignage jaune uniquement
+  - Actuellement : L'effet a été codé mais ne fonctionne pas
   - Fichier concerné : `content.js`, fonctions de correction individuelles
   - Fichier CSS : `styles.css`, ajouter classe `.gft-correction-highlight-green`
   - Difficulté : Facile
