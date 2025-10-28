@@ -66,7 +66,7 @@ Une extension Chrome/Edge qui transforme l'expérience de transcription sur **Ge
 
 1. **Clonez le dépôt** :
 ```bash
-git clone https://github.com/votre-username/genius-fast-transcriber.git
+git clone https://github.com/anthogoz/genius-fast-transcriber.git
 cd genius-fast-transcriber
 ```
 
@@ -162,13 +162,13 @@ genius-fast-transcriber/
 
 Les contributions sont les bienvenues ! Consultez [CONTRIBUTING.md](CONTRIBUTING.md) pour savoir comment participer au projet.
 
-Pour voir ce qui reste à faire, consultez [TODO.md](TODO.md) ou les [Issues GitHub](https://github.com/votre-username/genius-fast-transcriber/issues).
+Pour voir ce qui reste à faire, consultez [TODO.md](TODO.md) ou les [Issues GitHub](https://github.com/anthogoz/genius-fast-transcriber/issues).
 
 ## 🐛 Bugs et Suggestions
 
 Si vous rencontrez un bug ou avez une idée d'amélioration :
-1. Vérifiez d'abord les [Issues existantes](https://github.com/votre-username/genius-fast-transcriber/issues)
-2. Si le problème n'existe pas, [créez une nouvelle Issue](https://github.com/votre-username/genius-fast-transcriber/issues/new)
+1. Vérifiez d'abord les [Issues existantes](https://github.com/anthogoz/genius-fast-transcriber/issues)
+2. Si le problème n'existe pas, [créez une nouvelle Issue](https://github.com/anthogoz/genius-fast-transcriber/issues/new)
 
 ## 📝 Changelog
 

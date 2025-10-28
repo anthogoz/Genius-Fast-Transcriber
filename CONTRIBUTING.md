@@ -30,7 +30,7 @@ Vous avez une idée pour améliorer l'extension ? Partagez-la !
 La documentation peut toujours être améliorée (README, commentaires dans le code, etc.)
 
 ### 4. 💻 Écrire du code
-Consultez les [Issues ouvertes](https://github.com/votre-username/genius-fast-transcriber/issues) ou le fichier [TODO.md](TODO.md)
+Consultez les [Issues ouvertes](https://github.com/anthogoz/genius-fast-transcriber/issues) ou le fichier [TODO.md](TODO.md)
 
 ## 🐛 Signaler un Bug
 
@@ -87,7 +87,7 @@ Avant de proposer une fonctionnalité :
 
 ```bash
 # Fork le projet sur GitHub, puis :
-git clone https://github.com/votre-username/genius-fast-transcriber.git
+git clone https://github.com/anthogoz/genius-fast-transcriber.git
 cd genius-fast-transcriber
 
 # Créez une branche pour votre fonctionnalité
