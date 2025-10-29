@@ -36,6 +36,7 @@ let currentMainArtists = []; // Liste des artistes principaux.
 let currentFeaturingArtists = []; // Liste des artistes en featuring.
 const DARK_MODE_CLASS = 'gft-dark-mode'; // Classe CSS pour le mode sombre du panneau.
 const DARK_MODE_STORAGE_KEY = 'gftDarkModeEnabled'; // Clé pour stocker la préférence du mode sombre dans le localStorage.
+const HEADER_FEAT_STORAGE_KEY = 'gftHeaderFeatEnabled'; // Clé pour stocker la préférence d'inclusion des feat dans l'en-tête.
 let darkModeButton = null; // Référence au bouton pour activer/désactiver le mode sombre.
 let floatingFormattingToolbar = null; // Référence à la barre d'outils flottante pour le formatage (gras/italique).
 let undoStack = []; // Stack pour l'historique des modifications (max 10 entrées).
@@ -1194,6 +1195,23 @@ function setTooltipsEnabled(enabled) {
     localStorage.setItem('gft-tooltips-enabled', enabled.toString());
 }
 
+/**
+ * Vérifie si l'inclusion des feat dans l'en-tête est activée.
+ * @returns {boolean} true si activé, false sinon. Par défaut true.
+ */
+function isHeaderFeatEnabled() {
+    const setting = localStorage.getItem(HEADER_FEAT_STORAGE_KEY);
+    return setting === null ? true : setting === 'true';
+}
+
+/**
+ * Active ou désactive l'inclusion des feat dans l'en-tête.
+ * @param {boolean} enabled - true pour inclure, false pour exclure.
+ */
+function setHeaderFeatEnabled(enabled) {
+    localStorage.setItem(HEADER_FEAT_STORAGE_KEY, enabled.toString());
+}
+
 let currentTutorialStep = 0;
 let tutorialOverlay = null;
 let tutorialModal = null;
@@ -1425,6 +1443,22 @@ function showSettingsMenu() {
         );
     });
     menu.appendChild(tooltipsOption);
+    
+    // Option 3: Toggle feat dans l'en-tête
+    const headerFeatOption = document.createElement('button');
+    headerFeatOption.className = 'gft-settings-menu-item';
+    const headerFeatEnabled = isHeaderFeatEnabled();
+    headerFeatOption.textContent = headerFeatEnabled ? '🎤 Masquer feat dans l\'en-tête' : '🎤 Afficher feat dans l\'en-tête';
+    headerFeatOption.addEventListener('click', () => {
+        setHeaderFeatEnabled(!headerFeatEnabled);
+        closeSettingsMenu();
+        showFeedbackMessage(
+            headerFeatEnabled ? 'Feat masqués dans l\'en-tête' : 'Feat affichés dans l\'en-tête',
+            2000,
+            shortcutsContainerElement
+        );
+    });
+    menu.appendChild(headerFeatOption);
     
     // Positionne le menu
     const settingsButton = document.getElementById('gft-settings-button');
@@ -2248,7 +2282,7 @@ function initLyricsEditorEnhancer() {
     const SHORTCUTS = {
         TAGS_STRUCTURAUX: [ 
             { buttons: [
-                { label: "En-tête", getText: () => { let txt = `[Paroles de "${currentSongTitle}"`; const fts = formatArtistList(currentFeaturingArtists); if(fts) txt+=` ft. ${fts}`; txt+=']\n'; return txt;}, tooltip: "Insérer l'en-tête de la chanson avec les artistes"},
+                { label: "En-tête", getText: () => { let txt = `[Paroles de "${currentSongTitle}"`; const fts = formatArtistList(currentFeaturingArtists); if(fts && isHeaderFeatEnabled()) txt+=` ft. ${fts}`; txt+=']\n'; return txt;}, tooltip: "Insérer l'en-tête de la chanson avec les artistes"},
                 { type: 'coupletManager', 
                     prev: { label: '←', title: 'Couplet précédent', tooltip: 'Revenir au couplet précédent' },
                     main: { 
@@ -2441,7 +2475,12 @@ function initLyricsEditorEnhancer() {
                 settingsButton.classList.add('genius-lyrics-shortcut-button');
                 settingsButton.addEventListener('click', (event) => {
                     event.preventDefault();
-                    showSettingsMenu();
+                    const existingMenu = document.getElementById('gft-settings-menu');
+                    if (existingMenu) {
+                        closeSettingsMenu();
+                    } else {
+                        showSettingsMenu();
+                    }
                 });
                 panelTitle.appendChild(settingsButton);
                 addTooltip(settingsButton, 'Ouvrir les paramètres et le tutoriel');
