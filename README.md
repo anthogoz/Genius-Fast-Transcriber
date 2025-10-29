@@ -52,8 +52,9 @@ L'extension sera immédiatement active sur toutes les pages d'édition de parole
 - **Gras** et **Italique** : Formatage rapide du texte sélectionné
 - **Nombre → Lettres** : Conversion automatique des nombres en lettres (ex: "42" → "quarante-deux")
   - Apparaît uniquement lorsqu'un nombre est sélectionné
-  - Supporte les nombres de 0 à 999 999
-  - Respecte les règles de l'orthographe française (traits d'union, "et", etc.)
+  - Supporte les nombres de 0 à 999 milliards (999 999 999 999)
+  - Gestion complète : milliers, millions, milliards
+  - Respecte les règles de l'orthographe française (traits d'union, "et", pluriels)
 - **Barre d'outils flottante** : Apparaît automatiquement lors de la sélection de texte pour un formatage rapide
 - **Mode sombre** : Interface agréable pour les yeux, avec préférence sauvegardée
 
@@ -193,9 +194,11 @@ Si vous rencontrez un bug ou avez une idée d'amélioration :
 ## 📝 Changelog
 
 ### Version 2.2.0 (Actuelle)
-- 🔢 **NOUVEAU** : Conversion automatique de nombres en lettres françaises (0-999 999)
+- 🔢 **NOUVEAU** : Conversion automatique de nombres en lettres françaises (0-999 milliards)
   - Bouton "Nombre → Lettres" dans la barre d'outils flottante
   - Apparaît uniquement lorsqu'un nombre seul est sélectionné
+  - Supporte jusqu'à 999 999 999 999 (999 milliards 999 millions 999 mille 999)
+  - Gestion complète des milliers, millions et milliards avec pluriels corrects
   - Respect des règles de l'orthographe française (traits d'union, "et", pluriels, etc.)
   - Gestion correcte des nombres complexes (70-79, 80-89, 90-99)
 

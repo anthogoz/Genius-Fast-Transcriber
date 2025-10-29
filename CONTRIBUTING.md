@@ -214,10 +214,12 @@ function maFonction(paramName) {
 - `escapeRegExp()` : Échappe les caractères spéciaux pour regex
 - `formatArtistList()` : Formate une liste d'artistes
 
-**Section 4 : Conversion de Nombres (lignes 147-245) ✨ NOUVEAU v2.2.0**
-- `numberToFrenchWords()` : Convertit un nombre (0-999999) en lettres françaises
+**Section 4 : Conversion de Nombres (lignes 147-282) ✨ NOUVEAU v2.2.0**
+- `numberToFrenchWords()` : Convertit un nombre (0-999 milliards) en lettres françaises
   - Gestion complète de l'orthographe française (traits d'union, "et", pluriels)
+  - Supporte jusqu'à 999 999 999 999 (milliers, millions, milliards)
   - Cas spéciaux : 70-79 (soixante-dix), 80-89 (quatre-vingt), 90-99 (quatre-vingt-dix)
+  - Pluriels corrects : "millions", "milliards" (mais "mille" invariable)
 - `isValidNumber()` : Vérifie si une chaîne est un nombre valide
 
 **Section 5 : Extraction de Données (lignes 247-760)**
@@ -363,21 +365,35 @@ Modifiez `extractSongData()` (ligne ~175) ou les `SELECTORS` (ligne ~42)
 
 #### Étendre la conversion de nombres (v2.2.0)
 
-La fonction `numberToFrenchWords()` supporte actuellement les nombres de 0 à 999 999. Pour étendre :
+La fonction `numberToFrenchWords()` supporte actuellement les nombres de 0 à 999 milliards (999 999 999 999). Pour étendre davantage :
 
-1. **Ajouter les millions** : Modifiez la fonction pour gérer les nombres > 999 999
+1. **Ajouter les billions (mille milliards)** : Pour les nombres > 999 999 999 999
+   ```javascript
+   if (num >= 1000000000000) {
+       const billions = Math.floor(num / 1000000000000);
+       const rest = num % 1000000000000;
+       // Note: en français, "billion" = 1 000 000 000 000 (mille milliards)
+   }
+   ```
+
 2. **Nombres décimaux** : Ajoutez la gestion des nombres à virgule
-3. **Nombres négatifs** : Ajoutez le préfixe "moins" pour les négatifs
-4. **Options d'orthographe** : Ajoutez un paramètre pour l'orthographe traditionnelle vs réformée
+   ```javascript
+   if (str.includes('.') || str.includes(',')) {
+       const [integer, decimal] = str.split(/[.,]/);
+       return `${convertInteger(integer)} virgule ${convertDecimal(decimal)}`;
+   }
+   ```
 
-Exemple de structure pour les millions :
-```javascript
-if (num >= 1000000) {
-    const millions = Math.floor(num / 1000000);
-    const rest = num % 1000000;
-    // ...
-}
-```
+3. **Nombres négatifs** : Ajoutez le préfixe "moins"
+   ```javascript
+   if (num < 0) {
+       return "moins " + numberToFrenchWords(Math.abs(num));
+   }
+   ```
+
+4. **Options d'orthographe** : Paramètre pour l'orthographe traditionnelle vs réformée
+   - Traits d'union partout (réforme 1990) : "vingt-et-un", "cent-vingt"
+   - Ou orthographe traditionnelle : "vingt et un", "cent vingt"
 
 ## 🧪 Tests
 
@@ -396,8 +412,13 @@ Avant de soumettre votre PR, testez sur Genius.com :
 6. **Conversion de nombres (v2.2.0)** :
    - Sélectionnez un nombre seul : le bouton "Nombre → Lettres" doit apparaître
    - Sélectionnez du texte avec un nombre : le bouton ne doit PAS apparaître
-   - Testez différents nombres : 0, 21, 42, 71, 80, 81, 91, 100, 200, 1000, 1234, 999999
-   - Vérifiez l'orthographe (traits d'union, "et", pluriels)
+   - Testez différents nombres :
+     - Petits : 0, 21, 42, 71, 80, 81, 91
+     - Centaines : 100, 200, 999
+     - Milliers : 1000, 1234, 999999
+     - Millions : 1000000, 42000000, 999999999
+     - Milliards : 1000000000, 123456789012, 999999999999
+   - Vérifiez l'orthographe (traits d'union, "et", pluriels de "millions" et "milliards")
 
 ### Checklist avant PR
 

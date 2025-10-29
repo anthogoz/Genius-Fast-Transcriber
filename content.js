@@ -13,7 +13,7 @@
  * - Statistiques en temps réel (lignes, mots, sections, caractères)
  * - Tutoriel guidé au premier lancement (6 étapes)
  * - Barre d'outils flottante pour formatage (gras/italique/nombres en lettres)
- * - Conversion de nombres en lettres françaises (0-999999)
+ * - Conversion de nombres en lettres françaises (0-999 milliards)
  * - Mode sombre avec préférence sauvegardée
  * - Corrections automatiques avec barre de progression
  * 
@@ -146,7 +146,7 @@ function formatArtistList(artists) {
 }
 
 /**
- * Convertit un nombre (0-999999) en lettres en français.
+ * Convertit un nombre (0-999999999999) en lettres en français.
  * @param {number} num - Le nombre à convertir.
  * @returns {string} Le nombre en lettres.
  */
@@ -212,10 +212,50 @@ function numberToFrenchWords(num) {
         return result;
     }
     
-    if (num < 0 || num > 999999) return num.toString();
+    // Vérifie la limite (999 milliards 999 millions 999 mille 999)
+    if (num < 0 || num > 999999999999) return num.toString();
     
     if (num < 1000) return convertUpTo999(num);
     
+    // Gestion des milliards (1 000 000 000 à 999 999 999 999)
+    if (num >= 1000000000) {
+        const billions = Math.floor(num / 1000000000);
+        const rest = num % 1000000000;
+        
+        let result = "";
+        if (billions === 1) {
+            result = "un milliard";
+        } else {
+            result = convertUpTo999(billions) + " milliards";
+        }
+        
+        if (rest > 0) {
+            result += " " + numberToFrenchWords(rest);
+        }
+        
+        return result;
+    }
+    
+    // Gestion des millions (1 000 000 à 999 999 999)
+    if (num >= 1000000) {
+        const millions = Math.floor(num / 1000000);
+        const rest = num % 1000000;
+        
+        let result = "";
+        if (millions === 1) {
+            result = "un million";
+        } else {
+            result = convertUpTo999(millions) + " millions";
+        }
+        
+        if (rest > 0) {
+            result += " " + numberToFrenchWords(rest);
+        }
+        
+        return result;
+    }
+    
+    // Gestion des milliers (1 000 à 999 999)
     const thousand = Math.floor(num / 1000);
     const rest = num % 1000;
     
