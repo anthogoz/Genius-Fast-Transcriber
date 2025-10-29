@@ -3,7 +3,7 @@
 /* ----- Conteneur Principal du Panneau ----- */
 #genius-lyrics-shortcuts-container {
   background-color: rgb(255, 255, 100); /* Ta couleur de fond jaune */
-  padding: 10px;
+  padding: 6px;
   border: 1px solid #000000;
   border-radius: 6px;
   margin-bottom: 30px;
@@ -17,7 +17,7 @@
 
 #gftPanelTitle {
   font-size: 14px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   color: #111;
   display: flex; /* Pour aligner le contenu du titre (logo+texte et bouton dark mode) */
   align-items: center; /* Aligner verticalement au centre */
@@ -52,7 +52,7 @@
     flex-wrap: wrap; /* Important pour que les boutons passent à la ligne si besoin */
     align-items: center;
     /* margin-bottom: 5px; */ /* Peut-être plus nécessaire si on n'a qu'un seul grand groupe pour la structure */
-    margin-top: 10px; /* Espace avant le groupe de boutons structuraux */
+    margin-top: 5px; /* Espace avant le groupe de boutons structuraux */
     gap: 5px; /* Ajoute un petit espace entre les boutons eux-mêmes */
 }
 /* ----- Message de Feedback Temporaire ----- */
@@ -89,10 +89,10 @@
   visibility: visible;
   opacity: 1;
   max-height: 70px; /* Hauteur suffisante pour le contenu (ajuster si besoin) */
-  padding-top: 8px;
-  padding-bottom: 8px;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   transition: opacity 0.3s ease-in-out,
               max-height 0.3s ease-in-out,
               padding-top 0.3s ease-in-out,
@@ -105,12 +105,12 @@
 
 /* ----- Section de Sélection des Artistes ----- */
 #artistSelectorContainerLyricsHelper {
-  margin-bottom: 10px;
-  margin-top: 10px;
+  margin-bottom: 5px;
+  margin-top: 5px;
 }
 
 #artistSelectorContainerLyricsHelper p {
-  margin: 0 0 8px 0;
+  margin: 0 0 5px 0;
   font-weight: bold;
   font-size: 13px;
   color: #333;
@@ -132,7 +132,7 @@
 
 /* ----- Séparateurs Horizontaux ----- */
 #genius-lyrics-shortcuts-container > hr {
-  margin: 10px 0;
+  margin: 5px 0;
   border: none;
   border-top: 1px solid rgba(14, 14, 14, 0.406);
 }
@@ -140,8 +140,8 @@
 /* ----- Boutons de Raccourci ----- */
 .genius-lyrics-shortcut-button {
   margin-right: 5px;
-  margin-bottom: 5px;
-  padding: 6px 10px;
+  margin-bottom: 3px;
+  padding: 4px 10px;
   border: 1px solid #adadad;
   border-radius: 100px;
   background-color: #fffdef;
@@ -359,9 +359,9 @@
 
 #gft-stats-display.gft-stats-visible,
 .gft-stats-display.gft-stats-visible {
-  padding: 8px 10px;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  padding: 5px 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   max-height: 50px;
   opacity: 1;
 }
@@ -397,7 +397,7 @@
   background: rgba(0, 0, 0, 0.1);
   border-radius: 4px;
   overflow: hidden;
-  margin: 8px 0;
+  margin: 5px 0;
   display: none;
 }
 
@@ -802,13 +802,31 @@
   background: #353535;
 }
 
-/* ----- Label de Version ----- */
+/* ----- Footer avec crédit et version ----- */
+#gft-footer-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 5px;
+}
+
+#gft-credit-label {
+  font-size: 10px;
+  color: #888;
+  opacity: 0.6;
+  user-select: none;
+  transition: opacity 0.3s ease;
+}
+
+#gft-credit-label:hover {
+  opacity: 0.9;
+}
+
 #gft-version-label {
   font-size: 10px;
   color: #888;
   text-align: right;
   padding: 4px 8px;
-  margin-top: 8px;
   opacity: 0.6;
   user-select: none;
   transition: opacity 0.3s ease;
@@ -818,7 +836,8 @@
   opacity: 0.9;
 }
 
-/* Mode sombre pour le label de version */
+/* Mode sombre pour le footer */
+.gft-dark-mode #gft-credit-label,
 .gft-dark-mode #gft-version-label {
   color: #999;
 }

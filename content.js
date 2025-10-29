@@ -1,6 +1,6 @@
-// content.js (Version 2.0 - Extension Complète)
+// content.js (Version 2.2 - Extension Complète)
 /**
- * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.0.
+ * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.2.
  * Ce script s'injecte dans les pages du site genius.com.
  * Il détecte la présence de l'éditeur de paroles et y ajoute un panneau d'outils
  * pour accélérer et fiabiliser la transcription (ajout de tags, correction de texte, etc.).
@@ -12,15 +12,16 @@
  * - Prévisualisation des corrections avec modal avant/après
  * - Statistiques en temps réel (lignes, mots, sections, caractères)
  * - Tutoriel guidé au premier lancement (6 étapes)
- * - Barre d'outils flottante pour formatage (gras/italique)
+ * - Barre d'outils flottante pour formatage (gras/italique/nombres en lettres)
+ * - Conversion de nombres en lettres françaises (0-999999)
  * - Mode sombre avec préférence sauvegardée
  * - Corrections automatiques avec barre de progression
  * 
  * @author Lnkhey
- * @version 2.0.0
+ * @version 2.2.0
  */
 
-console.log('Genius Fast Transcriber (by Lnkhey) v2.0 - Toutes fonctionnalités activées ! 🎵');
+console.log('Genius Fast Transcriber (by Lnkhey) v2.2.0 - Toutes fonctionnalités activées ! 🎵');
 
 // ----- Déclarations des variables globales -----
 // Ces variables maintiennent l'état de l'extension pendant que l'utilisateur navigue.
@@ -142,6 +143,106 @@ function formatArtistList(artists) {
     if (artists.length === 1) return artists[0];
     if (artists.length === 2) return artists.join(' & ');
     return `${artists.slice(0, -1).join(', ')} & ${artists[artists.length - 1]}`;
+}
+
+/**
+ * Convertit un nombre (0-999999) en lettres en français.
+ * @param {number} num - Le nombre à convertir.
+ * @returns {string} Le nombre en lettres.
+ */
+function numberToFrenchWords(num) {
+    if (num === 0) return "zéro";
+    
+    const ones = ["", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"];
+    const teens = ["dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf"];
+    const tens = ["", "", "vingt", "trente", "quarante", "cinquante", "soixante", "soixante", "quatre-vingt", "quatre-vingt"];
+    
+    function convertUpTo99(n) {
+        if (n < 10) return ones[n];
+        if (n < 20) return teens[n - 10];
+        
+        const ten = Math.floor(n / 10);
+        const one = n % 10;
+        
+        if (ten === 7) {
+            // 70-79: soixante-dix, soixante et onze, soixante-douze, etc.
+            if (one === 0) return "soixante-dix";
+            if (one === 1) return "soixante et onze";
+            return "soixante-" + teens[one];
+        }
+        
+        if (ten === 9) {
+            // 90-99: quatre-vingt-dix, quatre-vingt-onze, etc.
+            if (one === 0) return "quatre-vingt-dix";
+            return "quatre-vingt-" + teens[one];
+        }
+        
+        if (one === 0) {
+            if (ten === 8) return "quatre-vingts"; // 80 avec un "s"
+            return tens[ten];
+        }
+        
+        if (one === 1 && (ten === 2 || ten === 3 || ten === 4 || ten === 5 || ten === 6)) {
+            return tens[ten] + " et un";
+        }
+        
+        if (ten === 8) return "quatre-vingt-" + ones[one]; // 81-89 sans "s"
+        return tens[ten] + "-" + ones[one];
+    }
+    
+    function convertUpTo999(n) {
+        if (n < 100) return convertUpTo99(n);
+        
+        const hundred = Math.floor(n / 100);
+        const rest = n % 100;
+        
+        let result = "";
+        if (hundred === 1) {
+            result = "cent";
+        } else {
+            result = ones[hundred] + " cent";
+        }
+        
+        if (rest === 0 && hundred > 1) {
+            result += "s"; // "cents" au pluriel
+        } else if (rest > 0) {
+            result += " " + convertUpTo99(rest);
+        }
+        
+        return result;
+    }
+    
+    if (num < 0 || num > 999999) return num.toString();
+    
+    if (num < 1000) return convertUpTo999(num);
+    
+    const thousand = Math.floor(num / 1000);
+    const rest = num % 1000;
+    
+    let result = "";
+    if (thousand === 1) {
+        result = "mille";
+    } else {
+        result = convertUpTo999(thousand) + " mille";
+    }
+    
+    if (rest > 0) {
+        result += " " + convertUpTo999(rest);
+    }
+    
+    return result;
+}
+
+/**
+ * Vérifie si une chaîne est un nombre valide (entier positif).
+ * @param {string} str - La chaîne à vérifier.
+ * @returns {boolean} True si c'est un nombre valide.
+ */
+function isValidNumber(str) {
+    if (!str || str.trim() === "") return false;
+    const trimmed = str.trim();
+    // Accepte les nombres entiers positifs (avec ou sans espaces)
+    return /^\d+$/.test(trimmed);
 }
 
 /**
@@ -497,8 +598,23 @@ function createFloatingFormattingToolbar() {
     });
     addTooltip(italicButton, 'Mettre le texte sélectionné en italique');
     
+    // Bouton Nombre → Lettres
+    const numberButton = document.createElement('button');
+    numberButton.textContent = 'Nombre → Lettres';
+    numberButton.classList.add('gft-floating-format-button', 'gft-number-button');
+    numberButton.title = 'Convertir le nombre en lettres';
+    numberButton.type = 'button';
+    numberButton.style.display = 'none'; // Caché par défaut
+    numberButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        convertNumberToWords();
+    });
+    addTooltip(numberButton, 'Convertir le nombre sélectionné en lettres');
+    
     toolbar.appendChild(boldButton);
     toolbar.appendChild(italicButton);
+    toolbar.appendChild(numberButton);
     document.body.appendChild(toolbar);
     
     floatingFormattingToolbar = toolbar;
@@ -574,6 +690,71 @@ function applyFormattingToSelection(formatType) {
     }, 100);
     
     // Cache la barre d'outils après l'application du formatage
+    hideFloatingToolbar();
+}
+
+/**
+ * Convertit le nombre sélectionné en lettres.
+ */
+function convertNumberToWords() {
+    if (!currentActiveEditor) return;
+    
+    // Active le flag pour désactiver la sauvegarde automatique
+    isButtonActionInProgress = true;
+    
+    // Annule le timeout de sauvegarde automatique
+    if (autoSaveTimeout) {
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = null;
+    }
+    
+    // Sauvegarde dans l'historique avant modification
+    saveToHistory();
+    
+    currentActiveEditor.focus();
+    
+    let selectedText = '';
+    let start, end;
+    
+    if (currentEditorType === 'textarea') {
+        start = currentActiveEditor.selectionStart;
+        end = currentActiveEditor.selectionEnd;
+        selectedText = currentActiveEditor.value.substring(start, end).trim();
+    } else if (currentEditorType === 'div') {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0) {
+            selectedText = selection.toString().trim();
+        }
+    }
+    
+    // Vérifie si c'est un nombre valide
+    if (!isValidNumber(selectedText)) {
+        hideFloatingToolbar();
+        return;
+    }
+    
+    const num = parseInt(selectedText, 10);
+    const wordsText = numberToFrenchWords(num);
+    
+    // Remplace le texte sélectionné
+    if (currentEditorType === 'textarea') {
+        document.execCommand('insertText', false, wordsText);
+        const newEnd = start + wordsText.length;
+        currentActiveEditor.setSelectionRange(newEnd, newEnd);
+    } else if (currentEditorType === 'div') {
+        document.execCommand('insertText', false, wordsText);
+    }
+    
+    // Désactive le flag après un court délai et met à jour lastSavedContent
+    setTimeout(() => {
+        isButtonActionInProgress = false;
+        if (currentActiveEditor) {
+            lastSavedContent = getCurrentEditorContent();
+            hasUnsavedChanges = false;
+        }
+    }, 100);
+    
+    // Cache la barre d'outils après la conversion
     hideFloatingToolbar();
 }
 
@@ -1075,13 +1256,14 @@ function showCorrectionPreview(originalText, correctedText, corrections, onApply
     const detailsArray = [];
     if (corrections.yPrime > 0) detailsArray.push(`${corrections.yPrime} "y'"`);
     if (corrections.apostrophes > 0) detailsArray.push(`${corrections.apostrophes} apostrophe(s)`);
+    if (corrections.oeuLigature > 0) detailsArray.push(`${corrections.oeuLigature} "oeu"`);
     if (corrections.capitalization > 0) detailsArray.push(`${corrections.capitalization} majuscule(s)`);
     if (corrections.punctuation > 0) detailsArray.push(`${corrections.punctuation} ponctuation(s)`);
     if (corrections.spacing > 0) detailsArray.push(`${corrections.spacing} espacement(s)`);
     
     const totalCorrections = corrections.yPrime + corrections.apostrophes + 
-                           corrections.capitalization + corrections.punctuation + 
-                           corrections.spacing;
+                           corrections.oeuLigature + corrections.capitalization + 
+                           corrections.punctuation + corrections.spacing;
     
     summary.innerHTML = `<strong>📊 ${totalCorrections} correction(s) détectée(s) :</strong><br>${detailsArray.join(', ')}`;
     modal.appendChild(summary);
@@ -1723,6 +1905,7 @@ function showFloatingToolbar() {
     }
     
     let rect;
+    let selectedText = '';
     
     if (currentEditorType === 'textarea') {
         // Pour les textarea, calcule la position du texte sélectionné
@@ -1734,6 +1917,8 @@ function showFloatingToolbar() {
             hideFloatingToolbar();
             return;
         }
+        
+        selectedText = currentActiveEditor.value.substring(start, end);
         
         // Calcule la position du début de la sélection (position relative au textarea)
         const startPos = getTextareaCaretPosition(currentActiveEditor, start);
@@ -1754,12 +1939,27 @@ function showFloatingToolbar() {
             return;
         }
         
+        selectedText = selection.toString();
+        
         const range = selection.getRangeAt(0);
         rect = range.getBoundingClientRect();
         
         if (rect.width === 0 && rect.height === 0) {
             hideFloatingToolbar();
             return;
+        }
+    }
+    
+    // Vérifie si le texte sélectionné est un nombre (et seulement un nombre)
+    const isNumber = isValidNumber(selectedText);
+    
+    // Trouve le bouton de conversion de nombre
+    const numberButton = floatingFormattingToolbar.querySelector('.gft-number-button');
+    if (numberButton) {
+        if (isNumber) {
+            numberButton.style.display = 'inline-block';
+        } else {
+            numberButton.style.display = 'none';
         }
     }
     
@@ -2141,6 +2341,7 @@ function applyAllTextCorrectionsToString(text) {
     const corrections = {
         yPrime: 0,
         apostrophes: 0,
+        oeuLigature: 0,
         capitalization: 0,
         punctuation: 0,
         spacing: 0
@@ -2161,6 +2362,15 @@ function applyAllTextCorrectionsToString(text) {
     if (textAfterApostrophe !== currentText) {
         corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
         currentText = textAfterApostrophe;
+    }
+
+    // Correction de "oeu" -> "œu"
+    const oeuPattern = /([Oo])eu/g;
+    const oeuReplacement = (match, firstLetter)=>(firstLetter === 'O' ? 'Œu' : 'œu');
+    const textAfterOeu = currentText.replace(oeuPattern, oeuReplacement);
+    if (textAfterOeu !== currentText) {
+        corrections.oeuLigature = (currentText.match(oeuPattern) || []).length;
+        currentText = textAfterOeu;
     }
 
     // Application des autres corrections
@@ -2184,8 +2394,8 @@ function applyAllTextCorrectionsToString(text) {
     
     // Calcul du total
     const totalCorrections = corrections.yPrime + corrections.apostrophes + 
-                           corrections.capitalization + corrections.punctuation + 
-                           corrections.spacing;
+                           corrections.oeuLigature + corrections.capitalization + 
+                           corrections.punctuation + corrections.spacing;
     
     return { newText: currentText, correctionsCount: totalCorrections, corrections: corrections };
 }
@@ -2198,12 +2408,13 @@ function applyAllTextCorrectionsToString(text) {
 async function applyAllTextCorrectionsAsync(text) {
     let currentText = text;
     let result;
-    const totalSteps = 5;
+    const totalSteps = 6;
     
     // Objet pour tracker les corrections par type
     const corrections = {
         yPrime: 0,
         apostrophes: 0,
+        oeuLigature: 0,
         capitalization: 0,
         punctuation: 0,
         spacing: 0
@@ -2232,8 +2443,20 @@ async function applyAllTextCorrectionsAsync(text) {
         currentText = textAfterApostrophe;
     }
 
-    // Étape 3: Majuscules
-    showProgress(3, totalSteps, 'Majuscules en début de ligne...');
+    // Étape 3: Correction de "oeu" -> "œu"
+    showProgress(3, totalSteps, 'Correction de "oeu"...');
+    await new Promise(resolve => setTimeout(resolve, 50));
+    
+    const oeuPattern = /([Oo])eu/g;
+    const oeuReplacement = (match, firstLetter)=>(firstLetter === 'O' ? 'Œu' : 'œu');
+    const textAfterOeu = currentText.replace(oeuPattern, oeuReplacement);
+    if (textAfterOeu !== currentText) {
+        corrections.oeuLigature = (currentText.match(oeuPattern) || []).length;
+        currentText = textAfterOeu;
+    }
+
+    // Étape 4: Majuscules
+    showProgress(4, totalSteps, 'Majuscules en début de ligne...');
     await new Promise(resolve => setTimeout(resolve, 50));
     
     result = capitalizeFirstLetterOfEachLine(currentText);
@@ -2242,8 +2465,8 @@ async function applyAllTextCorrectionsAsync(text) {
         currentText = result.newText;
     }
 
-    // Étape 4: Ponctuation
-    showProgress(4, totalSteps, 'Suppression de la ponctuation...');
+    // Étape 5: Ponctuation
+    showProgress(5, totalSteps, 'Suppression de la ponctuation...');
     await new Promise(resolve => setTimeout(resolve, 50));
     
     result = removeTrailingPunctuationFromLines(currentText);
@@ -2252,8 +2475,8 @@ async function applyAllTextCorrectionsAsync(text) {
         currentText = result.newText;
     }
 
-    // Étape 5: Espacement
-    showProgress(5, totalSteps, 'Correction de l\'espacement...');
+    // Étape 6: Espacement
+    showProgress(6, totalSteps, 'Correction de l\'espacement...');
     await new Promise(resolve => setTimeout(resolve, 50));
     
     result = correctLineSpacing(currentText); 
@@ -2264,8 +2487,8 @@ async function applyAllTextCorrectionsAsync(text) {
     
     // Calcul du total
     const totalCorrections = corrections.yPrime + corrections.apostrophes + 
-                           corrections.capitalization + corrections.punctuation + 
-                           corrections.spacing;
+                           corrections.oeuLigature + corrections.capitalization + 
+                           corrections.punctuation + corrections.spacing;
     
     return { newText: currentText, correctionsCount: totalCorrections, corrections: corrections };
 }
@@ -2295,11 +2518,14 @@ function initLyricsEditorEnhancer() {
                 },
                 {label:'[Intro]',getText:()=>addArtistToText('[Intro]'), tooltip: 'Insérer un tag [Intro] avec les artistes (Ctrl+4)'},
                 {label:'[Couplet unique]',getText:()=>addArtistToText('[Couplet unique]'), tooltip: 'Insérer un tag [Couplet unique] avec les artistes'},
+                {label:'[Couplet]',getText:()=>addArtistToText('[Couplet]'), tooltip: 'Insérer un tag [Couplet] sans numéro avec les artistes'},
                 {label:'[Pré-refrain]',getText:()=>addArtistToText('[Pré-refrain]'), tooltip: 'Insérer un tag [Pré-refrain] avec les artistes'},
                 {label:'[Refrain]',getText:()=>addArtistToText('[Refrain]'), tooltip: 'Insérer un tag [Refrain] avec les artistes (Ctrl+2)'},
                 {label:'[Pont]',getText:()=>addArtistToText('[Pont]'), tooltip: 'Insérer un tag [Pont] avec les artistes (Ctrl+3)'},
                 {label:'[Outro]',getText:()=>addArtistToText('[Outro]'), tooltip: 'Insérer un tag [Outro] avec les artistes (Ctrl+5)'},
-                {label:'[?]',text:'[?]\n', tooltip: 'Insérer un tag [?] pour les paroles inconnues'}
+                {label:'[Instrumental]',text:'[Instrumental]\n', tooltip: 'Insérer un tag [Instrumental] pour les sections instrumentales'},
+                {label:'[?]',text:'[?]\n', tooltip: 'Insérer un tag [?] pour les paroles inconnues'},
+                {label:'ZWS',text:'\u200B', tooltip: 'Insérer un Zero Width Space (espace de largeur nulle)'}
               ]
             }
         ],
@@ -2313,12 +2539,20 @@ function initLyricsEditorEnhancer() {
                 tooltip: "Corriger tous les y' en y (typique en français)"
             },
             {label:"' → '",action:'replaceText',searchPattern:/'/g,replacementText:"'",highlightClass:LYRICS_HELPER_HIGHLIGHT_CLASS, tooltip: "Remplacer les apostrophes typographiques ' par des apostrophes standard '"},
+            {
+                label:"oeu → œu",
+                action:'replaceText',
+                searchPattern:/([Oo])eu/g,
+                replacementFunction:(match, firstLetter)=>(firstLetter === 'O' ? 'Œu' : 'œu'),
+                highlightClass:LYRICS_HELPER_HIGHLIGHT_CLASS,
+                tooltip: "Remplacer oeu par œu (ligature française)"
+            },
             {label:"Maj. début ligne",action:'lineCorrection',correctionType:'capitalize',title:"Met en majuscule la première lettre de chaque ligne.", tooltip: "Mettre en majuscule la première lettre de chaque ligne"},
             {label:"Suppr. ., fin ligne",action:'lineCorrection',correctionType:'removePunctuation',title:"Supprime les points et virgules en fin de ligne.", tooltip: "Supprimer les points et virgules en fin de ligne"},
             {label:"Corriger Espacement",action:'lineCorrection',correctionType:'spacing',title:"Corrige les espacements (lignes vides inutiles ou manquantes).", tooltip: "Corriger les espacements (lignes vides inutiles ou manquantes)"}
         ],
         GLOBAL_FIXES: [
-            {label:"Tout Corriger (Texte)", action:'globalTextFix', title:"Applique toutes les corrections de texte (y', apostrophes, majuscules, ponctuation, espacement).", tooltip: "Appliquer toutes les corrections automatiques avec prévisualisation (Ctrl+Shift+C)"}
+            {label:"Tout Corriger (Texte)", action:'globalTextFix', title:"Applique toutes les corrections de texte (y', apostrophes, oeu, majuscules, ponctuation, espacement).", tooltip: "Appliquer toutes les corrections automatiques avec prévisualisation (Ctrl+Shift+C)"}
         ]
     };
 
@@ -2634,6 +2868,7 @@ function initLyricsEditorEnhancer() {
                                             const detailsArray = [];
                                             if (result.corrections.yPrime > 0) detailsArray.push(`${result.corrections.yPrime} "y'"`);
                                             if (result.corrections.apostrophes > 0) detailsArray.push(`${result.corrections.apostrophes} apostrophe(s)`);
+                                            if (result.corrections.oeuLigature > 0) detailsArray.push(`${result.corrections.oeuLigature} "oeu"`);
                                             if (result.corrections.capitalization > 0) detailsArray.push(`${result.corrections.capitalization} majuscule(s)`);
                                             if (result.corrections.punctuation > 0) detailsArray.push(`${result.corrections.punctuation} ponctuation(s)`);
                                             if (result.corrections.spacing > 0) detailsArray.push(`${result.corrections.spacing} espacement(s)`);
@@ -2738,12 +2973,30 @@ function initLyricsEditorEnhancer() {
                     shortcutsContainerElement.appendChild(globalFixesDiv);
                 }
 
-                // Ajoute le numéro de version en bas à droite
+                // Ajoute le footer avec le crédit et la version
+                const footerContainer = document.createElement('div');
+                footerContainer.id = 'gft-footer-container';
+                footerContainer.style.display = 'flex';
+                footerContainer.style.justifyContent = 'space-between';
+                footerContainer.style.alignItems = 'center';
+                footerContainer.style.marginTop = '8px';
+                
+                const creditLabel = document.createElement('div');
+                creditLabel.id = 'gft-credit-label';
+                creditLabel.textContent = 'Made with ❤️ by Lnkhey';
+                creditLabel.style.fontSize = '10px';
+                creditLabel.style.color = '#888';
+                creditLabel.style.opacity = '0.6';
+                creditLabel.style.userSelect = 'none';
+                
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v2.0';
-                versionLabel.title = 'Genius Fast Transcriber version 2.0';
-                shortcutsContainerElement.appendChild(versionLabel);
+                versionLabel.textContent = 'v2.2.0';
+                versionLabel.title = 'Genius Fast Transcriber version 2.2.0';
+                
+                footerContainer.appendChild(creditLabel);
+                footerContainer.appendChild(versionLabel);
+                shortcutsContainerElement.appendChild(footerContainer);
                 
                 // 4. Injecte le panneau complet dans la page.
                 targetStickySection.prepend(shortcutsContainerElement);

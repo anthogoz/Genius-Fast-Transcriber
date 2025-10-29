@@ -2,7 +2,7 @@
 
 Une extension Chrome/Edge qui transforme l'expérience de transcription sur **Genius.com** en ajoutant des outils intelligents et des raccourcis puissants.
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 ## 🚀 Installation Facile
@@ -50,6 +50,10 @@ L'extension sera immédiatement active sur toutes les pages d'édition de parole
 
 ### 🎨 Formatage
 - **Gras** et **Italique** : Formatage rapide du texte sélectionné
+- **Nombre → Lettres** : Conversion automatique des nombres en lettres (ex: "42" → "quarante-deux")
+  - Apparaît uniquement lorsqu'un nombre est sélectionné
+  - Supporte les nombres de 0 à 999 999
+  - Respecte les règles de l'orthographe française (traits d'union, "et", etc.)
 - **Barre d'outils flottante** : Apparaît automatiquement lors de la sélection de texte pour un formatage rapide
 - **Mode sombre** : Interface agréable pour les yeux, avec préférence sauvegardée
 
@@ -121,6 +125,7 @@ cd genius-fast-transcriber
 ### Fonctionnalités Avancées
 
 - **Formatage rapide** : Sélectionnez du texte et utilisez la barre d'outils flottante pour le mettre en **gras** ou en *italique*
+- **Conversion de nombres** : Sélectionnez un nombre (uniquement un nombre, sans autres mots) et le bouton "Nombre → Lettres" apparaîtra pour le convertir en lettres françaises
 - **Statistiques** : Activez le compteur en temps réel pour suivre votre progression (lignes, mots, sections, caractères)
 - **Historique** : Annulez jusqu'à 10 modifications avec `Ctrl+Z` ou les boutons dédiés
 - **Prévisualisation** : Avant d'appliquer "Tout Corriger", visualisez un aperçu avant/après avec le détail des corrections
@@ -187,7 +192,14 @@ Si vous rencontrez un bug ou avez une idée d'amélioration :
 
 ## 📝 Changelog
 
-### Version 2.0.0 (Actuelle)
+### Version 2.2.0 (Actuelle)
+- 🔢 **NOUVEAU** : Conversion automatique de nombres en lettres françaises (0-999 999)
+  - Bouton "Nombre → Lettres" dans la barre d'outils flottante
+  - Apparaît uniquement lorsqu'un nombre seul est sélectionné
+  - Respect des règles de l'orthographe française (traits d'union, "et", pluriels, etc.)
+  - Gestion correcte des nombres complexes (70-79, 80-89, 90-99)
+
+### Version 2.0.0
 - 🎨 **NOUVEAU** : Affichage du numéro de version en bas à droite du panneau
 - 📦 **Majeur** : Passage à la version 2.0 (refonte complète avec toutes les nouvelles fonctionnalités de la v1.6.0)
 

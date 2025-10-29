@@ -198,21 +198,31 @@ function maFonction(paramName) {
 
 ### Fichiers Principaux
 
-#### `content.js` (2787 lignes)
+#### `content.js` (2972 lignes - v2.2.0)
 
-**Section 1 : Variables Globales (lignes 14-33)**
+**Section 1 : Variables Globales (lignes 26-44)**
 - État de l'extension (compteurs, éditeur actif, mode sombre, historique Undo/Redo)
 
-**Section 2 : Constantes et Sélecteurs (lignes 34-64)**
+**Section 2 : Constantes et Sélecteurs (lignes 46-76)**
 - Sélecteurs CSS pour les éléments de Genius
 - IDs des composants de l'extension
 - Classes CSS utilitaires
 
-**Section 3 : Utilitaires (lignes 66-570)**
+**Section 3 : Utilitaires de Base (lignes 78-145)**
 - `decodeHtmlEntities()` : Décode les entités HTML
 - `cleanArtistName()` : Nettoie les noms d'artistes
+- `escapeRegExp()` : Échappe les caractères spéciaux pour regex
 - `formatArtistList()` : Formate une liste d'artistes
+
+**Section 4 : Conversion de Nombres (lignes 147-245) ✨ NOUVEAU v2.2.0**
+- `numberToFrenchWords()` : Convertit un nombre (0-999999) en lettres françaises
+  - Gestion complète de l'orthographe française (traits d'union, "et", pluriels)
+  - Cas spéciaux : 70-79 (soixante-dix), 80-89 (quatre-vingt), 90-99 (quatre-vingt-dix)
+- `isValidNumber()` : Vérifie si une chaîne est un nombre valide
+
+**Section 5 : Extraction de Données (lignes 247-760)**
 - `extractArtistsFromMetaContent()` : Extrait artistes depuis meta tags
+- `extractSongData()` : Fonction principale pour extraire titre et artistes
 - `calculateStats()` : Calcule les statistiques (lignes, mots, sections, caractères)
 
 **Section 4 : Statistiques en Temps Réel (lignes 571-651)**
@@ -245,10 +255,13 @@ function maFonction(paramName) {
 - `handleKeyboardShortcut()` : Gestion des événements clavier
 - `insertTagViaShortcut()` : Insère un tag via raccourci
 
-**Section 10 : Barre d'Outils Flottante (lignes 1650-1850)**
-- `createFloatingFormattingToolbar()` : Crée la barre de formatage
-- `handleSelectionChange()` : Détecte la sélection de texte
-- `applyBoldToSelection()` / `applyItalicToSelection()` : Applique le formatage
+**Section 10 : Barre d'Outils Flottante (lignes 565-758) ✨ MAJ v2.2.0**
+- `createFloatingFormattingToolbar()` : Crée la barre de formatage (gras/italique/nombres)
+- `applyFormattingToSelection()` : Applique le formatage gras/italique
+- `convertNumberToWords()` : Convertit le nombre sélectionné en lettres ✨ NOUVEAU
+- `showFloatingToolbar()` : Affiche la barre et détecte si c'est un nombre
+- `hideFloatingToolbar()` : Cache la barre d'outils
+- `handleSelectionChange()` : Détecte la sélection de texte (lignes 1977-2012)
 
 **Section 11 : Extraction de Données (lignes 175-264)**
 - `extractSongData()` : Fonction principale pour extraire titre et artistes
@@ -288,6 +301,45 @@ Modifiez l'objet `SHORTCUTS.TAGS_STRUCTURAUX` (ligne ~778) :
 {label:'[Mon Tag]', getText:()=>addArtistToText('[Mon Tag]')}
 ```
 
+#### Ajouter un bouton à la barre d'outils flottante (v2.2.0)
+
+Pour ajouter un nouveau bouton de formatage dans `createFloatingFormattingToolbar()` :
+
+```javascript
+// Créez le bouton
+const monBouton = document.createElement('button');
+monBouton.textContent = 'Mon Action';
+monBouton.classList.add('gft-floating-format-button', 'mon-bouton-class');
+monBouton.title = 'Description de l\'action';
+monBouton.type = 'button';
+monBouton.style.display = 'none'; // Caché par défaut si conditionnel
+
+// Ajoutez l'écouteur d'événement
+monBouton.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    maFonctionAction();
+});
+
+// Ajoutez le tooltip
+addTooltip(monBouton, 'Description complète');
+
+// Ajoutez le bouton à la barre
+toolbar.appendChild(monBouton);
+```
+
+Puis modifiez `showFloatingToolbar()` pour afficher/masquer le bouton selon les conditions :
+```javascript
+const monBouton = floatingFormattingToolbar.querySelector('.mon-bouton-class');
+if (monBouton) {
+    if (maCondition(selectedText)) {
+        monBouton.style.display = 'inline-block';
+    } else {
+        monBouton.style.display = 'none';
+    }
+}
+```
+
 #### Ajouter une nouvelle correction
 
 1. Créez une fonction de correction (section 13, lignes 1900-2220)
@@ -309,6 +361,24 @@ Modifiez `extractSongData()` (ligne ~175) ou les `SELECTORS` (ligne ~42)
 1. Modifiez `calculateStats()` (ligne ~571) pour calculer la nouvelle métrique
 2. Mettez à jour `updateStatsDisplay()` (ligne ~590) pour l'afficher
 
+#### Étendre la conversion de nombres (v2.2.0)
+
+La fonction `numberToFrenchWords()` supporte actuellement les nombres de 0 à 999 999. Pour étendre :
+
+1. **Ajouter les millions** : Modifiez la fonction pour gérer les nombres > 999 999
+2. **Nombres décimaux** : Ajoutez la gestion des nombres à virgule
+3. **Nombres négatifs** : Ajoutez le préfixe "moins" pour les négatifs
+4. **Options d'orthographe** : Ajoutez un paramètre pour l'orthographe traditionnelle vs réformée
+
+Exemple de structure pour les millions :
+```javascript
+if (num >= 1000000) {
+    const millions = Math.floor(num / 1000000);
+    const rest = num % 1000000;
+    // ...
+}
+```
+
 ## 🧪 Tests
 
 Avant de soumettre votre PR, testez sur Genius.com :
@@ -323,6 +393,11 @@ Avant de soumettre votre PR, testez sur Genius.com :
    - Chanson avec featurings
    - Chanson avec plusieurs artistes principaux
 5. **Mode sombre** : Vérifiez que la préférence est sauvegardée
+6. **Conversion de nombres (v2.2.0)** :
+   - Sélectionnez un nombre seul : le bouton "Nombre → Lettres" doit apparaître
+   - Sélectionnez du texte avec un nombre : le bouton ne doit PAS apparaître
+   - Testez différents nombres : 0, 21, 42, 71, 80, 81, 91, 100, 200, 1000, 1234, 999999
+   - Vérifiez l'orthographe (traits d'union, "et", pluriels)
 
 ### Checklist avant PR
 
@@ -335,8 +410,15 @@ Avant de soumettre votre PR, testez sur Genius.com :
 - [ ] Le tutoriel est à jour (si de nouvelles fonctionnalités sont ajoutées)
 - [ ] Les commentaires JSDoc sont à jour
 - [ ] Le code suit le guide de style
-- [ ] La version dans `manifest.json` est correcte (si applicable)
+- [ ] Les versions sont cohérentes :
+  - [ ] `manifest.json` (ligne 4)
+  - [ ] `content.js` en-tête (ligne 21)
+  - [ ] `content.js` console.log (ligne 24)
+  - [ ] `content.js` footer du panneau (ligne 2994)
+  - [ ] `README.md` badge (ligne 5)
+  - [ ] `CONTRIBUTING.md` titre de section (ligne 201)
 - [ ] Le README.md et TODO.md sont à jour (si fonctionnalité majeure)
+- [ ] Le changelog dans README.md est à jour avec les nouvelles fonctionnalités
 
 ## 🔍 Processus de Review
 
