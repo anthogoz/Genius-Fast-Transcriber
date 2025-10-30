@@ -198,7 +198,7 @@ function maFonction(paramName) {
 
 ### Fichiers Principaux
 
-#### `content.js` (2972 lignes - v2.2.0)
+#### `content.js` (3792 lignes - v2.3.3)
 
 **Section 1 : Variables Globales (lignes 26-44)**
 - État de l'extension (compteurs, éditeur actif, mode sombre, historique Undo/Redo)
@@ -433,9 +433,10 @@ Avant de soumettre votre PR, testez sur Genius.com :
 - [ ] Le code suit le guide de style
 - [ ] Les versions sont cohérentes :
   - [ ] `manifest.json` (ligne 4)
-  - [ ] `content.js` en-tête (ligne 21)
-  - [ ] `content.js` console.log (ligne 24)
-  - [ ] `content.js` footer du panneau (ligne 2994)
+  - [ ] `content.js` en-tête (ligne 1)
+  - [ ] `content.js` @version JSDoc (ligne 22)
+  - [ ] `content.js` console.log (ligne 25)
+  - [ ] `content.js` footer du panneau (ligne 3675)
   - [ ] `README.md` badge (ligne 5)
   - [ ] `CONTRIBUTING.md` titre de section (ligne 201)
 - [ ] Le README.md et TODO.md sont à jour (si fonctionnalité majeure)

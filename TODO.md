@@ -10,9 +10,9 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
 
 #### 🐛 Bugs à Corriger
 
-- [ ] **Problème de curseur après corrections** : Parfois, le curseur se retrouve à la fin du texte après une correction (à améliorer)
+- [x] **Problème de curseur après corrections** : ✅ RÉSOLU dans v2.3.3 - Le curseur ne saute plus à la fin du texte
+  - Solution : Sauvegarde et restauration automatique de la position du curseur
   - Fichier concerné : `content.js`, fonction `applyTextTransformToDivEditor()`
-  - Difficulté : Moyenne
   
 - [ ] **Détection incomplète de certains artistes** : Sur certaines pages, les featurings ne sont pas détectés
   - Fichier concerné : `content.js`, fonction `extractSongData()`
@@ -77,7 +77,7 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
 
 #### 🚀 Optimisations
 
-- [ ] **Refactorisation en modules** : Découper `content.js` (2787 lignes) en plusieurs fichiers
+- [ ] **Refactorisation en modules** : Découper `content.js` (3792 lignes) en plusieurs fichiers
   - Créer des modules : `utils.js`, `corrections.js`, `ui.js`, `observers.js`, `keyboard.js`, `statistics.js`
   - Difficulté : Moyenne-Difficile (le fichier a beaucoup grandi)
 
@@ -105,7 +105,7 @@ Ce fichier répertorie les fonctionnalités prévues, les améliorations et les 
 
 ## 📊 Statistiques du Projet
 
-- **Lignes de code** : ~3000 (JavaScript + CSS)
+- **Lignes de code** : ~3800 (JavaScript + CSS)
 - **Nombre de fonctions** : ~60
 - **Nombre de boutons** : 20+
 - **Corrections automatiques** : 5 types
@@ -130,8 +130,12 @@ Ces fonctionnalités ont été implémentées avec succès :
 - ✅ En-tête automatique avec titre et featurings
 - ✅ **[v1.5.1]** Feedback détaillé du bouton "Tout Corriger" avec comptage précis par type de correction
 
-### Version 2.0.0 (MAJEURE - ACTUELLE)
-- ✅ **Affichage de version** : Numéro de version visible en bas à droite du panneau
+### Version 2.3.3 (ACTUELLE - 30 octobre 2025)
+- ✅ **Vérification des parenthèses et crochets** : Détection et surlignage des parenthèses/crochets non appariés (v2.3.0)
+- ✅ **Fix majeur du curseur** : Le curseur ne saute plus à la fin du texte lors des corrections (v2.3.3)
+- ✅ **Fix du surlignage** : Le surlignage des corrections est maintenant visible et précis (v2.3.1, v2.3.2)
+- ✅ **Conversion de nombres en lettres** : Support complet 0-999 milliards en français (v2.2.0)
+- ✅ **Affichage de version** : Numéro de version visible en bas à droite du panneau (v2.0.0)
 - ✅ **Refonte complète** : Passage à la version 2.0 avec toutes les fonctionnalités de la v1.6.0
 
 ### Version 1.6.0
@@ -165,5 +169,5 @@ Ces fonctionnalités ont été implémentées avec succès :
 - 🔧 Maintenance
 - 🚀 Optimisation
 
-**Dernière mise à jour** : Octobre 2025 (Version 2.0.0)
+**Dernière mise à jour** : 30 octobre 2025 (Version 2.3.3)
 
