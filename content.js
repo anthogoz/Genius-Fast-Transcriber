@@ -2100,11 +2100,14 @@ function closeTutorial() {
  * @param {string} text - Le texte du tooltip.
  */
 function addTooltip(element, text) {
-    if (!areTooltipsEnabled() || !element) return;
+    if (!element) return;
     
     let tooltip = null;
     
     element.addEventListener('mouseenter', () => {
+        // Vérifie si les tooltips sont activés à chaque survol
+        if (!areTooltipsEnabled()) return;
+        
         tooltip = document.createElement('div');
         tooltip.className = 'gft-tooltip';
         tooltip.textContent = text;
@@ -2169,10 +2172,12 @@ function showSettingsMenu() {
     const tooltipsEnabled = areTooltipsEnabled();
     tooltipsOption.textContent = tooltipsEnabled ? '💬 Désactiver les tooltips' : '💬 Activer les tooltips';
     tooltipsOption.addEventListener('click', () => {
-        setTooltipsEnabled(!tooltipsEnabled);
+        // Réévalue l'état actuel au moment du clic
+        const currentState = areTooltipsEnabled();
+        setTooltipsEnabled(!currentState);
         closeSettingsMenu();
         showFeedbackMessage(
-            tooltipsEnabled ? 'Tooltips désactivés' : 'Tooltips activés',
+            currentState ? 'Tooltips désactivés' : 'Tooltips activés',
             2000,
             shortcutsContainerElement
         );
@@ -2185,10 +2190,12 @@ function showSettingsMenu() {
     const headerFeatEnabled = isHeaderFeatEnabled();
     headerFeatOption.textContent = headerFeatEnabled ? '🎤 Masquer feat dans l\'en-tête' : '🎤 Afficher feat dans l\'en-tête';
     headerFeatOption.addEventListener('click', () => {
-        setHeaderFeatEnabled(!headerFeatEnabled);
+        // Réévalue l'état actuel au moment du clic
+        const currentState = isHeaderFeatEnabled();
+        setHeaderFeatEnabled(!currentState);
         closeSettingsMenu();
         showFeedbackMessage(
-            headerFeatEnabled ? 'Feat masqués dans l\'en-tête' : 'Feat affichés dans l\'en-tête',
+            currentState ? 'Feat masqués dans l\'en-tête' : 'Feat affichés dans l\'en-tête',
             2000,
             shortcutsContainerElement
         );
