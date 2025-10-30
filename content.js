@@ -1,6 +1,6 @@
-// content.js (Version 2.2 - Extension Complète)
+// content.js (Version 2.3.3 - Extension Complète)
 /**
- * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.2.
+ * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.3.3.
  * Ce script s'injecte dans les pages du site genius.com.
  * Il détecte la présence de l'éditeur de paroles et y ajoute un panneau d'outils
  * pour accélérer et fiabiliser la transcription (ajout de tags, correction de texte, etc.).
@@ -15,13 +15,40 @@
  * - Barre d'outils flottante pour formatage (gras/italique/nombres en lettres)
  * - Conversion de nombres en lettres françaises (0-999 milliards)
  * - Mode sombre avec préférence sauvegardée
- * - Corrections automatiques avec barre de progression
+ * - Corrections automatiques avec barre de progression et surlignage visuel
+ * - Détection et surlignage des parenthèses/crochets non appariés
  * 
  * @author Lnkhey
- * @version 2.2.0
+ * @version 2.3.3
  */
 
-console.log('Genius Fast Transcriber (by Lnkhey) v2.2.0 - Toutes fonctionnalités activées ! 🎵');
+console.log('Genius Fast Transcriber (by Lnkhey) v2.3.3 - Toutes fonctionnalités activées ! 🎵');
+
+// ----- Injection des animations CSS essentielles -----
+// Injecte l'animation de surlignage pour s'assurer qu'elle fonctionne même si les styles CSS de Genius l'écrasent
+(function injectCriticalStyles() {
+    if (!document.getElementById('gft-critical-animations')) {
+        const style = document.createElement('style');
+        style.id = 'gft-critical-animations';
+        style.textContent = `
+            @keyframes lyrics-helper-fadeout {
+                0% {
+                    background-color: #f9ff55;
+                    opacity: 0.8;
+                }
+                70% {
+                    background-color: #f9ff55;
+                    opacity: 0.5;
+                }
+                100% {
+                    background-color: transparent;
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+})();
 
 // ----- Déclarations des variables globales -----
 // Ces variables maintiennent l'état de l'extension pendant que l'utilisateur navigue.
@@ -504,7 +531,11 @@ function replaceAndHighlightInDiv(editorNode, searchRegex, replacementTextOrFn, 
                 if (match.index > lastIndex) fragment.appendChild(document.createTextNode(textNode.nodeValue.substring(lastIndex, match.index)));
                 const actualReplacement = typeof replacementTextOrFn === 'function' ? replacementTextOrFn(match[0], ...match.slice(1)) : replacementTextOrFn;
                 const span = document.createElement('span');
-                span.className = highlightClass; span.textContent = actualReplacement; fragment.appendChild(span);
+                span.className = highlightClass; 
+                // Applique des styles inline avec !important pour éviter qu'ils soient écrasés par les styles de Genius
+                span.style.cssText = 'background-color: #f9ff55 !important; border-radius: 2px !important; padding: 0 1px !important; animation: lyrics-helper-fadeout 2s ease-out forwards !important;';
+                span.textContent = actualReplacement; 
+                fragment.appendChild(span);
                 lastIndex = localSearchRegex.lastIndex;
                 nodeChangedThisIteration = true;
                 replacementsMadeCount++;
@@ -516,6 +547,393 @@ function replaceAndHighlightInDiv(editorNode, searchRegex, replacementTextOrFn, 
         }
     });
     return replacementsMadeCount;
+}
+
+/**
+ * Trouve les parenthèses et crochets non appariés dans le texte.
+ * @param {string} text - Le texte à analyser.
+ * @returns {Array} Un tableau d'objets contenant les positions et types des caractères non appariés.
+ */
+function findUnmatchedBracketsAndParentheses(text) {
+    const unmatched = [];
+    const stack = [];
+    const pairs = {
+        '(': ')',
+        '[': ']'
+    };
+    const closingChars = {
+        ')': '(',
+        ']': '['
+    };
+
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        
+        if (pairs[char]) {
+            // C'est un caractère ouvrant
+            stack.push({ char: char, position: i });
+        } else if (closingChars[char]) {
+            // C'est un caractère fermant
+            if (stack.length === 0) {
+                // Pas de caractère ouvrant correspondant
+                unmatched.push({ char: char, position: i, type: 'closing-without-opening' });
+            } else {
+                const last = stack[stack.length - 1];
+                if (pairs[last.char] === char) {
+                    // Paire correcte, on enlève de la pile
+                    stack.pop();
+                } else {
+                    // Mauvaise paire (par exemple [ fermé par ) )
+                    unmatched.push({ char: char, position: i, type: 'wrong-pair' });
+                    stack.pop();
+                }
+            }
+        }
+    }
+
+    // Tous les caractères restants dans la pile sont des caractères ouvrants sans fermeture
+    stack.forEach(item => {
+        unmatched.push({ char: item.char, position: item.position, type: 'opening-without-closing' });
+    });
+
+    return unmatched;
+}
+
+/**
+ * Crée un overlay visuel pour surligner les corrections dans un textarea.
+ * @param {HTMLElement} textarea - L'élément textarea.
+ * @param {string} originalText - Le texte original avant correction.
+ * @param {string} newText - Le texte après correction.
+ * @param {RegExp} searchPattern - La regex utilisée pour la recherche (pour identifier précisément les modifications).
+ * @param {string} color - Couleur du surlignage (par défaut jaune pour corrections, rouge pour erreurs).
+ */
+function createTextareaReplacementOverlay(textarea, originalText, newText, searchPattern, color = '#f9ff55') {
+    // Supprime l'ancien overlay s'il existe
+    const existingOverlay = document.getElementById('gft-textarea-overlay');
+    if (existingOverlay) {
+        existingOverlay.remove();
+    }
+
+    // Si aucun changement, ne fait rien
+    if (originalText === newText) {
+        return;
+    }
+
+    // Trouve les positions des modifications en appliquant la regex sur le texte MODIFIÉ
+    // Pour identifier les caractères qui ont été changés
+    const modifiedPositions = new Set();
+    
+    // Utilise un algorithme de différence simple mais plus précis
+    // Trouve tous les matches de la regex dans l'original
+    const originalMatches = [];
+    const localSearchRegex = new RegExp(searchPattern.source, searchPattern.flags);
+    let match;
+    localSearchRegex.lastIndex = 0;
+    while ((match = localSearchRegex.exec(originalText)) !== null) {
+        originalMatches.push({
+            start: match.index,
+            end: match.index + match[0].length,
+            text: match[0]
+        });
+        if (!searchPattern.flags.includes('g')) break;
+    }
+    
+    // Pour chaque match trouvé dans l'original, trouve la position correspondante dans le nouveau texte
+    let offset = 0; // Décalage causé par les remplacements
+    originalMatches.forEach(originalMatch => {
+        const posInNew = originalMatch.start + offset;
+        // Calcule la différence de longueur causée par ce remplacement
+        // On doit trouver combien de caractères ont été ajoutés/supprimés
+        const originalLength = originalMatch.end - originalMatch.start;
+        
+        // Trouve le texte de remplacement en regardant dans newText
+        let newLength = 0;
+        let k = posInNew;
+        // Cherche jusqu'à trouver un caractère qui existait après le match original
+        const charAfterMatch = originalText[originalMatch.end];
+        if (charAfterMatch) {
+            while (k < newText.length && newText[k] !== charAfterMatch) {
+                newLength++;
+                k++;
+            }
+        } else {
+            // C'est à la fin du texte
+            newLength = newText.length - posInNew;
+        }
+        
+        // Marque les positions modifiées
+        for (let i = posInNew; i < posInNew + newLength; i++) {
+            modifiedPositions.add(i);
+        }
+        
+        // Met à jour le décalage
+        offset += (newLength - originalLength);
+    });
+
+    // Crée le conteneur de l'overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'gft-textarea-overlay';
+    overlay.style.cssText = `
+        position: absolute;
+        pointer-events: none;
+        z-index: 1;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow: hidden;
+        font-family: ${window.getComputedStyle(textarea).fontFamily};
+        font-size: ${window.getComputedStyle(textarea).fontSize};
+        line-height: ${window.getComputedStyle(textarea).lineHeight};
+        padding: ${window.getComputedStyle(textarea).padding};
+        border: ${window.getComputedStyle(textarea).border};
+        box-sizing: border-box;
+    `;
+
+    // Positionne l'overlay exactement sur le textarea
+    const rect = textarea.getBoundingClientRect();
+    const parentRect = textarea.offsetParent ? textarea.offsetParent.getBoundingClientRect() : { top: 0, left: 0 };
+    overlay.style.top = (rect.top - parentRect.top + (textarea.offsetParent ? textarea.offsetParent.scrollTop : 0)) + 'px';
+    overlay.style.left = (rect.left - parentRect.left + (textarea.offsetParent ? textarea.offsetParent.scrollLeft : 0)) + 'px';
+    overlay.style.width = textarea.offsetWidth + 'px';
+    overlay.style.height = textarea.offsetHeight + 'px';
+
+    // Crée le contenu de l'overlay avec surlignage
+    let htmlContent = '';
+    for (let i = 0; i < newText.length; i++) {
+        const char = newText[i];
+        if (modifiedPositions.has(i)) {
+            htmlContent += `<span class="gft-correction-overlay" style="background-color: ${color}; opacity: 0.6; border-radius: 2px; padding: 0 1px; color: transparent; font-weight: inherit;">${char === '<' ? '&lt;' : char === '>' ? '&gt;' : char === '&' ? '&amp;' : char === '\n' ? '<br>' : char}</span>`;
+        } else {
+            htmlContent += `<span style="color: transparent;">${char === '<' ? '&lt;' : char === '>' ? '&gt;' : char === '&' ? '&amp;' : char === '\n' ? '<br>' : char}</span>`;
+        }
+    }
+    
+    overlay.innerHTML = htmlContent;
+    
+    // Insère l'overlay avant le textarea dans le DOM
+    textarea.parentNode.insertBefore(overlay, textarea);
+    
+    // Synchronise le scroll de l'overlay avec celui du textarea
+    const syncScroll = () => {
+        overlay.scrollTop = textarea.scrollTop;
+        overlay.scrollLeft = textarea.scrollLeft;
+    };
+    
+    textarea.addEventListener('scroll', syncScroll);
+    
+    // Supprime l'overlay après l'animation (2 secondes)
+    setTimeout(() => {
+        if (overlay && overlay.parentNode) {
+            overlay.remove();
+            textarea.removeEventListener('scroll', syncScroll);
+        }
+    }, 2000);
+}
+
+/**
+ * Crée un overlay visuel pour surligner les erreurs dans un textarea.
+ * @param {HTMLElement} textarea - L'élément textarea.
+ * @param {Array} unmatched - Liste des caractères non appariés avec leurs positions.
+ */
+function createTextareaOverlay(textarea, unmatched) {
+    // Supprime l'ancien overlay s'il existe
+    const existingOverlay = document.getElementById('gft-textarea-overlay');
+    if (existingOverlay) {
+        existingOverlay.remove();
+    }
+
+    // Crée le conteneur de l'overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'gft-textarea-overlay';
+    overlay.style.cssText = `
+        position: absolute;
+        pointer-events: none;
+        z-index: 1;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        overflow: hidden;
+        font-family: ${window.getComputedStyle(textarea).fontFamily};
+        font-size: ${window.getComputedStyle(textarea).fontSize};
+        line-height: ${window.getComputedStyle(textarea).lineHeight};
+        padding: ${window.getComputedStyle(textarea).padding};
+        border: ${window.getComputedStyle(textarea).border};
+        box-sizing: border-box;
+    `;
+
+    // Positionne l'overlay exactement sur le textarea
+    const rect = textarea.getBoundingClientRect();
+    const parentRect = textarea.offsetParent.getBoundingClientRect();
+    overlay.style.top = (rect.top - parentRect.top + textarea.offsetParent.scrollTop) + 'px';
+    overlay.style.left = (rect.left - parentRect.left + textarea.offsetParent.scrollLeft) + 'px';
+    overlay.style.width = textarea.offsetWidth + 'px';
+    overlay.style.height = textarea.offsetHeight + 'px';
+
+    // Crée le contenu de l'overlay avec surlignage
+    const text = textarea.value;
+    const unmatchedPositions = new Set(unmatched.map(u => u.position));
+    let htmlContent = '';
+    
+    for (let i = 0; i < text.length; i++) {
+        const char = text[i];
+        if (unmatchedPositions.has(i)) {
+            const unmatchedItem = unmatched.find(u => u.position === i);
+            let title = '';
+            if (unmatchedItem.type === 'opening-without-closing') {
+                title = `${unmatchedItem.char} ouvrant sans fermeture correspondante`;
+            } else if (unmatchedItem.type === 'closing-without-opening') {
+                title = `${unmatchedItem.char} fermant sans ouverture correspondante`;
+            } else if (unmatchedItem.type === 'wrong-pair') {
+                title = `${unmatchedItem.char} ne correspond pas au caractère ouvrant`;
+            }
+            htmlContent += `<span class="gft-bracket-error-overlay" title="${title}" style="background-color: rgba(255, 68, 68, 0.5); color: transparent; font-weight: bold; position: relative; z-index: 2;">${char === '<' ? '&lt;' : char === '>' ? '&gt;' : char === '&' ? '&amp;' : char}</span>`;
+        } else {
+            htmlContent += `<span style="color: transparent;">${char === '<' ? '&lt;' : char === '>' ? '&gt;' : char === '&' ? '&amp;' : char === '\n' ? '<br>' : char}</span>`;
+        }
+    }
+    
+    overlay.innerHTML = htmlContent;
+    
+    // Insère l'overlay avant le textarea dans le DOM
+    textarea.parentNode.insertBefore(overlay, textarea);
+    
+    // Synchronise le scroll de l'overlay avec celui du textarea
+    const syncScroll = () => {
+        overlay.scrollTop = textarea.scrollTop;
+        overlay.scrollLeft = textarea.scrollLeft;
+    };
+    
+    textarea.addEventListener('scroll', syncScroll);
+    textarea.addEventListener('input', () => {
+        // Supprime l'overlay quand l'utilisateur commence à taper
+        overlay.remove();
+        textarea.removeEventListener('scroll', syncScroll);
+    });
+
+    // Ajoute une animation pulsée
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes gft-overlay-pulse {
+            0%, 100% { background-color: rgba(255, 68, 68, 0.5); }
+            50% { background-color: rgba(255, 34, 34, 0.7); }
+        }
+        .gft-bracket-error-overlay {
+            animation: gft-overlay-pulse 1.5s ease-in-out infinite;
+        }
+    `;
+    if (!document.getElementById('gft-overlay-style')) {
+        style.id = 'gft-overlay-style';
+        document.head.appendChild(style);
+    }
+}
+
+/**
+ * Surligne les parenthèses et crochets non appariés dans l'éditeur.
+ * @param {HTMLElement} editorNode - L'élément de l'éditeur (textarea ou div).
+ * @param {string} editorType - Le type d'éditeur ('textarea' ou 'div').
+ * @returns {number} Le nombre de caractères non appariés trouvés.
+ */
+function highlightUnmatchedBracketsInEditor(editorNode, editorType) {
+    console.log('[GFT] highlightUnmatchedBracketsInEditor appelée');
+    console.log('[GFT] editorType:', editorType);
+    
+    const text = editorType === 'textarea' ? editorNode.value : editorNode.textContent;
+    console.log('[GFT] Texte à analyser (longueur):', text.length);
+    
+    const unmatched = findUnmatchedBracketsAndParentheses(text);
+    console.log('[GFT] Caractères non appariés trouvés:', unmatched.length);
+
+    if (unmatched.length === 0) {
+        // Supprime l'overlay s'il existe
+        const existingOverlay = document.getElementById('gft-textarea-overlay');
+        if (existingOverlay) {
+            existingOverlay.remove();
+        }
+        console.log('[GFT] Aucun problème trouvé, retour 0');
+        return 0;
+    }
+    
+    console.log('[GFT] Problèmes trouvés, création de l\'overlay...');
+
+    if (editorType === 'div') {
+        // Pour les éditeurs div (contenteditable), on doit travailler avec le DOM
+        const treeWalker = document.createTreeWalker(editorNode, NodeFilter.SHOW_TEXT, null, false);
+        const textNodes = [];
+        while (treeWalker.nextNode()) {
+            textNodes.push(treeWalker.currentNode);
+        }
+
+        let globalPosition = 0;
+        const unmatchedPositions = new Set(unmatched.map(u => u.position));
+
+        textNodes.forEach(textNode => {
+            const nodeText = textNode.nodeValue;
+            const nodeStartPos = globalPosition;
+            const nodeEndPos = globalPosition + nodeText.length;
+
+            // Vérifie si ce nœud contient des positions non appariées
+            const relevantPositions = unmatched.filter(
+                u => u.position >= nodeStartPos && u.position < nodeEndPos
+            );
+
+            if (relevantPositions.length > 0) {
+                const parent = textNode.parentNode;
+                // Ne surligne pas si déjà surligné
+                if (parent && parent.nodeType === Node.ELEMENT_NODE && 
+                    parent.classList.contains('gft-bracket-error')) {
+                    globalPosition += nodeText.length;
+                    return;
+                }
+
+                const fragment = document.createDocumentFragment();
+                let lastIndex = 0;
+
+                relevantPositions.forEach(unmatchedItem => {
+                    const localPos = unmatchedItem.position - nodeStartPos;
+                    
+                    // Ajoute le texte avant le caractère non apparié
+                    if (localPos > lastIndex) {
+                        fragment.appendChild(document.createTextNode(nodeText.substring(lastIndex, localPos)));
+                    }
+
+                    // Crée un span pour le caractère non apparié
+                    const span = document.createElement('span');
+                    span.className = 'gft-bracket-error';
+                    span.textContent = nodeText[localPos];
+                    span.style.cssText = 'background-color: #ff4444 !important; color: white !important; padding: 0 2px; border-radius: 2px; font-weight: bold;';
+                    
+                    // Ajoute un titre pour expliquer le problème
+                    if (unmatchedItem.type === 'opening-without-closing') {
+                        span.title = `${unmatchedItem.char} ouvrant sans fermeture correspondante`;
+                    } else if (unmatchedItem.type === 'closing-without-opening') {
+                        span.title = `${unmatchedItem.char} fermant sans ouverture correspondante`;
+                    } else if (unmatchedItem.type === 'wrong-pair') {
+                        span.title = `${unmatchedItem.char} ne correspond pas au caractère ouvrant`;
+                    }
+                    
+                    fragment.appendChild(span);
+                    lastIndex = localPos + 1;
+                });
+
+                // Ajoute le reste du texte
+                if (lastIndex < nodeText.length) {
+                    fragment.appendChild(document.createTextNode(nodeText.substring(lastIndex)));
+                }
+
+                if (fragment.childNodes.length > 0 && parent) {
+                    parent.replaceChild(fragment, textNode);
+                }
+            }
+
+            globalPosition += nodeText.length;
+        });
+    } else {
+        // Pour les textarea, crée un overlay visuel pour simuler le surlignage
+        createTextareaOverlay(editorNode, unmatched);
+        
+        // Ne pas forcer le focus ou le scroll pour éviter la "téléportation"
+        // L'utilisateur peut voir les erreurs surlignées sans être déplacé
+    }
+
+    return unmatched.length;
 }
 
 /**
@@ -1260,6 +1678,82 @@ function hideProgress() {
 // ----- Prévisualisation et Mode Validation -----
 
 /**
+ * Surligne les différences entre deux textes en jaune.
+ * @param {string} originalText - Le texte original.
+ * @param {string} correctedText - Le texte corrigé.
+ * @returns {string} Le HTML avec les différences surlignées.
+ */
+function highlightDifferences(originalText, correctedText) {
+    // Échappe le HTML pour éviter les problèmes d'injection
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    // Algorithme de diff amélioré utilisant la plus longue sous-séquence commune (LCS)
+    function computeLCS(str1, str2) {
+        const m = str1.length;
+        const n = str2.length;
+        const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+        
+        for (let i = 1; i <= m; i++) {
+            for (let j = 1; j <= n; j++) {
+                if (str1[i - 1] === str2[j - 1]) {
+                    dp[i][j] = dp[i - 1][j - 1] + 1;
+                } else {
+                    dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                }
+            }
+        }
+        
+        // Reconstruction du chemin
+        const lcs = [];
+        let i = m, j = n;
+        while (i > 0 && j > 0) {
+            if (str1[i - 1] === str2[j - 1]) {
+                lcs.unshift({ i: i - 1, j: j - 1 });
+                i--;
+                j--;
+            } else if (dp[i - 1][j] > dp[i][j - 1]) {
+                i--;
+            } else {
+                j--;
+            }
+        }
+        
+        return lcs;
+    }
+    
+    // Calcule la LCS
+    const lcs = computeLCS(originalText, correctedText);
+    
+    // Construit le résultat avec surlignage
+    let result = '';
+    let lastJ = 0;
+    
+    for (let k = 0; k < lcs.length; k++) {
+        const match = lcs[k];
+        
+        // Surligne les caractères ajoutés/modifiés avant ce match
+        if (lastJ < match.j) {
+            result += `<span class="gft-diff-highlight">${escapeHtml(correctedText.substring(lastJ, match.j))}</span>`;
+        }
+        
+        // Ajoute le caractère correspondant (non modifié)
+        result += escapeHtml(correctedText[match.j]);
+        lastJ = match.j + 1;
+    }
+    
+    // Surligne les caractères restants à la fin
+    if (lastJ < correctedText.length) {
+        result += `<span class="gft-diff-highlight">${escapeHtml(correctedText.substring(lastJ))}</span>`;
+    }
+    
+    return result;
+}
+
+/**
  * Crée le modal de prévisualisation des corrections.
  * @param {string} originalText - Le texte original.
  * @param {string} correctedText - Le texte corrigé.
@@ -1320,11 +1814,9 @@ function showCorrectionPreview(originalText, correctedText, corrections, onApply
     beforeColumn.appendChild(beforeTitle);
     const beforeContent = document.createElement('pre');
     beforeContent.className = 'gft-preview-content';
-    // Limite à 500 caractères pour l'aperçu
-    const beforePreview = originalText.length > 500 
-        ? originalText.substring(0, 500) + '\n\n[...] (texte tronqué pour l\'aperçu)'
-        : originalText;
-    beforeContent.textContent = beforePreview;
+    beforeContent.id = 'gft-preview-before';
+    // Affiche le texte complet (pas de troncature)
+    beforeContent.textContent = originalText;
     beforeColumn.appendChild(beforeContent);
     
     // Colonne "Après"
@@ -1333,17 +1825,38 @@ function showCorrectionPreview(originalText, correctedText, corrections, onApply
     const afterTitle = document.createElement('h3');
     afterTitle.textContent = 'Après';
     afterColumn.appendChild(afterTitle);
-    const afterContent = document.createElement('pre');
+    const afterContent = document.createElement('div');
     afterContent.className = 'gft-preview-content';
-    const afterPreview = correctedText.length > 500 
-        ? correctedText.substring(0, 500) + '\n\n[...] (texte tronqué pour l\'aperçu)'
-        : correctedText;
-    afterContent.textContent = afterPreview;
+    afterContent.id = 'gft-preview-after';
+    // Génère le HTML avec les différences surlignées
+    afterContent.innerHTML = highlightDifferences(originalText, correctedText);
     afterColumn.appendChild(afterContent);
     
     comparisonContainer.appendChild(beforeColumn);
     comparisonContainer.appendChild(afterColumn);
     modal.appendChild(comparisonContainer);
+    
+    // Synchronise le scroll entre les deux zones
+    let isSyncingBefore = false;
+    let isSyncingAfter = false;
+    
+    beforeContent.addEventListener('scroll', () => {
+        if (!isSyncingBefore) {
+            isSyncingAfter = true;
+            afterContent.scrollTop = beforeContent.scrollTop;
+            afterContent.scrollLeft = beforeContent.scrollLeft;
+            setTimeout(() => { isSyncingAfter = false; }, 10);
+        }
+    });
+    
+    afterContent.addEventListener('scroll', () => {
+        if (!isSyncingAfter) {
+            isSyncingBefore = true;
+            beforeContent.scrollTop = afterContent.scrollTop;
+            beforeContent.scrollLeft = afterContent.scrollLeft;
+            setTimeout(() => { isSyncingBefore = false; }, 10);
+        }
+    });
     
     // Boutons d'action
     const buttonContainer = document.createElement('div');
@@ -2592,7 +3105,8 @@ function initLyricsEditorEnhancer() {
             {label:"Corriger Espacement",action:'lineCorrection',correctionType:'spacing',title:"Corrige les espacements (lignes vides inutiles ou manquantes).", tooltip: "Corriger les espacements (lignes vides inutiles ou manquantes)"}
         ],
         GLOBAL_FIXES: [
-            {label:"Tout Corriger (Texte)", action:'globalTextFix', title:"Applique toutes les corrections de texte (y', apostrophes, oeu, majuscules, ponctuation, espacement).", tooltip: "Appliquer toutes les corrections automatiques avec prévisualisation (Ctrl+Shift+C)"}
+            {label:"Tout Corriger (Texte)", action:'globalTextFix', title:"Applique toutes les corrections de texte (y', apostrophes, oeu, majuscules, ponctuation, espacement).", tooltip: "Appliquer toutes les corrections automatiques avec prévisualisation (Ctrl+Shift+C)"},
+            {label:"🔍 Vérifier ( ) [ ]", action:'checkBrackets', title:"Vérifie et surligne les parenthèses et crochets non appariés.", tooltip: "Détecter et surligner les parenthèses et crochets non appariés"}
         ]
     };
 
@@ -2799,6 +3313,15 @@ function initLyricsEditorEnhancer() {
                     button.addEventListener('click', (event) => {
                         event.preventDefault();
                         if (!currentActiveEditor) { initLyricsEditorEnhancer(); if(!currentActiveEditor) return; }
+                        
+                        // Sauvegarde la position du curseur pour les textarea
+                        let savedCursorStart = null;
+                        let savedCursorEnd = null;
+                        if (currentEditorType === 'textarea') {
+                            savedCursorStart = currentActiveEditor.selectionStart;
+                            savedCursorEnd = currentActiveEditor.selectionEnd;
+                        }
+                        
                         currentActiveEditor.focus();
                         
                         // Active le flag pour désactiver la sauvegarde automatique pendant toute l'action
@@ -2829,6 +3352,8 @@ function initLyricsEditorEnhancer() {
                                     currentActiveEditor.value = newValue;
                                     currentActiveEditor.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
                                     replacementsCount = tempCount;
+                                    // Crée un overlay pour surligner les modifications dans le textarea
+                                    createTextareaReplacementOverlay(currentActiveEditor, originalValue, newValue, config.searchPattern);
                                 }
                             } else if (currentEditorType === 'div') {
                                 replacementsCount = replaceAndHighlightInDiv(currentActiveEditor, config.searchPattern, replacementValueOrFn, config.highlightClass);
@@ -2859,6 +3384,14 @@ function initLyricsEditorEnhancer() {
                                     if (originalText !== newText) {
                                         currentActiveEditor.value = newText;
                                         currentActiveEditor.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+                                        // Crée un overlay basique pour les corrections ligne par ligne
+                                        if (config.correctionType === 'capitalize') {
+                                            // Pour les majuscules, on surligne les premières lettres de chaque ligne qui ont été changées
+                                            const capitalizePattern = /^[a-z]/gm;
+                                            createTextareaReplacementOverlay(currentActiveEditor, originalText, newText, capitalizePattern);
+                                        }
+                                        // Note : Pour removePunctuation et spacing, le surlignage est complexe car ce sont des suppressions/ajouts
+                                        // On pourrait l'ajouter plus tard avec un algorithme de diff plus sophistiqué
                                     }
                                     correctionsCount = count;
                                 } else if (currentEditorType === 'div') {
@@ -2883,8 +3416,45 @@ function initLyricsEditorEnhancer() {
                                     
                                     if (result.correctionsCount === 0) {
                                         showFeedbackMessage("Aucune correction de texte globale n'était nécessaire.", 2000, shortcutsContainerElement);
+                                        
+                                        // Vérifie quand même les brackets même s'il n'y a pas de corrections textuelles
+                                        const editorRef = currentActiveEditor;
+                                        const editorTypeRef = currentEditorType;
+                                        
+                                        console.log('[GFT] Vérification des brackets (cas sans correction)...');
+                                        console.log('[GFT] editorRef:', editorRef);
+                                        console.log('[GFT] editorTypeRef:', editorTypeRef);
+                                        
+                                        if (editorRef) {
+                                            const unmatchedCount = highlightUnmatchedBracketsInEditor(editorRef, editorTypeRef);
+                                            console.log('[GFT] unmatchedCount:', unmatchedCount);
+                                            
+                                            // Affiche le résultat après un délai
+                                            setTimeout(() => {
+                                                if (unmatchedCount > 0) {
+                                                    const pluriel = unmatchedCount > 1 ? 's' : '';
+                                                    showFeedbackMessage(
+                                                        `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} détecté${pluriel} et surligné${pluriel} en rouge !`, 
+                                                        5000, 
+                                                        shortcutsContainerElement
+                                                    );
+                                                } else {
+                                                    showFeedbackMessage(
+                                                        "✅ Toutes les parenthèses et crochets sont bien appariés.", 
+                                                        3000, 
+                                                        shortcutsContainerElement
+                                                    );
+                                                }
+                                            }, 2100);
+                                        } else {
+                                            console.log('[GFT] editorRef est null, impossible de vérifier les brackets');
+                                        }
                                         return;
                                     }
+                                    
+                                    // Capture les références de l'éditeur pour les callbacks
+                                    const editorRef = currentActiveEditor;
+                                    const editorTypeRef = currentEditorType;
                                     
                                     // Affiche la prévisualisation
                                     showCorrectionPreview(
@@ -2897,10 +3467,10 @@ function initLyricsEditorEnhancer() {
                                             saveToHistory();
                                             
                                             // Applique les corrections
-                                            if (currentEditorType === 'textarea') {
-                                                currentActiveEditor.value = result.newText;
-                                                currentActiveEditor.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-                                            } else if (currentEditorType === 'div') {
+                                            if (editorTypeRef === 'textarea') {
+                                                editorRef.value = result.newText;
+                                                editorRef.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+                                            } else if (editorTypeRef === 'div') {
                                                 setEditorContent(result.newText);
                                             }
                                             
@@ -2918,6 +3488,36 @@ function initLyricsEditorEnhancer() {
                                                 : `${result.correctionsCount} correction(s) appliquée(s)`;
                                                 
                                             showFeedbackMessage(message, 4500, shortcutsContainerElement);
+                                            
+                                            // Vérifie automatiquement les brackets après les corrections (immédiatement)
+                                            console.log('[GFT] Vérification des brackets après corrections...');
+                                            console.log('[GFT] editorRef:', editorRef);
+                                            console.log('[GFT] editorTypeRef:', editorTypeRef);
+                                            
+                                            if (editorRef) {
+                                                const unmatchedCount = highlightUnmatchedBracketsInEditor(editorRef, editorTypeRef);
+                                                console.log('[GFT] unmatchedCount:', unmatchedCount);
+                                                
+                                                // Affiche le résultat après un délai pour ne pas écraser le premier message
+                                                setTimeout(() => {
+                                                    if (unmatchedCount > 0) {
+                                                        const pluriel = unmatchedCount > 1 ? 's' : '';
+                                                        showFeedbackMessage(
+                                                            `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} détecté${pluriel} et surligné${pluriel} en rouge !`, 
+                                                            5000, 
+                                                            shortcutsContainerElement
+                                                        );
+                                                    } else {
+                                                        showFeedbackMessage(
+                                                            "✅ Toutes les parenthèses et crochets sont bien appariés.", 
+                                                            3000, 
+                                                            shortcutsContainerElement
+                                                        );
+                                                    }
+                                                }, 4600);
+                                            } else {
+                                                console.log('[GFT] editorRef est null, impossible de vérifier les brackets');
+                                            }
                                         },
                                         // Callback si l'utilisateur annule
                                         () => {
@@ -2930,6 +3530,24 @@ function initLyricsEditorEnhancer() {
                                     showFeedbackMessage("❌ Erreur lors des corrections", 3000, shortcutsContainerElement);
                                 }
                             })();
+                        } else if (config.action === 'checkBrackets') {
+                            // Vérifie et surligne les parenthèses et crochets non appariés
+                            const unmatchedCount = highlightUnmatchedBracketsInEditor(currentActiveEditor, currentEditorType);
+                            
+                            if (unmatchedCount > 0) {
+                                const pluriel = unmatchedCount > 1 ? 's' : '';
+                                showFeedbackMessage(
+                                    `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} trouvé${pluriel} et surligné${pluriel} en rouge !`, 
+                                    5000, 
+                                    shortcutsContainerElement
+                                );
+                            } else {
+                                showFeedbackMessage(
+                                    "✅ Aucun problème trouvé ! Toutes les parenthèses et crochets sont bien appariés.", 
+                                    3000, 
+                                    shortcutsContainerElement
+                                );
+                            }
                         }
                          else { 
                             // Action par défaut : insérer du texte (tags, etc.).
@@ -2958,6 +3576,12 @@ function initLyricsEditorEnhancer() {
                         } else if (typeof config.getLabel === 'function' && !isCoupletMainButton) { 
                             button.textContent = config.getLabel();
                         }
+                        
+                        // Restaure la position du curseur pour éviter le "jumpscare" du scroll
+                        if (currentEditorType === 'textarea' && savedCursorStart !== null && savedCursorEnd !== null) {
+                            currentActiveEditor.setSelectionRange(savedCursorStart, savedCursorEnd);
+                        }
+                        
                         currentActiveEditor.focus();
                         
                         // Désactive le flag après un court délai et met à jour lastSavedContent
@@ -3031,8 +3655,8 @@ function initLyricsEditorEnhancer() {
                 
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v2.2.0';
-                versionLabel.title = 'Genius Fast Transcriber version 2.2.0';
+                versionLabel.textContent = 'v2.3.3';
+                versionLabel.title = 'Genius Fast Transcriber version 2.3.3 - Fix : Curseur ne saute plus à la fin + Surlignage majuscules';
                 
                 footerContainer.appendChild(creditLabel);
                 footerContainer.appendChild(versionLabel);

@@ -2,7 +2,7 @@
 
 Une extension Chrome/Edge qui transforme l'expérience de transcription sur **Genius.com** en ajoutant des outils intelligents et des raccourcis puissants.
 
-![Version](https://img.shields.io/badge/version-2.2.0-blue.svg)
+![Version](https://img.shields.io/badge/version-2.3.3-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 ## 🚀 Installation Facile
@@ -47,6 +47,18 @@ L'extension sera immédiatement active sur toutes les pages d'édition de parole
 - **Espacement intelligent** : Corrige les lignes vides (ajoute/supprime selon les besoins)
 - **Bouton "Tout Corriger"** : Applique toutes les corrections avec **prévisualisation avant/après**
 - **Barre de progression** : Affichage visuel pendant les corrections longues
+
+### 🔍 Vérification des Parenthèses et Crochets (NOUVEAU v2.3.0)
+- **Détection intelligente** : Identifie automatiquement les parenthèses `( )` et crochets `[ ]` non appariés
+- **Surlignage visuel** : Les caractères problématiques sont surlignés en rouge avec une animation pulsée
+- **Messages détaillés** : Infobulle explicative au survol indiquant le type d'erreur
+- **Bouton dédié** : Cliquez sur "🔍 Vérifier ( ) [ ]" pour lancer la vérification
+- **Résout l'erreur Genius** : Évite l'erreur "Oops! It looks like you might have an uneven number of parentheses or square brackets"
+- **Détection avancée** :
+  - Parenthèse/crochet ouvrant sans fermeture
+  - Parenthèse/crochet fermant sans ouverture
+  - Mauvaises paires (ex: `[texte)` au lieu de `[texte]`)
+- **Compatible** : Fonctionne avec les deux types d'éditeurs Genius et le mode sombre
 
 ### 🎨 Formatage
 - **Gras** et **Italique** : Formatage rapide du texte sélectionné
@@ -193,7 +205,39 @@ Si vous rencontrez un bug ou avez une idée d'amélioration :
 
 ## 📝 Changelog
 
-### Version 2.2.0 (Actuelle)
+### Version 2.3.3 (Actuelle - 30 octobre 2025)
+- 🎯 **FIX MAJEUR** : Plus d'effet "jumpscare" en cliquant sur les boutons !
+  - Fix : Le curseur ne saute plus à la fin du texte lors des corrections
+  - Sauvegarde et restauration automatique de la position du curseur
+  - Le panneau reste stable, plus de scroll brutal
+  - Bonus : Ajout du surlignage pour les corrections de majuscules en début de ligne
+  - Note : Le surlignage de ponctuation viendra dans une future version (algorithme de diff complexe)
+
+### Version 2.3.2 (30 octobre 2025)
+- 🐛 **FIX CRITIQUE** : Le surlignage ne déborde plus sur 90% du texte !
+  - Fix : Algorithme amélioré pour détecter précisément les caractères modifiés
+  - Utilise maintenant la regex de recherche pour identifier les positions exactes
+  - Le surlignage est maintenant chirurgical et ne met en évidence que les corrections réelles
+  - Impact : Correction "oeu → œu" et autres fonctionnent parfaitement ! 🎯
+
+### Version 2.3.1 (30 octobre 2025)
+- 🐛 **CORRECTION** : Le surlignage des corrections est maintenant **enfin visible** ! 
+  - Fix : Les styles de Genius écrasaient le surlignage jaune des corrections
+  - Utilisation de styles inline avec `!important` pour garantir la visibilité
+  - Nouveau : Overlay visuel pour les textarea (ancien éditeur) - les corrections sont maintenant surlignées même dans les anciens éditeurs !
+  - Injection automatique des animations CSS essentielles au chargement
+  - Impact : TOUTES les corrections sont maintenant visuellement surlignées 🎉
+
+### Version 2.3.0 (30 octobre 2025)
+- 🔍 **NOUVEAU** : Vérification des parenthèses et crochets non appariés
+  - Bouton "🔍 Vérifier ( ) [ ]" dans le panneau d'outils
+  - Détection intelligente des parenthèses `( )` et crochets `[ ]` non appariés
+  - Surlignage en rouge avec animation pulsée pour identifier les erreurs
+  - Messages détaillés au survol (ouvrant sans fermeture, fermant sans ouverture, mauvaise paire)
+  - Compatible avec les deux types d'éditeurs Genius et le mode sombre
+  - Résout l'erreur Genius : "Oops! It looks like you might have an uneven number of parentheses or square brackets"
+
+### Version 2.2.0
 - 🔢 **NOUVEAU** : Conversion automatique de nombres en lettres françaises (0-999 milliards)
   - Bouton "Nombre → Lettres" dans la barre d'outils flottante
   - Apparaît uniquement lorsqu'un nombre seul est sélectionné

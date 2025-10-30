@@ -452,43 +452,52 @@
   left: 50%;
   transform: translate(-50%, -50%);
   background: white;
-  padding: 24px;
+  padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
   z-index: 10001;
-  max-width: 900px;
-  max-height: 85vh;
-  overflow-y: auto;
-  width: 90%;
+  max-width: 1200px;
+  max-height: 90vh;
+  width: 95%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .gft-preview-title {
-  margin: 0 0 16px 0;
+  margin: 0 0 12px 0;
   font-size: 20px;
   color: #0e0e0e;
   font-family: Programme, sans-serif;
   font-weight: bold;
+  flex-shrink: 0;
 }
 
 .gft-preview-summary {
   background: rgba(249, 255, 85, 0.2);
-  padding: 12px;
+  padding: 10px;
   border-radius: 4px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   font-size: 13px;
   line-height: 1.6;
+  flex-shrink: 0;
 }
 
 .gft-preview-comparison {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .gft-preview-column {
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .gft-preview-column h3 {
@@ -497,6 +506,7 @@
   color: #333;
   font-family: Programme, sans-serif;
   font-weight: bold;
+  flex-shrink: 0;
 }
 
 .gft-preview-content {
@@ -507,18 +517,28 @@
   font-size: 12px;
   line-height: 1.5;
   overflow-x: auto;
-  max-height: 400px;
   overflow-y: auto;
   white-space: pre-wrap;
   word-wrap: break-word;
   margin: 0;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Surlignage des différences en jaune dans le panneau de prévisualisation */
+.gft-diff-highlight {
+  background-color: #ffeb3b;
+  padding: 0 2px;
+  border-radius: 2px;
+  font-weight: bold;
 }
 
 .gft-preview-buttons {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 20px;
+  margin-top: 16px;
+  flex-shrink: 0;
 }
 
 .gft-preview-button {
@@ -573,6 +593,11 @@
 .gft-dark-mode .gft-preview-content {
   background: #1a1a1a;
   color: #e0e0e0;
+}
+
+.gft-dark-mode .gft-diff-highlight {
+  background-color: #f9ff55;
+  color: #0e0e0e;
 }
 
 .gft-dark-mode .gft-preview-button-cancel {
@@ -840,4 +865,117 @@
 .gft-dark-mode #gft-credit-label,
 .gft-dark-mode #gft-version-label {
   color: #999;
+}
+
+/* ----- Surlignage des erreurs de parenthèses/crochets ----- */
+.gft-bracket-error {
+  background-color: #ff4444 !important;
+  color: white !important;
+  padding: 0 2px !important;
+  border-radius: 2px !important;
+  font-weight: bold !important;
+  cursor: help !important;
+  animation: gft-bracket-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes gft-bracket-pulse {
+  0%, 100% {
+    background-color: #ff4444;
+    box-shadow: 0 0 0 rgba(255, 68, 68, 0);
+  }
+  50% {
+    background-color: #ff2222;
+    box-shadow: 0 0 8px rgba(255, 68, 68, 0.8);
+  }
+}
+
+/* Mode sombre pour les erreurs de parenthèses/crochets */
+.gft-dark-mode .gft-bracket-error {
+  background-color: #ff5555 !important;
+}
+
+@keyframes gft-bracket-pulse-dark {
+  0%, 100% {
+    background-color: #ff5555;
+    box-shadow: 0 0 0 rgba(255, 85, 85, 0);
+  }
+  50% {
+    background-color: #ff3333;
+    box-shadow: 0 0 8px rgba(255, 85, 85, 0.8);
+  }
+}
+
+.gft-dark-mode .gft-bracket-error {
+  animation: gft-bracket-pulse-dark 1.5s ease-in-out infinite;
+}
+
+/* ----- Media Queries pour la Responsivité ----- */
+
+/* Écrans moyens et petits */
+@media screen and (max-width: 1400px) {
+  #gft-preview-modal,
+  .gft-preview-modal {
+    max-height: 85vh;
+  }
+  
+  .gft-preview-content {
+    font-size: 11px;
+  }
+}
+
+/* Petits écrans */
+@media screen and (max-height: 800px) {
+  #gft-preview-modal,
+  .gft-preview-modal {
+    max-height: 95vh;
+    padding: 16px;
+  }
+  
+  .gft-preview-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .gft-preview-summary {
+    font-size: 12px;
+    padding: 8px;
+    margin-bottom: 10px;
+  }
+  
+  .gft-preview-comparison {
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .gft-preview-content {
+    font-size: 11px;
+    padding: 10px;
+  }
+  
+  .gft-preview-buttons {
+    margin-top: 12px;
+  }
+  
+  .gft-preview-button {
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+}
+
+/* Très petits écrans */
+@media screen and (max-width: 768px) {
+  #gft-preview-modal,
+  .gft-preview-modal {
+    width: 98%;
+    padding: 12px;
+  }
+  
+  .gft-preview-comparison {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .gft-preview-column h3 {
+    font-size: 13px;
+  }
 }
