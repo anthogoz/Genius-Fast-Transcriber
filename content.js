@@ -2638,7 +2638,17 @@ function removeTrailingPunctuationFromLines(text) {
  * @returns {boolean}
  */
 function isSectionTag(line) {
-    return line.trim().startsWith('[') && line.trim().endsWith(']');
+    const trimmed = line.trim();
+    // Vérifie si c'est un tag de section (commence par [ et finit par ])
+    // MAIS exclut les placeholders comme [?] ou [??]
+    if (!trimmed.startsWith('[') || !trimmed.endsWith(']')) {
+        return false;
+    }
+    
+    // Exclut les placeholders [?] (un ou plusieurs points d'interrogation)
+    const isPlaceholder = /^\[\?+\]$/.test(trimmed);
+    
+    return !isPlaceholder;
 }
 
 /**
