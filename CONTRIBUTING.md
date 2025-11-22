@@ -198,7 +198,7 @@ function maFonction(paramName) {
 
 ### Fichiers Principaux
 
-#### `content.js` (3792 lignes - v2.3.3)
+#### `content.js` (3792 lignes - v2.5)
 
 **Section 1 : Variables Globales (lignes 26-44)**
 - État de l'extension (compteurs, éditeur actif, mode sombre, historique Undo/Redo)
@@ -251,53 +251,6 @@ function maFonction(paramName) {
 - `renderTutorialStep()` : Affiche une étape spécifique
 - `isFirstLaunch()` : Détecte le premier lancement
 - `areTooltipsEnabled()` : Vérifie si les tooltips sont activés
-
-**Section 9 : Raccourcis Clavier (lignes 1462-1548)**
-- `KEYBOARD_SHORTCUTS` : Configuration des raccourcis
-- `handleKeyboardShortcut()` : Gestion des événements clavier
-- `insertTagViaShortcut()` : Insère un tag via raccourci
-
-**Section 10 : Barre d'Outils Flottante (lignes 565-758) ✨ MAJ v2.2.0**
-- `createFloatingFormattingToolbar()` : Crée la barre de formatage (gras/italique/nombres)
-- `applyFormattingToSelection()` : Applique le formatage gras/italique
-- `convertNumberToWords()` : Convertit le nombre sélectionné en lettres ✨ NOUVEAU
-- `showFloatingToolbar()` : Affiche la barre et détecte si c'est un nombre
-- `hideFloatingToolbar()` : Cache la barre d'outils
-- `handleSelectionChange()` : Détecte la sélection de texte (lignes 1977-2012)
-
-**Section 11 : Extraction de Données (lignes 175-264)**
-- `extractSongData()` : Fonction principale pour extraire titre et artistes
-
-**Section 12 : Interface Utilisateur (lignes 300-450)**
-- `createArtistSelectors()` : Crée les cases à cocher des artistes
-- `showFeedbackMessage()` : Affiche les messages temporaires
-- `applyDarkMode()` / `toggleDarkMode()` : Gestion du mode sombre
-
-**Section 13 : Corrections de Texte (lignes 1900-2220)**
-- `capitalizeFirstLetterOfEachLine()`
-- `removeTrailingPunctuationFromLines()`
-- `correctLineSpacing()` : Logique complexe pour l'espacement
-- `applyAllTextCorrectionsAsync()` : Chaîne toutes les corrections avec barre de progression
-
-**Section 14 : Éditeur Contenteditable (lignes 500-1000)**
-- `replaceAndHighlightInDiv()` : Remplacement avec surlignage dans un div
-- `applyTextTransformToDivEditor()` : Applique transformations dans un div
-
-**Section 15 : Initialisation Principale (lignes 2227-2680)**
-- `initLyricsEditorEnhancer()` : Fonction cœur qui crée le panneau
-- Gestion de la configuration des boutons (objet `SHORTCUTS`)
-- Factory de boutons avec événements
-- Création du panneau de paramètres
-
-**Section 16 : MutationObserver (lignes 2717-2787)**
-- `startObserver()` : Surveille les changements DOM (SPA)
-- Écouteurs d'événements globaux (clavier, sélection, scroll)
-
-### Points d'Extension Courants
-
-#### Ajouter un nouveau bouton de tag
-
-Modifiez l'objet `SHORTCUTS.TAGS_STRUCTURAUX` (ligne ~778) :
 
 ```javascript
 {label:'[Mon Tag]', getText:()=>addArtistToText('[Mon Tag]')}
@@ -419,6 +372,11 @@ Avant de soumettre votre PR, testez sur Genius.com :
      - Millions : 1000000, 42000000, 999999999
      - Milliards : 1000000000, 123456789012, 999999999999
    - Vérifiez l'orthographe (traits d'union, "et", pluriels de "millions" et "milliards")
+7. **Lyric Card (v2.5)** :
+   - **Mode Édition** : Sélectionnez des paroles -> bouton "Créer Lyric Card" -> Image générée
+   - **Mode Lecture** : Sélectionnez des paroles sur une page de chanson -> bouton apparaît -> Image générée
+   - **Robustesse** : Testez sur des pages avec des pochettes problématiques (ex: Vald)
+   - **Design** : Vérifiez le logo Genius, les polices, et le contraste (noir/blanc) adapté à la pochette
 
 ### Checklist avant PR
 

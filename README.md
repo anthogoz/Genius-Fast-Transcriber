@@ -2,7 +2,7 @@
 
 Une extension Chrome/Edge qui transforme l'expérience de transcription sur **Genius.com** en ajoutant des outils intelligents et des raccourcis puissants.
 
-![Version](https://img.shields.io/badge/version-2.3.3-blue.svg)
+![Version](https://img.shields.io/badge/version-2.5-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 
 ## 🚀 Installation Facile
@@ -69,6 +69,17 @@ L'extension sera immédiatement active sur toutes les pages d'édition de parole
   - Respecte les règles de l'orthographe française (traits d'union, "et", pluriels)
 - **Barre d'outils flottante** : Apparaît automatiquement lors de la sélection de texte pour un formatage rapide
 - **Mode sombre** : Interface agréable pour les yeux, avec préférence sauvegardée
+
+### 🖼️ Lyric Card (NOUVEAU v2.5)
+- **Génération d'images** : Créez instantanément une image élégante (1280x720) avec les paroles sélectionnées
+- **Design adaptatif** :
+  - Récupère automatiquement la pochette de l'album
+  - Adapte les couleurs (texte noir/blanc, bordures) en fonction de la luminosité de la pochette
+  - Utilise la police officielle "Programme" de Genius
+- **Accessible partout** :
+  - **Mode Édition** : Sélectionnez du texte -> bouton "Créer Lyric Card"
+  - **Mode Lecture** : Sélectionnez simplement des paroles sur n'importe quelle page de chanson !
+- **Robustesse** : Système intelligent de chargement d'images pour contourner les erreurs (CORS, cache)
 
 ### ↩️ Historique des Modifications
 - **Annuler/Refaire** : Historique des 10 dernières modifications
@@ -205,7 +216,17 @@ Si vous rencontrez un bug ou avez une idée d'amélioration :
 
 ## 📝 Changelog
 
-### Version 2.3.3 (Actuelle - 30 octobre 2025)
+### Version 2.5 (22 novembre 2025)
+- 🖼️ **NOUVEAU** : Fonctionnalité **Lyric Card** !
+  - Générez des images de partage magnifiques à partir de n'importe quelle sélection de paroles
+  - Design pro avec pochette d'album, flou artistique et typographie Genius
+  - Couleurs dynamiques (noir/blanc) basées sur l'analyse de l'image
+- 📖 **NOUVEAU** : Support du **Mode Lecture**
+  - La barre d'outils flottante apparaît maintenant même quand vous n'êtes pas en mode édition !
+  - Sélectionnez simplement des paroles sur une page de chanson pour créer une Lyric Card
+- 🔧 **Amélioration** : Chargement d'images ultra-robuste (contournement des problèmes de cache/CORS)
+
+### Version 2.3.3 (30 octobre 2025)
 - 🎯 **FIX MAJEUR** : Plus d'effet "jumpscare" en cliquant sur les boutons !
   - Fix : Le curseur ne saute plus à la fin du texte lors des corrections
   - Sauvegarde et restauration automatique de la position du curseur

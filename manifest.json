@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Genius Fast Transcriber (by Lnkhey)",
-  "version": "2.3.3", 
+  "version": "2.5",
   "description": "Accélérez vos transcriptions sur Genius.com ! Raccourcis intelligents, tags d'artistes auto-détectés, formatage facile.",
   "permissions": [],
   "host_permissions": [
@@ -9,9 +9,15 @@
   ],
   "content_scripts": [
     {
-      "matches": ["*://*.genius.com/*"],
-      "js": ["content.js"],
-      "css": ["styles.css"]
+      "matches": [
+        "*://*.genius.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "css": [
+        "styles.css"
+      ]
     }
   ],
   "icons": {
@@ -22,12 +28,15 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "images/icon16.png", 
-        "images/icon48.png", 
-        "images/icon128.png" 
-
+        "images/icon16.png",
+        "images/icon48.png",
+        "images/icon128.png",
+        "images/geniuslogowhite.png",
+        "images/geniuslogoblack.png"
       ],
-      "matches": ["*://*.genius.com/*"]
+      "matches": [
+        "*://*.genius.com/*"
+      ]
     }
   ]
 }

@@ -1,6 +1,6 @@
-// content.js (Version 2.3.3 - Extension Complète)
+// content.js (Version 2.5 - Extension Complète)
 /**
- * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.3.3.
+ * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.5.
  * Ce script s'injecte dans les pages du site genius.com.
  * Il détecte la présence de l'éditeur de paroles et y ajoute un panneau d'outils
  * pour accélérer et fiabiliser la transcription (ajout de tags, correction de texte, etc.).
@@ -19,10 +19,10 @@
  * - Détection et surlignage des parenthèses/crochets non appariés
  * 
  * @author Lnkhey
- * @version 2.3.3
+ * @version 2.5
  */
 
-console.log('Genius Fast Transcriber (by Lnkhey) v2.3.3 - Toutes fonctionnalités activées ! 🎵');
+console.log('Genius Fast Transcriber (by Lnkhey) v2.5 - Toutes fonctionnalités activées ! 🎵');
 
 // ----- Injection des animations CSS essentielles -----
 // Injecte l'animation de surlignage pour s'assurer qu'elle fonctionne même si les styles CSS de Genius l'écrasent
@@ -100,7 +100,8 @@ const SELECTORS = {
     TEXTAREA_EDITOR: 'textarea[class*="ExpandingTextarea__Textarea"]', // Éditeur de paroles (ancien)
     DIV_EDITOR: 'div[data-testid="lyrics-input"]', // Éditeur de paroles (nouveau, content-editable)
     CONTROLS_STICKY_SECTION: 'div[class^="LyricsEdit-desktop__Controls-sc-"]', // Section où le panneau d'outils sera injecté.
-    GENIUS_FORMATTING_HELPER: 'div[class*="LyricsEditExplainer__Container-sc-"][class*="LyricsEdit-desktop__Explainer-sc-"]' // Aide de Genius, que nous masquons.
+    GENIUS_FORMATTING_HELPER: 'div[class*="LyricsEditExplainer__Container-sc-"][class*="LyricsEdit-desktop__Explainer-sc-"]', // Aide de Genius, que nous masquons.
+    LYRICS_CONTAINER: '[data-lyrics-container="true"]' // Conteneur des paroles en mode lecture
 };
 
 /**
@@ -179,124 +180,124 @@ function formatArtistList(artists) {
  */
 function numberToFrenchWords(num) {
     if (num === 0) return "zéro";
-    
+
     const ones = ["", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"];
     const teens = ["dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf"];
     const tens = ["", "", "vingt", "trente", "quarante", "cinquante", "soixante", "soixante", "quatre-vingt", "quatre-vingt"];
-    
+
     function convertUpTo99(n) {
         if (n < 10) return ones[n];
         if (n < 20) return teens[n - 10];
-        
+
         const ten = Math.floor(n / 10);
         const one = n % 10;
-        
+
         if (ten === 7) {
             // 70-79: soixante-dix, soixante et onze, soixante-douze, etc.
             if (one === 0) return "soixante-dix";
             if (one === 1) return "soixante et onze";
             return "soixante-" + teens[one];
         }
-        
+
         if (ten === 9) {
             // 90-99: quatre-vingt-dix, quatre-vingt-onze, etc.
             if (one === 0) return "quatre-vingt-dix";
             return "quatre-vingt-" + teens[one];
         }
-        
+
         if (one === 0) {
             if (ten === 8) return "quatre-vingts"; // 80 avec un "s"
             return tens[ten];
         }
-        
+
         if (one === 1 && (ten === 2 || ten === 3 || ten === 4 || ten === 5 || ten === 6)) {
             return tens[ten] + " et un";
         }
-        
+
         if (ten === 8) return "quatre-vingt-" + ones[one]; // 81-89 sans "s"
         return tens[ten] + "-" + ones[one];
     }
-    
+
     function convertUpTo999(n) {
         if (n < 100) return convertUpTo99(n);
-        
+
         const hundred = Math.floor(n / 100);
         const rest = n % 100;
-        
+
         let result = "";
         if (hundred === 1) {
             result = "cent";
         } else {
             result = ones[hundred] + " cent";
         }
-        
+
         if (rest === 0 && hundred > 1) {
             result += "s"; // "cents" au pluriel
         } else if (rest > 0) {
             result += " " + convertUpTo99(rest);
         }
-        
+
         return result;
     }
-    
+
     // Vérifie la limite (999 milliards 999 millions 999 mille 999)
     if (num < 0 || num > 999999999999) return num.toString();
-    
+
     if (num < 1000) return convertUpTo999(num);
-    
+
     // Gestion des milliards (1 000 000 000 à 999 999 999 999)
     if (num >= 1000000000) {
         const billions = Math.floor(num / 1000000000);
         const rest = num % 1000000000;
-        
+
         let result = "";
         if (billions === 1) {
             result = "un milliard";
         } else {
             result = convertUpTo999(billions) + " milliards";
         }
-        
+
         if (rest > 0) {
             result += " " + numberToFrenchWords(rest);
         }
-        
+
         return result;
     }
-    
+
     // Gestion des millions (1 000 000 à 999 999 999)
     if (num >= 1000000) {
         const millions = Math.floor(num / 1000000);
         const rest = num % 1000000;
-        
+
         let result = "";
         if (millions === 1) {
             result = "un million";
         } else {
             result = convertUpTo999(millions) + " millions";
         }
-        
+
         if (rest > 0) {
             result += " " + numberToFrenchWords(rest);
         }
-        
+
         return result;
     }
-    
+
     // Gestion des milliers (1 000 à 999 999)
     const thousand = Math.floor(num / 1000);
     const rest = num % 1000;
-    
+
     let result = "";
     if (thousand === 1) {
         result = "mille";
     } else {
         result = convertUpTo999(thousand) + " mille";
     }
-    
+
     if (rest > 0) {
         result += " " + convertUpTo999(rest);
     }
-    
+
     return result;
 }
 
@@ -531,10 +532,10 @@ function replaceAndHighlightInDiv(editorNode, searchRegex, replacementTextOrFn, 
                 if (match.index > lastIndex) fragment.appendChild(document.createTextNode(textNode.nodeValue.substring(lastIndex, match.index)));
                 const actualReplacement = typeof replacementTextOrFn === 'function' ? replacementTextOrFn(match[0], ...match.slice(1)) : replacementTextOrFn;
                 const span = document.createElement('span');
-                span.className = highlightClass; 
+                span.className = highlightClass;
                 // Applique des styles inline avec !important pour éviter qu'ils soient écrasés par les styles de Genius
                 span.style.cssText = 'background-color: #f9ff55 !important; border-radius: 2px !important; padding: 0 1px !important; animation: lyrics-helper-fadeout 2s ease-out forwards !important;';
-                span.textContent = actualReplacement; 
+                span.textContent = actualReplacement;
                 fragment.appendChild(span);
                 lastIndex = localSearchRegex.lastIndex;
                 nodeChangedThisIteration = true;
@@ -568,7 +569,7 @@ function findUnmatchedBracketsAndParentheses(text) {
 
     for (let i = 0; i < text.length; i++) {
         const char = text[i];
-        
+
         if (pairs[char]) {
             // C'est un caractère ouvrant
             stack.push({ char: char, position: i });
@@ -622,7 +623,7 @@ function createTextareaReplacementOverlay(textarea, originalText, newText, searc
     // Trouve les positions des modifications en appliquant la regex sur le texte MODIFIÉ
     // Pour identifier les caractères qui ont été changés
     const modifiedPositions = new Set();
-    
+
     // Utilise un algorithme de différence simple mais plus précis
     // Trouve tous les matches de la regex dans l'original
     const originalMatches = [];
@@ -637,7 +638,7 @@ function createTextareaReplacementOverlay(textarea, originalText, newText, searc
         });
         if (!searchPattern.flags.includes('g')) break;
     }
-    
+
     // Pour chaque match trouvé dans l'original, trouve la position correspondante dans le nouveau texte
     let offset = 0; // Décalage causé par les remplacements
     originalMatches.forEach(originalMatch => {
@@ -645,7 +646,7 @@ function createTextareaReplacementOverlay(textarea, originalText, newText, searc
         // Calcule la différence de longueur causée par ce remplacement
         // On doit trouver combien de caractères ont été ajoutés/supprimés
         const originalLength = originalMatch.end - originalMatch.start;
-        
+
         // Trouve le texte de remplacement en regardant dans newText
         let newLength = 0;
         let k = posInNew;
@@ -660,12 +661,12 @@ function createTextareaReplacementOverlay(textarea, originalText, newText, searc
             // C'est à la fin du texte
             newLength = newText.length - posInNew;
         }
-        
+
         // Marque les positions modifiées
         for (let i = posInNew; i < posInNew + newLength; i++) {
             modifiedPositions.add(i);
         }
-        
+
         // Met à jour le décalage
         offset += (newLength - originalLength);
     });
@@ -706,20 +707,20 @@ function createTextareaReplacementOverlay(textarea, originalText, newText, searc
             htmlContent += `<span style="color: transparent;">${char === '<' ? '&lt;' : char === '>' ? '&gt;' : char === '&' ? '&amp;' : char === '\n' ? '<br>' : char}</span>`;
         }
     }
-    
+
     overlay.innerHTML = htmlContent;
-    
+
     // Insère l'overlay avant le textarea dans le DOM
     textarea.parentNode.insertBefore(overlay, textarea);
-    
+
     // Synchronise le scroll de l'overlay avec celui du textarea
     const syncScroll = () => {
         overlay.scrollTop = textarea.scrollTop;
         overlay.scrollLeft = textarea.scrollLeft;
     };
-    
+
     textarea.addEventListener('scroll', syncScroll);
-    
+
     // Supprime l'overlay après l'animation (2 secondes)
     setTimeout(() => {
         if (overlay && overlay.parentNode) {
@@ -771,7 +772,7 @@ function createTextareaOverlay(textarea, unmatched) {
     const text = textarea.value;
     const unmatchedPositions = new Set(unmatched.map(u => u.position));
     let htmlContent = '';
-    
+
     for (let i = 0; i < text.length; i++) {
         const char = text[i];
         if (unmatchedPositions.has(i)) {
@@ -789,18 +790,18 @@ function createTextareaOverlay(textarea, unmatched) {
             htmlContent += `<span style="color: transparent;">${char === '<' ? '&lt;' : char === '>' ? '&gt;' : char === '&' ? '&amp;' : char === '\n' ? '<br>' : char}</span>`;
         }
     }
-    
+
     overlay.innerHTML = htmlContent;
-    
+
     // Insère l'overlay avant le textarea dans le DOM
     textarea.parentNode.insertBefore(overlay, textarea);
-    
+
     // Synchronise le scroll de l'overlay avec celui du textarea
     const syncScroll = () => {
         overlay.scrollTop = textarea.scrollTop;
         overlay.scrollLeft = textarea.scrollLeft;
     };
-    
+
     textarea.addEventListener('scroll', syncScroll);
     textarea.addEventListener('input', () => {
         // Supprime l'overlay quand l'utilisateur commence à taper
@@ -834,10 +835,10 @@ function createTextareaOverlay(textarea, unmatched) {
 function highlightUnmatchedBracketsInEditor(editorNode, editorType) {
     console.log('[GFT] highlightUnmatchedBracketsInEditor appelée');
     console.log('[GFT] editorType:', editorType);
-    
+
     const text = editorType === 'textarea' ? editorNode.value : editorNode.textContent;
     console.log('[GFT] Texte à analyser (longueur):', text.length);
-    
+
     const unmatched = findUnmatchedBracketsAndParentheses(text);
     console.log('[GFT] Caractères non appariés trouvés:', unmatched.length);
 
@@ -850,7 +851,7 @@ function highlightUnmatchedBracketsInEditor(editorNode, editorType) {
         console.log('[GFT] Aucun problème trouvé, retour 0');
         return 0;
     }
-    
+
     console.log('[GFT] Problèmes trouvés, création de l\'overlay...');
 
     if (editorType === 'div') {
@@ -877,7 +878,7 @@ function highlightUnmatchedBracketsInEditor(editorNode, editorType) {
             if (relevantPositions.length > 0) {
                 const parent = textNode.parentNode;
                 // Ne surligne pas si déjà surligné
-                if (parent && parent.nodeType === Node.ELEMENT_NODE && 
+                if (parent && parent.nodeType === Node.ELEMENT_NODE &&
                     parent.classList.contains('gft-bracket-error')) {
                     globalPosition += nodeText.length;
                     return;
@@ -888,7 +889,7 @@ function highlightUnmatchedBracketsInEditor(editorNode, editorType) {
 
                 relevantPositions.forEach(unmatchedItem => {
                     const localPos = unmatchedItem.position - nodeStartPos;
-                    
+
                     // Ajoute le texte avant le caractère non apparié
                     if (localPos > lastIndex) {
                         fragment.appendChild(document.createTextNode(nodeText.substring(lastIndex, localPos)));
@@ -899,7 +900,7 @@ function highlightUnmatchedBracketsInEditor(editorNode, editorType) {
                     span.className = 'gft-bracket-error';
                     span.textContent = nodeText[localPos];
                     span.style.cssText = 'background-color: #ff4444 !important; color: white !important; padding: 0 2px; border-radius: 2px; font-weight: bold;';
-                    
+
                     // Ajoute un titre pour expliquer le problème
                     if (unmatchedItem.type === 'opening-without-closing') {
                         span.title = `${unmatchedItem.char} ouvrant sans fermeture correspondante`;
@@ -908,7 +909,7 @@ function highlightUnmatchedBracketsInEditor(editorNode, editorType) {
                     } else if (unmatchedItem.type === 'wrong-pair') {
                         span.title = `${unmatchedItem.char} ne correspond pas au caractère ouvrant`;
                     }
-                    
+
                     fragment.appendChild(span);
                     lastIndex = localPos + 1;
                 });
@@ -928,7 +929,7 @@ function highlightUnmatchedBracketsInEditor(editorNode, editorType) {
     } else {
         // Pour les textarea, crée un overlay visuel pour simuler le surlignage
         createTextareaOverlay(editorNode, unmatched);
-        
+
         // Ne pas forcer le focus ou le scroll pour éviter la "téléportation"
         // L'utilisateur peut voir les erreurs surlignées sans être déplacé
     }
@@ -952,19 +953,35 @@ let feedbackTimeout = null; // Timeout pour masquer automatiquement le message d
  * @param {HTMLElement} [parentElement] - L'élément parent où afficher le message.
  */
 function showFeedbackMessage(message, duration = 3000, parentElement) {
-    const container = parentElement || shortcutsContainerElement;
-    if (!container) { console.warn("showFeedbackMessage: Conteneur non trouvé."); return; }
+    let container = parentElement || shortcutsContainerElement;
+
+    // Fallback sur le body si aucun conteneur n'est trouvé (ex: mode lecture)
+    if (!container) {
+        container = document.body;
+    }
+
     let feedbackEl = document.getElementById(FEEDBACK_MESSAGE_ID);
     if (!feedbackEl) {
         feedbackEl = document.createElement('div');
         feedbackEl.id = FEEDBACK_MESSAGE_ID;
-        if (container.lastChild !== feedbackEl) {
+
+        // Si on est sur le body, on s'assure que le style est approprié (fixed position)
+        // Le CSS gère déjà probablement ça, mais on vérifie l'attachement
+        container.appendChild(feedbackEl);
+    } else {
+        // Si l'élément existe mais n'est pas dans le conteneur actuel (cas rare de changement de contexte)
+        if (!container.contains(feedbackEl)) {
             container.appendChild(feedbackEl);
         }
     }
+
     feedbackEl.textContent = message;
     feedbackEl.classList.add(GFT_VISIBLE_CLASS);
-    if (feedbackTimeout) clearTimeout(feedbackTimeout);
+
+    if (feedbackTimeout) {
+        clearTimeout(feedbackTimeout);
+    }
+
     feedbackTimeout = setTimeout(() => {
         if (feedbackEl) {
             feedbackEl.classList.remove(GFT_VISIBLE_CLASS);
@@ -986,7 +1003,7 @@ function applyDarkMode(isDark) {
             if (darkModeButton) darkModeButton.textContent = '🌙';
         }
     }
-    
+
     // Applique aussi le mode sombre à la barre flottante
     if (floatingFormattingToolbar) {
         if (isDark) {
@@ -995,7 +1012,7 @@ function applyDarkMode(isDark) {
             floatingFormattingToolbar.classList.remove(DARK_MODE_CLASS);
         }
     }
-    
+
     // Sauvegarde la préférence dans le stockage local du navigateur.
     localStorage.setItem(DARK_MODE_STORAGE_KEY, isDark.toString());
 }
@@ -1025,11 +1042,11 @@ function createFloatingFormattingToolbar() {
     if (floatingFormattingToolbar && document.body.contains(floatingFormattingToolbar)) {
         return floatingFormattingToolbar;
     }
-    
+
     const toolbar = document.createElement('div');
     toolbar.id = FLOATING_TOOLBAR_ID;
     toolbar.className = 'gft-floating-toolbar';
-    
+
     // Bouton Gras
     const boldButton = document.createElement('button');
     boldButton.textContent = 'Gras';
@@ -1042,7 +1059,7 @@ function createFloatingFormattingToolbar() {
         applyFormattingToSelection('bold');
     });
     addTooltip(boldButton, 'Mettre le texte sélectionné en gras');
-    
+
     // Bouton Italique
     const italicButton = document.createElement('button');
     italicButton.textContent = 'Italique';
@@ -1055,7 +1072,20 @@ function createFloatingFormattingToolbar() {
         applyFormattingToSelection('italic');
     });
     addTooltip(italicButton, 'Mettre le texte sélectionné en italique');
-    
+
+    // Bouton Créer Lyrics Card
+    const lyricsCardButton = document.createElement('button');
+    lyricsCardButton.textContent = 'Créer Lyric Card';
+    lyricsCardButton.classList.add('gft-floating-format-button');
+    lyricsCardButton.title = 'Générer une image avec les paroles sélectionnées';
+    lyricsCardButton.type = 'button';
+    lyricsCardButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        generateLyricsCard();
+    });
+    addTooltip(lyricsCardButton, 'Générer une Lyric Card (1280x720)');
+
     // Bouton Nombre → Lettres
     const numberButton = document.createElement('button');
     numberButton.textContent = 'Nombre → Lettres';
@@ -1069,20 +1099,21 @@ function createFloatingFormattingToolbar() {
         convertNumberToWords();
     });
     addTooltip(numberButton, 'Convertir le nombre sélectionné en lettres');
-    
+
     toolbar.appendChild(boldButton);
     toolbar.appendChild(italicButton);
+    toolbar.appendChild(lyricsCardButton);
     toolbar.appendChild(numberButton);
     document.body.appendChild(toolbar);
-    
+
     floatingFormattingToolbar = toolbar;
-    
+
     // Applique le mode sombre si nécessaire
     const isDarkMode = localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true';
     if (isDarkMode) {
         toolbar.classList.add(DARK_MODE_CLASS);
     }
-    
+
     return toolbar;
 }
 
@@ -1092,23 +1123,23 @@ function createFloatingFormattingToolbar() {
  */
 function applyFormattingToSelection(formatType) {
     if (!currentActiveEditor) return;
-    
+
     // Active le flag pour désactiver la sauvegarde automatique
     isButtonActionInProgress = true;
-    
+
     // Annule le timeout de sauvegarde automatique
     if (autoSaveTimeout) {
         clearTimeout(autoSaveTimeout);
         autoSaveTimeout = null;
     }
-    
+
     // Sauvegarde dans l'historique avant modification
     saveToHistory();
-    
+
     currentActiveEditor.focus();
     const prefix = formatType === 'bold' ? '<b>' : '<i>';
     const suffix = formatType === 'bold' ? '</b>' : '</i>';
-    
+
     if (currentEditorType === 'textarea') {
         const start = currentActiveEditor.selectionStart;
         const end = currentActiveEditor.selectionEnd;
@@ -1137,7 +1168,7 @@ function applyFormattingToSelection(formatType) {
             selection.addRange(newRange);
         }
     }
-    
+
     // Désactive le flag après un court délai et met à jour lastSavedContent
     setTimeout(() => {
         isButtonActionInProgress = false;
@@ -1146,7 +1177,7 @@ function applyFormattingToSelection(formatType) {
             hasUnsavedChanges = false;
         }
     }, 100);
-    
+
     // Cache la barre d'outils après l'application du formatage
     hideFloatingToolbar();
 }
@@ -1156,24 +1187,24 @@ function applyFormattingToSelection(formatType) {
  */
 function convertNumberToWords() {
     if (!currentActiveEditor) return;
-    
+
     // Active le flag pour désactiver la sauvegarde automatique
     isButtonActionInProgress = true;
-    
+
     // Annule le timeout de sauvegarde automatique
     if (autoSaveTimeout) {
         clearTimeout(autoSaveTimeout);
         autoSaveTimeout = null;
     }
-    
+
     // Sauvegarde dans l'historique avant modification
     saveToHistory();
-    
+
     currentActiveEditor.focus();
-    
+
     let selectedText = '';
     let start, end;
-    
+
     if (currentEditorType === 'textarea') {
         start = currentActiveEditor.selectionStart;
         end = currentActiveEditor.selectionEnd;
@@ -1184,16 +1215,16 @@ function convertNumberToWords() {
             selectedText = selection.toString().trim();
         }
     }
-    
+
     // Vérifie si c'est un nombre valide
     if (!isValidNumber(selectedText)) {
         hideFloatingToolbar();
         return;
     }
-    
+
     const num = parseInt(selectedText, 10);
     const wordsText = numberToFrenchWords(num);
-    
+
     // Remplace le texte sélectionné
     if (currentEditorType === 'textarea') {
         document.execCommand('insertText', false, wordsText);
@@ -1202,7 +1233,7 @@ function convertNumberToWords() {
     } else if (currentEditorType === 'div') {
         document.execCommand('insertText', false, wordsText);
     }
-    
+
     // Désactive le flag après un court délai et met à jour lastSavedContent
     setTimeout(() => {
         isButtonActionInProgress = false;
@@ -1211,7 +1242,7 @@ function convertNumberToWords() {
             hasUnsavedChanges = false;
         }
     }, 100);
-    
+
     // Cache la barre d'outils après la conversion
     hideFloatingToolbar();
 }
@@ -1223,12 +1254,12 @@ function convertNumberToWords() {
  */
 function calculateStats(text) {
     if (!text) return { lines: 0, words: 0, sections: 0, characters: 0 };
-    
+
     const lines = text.split('\n').filter(l => l.trim().length > 0);
     const words = text.split(/\s+/).filter(w => w.trim().length > 0);
     const sections = (text.match(/\[.*?\]/g) || []).length;
     const characters = text.replace(/\s/g, '').length;
-    
+
     return {
         lines: lines.length,
         words: words.length,
@@ -1242,16 +1273,16 @@ function calculateStats(text) {
  */
 function updateStatsDisplay() {
     if (!currentActiveEditor) return;
-    
+
     const statsElement = document.getElementById('gft-stats-display');
     if (!statsElement || !statsElement.classList.contains('gft-stats-visible')) return;
-    
-    const text = currentEditorType === 'textarea' 
-        ? currentActiveEditor.value 
+
+    const text = currentEditorType === 'textarea'
+        ? currentActiveEditor.value
         : currentActiveEditor.textContent || '';
-    
+
     const stats = calculateStats(text);
-    
+
     statsElement.innerHTML = `📊 <strong>${stats.lines}</strong> lignes • <strong>${stats.words}</strong> mots • <strong>${stats.sections}</strong> sections • <strong>${stats.characters}</strong> caractères`;
 }
 
@@ -1272,9 +1303,9 @@ function debouncedStatsUpdate() {
 function toggleStatsDisplay() {
     const statsElement = document.getElementById('gft-stats-display');
     if (!statsElement) return;
-    
+
     const isVisible = statsElement.classList.contains('gft-stats-visible');
-    
+
     if (isVisible) {
         statsElement.classList.remove('gft-stats-visible');
         localStorage.setItem('gft-stats-visible', 'false');
@@ -1293,13 +1324,13 @@ function createStatsDisplay() {
     const statsElement = document.createElement('div');
     statsElement.id = 'gft-stats-display';
     statsElement.className = 'gft-stats-display';
-    
+
     // Restaurer l'état sauvegardé
     const isVisible = localStorage.getItem('gft-stats-visible') === 'true';
     if (isVisible) {
         statsElement.classList.add('gft-stats-visible');
     }
-    
+
     return statsElement;
 }
 
@@ -1311,7 +1342,7 @@ function createStatsDisplay() {
  */
 function getCurrentEditorContent() {
     if (!currentActiveEditor) return '';
-    
+
     if (currentEditorType === 'textarea') {
         return currentActiveEditor.value;
     } else if (currentEditorType === 'div') {
@@ -1326,7 +1357,7 @@ function getCurrentEditorContent() {
  */
 function setEditorContent(content) {
     if (!currentActiveEditor) return;
-    
+
     if (currentEditorType === 'textarea') {
         currentActiveEditor.value = content;
         currentActiveEditor.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
@@ -1343,17 +1374,17 @@ function setEditorContent(content) {
             }
             currentActiveEditor.appendChild(lineDiv);
         });
-        
+
         // S'assure que l'éditeur n'est jamais complètement vide
         if (currentActiveEditor.childNodes.length === 0) {
             const emptyDiv = document.createElement('div');
             emptyDiv.appendChild(document.createElement('br'));
             currentActiveEditor.appendChild(emptyDiv);
         }
-        
+
         currentActiveEditor.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
     }
-    
+
     // Met à jour les statistiques
     debouncedStatsUpdate();
 }
@@ -1369,26 +1400,26 @@ let hasUnsavedChanges = false; // Flag pour savoir si des modifications non sauv
  */
 function saveToHistory() {
     if (!currentActiveEditor || isUndoRedoInProgress) return;
-    
+
     const currentContent = getCurrentEditorContent();
-    
+
     // Ne sauvegarde pas si le contenu est identique au dernier élément de l'undoStack
     if (undoStack.length > 0 && undoStack[undoStack.length - 1] === currentContent) {
         return;
     }
-    
+
     undoStack.push(currentContent);
     lastSavedContent = currentContent;
     hasUnsavedChanges = false;
-    
+
     // Limite la taille de l'historique (FIFO)
     if (undoStack.length > MAX_HISTORY_SIZE) {
         undoStack.shift(); // Retire le plus ancien
     }
-    
+
     // Vider le redoStack car nouvelle branche d'historique
     redoStack = [];
-    
+
     // Met à jour les boutons
     updateHistoryButtons();
 }
@@ -1400,38 +1431,38 @@ function saveToHistory() {
  */
 function autoSaveToHistory() {
     if (!currentActiveEditor || isUndoRedoInProgress || isButtonActionInProgress) return;
-    
+
     const currentContent = getCurrentEditorContent();
-    
+
     // Si c'est le premier changement depuis la dernière sauvegarde,
     // on sauvegarde IMMÉDIATEMENT l'état AVANT la modification
     if (!hasUnsavedChanges && currentContent !== lastSavedContent) {
         // Sauvegarde l'état AVANT (qui est dans lastSavedContent ou le dernier de undoStack)
         if (lastSavedContent && lastSavedContent !== (undoStack[undoStack.length - 1] || '')) {
             undoStack.push(lastSavedContent);
-            
+
             // Limite la taille de l'historique (FIFO)
             if (undoStack.length > MAX_HISTORY_SIZE) {
                 undoStack.shift();
             }
-            
+
             // Vider le redoStack car nouvelle branche d'historique
             redoStack = [];
-            
+
             updateHistoryButtons();
         }
         hasUnsavedChanges = true;
     }
-    
+
     // Annule le timeout précédent
     if (autoSaveTimeout) {
         clearTimeout(autoSaveTimeout);
     }
-    
+
     // Après 2 secondes d'inactivité, met à jour lastSavedContent et réinitialise le flag
     autoSaveTimeout = setTimeout(() => {
         if (isUndoRedoInProgress || isButtonActionInProgress) return;
-        
+
         const finalContent = getCurrentEditorContent();
         lastSavedContent = finalContent;
         hasUnsavedChanges = false;
@@ -1444,19 +1475,19 @@ function autoSaveToHistory() {
  */
 async function executeButtonAction(action) {
     isButtonActionInProgress = true;
-    
+
     // Annule le timeout de sauvegarde automatique
     if (autoSaveTimeout) {
         clearTimeout(autoSaveTimeout);
         autoSaveTimeout = null;
     }
-    
+
     // Sauvegarde l'état AVANT la modification
     saveToHistory();
-    
+
     // Exécute l'action
     await action();
-    
+
     // Désactive le flag après un court délai
     setTimeout(() => {
         isButtonActionInProgress = false;
@@ -1475,35 +1506,35 @@ function undoLastChange() {
         showFeedbackMessage("Aucune modification à annuler", 2000, shortcutsContainerElement);
         return;
     }
-    
+
     // Active le flag pour éviter les sauvegardes automatiques
     isUndoRedoInProgress = true;
-    
+
     // Annule le timeout de sauvegarde automatique
     if (autoSaveTimeout) {
         clearTimeout(autoSaveTimeout);
         autoSaveTimeout = null;
     }
-    
+
     // Sauvegarde l'état actuel dans le redoStack
     const currentContent = getCurrentEditorContent();
     redoStack.push(currentContent);
-    
+
     // Récupère le dernier état depuis l'undoStack
     const previousContent = undoStack.pop();
-    
+
     // Restaure cet état
     setEditorContent(previousContent);
-    
+
     // Met à jour lastSavedContent et réinitialise hasUnsavedChanges
     lastSavedContent = previousContent;
     hasUnsavedChanges = false;
-    
+
     // Met à jour les boutons
     updateHistoryButtons();
-    
+
     showFeedbackMessage("↩️ Modification annulée", 2000, shortcutsContainerElement);
-    
+
     // Désactive le flag après un court délai
     setTimeout(() => {
         isUndoRedoInProgress = false;
@@ -1518,40 +1549,40 @@ function redoLastChange() {
         showFeedbackMessage("Aucune modification à refaire", 2000, shortcutsContainerElement);
         return;
     }
-    
+
     // Active le flag pour éviter les sauvegardes automatiques
     isUndoRedoInProgress = true;
-    
+
     // Annule le timeout de sauvegarde automatique
     if (autoSaveTimeout) {
         clearTimeout(autoSaveTimeout);
         autoSaveTimeout = null;
     }
-    
+
     // Sauvegarde l'état actuel dans l'undoStack
     const currentContent = getCurrentEditorContent();
     undoStack.push(currentContent);
-    
+
     // Limite la taille
     if (undoStack.length > MAX_HISTORY_SIZE) {
         undoStack.shift();
     }
-    
+
     // Récupère le dernier état depuis le redoStack
     const nextContent = redoStack.pop();
-    
+
     // Restaure cet état
     setEditorContent(nextContent);
-    
+
     // Met à jour lastSavedContent et réinitialise hasUnsavedChanges
     lastSavedContent = nextContent;
     hasUnsavedChanges = false;
-    
+
     // Met à jour les boutons
     updateHistoryButtons();
-    
+
     showFeedbackMessage("↪️ Modification refaite", 2000, shortcutsContainerElement);
-    
+
     // Désactive le flag après un court délai
     setTimeout(() => {
         isUndoRedoInProgress = false;
@@ -1564,7 +1595,7 @@ function redoLastChange() {
 function updateHistoryButtons() {
     const undoButton = document.getElementById('gft-undo-button');
     const redoButton = document.getElementById('gft-redo-button');
-    
+
     if (undoButton) {
         if (undoStack.length === 0) {
             undoButton.disabled = true;
@@ -1576,7 +1607,7 @@ function updateHistoryButtons() {
             undoButton.style.cursor = 'pointer';
         }
     }
-    
+
     if (redoButton) {
         if (redoStack.length === 0) {
             redoButton.disabled = true;
@@ -1600,19 +1631,19 @@ function createProgressBar() {
     const progressContainer = document.createElement('div');
     progressContainer.id = 'gft-progress-container';
     progressContainer.className = 'gft-progress-container';
-    
+
     const progressBar = document.createElement('div');
     progressBar.id = 'gft-progress-bar';
     progressBar.className = 'gft-progress-bar';
-    
+
     const progressText = document.createElement('div');
     progressText.id = 'gft-progress-text';
     progressText.className = 'gft-progress-text';
     progressText.textContent = 'Préparation...';
-    
+
     progressContainer.appendChild(progressBar);
     progressContainer.appendChild(progressText);
-    
+
     return progressContainer;
 }
 
@@ -1624,11 +1655,11 @@ function createProgressBar() {
  */
 function showProgress(step, total, message) {
     let progressContainer = document.getElementById('gft-progress-container');
-    
+
     // Crée le conteneur s'il n'existe pas
     if (!progressContainer && shortcutsContainerElement) {
         progressContainer = createProgressBar();
-        
+
         // Insère après le titre ou au début du panneau
         const feedbackMsg = document.getElementById(FEEDBACK_MESSAGE_ID);
         if (feedbackMsg) {
@@ -1642,23 +1673,23 @@ function showProgress(step, total, message) {
             }
         }
     }
-    
+
     if (!progressContainer) return;
-    
+
     // Affiche le conteneur
     progressContainer.style.display = 'block';
-    
+
     const progressBar = document.getElementById('gft-progress-bar');
     const progressText = document.getElementById('gft-progress-text');
-    
+
     // Calcule le pourcentage
     const percentage = Math.round((step / total) * 100);
-    
+
     // Met à jour la barre
     if (progressBar) {
         progressBar.style.width = `${percentage}%`;
     }
-    
+
     // Met à jour le texte
     if (progressText) {
         progressText.textContent = `${message} (${step}/${total})`;
@@ -1690,13 +1721,13 @@ function highlightDifferences(originalText, correctedText) {
         div.textContent = text;
         return div.innerHTML;
     }
-    
+
     // Algorithme de diff amélioré utilisant la plus longue sous-séquence commune (LCS)
     function computeLCS(str1, str2) {
         const m = str1.length;
         const n = str2.length;
         const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
-        
+
         for (let i = 1; i <= m; i++) {
             for (let j = 1; j <= n; j++) {
                 if (str1[i - 1] === str2[j - 1]) {
@@ -1706,7 +1737,7 @@ function highlightDifferences(originalText, correctedText) {
                 }
             }
         }
-        
+
         // Reconstruction du chemin
         const lcs = [];
         let i = m, j = n;
@@ -1721,35 +1752,35 @@ function highlightDifferences(originalText, correctedText) {
                 j--;
             }
         }
-        
+
         return lcs;
     }
-    
+
     // Calcule la LCS
     const lcs = computeLCS(originalText, correctedText);
-    
+
     // Construit le résultat avec surlignage
     let result = '';
     let lastJ = 0;
-    
+
     for (let k = 0; k < lcs.length; k++) {
         const match = lcs[k];
-        
+
         // Surligne les caractères ajoutés/modifiés avant ce match
         if (lastJ < match.j) {
             result += `<span class="gft-diff-highlight">${escapeHtml(correctedText.substring(lastJ, match.j))}</span>`;
         }
-        
+
         // Ajoute le caractère correspondant (non modifié)
         result += escapeHtml(correctedText[match.j]);
         lastJ = match.j + 1;
     }
-    
+
     // Surligne les caractères restants à la fin
     if (lastJ < correctedText.length) {
         result += `<span class="gft-diff-highlight">${escapeHtml(correctedText.substring(lastJ))}</span>`;
     }
-    
+
     return result;
 }
 
@@ -1766,24 +1797,24 @@ function showCorrectionPreview(originalText, correctedText, corrections, onApply
     const overlay = document.createElement('div');
     overlay.id = 'gft-preview-overlay';
     overlay.className = 'gft-preview-overlay';
-    
+
     // Crée le modal
     const modal = document.createElement('div');
     modal.id = 'gft-preview-modal';
     modal.className = 'gft-preview-modal';
-    
+
     // Applique le mode sombre si nécessaire
     const isDarkMode = localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true';
     if (isDarkMode) {
         modal.classList.add(DARK_MODE_CLASS);
     }
-    
+
     // Titre
     const title = document.createElement('h2');
     title.textContent = '🔍 Prévisualisation des corrections';
     title.className = 'gft-preview-title';
     modal.appendChild(title);
-    
+
     // Résumé des corrections
     const summary = document.createElement('div');
     summary.className = 'gft-preview-summary';
@@ -1794,18 +1825,18 @@ function showCorrectionPreview(originalText, correctedText, corrections, onApply
     if (corrections.capitalization > 0) detailsArray.push(`${corrections.capitalization} majuscule(s)`);
     if (corrections.punctuation > 0) detailsArray.push(`${corrections.punctuation} ponctuation(s)`);
     if (corrections.spacing > 0) detailsArray.push(`${corrections.spacing} espacement(s)`);
-    
-    const totalCorrections = corrections.yPrime + corrections.apostrophes + 
-                           corrections.oeuLigature + corrections.capitalization + 
-                           corrections.punctuation + corrections.spacing;
-    
+
+    const totalCorrections = corrections.yPrime + corrections.apostrophes +
+        corrections.oeuLigature + corrections.capitalization +
+        corrections.punctuation + corrections.spacing;
+
     summary.innerHTML = `<strong>📊 ${totalCorrections} correction(s) détectée(s) :</strong><br>${detailsArray.join(', ')}`;
     modal.appendChild(summary);
-    
+
     // Conteneur de comparaison
     const comparisonContainer = document.createElement('div');
     comparisonContainer.className = 'gft-preview-comparison';
-    
+
     // Colonne "Avant"
     const beforeColumn = document.createElement('div');
     beforeColumn.className = 'gft-preview-column';
@@ -1818,7 +1849,7 @@ function showCorrectionPreview(originalText, correctedText, corrections, onApply
     // Affiche le texte complet (pas de troncature)
     beforeContent.textContent = originalText;
     beforeColumn.appendChild(beforeContent);
-    
+
     // Colonne "Après"
     const afterColumn = document.createElement('div');
     afterColumn.className = 'gft-preview-column';
@@ -1831,15 +1862,15 @@ function showCorrectionPreview(originalText, correctedText, corrections, onApply
     // Génère le HTML avec les différences surlignées
     afterContent.innerHTML = highlightDifferences(originalText, correctedText);
     afterColumn.appendChild(afterContent);
-    
+
     comparisonContainer.appendChild(beforeColumn);
     comparisonContainer.appendChild(afterColumn);
     modal.appendChild(comparisonContainer);
-    
+
     // Synchronise le scroll entre les deux zones
     let isSyncingBefore = false;
     let isSyncingAfter = false;
-    
+
     beforeContent.addEventListener('scroll', () => {
         if (!isSyncingBefore) {
             isSyncingAfter = true;
@@ -1848,7 +1879,7 @@ function showCorrectionPreview(originalText, correctedText, corrections, onApply
             setTimeout(() => { isSyncingAfter = false; }, 10);
         }
     });
-    
+
     afterContent.addEventListener('scroll', () => {
         if (!isSyncingAfter) {
             isSyncingBefore = true;
@@ -1857,11 +1888,11 @@ function showCorrectionPreview(originalText, correctedText, corrections, onApply
             setTimeout(() => { isSyncingBefore = false; }, 10);
         }
     });
-    
+
     // Boutons d'action
     const buttonContainer = document.createElement('div');
     buttonContainer.className = 'gft-preview-buttons';
-    
+
     const cancelButton = document.createElement('button');
     cancelButton.textContent = 'Annuler';
     cancelButton.className = 'gft-preview-button gft-preview-button-cancel';
@@ -1870,7 +1901,7 @@ function showCorrectionPreview(originalText, correctedText, corrections, onApply
         document.body.removeChild(modal);
         if (onCancel) onCancel();
     });
-    
+
     const applyButton = document.createElement('button');
     applyButton.textContent = 'Appliquer les corrections';
     applyButton.className = 'gft-preview-button gft-preview-button-apply';
@@ -1879,15 +1910,15 @@ function showCorrectionPreview(originalText, correctedText, corrections, onApply
         document.body.removeChild(modal);
         if (onApply) onApply();
     });
-    
+
     buttonContainer.appendChild(cancelButton);
     buttonContainer.appendChild(applyButton);
     modal.appendChild(buttonContainer);
-    
+
     // Ajoute au DOM
     document.body.appendChild(overlay);
     document.body.appendChild(modal);
-    
+
     // Fermeture par clic sur l'overlay
     overlay.addEventListener('click', () => {
         document.body.removeChild(overlay);
@@ -1983,26 +2014,26 @@ const TUTORIAL_STEPS = [
  */
 function showTutorial() {
     currentTutorialStep = 0;
-    
+
     // Crée l'overlay
     tutorialOverlay = document.createElement('div');
     tutorialOverlay.id = 'gft-tutorial-overlay';
     tutorialOverlay.className = 'gft-tutorial-overlay';
-    
+
     // Crée le modal
     tutorialModal = document.createElement('div');
     tutorialModal.id = 'gft-tutorial-modal';
     tutorialModal.className = 'gft-tutorial-modal';
-    
+
     // Applique le mode sombre si nécessaire
     const isDarkMode = localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true';
     if (isDarkMode) {
         tutorialModal.classList.add(DARK_MODE_CLASS);
     }
-    
+
     document.body.appendChild(tutorialOverlay);
     document.body.appendChild(tutorialModal);
-    
+
     renderTutorialStep();
 }
 
@@ -2011,40 +2042,40 @@ function showTutorial() {
  */
 function renderTutorialStep() {
     if (!tutorialModal) return;
-    
+
     const step = TUTORIAL_STEPS[currentTutorialStep];
-    
+
     tutorialModal.innerHTML = '';
-    
+
     // Titre
     const title = document.createElement('h2');
     title.className = 'gft-tutorial-title';
     title.textContent = step.title;
     tutorialModal.appendChild(title);
-    
+
     // Contenu
     const content = document.createElement('div');
     content.className = 'gft-tutorial-content';
     content.innerHTML = step.content;
     tutorialModal.appendChild(content);
-    
+
     // Indicateur de progression
     const progress = document.createElement('div');
     progress.className = 'gft-tutorial-progress';
     progress.textContent = `Étape ${currentTutorialStep + 1} sur ${TUTORIAL_STEPS.length}`;
     tutorialModal.appendChild(progress);
-    
+
     // Boutons
     const buttonsDiv = document.createElement('div');
     buttonsDiv.className = 'gft-tutorial-buttons';
-    
+
     // Bouton "Passer"
     const skipButton = document.createElement('button');
     skipButton.textContent = 'Passer le tutoriel';
     skipButton.className = 'gft-tutorial-button gft-tutorial-button-skip';
     skipButton.addEventListener('click', closeTutorial);
     buttonsDiv.appendChild(skipButton);
-    
+
     // Bouton "Précédent" (sauf première étape)
     if (currentTutorialStep > 0) {
         const prevButton = document.createElement('button');
@@ -2056,11 +2087,11 @@ function renderTutorialStep() {
         });
         buttonsDiv.appendChild(prevButton);
     }
-    
+
     // Bouton "Suivant" ou "Terminer"
     const nextButton = document.createElement('button');
     nextButton.className = 'gft-tutorial-button gft-tutorial-button-next';
-    
+
     if (currentTutorialStep < TUTORIAL_STEPS.length - 1) {
         nextButton.textContent = 'Suivant →';
         nextButton.addEventListener('click', () => {
@@ -2071,7 +2102,7 @@ function renderTutorialStep() {
         nextButton.textContent = 'Terminer ✓';
         nextButton.addEventListener('click', closeTutorial);
     }
-    
+
     buttonsDiv.appendChild(nextButton);
     tutorialModal.appendChild(buttonsDiv);
 }
@@ -2086,10 +2117,10 @@ function closeTutorial() {
     if (tutorialModal && document.body.contains(tutorialModal)) {
         document.body.removeChild(tutorialModal);
     }
-    
+
     tutorialOverlay = null;
     tutorialModal = null;
-    
+
     // Marque comme complété
     markTutorialCompleted();
 }
@@ -2101,38 +2132,38 @@ function closeTutorial() {
  */
 function addTooltip(element, text) {
     if (!element) return;
-    
+
     let tooltip = null;
-    
+
     element.addEventListener('mouseenter', () => {
         // Vérifie si les tooltips sont activés à chaque survol
         if (!areTooltipsEnabled()) return;
-        
+
         tooltip = document.createElement('div');
         tooltip.className = 'gft-tooltip';
         tooltip.textContent = text;
-        
+
         // Applique le mode sombre si nécessaire
         const isDarkMode = localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true';
         if (isDarkMode) {
             tooltip.classList.add(DARK_MODE_CLASS);
         }
-        
+
         document.body.appendChild(tooltip);
-        
+
         // Positionne le tooltip
         const rect = element.getBoundingClientRect();
         tooltip.style.position = 'fixed';
         tooltip.style.left = `${rect.left + rect.width / 2}px`;
         tooltip.style.top = `${rect.top - 35}px`;
         tooltip.style.transform = 'translateX(-50%)';
-        
+
         // Animation d'apparition
         setTimeout(() => {
             if (tooltip) tooltip.classList.add('gft-tooltip-visible');
         }, 10);
     });
-    
+
     element.addEventListener('mouseleave', () => {
         if (tooltip && document.body.contains(tooltip)) {
             document.body.removeChild(tooltip);
@@ -2149,13 +2180,13 @@ function showSettingsMenu() {
     const menu = document.createElement('div');
     menu.className = 'gft-settings-menu';
     menu.id = 'gft-settings-menu';
-    
+
     // Applique le mode sombre si nécessaire
     const isDarkMode = localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true';
     if (isDarkMode) {
         menu.classList.add(DARK_MODE_CLASS);
     }
-    
+
     // Option 1: Relancer le tutoriel
     const tutorialOption = document.createElement('button');
     tutorialOption.className = 'gft-settings-menu-item';
@@ -2165,7 +2196,7 @@ function showSettingsMenu() {
         showTutorial();
     });
     menu.appendChild(tutorialOption);
-    
+
     // Option 2: Toggle tooltips
     const tooltipsOption = document.createElement('button');
     tooltipsOption.className = 'gft-settings-menu-item';
@@ -2183,7 +2214,7 @@ function showSettingsMenu() {
         );
     });
     menu.appendChild(tooltipsOption);
-    
+
     // Option 3: Toggle feat dans l'en-tête
     const headerFeatOption = document.createElement('button');
     headerFeatOption.className = 'gft-settings-menu-item';
@@ -2201,7 +2232,7 @@ function showSettingsMenu() {
         );
     });
     menu.appendChild(headerFeatOption);
-    
+
     // Positionne le menu
     const settingsButton = document.getElementById('gft-settings-button');
     if (settingsButton) {
@@ -2210,9 +2241,9 @@ function showSettingsMenu() {
         menu.style.top = `${rect.bottom + 5}px`;
         menu.style.right = `${window.innerWidth - rect.right}px`;
     }
-    
+
     document.body.appendChild(menu);
-    
+
     // Fermeture par clic en dehors
     setTimeout(() => {
         document.addEventListener('click', closeSettingsMenuOnClickOutside);
@@ -2236,7 +2267,7 @@ function closeSettingsMenu() {
 function closeSettingsMenuOnClickOutside(event) {
     const menu = document.getElementById('gft-settings-menu');
     const settingsButton = document.getElementById('gft-settings-button');
-    
+
     if (menu && !menu.contains(event.target) && event.target !== settingsButton) {
         closeSettingsMenu();
     }
@@ -2267,18 +2298,18 @@ const KEYBOARD_SHORTCUTS = {
  */
 function insertTagViaShortcut(tagType) {
     if (!currentActiveEditor) return;
-    
+
     // Active le flag pour désactiver la sauvegarde automatique
     isButtonActionInProgress = true;
     if (autoSaveTimeout) {
         clearTimeout(autoSaveTimeout);
         autoSaveTimeout = null;
     }
-    
+
     currentActiveEditor.focus();
     let textToInsert = '';
-    
-    switch(tagType) {
+
+    switch (tagType) {
         case 'couplet':
             textToInsert = addArtistToText(`[Couplet ${coupletCounter}]`);
             coupletCounter++;
@@ -2304,13 +2335,13 @@ function insertTagViaShortcut(tagType) {
             isButtonActionInProgress = false;
             return;
     }
-    
+
     if (textToInsert) {
         // Sauvegarde dans l'historique avant insertion
         saveToHistory();
         document.execCommand('insertText', false, textToInsert);
     }
-    
+
     // Désactive le flag après un court délai et met à jour lastSavedContent
     setTimeout(() => {
         isButtonActionInProgress = false;
@@ -2327,7 +2358,7 @@ function insertTagViaShortcut(tagType) {
 function triggerToutCorrigerViaShortcut() {
     const toutCorrigerButton = Array.from(document.querySelectorAll('.genius-lyrics-shortcut-button'))
         .find(btn => btn.textContent.includes('Tout Corriger'));
-    
+
     if (toutCorrigerButton) {
         toutCorrigerButton.click();
     }
@@ -2340,30 +2371,30 @@ function triggerToutCorrigerViaShortcut() {
 function handleKeyboardShortcut(event) {
     // Ne rien faire si l'éditeur n'est pas actif
     if (!currentActiveEditor) return;
-    
+
     // Ne rien faire si on n'est pas dans l'éditeur de Genius
     if (document.activeElement !== currentActiveEditor) return;
-    
+
     // Construire la clé du raccourci
     let shortcutKey = '';
     if (event.ctrlKey || event.metaKey) shortcutKey += 'Ctrl+';
     if (event.shiftKey) shortcutKey += 'Shift+';
-    
+
     // Convertir la touche en majuscule pour la correspondance
     const key = event.key.toUpperCase();
     shortcutKey += key;
-    
+
     // Vérifier si ce raccourci existe dans notre configuration
     const action = KEYBOARD_SHORTCUTS[shortcutKey];
-    
+
     if (!action) return; // Pas de raccourci correspondant
-    
+
     // Empêcher le comportement par défaut pour les raccourcis reconnus
     event.preventDefault();
     event.stopPropagation();
-    
+
     // Exécuter l'action correspondante
-    switch(action) {
+    switch (action) {
         case 'couplet':
         case 'refrain':
         case 'pont':
@@ -2396,7 +2427,7 @@ function getTextareaCaretPosition(textarea, selectionPoint) {
     // Crée un div miroir pour calculer la position
     const div = document.createElement('div');
     const computed = window.getComputedStyle(textarea);
-    
+
     // Copie tous les styles pertinents du textarea
     const properties = [
         'boxSizing', 'width', 'height', 'overflowX', 'overflowY',
@@ -2407,11 +2438,11 @@ function getTextareaCaretPosition(textarea, selectionPoint) {
         'textIndent', 'textDecoration', 'letterSpacing', 'wordSpacing',
         'tabSize', 'whiteSpace', 'wordBreak', 'wordWrap'
     ];
-    
+
     properties.forEach(prop => {
         div.style[prop] = computed[prop];
     });
-    
+
     // Style le div pour qu'il soit invisible et positionné absolument
     div.style.position = 'absolute';
     div.style.visibility = 'hidden';
@@ -2420,29 +2451,29 @@ function getTextareaCaretPosition(textarea, selectionPoint) {
     div.style.overflow = 'hidden';
     div.style.top = '0px';
     div.style.left = '0px';
-    
+
     document.body.appendChild(div);
-    
+
     // Ajoute le texte jusqu'au point de sélection
     const textBeforeCaret = textarea.value.substring(0, selectionPoint);
     div.textContent = textBeforeCaret;
-    
+
     // Ajoute un span pour marquer la position exacte
     const span = document.createElement('span');
     span.textContent = textarea.value.substring(selectionPoint) || '.';
     div.appendChild(span);
-    
+
     // Obtient la hauteur du span (hauteur de ligne)
     const spanRect = span.getBoundingClientRect();
     const divRect = div.getBoundingClientRect();
-    
+
     // Position relative dans le div miroir
     const relativeTop = spanRect.top - divRect.top;
     const relativeLeft = spanRect.left - divRect.left;
-    
+
     // Nettoie
     document.body.removeChild(div);
-    
+
     // Retourne la position relative (SANS scrollTop car on va l'utiliser avec getBoundingClientRect)
     return {
         top: relativeTop - textarea.scrollTop,
@@ -2458,85 +2489,116 @@ function showFloatingToolbar() {
     if (!floatingFormattingToolbar) {
         createFloatingFormattingToolbar();
     }
-    
-    if (!currentActiveEditor) {
-        hideFloatingToolbar();
-        return;
-    }
-    
+
     let rect;
     let selectedText = '';
-    
-    if (currentEditorType === 'textarea') {
-        // Pour les textarea, calcule la position du texte sélectionné
-        const textareaRect = currentActiveEditor.getBoundingClientRect();
-        const start = currentActiveEditor.selectionStart;
-        const end = currentActiveEditor.selectionEnd;
-        
-        if (start === end) {
-            hideFloatingToolbar();
-            return;
+
+    if (currentActiveEditor) {
+        // Mode Édition
+        // Affiche tous les boutons
+        Array.from(floatingFormattingToolbar.children).forEach(child => child.style.display = '');
+
+        if (currentEditorType === 'textarea') {
+            // Pour les textarea, calcule la position du texte sélectionné
+            const textareaRect = currentActiveEditor.getBoundingClientRect();
+            const start = currentActiveEditor.selectionStart;
+            const end = currentActiveEditor.selectionEnd;
+
+            if (start === end) {
+                hideFloatingToolbar();
+                return;
+            }
+
+            selectedText = currentActiveEditor.value.substring(start, end);
+
+            // Calcule la position du début de la sélection (position relative au textarea)
+            const startPos = getTextareaCaretPosition(currentActiveEditor, start);
+
+            // Combine la position du textarea avec la position relative du texte sélectionné
+            // textareaRect.top/left sont déjà en coordonnées viewport (pas besoin de window.scrollY ici)
+            rect = {
+                left: textareaRect.left + startPos.left,
+                top: textareaRect.top + startPos.top,
+                width: 100, // Largeur arbitraire pour centrer la barre
+                height: startPos.height
+            };
+        } else {
+            // Pour les div contenteditable
+            const selection = window.getSelection();
+            if (!selection.rangeCount || selection.isCollapsed) {
+                hideFloatingToolbar();
+                return;
+            }
+
+            selectedText = selection.toString();
+
+            const range = selection.getRangeAt(0);
+            rect = range.getBoundingClientRect();
+
+            if (rect.width === 0 && rect.height === 0) {
+                hideFloatingToolbar();
+                return;
+            }
         }
-        
-        selectedText = currentActiveEditor.value.substring(start, end);
-        
-        // Calcule la position du début de la sélection (position relative au textarea)
-        const startPos = getTextareaCaretPosition(currentActiveEditor, start);
-        
-        // Combine la position du textarea avec la position relative du texte sélectionné
-        // textareaRect.top/left sont déjà en coordonnées viewport (pas besoin de window.scrollY ici)
-        rect = {
-            left: textareaRect.left + startPos.left,
-            top: textareaRect.top + startPos.top,
-            width: 100, // Largeur arbitraire pour centrer la barre
-            height: startPos.height
-        };
     } else {
-        // Pour les div contenteditable
+        // Mode Lecture
+        // Cache les boutons de formatage (Gras, Italique, Nombre)
+        // Affiche seulement le bouton Lyrics Card
+        Array.from(floatingFormattingToolbar.children).forEach(child => {
+            if (child.textContent === 'Créer Lyric Card') {
+                child.style.display = '';
+            } else {
+                child.style.display = 'none';
+            }
+        });
+
         const selection = window.getSelection();
         if (!selection.rangeCount || selection.isCollapsed) {
             hideFloatingToolbar();
             return;
         }
-        
         selectedText = selection.toString();
-        
         const range = selection.getRangeAt(0);
         rect = range.getBoundingClientRect();
-        
+
         if (rect.width === 0 && rect.height === 0) {
             hideFloatingToolbar();
             return;
         }
     }
-    
+
+    if (!rect) {
+        hideFloatingToolbar();
+        return;
+    }
+
     // Vérifie si le texte sélectionné est un nombre (et seulement un nombre)
     const isNumber = isValidNumber(selectedText);
-    
+
     // Trouve le bouton de conversion de nombre
     const numberButton = floatingFormattingToolbar.querySelector('.gft-number-button');
     if (numberButton) {
-        if (isNumber) {
+        if (isNumber && currentActiveEditor) { // Only show number button in edit mode
             numberButton.style.display = 'inline-block';
         } else {
             numberButton.style.display = 'none';
         }
     }
-    
+
     // Positionne la barre d'outils au-dessus de la sélection
     floatingFormattingToolbar.style.display = 'flex';
     floatingFormattingToolbar.style.visibility = 'visible';
     floatingFormattingToolbar.style.opacity = '1';
     floatingFormattingToolbar.style.position = 'fixed'; // Position fixed pour qu'elle suive le scroll
-    
+
     // Calcule la position centrale au-dessus de la sélection
     const toolbarWidth = floatingFormattingToolbar.offsetWidth || 150;
     const toolbarHeight = floatingFormattingToolbar.offsetHeight || 40;
-    
+
     // rect contient déjà les coordonnées viewport (pas besoin d'ajouter window.scrollX/Y)
     const left = rect.left + (rect.width / 2) - (toolbarWidth / 2);
     const top = rect.top - toolbarHeight - 8; // 8px au-dessus de la sélection
-    
+
     floatingFormattingToolbar.style.left = `${Math.max(10, left)}px`;
     floatingFormattingToolbar.style.top = `${Math.max(10, top)}px`;
 }
@@ -2554,46 +2616,93 @@ function hideFloatingToolbar() {
  * Gestionnaire pour détecter les changements de sélection et afficher/masquer la barre flottante.
  */
 function handleSelectionChange() {
-    if (!currentActiveEditor) {
-        return;
-    }
-    
-    let hasSelection = false;
-    
-    // Pour les textarea, il faut vérifier selectionStart et selectionEnd
-    if (currentEditorType === 'textarea') {
-        const start = currentActiveEditor.selectionStart;
-        const end = currentActiveEditor.selectionEnd;
-        hasSelection = (start !== end) && document.activeElement === currentActiveEditor;
+    // Si on est dans un éditeur, on garde la logique existante
+    if (currentActiveEditor) {
+        let hasSelection = false;
+
+        // Pour les textarea, il faut vérifier selectionStart et selectionEnd
+        if (currentEditorType === 'textarea') {
+            const start = currentActiveEditor.selectionStart;
+            const end = currentActiveEditor.selectionEnd;
+            hasSelection = (start !== end) && document.activeElement === currentActiveEditor;
+        } else {
+            // Pour les div contenteditable
+            const selection = window.getSelection();
+
+            if (!selection.rangeCount) {
+                hideFloatingToolbar();
+                return;
+            }
+
+            const range = selection.getRangeAt(0);
+            const container = range.commonAncestorContainer;
+
+            // Vérifie si le conteneur de la sélection est dans l'éditeur actif
+            let isInEditor = false;
+            if (currentActiveEditor.contains(container) ||
+                (container.nodeType === Node.ELEMENT_NODE && container === currentActiveEditor)) {
+                isInEditor = true;
+            } else if (container.parentNode && currentActiveEditor.contains(container.parentNode)) {
+                isInEditor = true;
+            }
+
+            hasSelection = isInEditor && !selection.isCollapsed;
+        }
+
+        if (hasSelection) {
+            setTimeout(showFloatingToolbar, 50);
+        } else {
+            hideFloatingToolbar();
+        }
     } else {
-        // Pour les div contenteditable
+        // Mode lecture (pas d'éditeur actif)
+        // On veut afficher la barre seulement si on est sur une page de chanson et qu'on sélectionne du texte
         const selection = window.getSelection();
-        
-        if (!selection.rangeCount) {
+        if (!selection || selection.isCollapsed || selection.toString().trim().length === 0) {
             hideFloatingToolbar();
             return;
         }
-        
-        const range = selection.getRangeAt(0);
-        const container = range.commonAncestorContainer;
-        
-        // Vérifie si le conteneur de la sélection est dans l'éditeur actif
-        let isInEditor = false;
-        if (currentActiveEditor.contains(container) || 
-            (container.nodeType === Node.ELEMENT_NODE && container === currentActiveEditor)) {
-            isInEditor = true;
-        } else if (container.parentNode && currentActiveEditor.contains(container.parentNode)) {
-            isInEditor = true;
+
+        // Vérifie si on est sur une page de chanson (présence de metadata song)
+        // Ou simplement si l'URL contient "lyrics" ou si on a trouvé des metadata
+        // On peut utiliser currentSongTitle comme proxy, ou vérifier le meta og:type
+        const isSongPage = document.querySelector('meta[property="og:type"][content="music.song"]') !== null;
+
+        if (isSongPage) {
+            // Vérifie si la sélection est DANS les paroles
+            const range = selection.getRangeAt(0);
+            const container = range.commonAncestorContainer;
+            const lyricsContainer = document.querySelector(SELECTORS.LYRICS_CONTAINER);
+
+            // Si on ne trouve pas le conteneur (ex: ancienne page ou structure différente), on autorise quand même pour ne pas casser la feature
+            // Mais si on le trouve, on restreint.
+            if (lyricsContainer) {
+                if (lyricsContainer.contains(container)) {
+                    setTimeout(showFloatingToolbar, 50);
+                } else {
+                    hideFloatingToolbar();
+                }
+            } else {
+                // Fallback : on vérifie si le parent a une classe qui ressemble à Lyrics
+                let parent = container.nodeType === Node.ELEMENT_NODE ? container : container.parentNode;
+                let isLyrics = false;
+                while (parent && parent !== document.body) {
+                    if (parent.className && typeof parent.className === 'string' && parent.className.includes('Lyrics__Container')) {
+                        isLyrics = true;
+                        break;
+                    }
+                    parent = parent.parentNode;
+                }
+
+                if (isLyrics) {
+                    setTimeout(showFloatingToolbar, 50);
+                } else {
+                    hideFloatingToolbar();
+                }
+            }
+        } else {
+            hideFloatingToolbar();
         }
-        
-        hasSelection = isInEditor && !selection.isCollapsed;
-    }
-    
-    if (hasSelection) {
-        // Délai pour permettre au texte d'être sélectionné
-        setTimeout(showFloatingToolbar, 50);
-    } else {
-        hideFloatingToolbar();
     }
 }
 
@@ -2651,10 +2760,10 @@ function isSectionTag(line) {
     if (!trimmed.startsWith('[') || !trimmed.endsWith(']')) {
         return false;
     }
-    
+
     // Exclut les placeholders [?] (un ou plusieurs points d'interrogation)
     const isPlaceholder = /^\[\?+\]$/.test(trimmed);
-    
+
     return !isPlaceholder;
 }
 
@@ -2684,10 +2793,10 @@ function correctLineSpacing(text) {
             if ((i + 1) < originalLines.length) {
                 const nextLineOriginal = originalLines[i + 1];
                 const trimmedNextLineOriginal = nextLineOriginal.trim();
-                
+
                 if (trimmedNextLineOriginal !== "" && isSectionTag(trimmedNextLineOriginal)) {
-                    if (newLinesInterim[newLinesInterim.length -1].trim() !== "") {
-                        newLinesInterim.push(""); 
+                    if (newLinesInterim[newLinesInterim.length - 1].trim() !== "") {
+                        newLinesInterim.push("");
                     }
                 }
             }
@@ -2710,14 +2819,14 @@ function correctLineSpacing(text) {
                         break;
                     }
                 }
-                
+
                 let nextNonEmptyLineIsTagInInterim = false;
                 for (let k = i + 1; k < newLinesInterim.length; k++) {
                     if (newLinesInterim[k].trim() !== "") {
                         if (isSectionTag(newLinesInterim[k])) {
                             nextNonEmptyLineIsTagInInterim = true;
                         }
-                        break; 
+                        break;
                     }
                 }
 
@@ -2727,7 +2836,7 @@ function correctLineSpacing(text) {
                 // On garde la ligne vide si la ligne suivante est un tag (que la précédente soit un tag ou du texte)
                 // Cela gère : Texte→vide→Tag ET Tag→vide→Tag
                 if (nextNonEmptyLineIsTagInInterim && !prevLineInNewLinesWasEmptyAndKept) {
-                     keepThisEmptyLine = true;
+                    keepThisEmptyLine = true;
                 }
 
                 if (keepThisEmptyLine) {
@@ -2738,42 +2847,42 @@ function correctLineSpacing(text) {
             }
         }
     }
-    
+
     // Troisième passe : nettoyage final des lignes vides en trop.
     const finalCleanedLines = [];
     if (newLines.length > 0) {
-        finalCleanedLines.push(newLines[0]); 
+        finalCleanedLines.push(newLines[0]);
         for (let i = 1; i < newLines.length; i++) {
-            if (newLines[i].trim() !== "" || newLines[i-1].trim() !== "") {
+            if (newLines[i].trim() !== "" || newLines[i - 1].trim() !== "") {
                 finalCleanedLines.push(newLines[i]);
             }
         }
     }
 
     // Supprime les lignes vides au début et à la fin du texte.
-    while (finalCleanedLines.length > 0 && finalCleanedLines[0].trim() === "" && 
-           (finalCleanedLines.length > 1 && finalCleanedLines[1].trim() !== "" ) ) {
+    while (finalCleanedLines.length > 0 && finalCleanedLines[0].trim() === "" &&
+        (finalCleanedLines.length > 1 && finalCleanedLines[1].trim() !== "")) {
         finalCleanedLines.shift();
     }
-     while (finalCleanedLines.length > 0 && finalCleanedLines[finalCleanedLines.length - 1].trim() === "") {
+    while (finalCleanedLines.length > 0 && finalCleanedLines[finalCleanedLines.length - 1].trim() === "") {
         finalCleanedLines.pop();
     }
 
     const newText = finalCleanedLines.join('\n');
-    
+
     // Calcule le nombre de corrections de manière plus précise
     if (text !== newText) {
         // Compte les lignes vides dans l'original et dans le résultat
         const originalEmptyLines = (text.match(/\n\s*\n/g) || []).length;
         const newEmptyLines = (newText.match(/\n\s*\n/g) || []).length;
-        
+
         // Compte aussi les lignes au début/fin qui ont changé
         const originalTrimmed = text.trim();
         const newTrimmed = newText.trim();
-        
+
         // Calcul simplifié : différence de lignes vides + 1 si le contenu a changé
         correctionsCount = Math.abs(originalEmptyLines - newEmptyLines);
-        
+
         // Si le texte a vraiment changé mais pas de différence dans les lignes vides,
         // compte comme 1 correction minimale
         if (correctionsCount === 0 && originalTrimmed !== newTrimmed) {
@@ -2812,29 +2921,29 @@ function applyTextTransformToDivEditor(editorNode, transformFunction) {
         } else if (child.nodeType === Node.TEXT_NODE) {
             nodeBuffer += child.textContent;
         } else if (child.nodeType === Node.ELEMENT_NODE) {
-             if (nodeBuffer) lineElements.push(document.createTextNode(nodeBuffer));
-             nodeBuffer = "";
-             if (child.nodeName === 'DIV' || child.nodeName === 'P') { 
+            if (nodeBuffer) lineElements.push(document.createTextNode(nodeBuffer));
+            nodeBuffer = "";
+            if (child.nodeName === 'DIV' || child.nodeName === 'P') {
                 if (child.textContent.trim() !== "") {
                     lineElements.push(child.cloneNode(true));
-                } else if (child.querySelector('br')) { 
+                } else if (child.querySelector('br')) {
                     lineElements.push(document.createElement('br'));
                 }
-             } else { 
+            } else {
                 nodeBuffer += child.textContent;
-             }
+            }
         }
     });
     if (nodeBuffer) lineElements.push(document.createTextNode(nodeBuffer));
 
-    currentTextContent = ""; 
+    currentTextContent = "";
     lineElements.forEach(el => {
         if (el.nodeName === 'BR') {
             currentTextContent += '\n';
         } else if (el.nodeType === Node.TEXT_NODE) {
             currentTextContent += el.textContent;
         } else if (el.nodeName === 'DIV' || el.nodeName === 'P') {
-            currentTextContent += el.textContent + '\n'; 
+            currentTextContent += el.textContent + '\n';
         }
     });
     currentTextContent = currentTextContent.replace(/\n+$/, '');
@@ -2843,12 +2952,12 @@ function applyTextTransformToDivEditor(editorNode, transformFunction) {
     const { newText, correctionsCount } = transformFunction(currentTextContent);
 
     // 4. Si le texte a changé, vide le div et le reconstruit.
-    if (currentTextContent !== newText || correctionsCount > 0) { 
-        editorNode.innerHTML = ''; 
+    if (currentTextContent !== newText || correctionsCount > 0) {
+        editorNode.innerHTML = '';
         newText.split('\n').forEach((lineText, index, arr) => {
             const lineDiv = document.createElement('div');
             if (lineText === "") {
-                if (index === arr.length -1 && arr.length > 1 && !newText.endsWith("\n\n")) { 
+                if (index === arr.length - 1 && arr.length > 1 && !newText.endsWith("\n\n")) {
                     // Ne rien faire pour la dernière ligne si elle est vide (évite un <br> en trop)
                 } else {
                     lineDiv.appendChild(document.createElement('br'));
@@ -2872,16 +2981,16 @@ function applyTextTransformToDivEditor(editorNode, transformFunction) {
                 const lastDiv = editorNode.lastChild;
                 if (lastDiv) {
                     const newRange = document.createRange();
-                     if (lastDiv.nodeName === 'DIV') {
+                    if (lastDiv.nodeName === 'DIV') {
                         if (lastDiv.firstChild && lastDiv.firstChild.nodeName === 'BR') {
                             newRange.setStartBefore(lastDiv.firstChild);
                         } else if (lastDiv.firstChild && lastDiv.firstChild.nodeType === Node.TEXT_NODE) {
                             newRange.setStart(lastDiv.firstChild, lastDiv.firstChild.textContent.length);
-                        } else { 
+                        } else {
                             newRange.selectNodeContents(lastDiv);
-                            newRange.collapse(false); 
+                            newRange.collapse(false);
                         }
-                    } else { 
+                    } else {
                         newRange.setStart(lastDiv, lastDiv.textContent ? lastDiv.textContent.length : 0);
                     }
                     newRange.collapse(true);
@@ -2895,7 +3004,7 @@ function applyTextTransformToDivEditor(editorNode, transformFunction) {
         const inputEvent = new Event('input', { bubbles: true, cancelable: true });
         editorNode.dispatchEvent(inputEvent);
     }
-    return correctionsCount; 
+    return correctionsCount;
 }
 
 /**
@@ -2906,7 +3015,7 @@ function applyTextTransformToDivEditor(editorNode, transformFunction) {
 function applyAllTextCorrectionsToString(text) {
     let currentText = text;
     let result;
-    
+
     // Objet pour tracker les corrections par type
     const corrections = {
         yPrime: 0,
@@ -2919,7 +3028,7 @@ function applyAllTextCorrectionsToString(text) {
 
     // Correction de "y'" -> "y "
     const yPrimePattern = /\b(Y|y)'/g;
-    const yPrimeReplacement = (match, firstLetter)=>(firstLetter === 'Y' ? 'Y ' : 'y ');
+    const yPrimeReplacement = (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y ');
     const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
     if (textAfterYPrime !== currentText) {
         corrections.yPrime = (currentText.match(yPrimePattern) || []).length;
@@ -2936,7 +3045,7 @@ function applyAllTextCorrectionsToString(text) {
 
     // Correction de "oeu" -> "œu"
     const oeuPattern = /([Oo])eu/g;
-    const oeuReplacement = (match, firstLetter)=>(firstLetter === 'O' ? 'Œu' : 'œu');
+    const oeuReplacement = (match, firstLetter) => (firstLetter === 'O' ? 'Œu' : 'œu');
     const textAfterOeu = currentText.replace(oeuPattern, oeuReplacement);
     if (textAfterOeu !== currentText) {
         corrections.oeuLigature = (currentText.match(oeuPattern) || []).length;
@@ -2956,17 +3065,17 @@ function applyAllTextCorrectionsToString(text) {
         currentText = result.newText;
     }
 
-    result = correctLineSpacing(currentText); 
+    result = correctLineSpacing(currentText);
     if (result.correctionsCount > 0) {
         corrections.spacing = result.correctionsCount;
         currentText = result.newText;
     }
-    
+
     // Calcul du total
-    const totalCorrections = corrections.yPrime + corrections.apostrophes + 
-                           corrections.oeuLigature + corrections.capitalization + 
-                           corrections.punctuation + corrections.spacing;
-    
+    const totalCorrections = corrections.yPrime + corrections.apostrophes +
+        corrections.oeuLigature + corrections.capitalization +
+        corrections.punctuation + corrections.spacing;
+
     return { newText: currentText, correctionsCount: totalCorrections, corrections: corrections };
 }
 
@@ -2979,7 +3088,7 @@ async function applyAllTextCorrectionsAsync(text) {
     let currentText = text;
     let result;
     const totalSteps = 6;
-    
+
     // Objet pour tracker les corrections par type
     const corrections = {
         yPrime: 0,
@@ -2993,9 +3102,9 @@ async function applyAllTextCorrectionsAsync(text) {
     // Étape 1: Correction de "y'" -> "y "
     showProgress(1, totalSteps, 'Correction de "y\'"...');
     await new Promise(resolve => setTimeout(resolve, 50)); // Petit délai pour l'affichage
-    
+
     const yPrimePattern = /\b(Y|y)'/g;
-    const yPrimeReplacement = (match, firstLetter)=>(firstLetter === 'Y' ? 'Y ' : 'y ');
+    const yPrimeReplacement = (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y ');
     const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
     if (textAfterYPrime !== currentText) {
         corrections.yPrime = (currentText.match(yPrimePattern) || []).length;
@@ -3005,7 +3114,7 @@ async function applyAllTextCorrectionsAsync(text) {
     // Étape 2: Correction de l'apostrophe typographique
     showProgress(2, totalSteps, 'Correction des apostrophes...');
     await new Promise(resolve => setTimeout(resolve, 50));
-    
+
     const apostrophePattern = /'/g;
     const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
     if (textAfterApostrophe !== currentText) {
@@ -3016,9 +3125,9 @@ async function applyAllTextCorrectionsAsync(text) {
     // Étape 3: Correction de "oeu" -> "œu"
     showProgress(3, totalSteps, 'Correction de "oeu"...');
     await new Promise(resolve => setTimeout(resolve, 50));
-    
+
     const oeuPattern = /([Oo])eu/g;
-    const oeuReplacement = (match, firstLetter)=>(firstLetter === 'O' ? 'Œu' : 'œu');
+    const oeuReplacement = (match, firstLetter) => (firstLetter === 'O' ? 'Œu' : 'œu');
     const textAfterOeu = currentText.replace(oeuPattern, oeuReplacement);
     if (textAfterOeu !== currentText) {
         corrections.oeuLigature = (currentText.match(oeuPattern) || []).length;
@@ -3028,7 +3137,7 @@ async function applyAllTextCorrectionsAsync(text) {
     // Étape 4: Majuscules
     showProgress(4, totalSteps, 'Majuscules en début de ligne...');
     await new Promise(resolve => setTimeout(resolve, 50));
-    
+
     result = capitalizeFirstLetterOfEachLine(currentText);
     if (result.correctionsCount > 0) {
         corrections.capitalization = result.correctionsCount;
@@ -3038,7 +3147,7 @@ async function applyAllTextCorrectionsAsync(text) {
     // Étape 5: Ponctuation
     showProgress(5, totalSteps, 'Suppression de la ponctuation...');
     await new Promise(resolve => setTimeout(resolve, 50));
-    
+
     result = removeTrailingPunctuationFromLines(currentText);
     if (result.correctionsCount > 0) {
         corrections.punctuation = result.correctionsCount;
@@ -3048,18 +3157,18 @@ async function applyAllTextCorrectionsAsync(text) {
     // Étape 6: Espacement
     showProgress(6, totalSteps, 'Correction de l\'espacement...');
     await new Promise(resolve => setTimeout(resolve, 50));
-    
-    result = correctLineSpacing(currentText); 
+
+    result = correctLineSpacing(currentText);
     if (result.correctionsCount > 0) {
         corrections.spacing = result.correctionsCount;
         currentText = result.newText;
     }
-    
+
     // Calcul du total
-    const totalCorrections = corrections.yPrime + corrections.apostrophes + 
-                           corrections.oeuLigature + corrections.capitalization + 
-                           corrections.punctuation + corrections.spacing;
-    
+    const totalCorrections = corrections.yPrime + corrections.apostrophes +
+        corrections.oeuLigature + corrections.capitalization +
+        corrections.punctuation + corrections.spacing;
+
     return { newText: currentText, correctionsCount: totalCorrections, corrections: corrections };
 }
 
@@ -3070,60 +3179,62 @@ async function applyAllTextCorrectionsAsync(text) {
  */
 function initLyricsEditorEnhancer() {
     let foundEditor = null; let foundEditorType = null;
-    
+
     // Configuration de tous les boutons et actions du panneau.
     const SHORTCUTS = {
-        TAGS_STRUCTURAUX: [ 
-            { buttons: [
-                { label: "En-tête", getText: () => { let txt = `[Paroles de "${currentSongTitle}"`; const fts = formatArtistList(currentFeaturingArtists); if(fts && isHeaderFeatEnabled()) txt+=` ft. ${fts}`; txt+=']\n'; return txt;}, tooltip: "Insérer l'en-tête de la chanson avec les artistes"},
-                { type: 'coupletManager', 
-                    prev: { label: '←', title: 'Couplet précédent', tooltip: 'Revenir au couplet précédent' },
-                    main: { 
-                        id: COUPLET_BUTTON_ID, 
-                        getLabel: () => `[Couplet ${coupletCounter}]`, 
-                        getText: () => addArtistToText(`[Couplet ${coupletCounter}]`),
-                        tooltip: 'Insérer un tag [Couplet] avec les artistes sélectionnés (Ctrl+1)'
+        TAGS_STRUCTURAUX: [
+            {
+                buttons: [
+                    { label: "En-tête", getText: () => { let txt = `[Paroles de "${currentSongTitle}"`; const fts = formatArtistList(currentFeaturingArtists); if (fts && isHeaderFeatEnabled()) txt += ` ft. ${fts}`; txt += ']\n'; return txt; }, tooltip: "Insérer l'en-tête de la chanson avec les artistes" },
+                    {
+                        type: 'coupletManager',
+                        prev: { label: '←', title: 'Couplet précédent', tooltip: 'Revenir au couplet précédent' },
+                        main: {
+                            id: COUPLET_BUTTON_ID,
+                            getLabel: () => `[Couplet ${coupletCounter}]`,
+                            getText: () => addArtistToText(`[Couplet ${coupletCounter}]`),
+                            tooltip: 'Insérer un tag [Couplet] avec les artistes sélectionnés (Ctrl+1)'
+                        },
+                        next: { label: '→', title: 'Couplet suivant', tooltip: 'Passer au couplet suivant' }
                     },
-                    next: { label: '→', title: 'Couplet suivant', tooltip: 'Passer au couplet suivant' }
-                },
-                {label:'[Intro]',getText:()=>addArtistToText('[Intro]'), tooltip: 'Insérer un tag [Intro] avec les artistes (Ctrl+4)'},
-                {label:'[Couplet unique]',getText:()=>addArtistToText('[Couplet unique]'), tooltip: 'Insérer un tag [Couplet unique] avec les artistes'},
-                {label:'[Couplet]',getText:()=>addArtistToText('[Couplet]'), tooltip: 'Insérer un tag [Couplet] sans numéro avec les artistes'},
-                {label:'[Pré-refrain]',getText:()=>addArtistToText('[Pré-refrain]'), tooltip: 'Insérer un tag [Pré-refrain] avec les artistes'},
-                {label:'[Refrain]',getText:()=>addArtistToText('[Refrain]'), tooltip: 'Insérer un tag [Refrain] avec les artistes (Ctrl+2)'},
-                {label:'[Pont]',getText:()=>addArtistToText('[Pont]'), tooltip: 'Insérer un tag [Pont] avec les artistes (Ctrl+3)'},
-                {label:'[Outro]',getText:()=>addArtistToText('[Outro]'), tooltip: 'Insérer un tag [Outro] avec les artistes (Ctrl+5)'},
-                {label:'[Instrumental]',text:'[Instrumental]\n', tooltip: 'Insérer un tag [Instrumental] pour les sections instrumentales'},
-                {label:'[?]',text:'[?]\n', tooltip: 'Insérer un tag [?] pour les paroles inconnues'},
-                {label:'ZWS',text:'\u200B', tooltip: 'Insérer un Zero Width Space (espace de largeur nulle)'}
-              ]
+                    { label: '[Intro]', getText: () => addArtistToText('[Intro]'), tooltip: 'Insérer un tag [Intro] avec les artistes (Ctrl+4)' },
+                    { label: '[Couplet unique]', getText: () => addArtistToText('[Couplet unique]'), tooltip: 'Insérer un tag [Couplet unique] avec les artistes' },
+                    { label: '[Couplet]', getText: () => addArtistToText('[Couplet]'), tooltip: 'Insérer un tag [Couplet] sans numéro avec les artistes' },
+                    { label: '[Pré-refrain]', getText: () => addArtistToText('[Pré-refrain]'), tooltip: 'Insérer un tag [Pré-refrain] avec les artistes' },
+                    { label: '[Refrain]', getText: () => addArtistToText('[Refrain]'), tooltip: 'Insérer un tag [Refrain] avec les artistes (Ctrl+2)' },
+                    { label: '[Pont]', getText: () => addArtistToText('[Pont]'), tooltip: 'Insérer un tag [Pont] avec les artistes (Ctrl+3)' },
+                    { label: '[Outro]', getText: () => addArtistToText('[Outro]'), tooltip: 'Insérer un tag [Outro] avec les artistes (Ctrl+5)' },
+                    { label: '[Instrumental]', text: '[Instrumental]\n', tooltip: 'Insérer un tag [Instrumental] pour les sections instrumentales' },
+                    { label: '[?]', text: '[?]\n', tooltip: 'Insérer un tag [?] pour les paroles inconnues' },
+                    { label: 'ZWS', text: '\u200B', tooltip: 'Insérer un Zero Width Space (espace de largeur nulle)' }
+                ]
             }
         ],
         TEXT_CLEANUP: [
             {
-                label:"y' → y ", 
-                action:'replaceText',
-                searchPattern:/\b(Y|y)'/g, 
-                replacementFunction:(match, firstLetter)=>(firstLetter === 'Y' ? 'Y ' : 'y '), 
-                highlightClass:LYRICS_HELPER_HIGHLIGHT_CLASS,
+                label: "y' → y ",
+                action: 'replaceText',
+                searchPattern: /\b(Y|y)'/g,
+                replacementFunction: (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y '),
+                highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
                 tooltip: "Corriger tous les y' en y (typique en français)"
             },
-            {label:"' → '",action:'replaceText',searchPattern:/'/g,replacementText:"'",highlightClass:LYRICS_HELPER_HIGHLIGHT_CLASS, tooltip: "Remplacer les apostrophes typographiques ' par des apostrophes standard '"},
+            { label: "' → '", action: 'replaceText', searchPattern: /'/g, replacementText: "'", highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS, tooltip: "Remplacer les apostrophes typographiques ' par des apostrophes standard '" },
             {
-                label:"oeu → œu",
-                action:'replaceText',
-                searchPattern:/([Oo])eu/g,
-                replacementFunction:(match, firstLetter)=>(firstLetter === 'O' ? 'Œu' : 'œu'),
-                highlightClass:LYRICS_HELPER_HIGHLIGHT_CLASS,
+                label: "oeu → œu",
+                action: 'replaceText',
+                searchPattern: /([Oo])eu/g,
+                replacementFunction: (match, firstLetter) => (firstLetter === 'O' ? 'Œu' : 'œu'),
+                highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
                 tooltip: "Remplacer oeu par œu (ligature française)"
             },
-            {label:"Maj. début ligne",action:'lineCorrection',correctionType:'capitalize',title:"Met en majuscule la première lettre de chaque ligne.", tooltip: "Mettre en majuscule la première lettre de chaque ligne"},
-            {label:"Suppr. ., fin ligne",action:'lineCorrection',correctionType:'removePunctuation',title:"Supprime les points et virgules en fin de ligne.", tooltip: "Supprimer les points et virgules en fin de ligne"},
-            {label:"Corriger Espacement",action:'lineCorrection',correctionType:'spacing',title:"Corrige les espacements (lignes vides inutiles ou manquantes).", tooltip: "Corriger les espacements (lignes vides inutiles ou manquantes)"}
+            { label: "Maj. début ligne", action: 'lineCorrection', correctionType: 'capitalize', title: "Met en majuscule la première lettre de chaque ligne.", tooltip: "Mettre en majuscule la première lettre de chaque ligne" },
+            { label: "Suppr. ., fin ligne", action: 'lineCorrection', correctionType: 'removePunctuation', title: "Supprime les points et virgules en fin de ligne.", tooltip: "Supprimer les points et virgules en fin de ligne" },
+            { label: "Corriger Espacement", action: 'lineCorrection', correctionType: 'spacing', title: "Corrige les espacements (lignes vides inutiles ou manquantes).", tooltip: "Corriger les espacements (lignes vides inutiles ou manquantes)" }
         ],
         GLOBAL_FIXES: [
-            {label:"Tout Corriger (Texte)", action:'globalTextFix', title:"Applique toutes les corrections de texte (y', apostrophes, oeu, majuscules, ponctuation, espacement).", tooltip: "Appliquer toutes les corrections automatiques avec prévisualisation (Ctrl+Shift+C)"},
-            {label:"🔍 Vérifier ( ) [ ]", action:'checkBrackets', title:"Vérifie et surligne les parenthèses et crochets non appariés.", tooltip: "Détecter et surligner les parenthèses et crochets non appariés"}
+            { label: "Tout Corriger (Texte)", action: 'globalTextFix', title: "Applique toutes les corrections de texte (y', apostrophes, oeu, majuscules, ponctuation, espacement).", tooltip: "Appliquer toutes les corrections automatiques avec prévisualisation (Ctrl+Shift+C)" },
+            { label: "🔍 Vérifier ( ) [ ]", action: 'checkBrackets', title: "Vérifie et surligne les parenthèses et crochets non appariés.", tooltip: "Détecter et surligner les parenthèses et crochets non appariés" }
         ]
     };
 
@@ -3140,7 +3251,7 @@ function initLyricsEditorEnhancer() {
         extractSongData(); // Extrait les données de la chanson à l'apparition de l'éditeur.
         hideGeniusFormattingHelper();
         if (shortcutsContainerElement) { shortcutsContainerElement.remove(); shortcutsContainerElement = null; }
-        
+
         // Réinitialise l'historique pour le nouvel éditeur
         undoStack = [];
         redoStack = [];
@@ -3150,10 +3261,10 @@ function initLyricsEditorEnhancer() {
             clearTimeout(autoSaveTimeout);
             autoSaveTimeout = null;
         }
-        
+
         // Initialise la barre d'outils flottante
         createFloatingFormattingToolbar();
-        
+
         // Ajoute un écouteur spécifique pour les sélections dans le textarea
         if (currentEditorType === 'textarea') {
             currentActiveEditor.addEventListener('select', handleSelectionChange);
@@ -3161,14 +3272,14 @@ function initLyricsEditorEnhancer() {
             // Cache la barre flottante quand on scroll dans le textarea
             currentActiveEditor.addEventListener('scroll', hideFloatingToolbar);
         }
-        
+
         // Ajoute un écouteur pour mettre à jour les statistiques en temps réel
         currentActiveEditor.addEventListener('input', debouncedStatsUpdate);
         // Ajoute un écouteur pour la sauvegarde automatique dans l'historique
         currentActiveEditor.addEventListener('input', autoSaveToHistory);
         // Met à jour les statistiques initiales
         setTimeout(() => updateStatsDisplay(), 500);
-        
+
         // Sauvegarde initiale dans l'historique
         setTimeout(() => {
             const initialContent = getCurrentEditorContent();
@@ -3183,7 +3294,7 @@ function initLyricsEditorEnhancer() {
     } else if (editorJustDisappeared) {
         currentActiveEditor = null; currentEditorType = null;
         hideFloatingToolbar();
-        
+
         // Réinitialise l'historique quand on quitte l'éditeur
         undoStack = [];
         redoStack = [];
@@ -3228,7 +3339,7 @@ function initLyricsEditorEnhancer() {
                 });
                 panelTitle.appendChild(darkModeButton);
                 addTooltip(darkModeButton, 'Activer/Désactiver le mode sombre');
-                
+
                 // Bouton pour afficher/masquer les statistiques
                 const statsToggleButton = document.createElement('button');
                 statsToggleButton.id = 'gftStatsToggleButton';
@@ -3241,7 +3352,7 @@ function initLyricsEditorEnhancer() {
                 });
                 panelTitle.appendChild(statsToggleButton);
                 addTooltip(statsToggleButton, 'Afficher/Masquer les statistiques (Ctrl+Shift+S)');
-                
+
                 // Bouton Undo
                 const undoButton = document.createElement('button');
                 undoButton.id = 'gft-undo-button';
@@ -3256,7 +3367,7 @@ function initLyricsEditorEnhancer() {
                 });
                 panelTitle.appendChild(undoButton);
                 addTooltip(undoButton, 'Annuler la dernière modification (Ctrl+Z)');
-                
+
                 // Bouton Redo
                 const redoButton = document.createElement('button');
                 redoButton.id = 'gft-redo-button';
@@ -3271,7 +3382,7 @@ function initLyricsEditorEnhancer() {
                 });
                 panelTitle.appendChild(redoButton);
                 addTooltip(redoButton, 'Refaire la dernière modification annulée (Ctrl+Y)');
-                
+
                 // Bouton Paramètres/Aide
                 const settingsButton = document.createElement('button');
                 settingsButton.id = 'gft-settings-button';
@@ -3289,14 +3400,14 @@ function initLyricsEditorEnhancer() {
                 });
                 panelTitle.appendChild(settingsButton);
                 addTooltip(settingsButton, 'Ouvrir les paramètres et le tutoriel');
-                
+
                 shortcutsContainerElement.appendChild(panelTitle);
                 loadDarkModePreference();
-                
+
                 // Crée l'affichage des statistiques
                 const statsDisplay = createStatsDisplay();
                 shortcutsContainerElement.appendChild(statsDisplay);
-                
+
                 // Met à jour les statistiques initiales si visibles
                 if (statsDisplay.classList.contains('gft-stats-visible')) {
                     updateStatsDisplay();
@@ -3314,14 +3425,14 @@ function initLyricsEditorEnhancer() {
                  * @param {boolean} isCoupletMainButton - Booléen spécial pour le bouton de couplet principal.
                  * @returns {HTMLButtonElement} Le bouton créé.
                  */
-                const createButton = (config, parentEl = shortcutsContainerElement, isCoupletMainButton = false) => { 
+                const createButton = (config, parentEl = shortcutsContainerElement, isCoupletMainButton = false) => {
                     const button = document.createElement('button');
                     button.textContent = typeof config.getLabel === 'function' ? config.getLabel() : config.label;
                     if (config.id) button.id = config.id;
                     button.classList.add('genius-lyrics-shortcut-button');
                     if (config.title) button.title = config.title;
                     button.type = 'button'; parentEl.appendChild(button);
-                    
+
                     // Ajoute le tooltip si défini
                     if (config.tooltip) {
                         addTooltip(button, config.tooltip);
@@ -3329,8 +3440,8 @@ function initLyricsEditorEnhancer() {
                     // Ajoute l'écouteur d'événement principal qui déclenche l'action du bouton.
                     button.addEventListener('click', (event) => {
                         event.preventDefault();
-                        if (!currentActiveEditor) { initLyricsEditorEnhancer(); if(!currentActiveEditor) return; }
-                        
+                        if (!currentActiveEditor) { initLyricsEditorEnhancer(); if (!currentActiveEditor) return; }
+
                         // Sauvegarde la position du curseur pour les textarea
                         let savedCursorStart = null;
                         let savedCursorEnd = null;
@@ -3338,23 +3449,23 @@ function initLyricsEditorEnhancer() {
                             savedCursorStart = currentActiveEditor.selectionStart;
                             savedCursorEnd = currentActiveEditor.selectionEnd;
                         }
-                        
+
                         currentActiveEditor.focus();
-                        
+
                         // Active le flag pour désactiver la sauvegarde automatique pendant toute l'action
                         isButtonActionInProgress = true;
                         if (autoSaveTimeout) {
                             clearTimeout(autoSaveTimeout);
                             autoSaveTimeout = null;
                         }
-                        
-                        let textToInsertForCouplet = null; 
+
+                        let textToInsertForCouplet = null;
 
                         // Logique pour chaque type d'action
                         if (config.action === 'replaceText' && config.searchPattern) {
                             // Sauvegarde dans l'historique avant modification
                             saveToHistory();
-                            
+
                             // Gère le remplacement de texte
                             const replacementValueOrFn = config.replacementFunction || config.replacementText;
                             let replacementsCount = 0;
@@ -3387,7 +3498,7 @@ function initLyricsEditorEnhancer() {
                         } else if (config.action === 'lineCorrection' && config.correctionType) {
                             // Sauvegarde dans l'historique avant modification
                             saveToHistory();
-                            
+
                             // Gère les corrections ligne par ligne
                             let correctionsCount = 0; let correctionFunction; let feedbackLabel = "";
                             if (config.correctionType === 'capitalize') { correctionFunction = capitalizeFirstLetterOfEachLine; feedbackLabel = "majuscule(s) en début de ligne"; }
@@ -3417,48 +3528,48 @@ function initLyricsEditorEnhancer() {
                                 if (correctionsCount > 0) showFeedbackMessage(`${correctionsCount} ${feedbackLabel} corrigé(s) !`, 3000, shortcutsContainerElement);
                                 else showFeedbackMessage(`Aucune correction de ${feedbackLabel} nécessaire.`, 2000, shortcutsContainerElement);
                             }
-                        } else if (config.action === 'globalTextFix') { 
+                        } else if (config.action === 'globalTextFix') {
                             // Version avec prévisualisation (mode validation)
                             (async () => {
                                 try {
-                                    const originalText = currentEditorType === 'textarea' 
-                                        ? currentActiveEditor.value 
+                                    const originalText = currentEditorType === 'textarea'
+                                        ? currentActiveEditor.value
                                         : currentActiveEditor.textContent || '';
-                                    
+
                                     // Calcule les corrections avec barre de progression
                                     const result = await applyAllTextCorrectionsAsync(originalText);
-                                    
+
                                     // Cache la barre de progression
                                     hideProgress();
-                                    
+
                                     if (result.correctionsCount === 0) {
                                         showFeedbackMessage("Aucune correction de texte globale n'était nécessaire.", 2000, shortcutsContainerElement);
-                                        
+
                                         // Vérifie quand même les brackets même s'il n'y a pas de corrections textuelles
                                         const editorRef = currentActiveEditor;
                                         const editorTypeRef = currentEditorType;
-                                        
+
                                         console.log('[GFT] Vérification des brackets (cas sans correction)...');
                                         console.log('[GFT] editorRef:', editorRef);
                                         console.log('[GFT] editorTypeRef:', editorTypeRef);
-                                        
+
                                         if (editorRef) {
                                             const unmatchedCount = highlightUnmatchedBracketsInEditor(editorRef, editorTypeRef);
                                             console.log('[GFT] unmatchedCount:', unmatchedCount);
-                                            
+
                                             // Affiche le résultat après un délai
                                             setTimeout(() => {
                                                 if (unmatchedCount > 0) {
                                                     const pluriel = unmatchedCount > 1 ? 's' : '';
                                                     showFeedbackMessage(
-                                                        `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} détecté${pluriel} et surligné${pluriel} en rouge !`, 
-                                                        5000, 
+                                                        `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} détecté${pluriel} et surligné${pluriel} en rouge !`,
+                                                        5000,
                                                         shortcutsContainerElement
                                                     );
                                                 } else {
                                                     showFeedbackMessage(
-                                                        "✅ Toutes les parenthèses et crochets sont bien appariés.", 
-                                                        3000, 
+                                                        "✅ Toutes les parenthèses et crochets sont bien appariés.",
+                                                        3000,
                                                         shortcutsContainerElement
                                                     );
                                                 }
@@ -3468,11 +3579,11 @@ function initLyricsEditorEnhancer() {
                                         }
                                         return;
                                     }
-                                    
+
                                     // Capture les références de l'éditeur pour les callbacks
                                     const editorRef = currentActiveEditor;
                                     const editorTypeRef = currentEditorType;
-                                    
+
                                     // Affiche la prévisualisation
                                     showCorrectionPreview(
                                         originalText,
@@ -3482,7 +3593,7 @@ function initLyricsEditorEnhancer() {
                                         () => {
                                             // Sauvegarde dans l'historique
                                             saveToHistory();
-                                            
+
                                             // Applique les corrections
                                             if (editorTypeRef === 'textarea') {
                                                 editorRef.value = result.newText;
@@ -3490,7 +3601,7 @@ function initLyricsEditorEnhancer() {
                                             } else if (editorTypeRef === 'div') {
                                                 setEditorContent(result.newText);
                                             }
-                                            
+
                                             // Construit le message de feedback
                                             const detailsArray = [];
                                             if (result.corrections.yPrime > 0) detailsArray.push(`${result.corrections.yPrime} "y'"`);
@@ -3499,35 +3610,35 @@ function initLyricsEditorEnhancer() {
                                             if (result.corrections.capitalization > 0) detailsArray.push(`${result.corrections.capitalization} majuscule(s)`);
                                             if (result.corrections.punctuation > 0) detailsArray.push(`${result.corrections.punctuation} ponctuation(s)`);
                                             if (result.corrections.spacing > 0) detailsArray.push(`${result.corrections.spacing} espacement(s)`);
-                                            
-                                            const message = detailsArray.length > 0 
+
+                                            const message = detailsArray.length > 0
                                                 ? `✅ Corrigé : ${detailsArray.join(', ')} (${result.correctionsCount} au total)`
                                                 : `${result.correctionsCount} correction(s) appliquée(s)`;
-                                                
+
                                             showFeedbackMessage(message, 4500, shortcutsContainerElement);
-                                            
+
                                             // Vérifie automatiquement les brackets après les corrections (immédiatement)
                                             console.log('[GFT] Vérification des brackets après corrections...');
                                             console.log('[GFT] editorRef:', editorRef);
                                             console.log('[GFT] editorTypeRef:', editorTypeRef);
-                                            
+
                                             if (editorRef) {
                                                 const unmatchedCount = highlightUnmatchedBracketsInEditor(editorRef, editorTypeRef);
                                                 console.log('[GFT] unmatchedCount:', unmatchedCount);
-                                                
+
                                                 // Affiche le résultat après un délai pour ne pas écraser le premier message
                                                 setTimeout(() => {
                                                     if (unmatchedCount > 0) {
                                                         const pluriel = unmatchedCount > 1 ? 's' : '';
                                                         showFeedbackMessage(
-                                                            `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} détecté${pluriel} et surligné${pluriel} en rouge !`, 
-                                                            5000, 
+                                                            `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} détecté${pluriel} et surligné${pluriel} en rouge !`,
+                                                            5000,
                                                             shortcutsContainerElement
                                                         );
                                                     } else {
                                                         showFeedbackMessage(
-                                                            "✅ Toutes les parenthèses et crochets sont bien appariés.", 
-                                                            3000, 
+                                                            "✅ Toutes les parenthèses et crochets sont bien appariés.",
+                                                            3000,
                                                             shortcutsContainerElement
                                                         );
                                                     }
@@ -3550,28 +3661,28 @@ function initLyricsEditorEnhancer() {
                         } else if (config.action === 'checkBrackets') {
                             // Vérifie et surligne les parenthèses et crochets non appariés
                             const unmatchedCount = highlightUnmatchedBracketsInEditor(currentActiveEditor, currentEditorType);
-                            
+
                             if (unmatchedCount > 0) {
                                 const pluriel = unmatchedCount > 1 ? 's' : '';
                                 showFeedbackMessage(
-                                    `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} trouvé${pluriel} et surligné${pluriel} en rouge !`, 
-                                    5000, 
+                                    `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} trouvé${pluriel} et surligné${pluriel} en rouge !`,
+                                    5000,
                                     shortcutsContainerElement
                                 );
                             } else {
                                 showFeedbackMessage(
-                                    "✅ Aucun problème trouvé ! Toutes les parenthèses et crochets sont bien appariés.", 
-                                    3000, 
+                                    "✅ Aucun problème trouvé ! Toutes les parenthèses et crochets sont bien appariés.",
+                                    3000,
                                     shortcutsContainerElement
                                 );
                             }
                         }
-                         else { 
+                        else {
                             // Action par défaut : insérer du texte (tags, etc.).
                             let textToInsert;
                             if (typeof config.getText === 'function') {
                                 textToInsert = config.getText();
-                                if (isCoupletMainButton) { 
+                                if (isCoupletMainButton) {
                                     textToInsertForCouplet = textToInsert;
                                 }
                             }
@@ -3589,18 +3700,18 @@ function initLyricsEditorEnhancer() {
                         // Logique spécifique au bouton de couplet
                         if (isCoupletMainButton && textToInsertForCouplet !== null) {
                             coupletCounter++;
-                            button.textContent = config.getLabel(); 
-                        } else if (typeof config.getLabel === 'function' && !isCoupletMainButton) { 
+                            button.textContent = config.getLabel();
+                        } else if (typeof config.getLabel === 'function' && !isCoupletMainButton) {
                             button.textContent = config.getLabel();
                         }
-                        
+
                         // Restaure la position du curseur pour éviter le "jumpscare" du scroll
                         if (currentEditorType === 'textarea' && savedCursorStart !== null && savedCursorEnd !== null) {
                             currentActiveEditor.setSelectionRange(savedCursorStart, savedCursorEnd);
                         }
-                        
+
                         currentActiveEditor.focus();
-                        
+
                         // Désactive le flag après un court délai et met à jour lastSavedContent
                         setTimeout(() => {
                             isButtonActionInProgress = false;
@@ -3614,9 +3725,9 @@ function initLyricsEditorEnhancer() {
                 };
 
                 // 3. Boucle sur la configuration SHORTCUTS pour créer tous les groupes de boutons.
-                const buttonGroupsContainer = document.createElement('div'); 
+                const buttonGroupsContainer = document.createElement('div');
                 buttonGroupsContainer.id = 'gftButtonGroupsContainer';
-                shortcutsContainerElement.appendChild(buttonGroupsContainer); 
+                shortcutsContainerElement.appendChild(buttonGroupsContainer);
 
                 if (SHORTCUTS.TAGS_STRUCTURAUX) {
                     SHORTCUTS.TAGS_STRUCTURAUX.forEach(groupConfig => {
@@ -3624,24 +3735,24 @@ function initLyricsEditorEnhancer() {
                         groupConfig.buttons.forEach(shortcut => {
                             if (shortcut.type === 'coupletManager') {
                                 // Crée les boutons "précédent", "suivant" et le bouton principal du couplet
-                                createButton(shortcut.prev, groupDiv).addEventListener('click', (e) => { 
-                                    e.stopPropagation(); 
-                                    if (coupletCounter > 1) coupletCounter--; 
-                                    let btn = document.getElementById(COUPLET_BUTTON_ID); 
-                                    if(btn) btn.textContent = shortcut.main.getLabel(); 
+                                createButton(shortcut.prev, groupDiv).addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    if (coupletCounter > 1) coupletCounter--;
+                                    let btn = document.getElementById(COUPLET_BUTTON_ID);
+                                    if (btn) btn.textContent = shortcut.main.getLabel();
                                 });
-                                createButton(shortcut.main, groupDiv, true); 
-                                createButton(shortcut.next, groupDiv).addEventListener('click', (e) => { 
-                                    e.stopPropagation(); 
-                                    coupletCounter++; 
-                                    let btn = document.getElementById(COUPLET_BUTTON_ID); 
-                                    if(btn) btn.textContent = shortcut.main.getLabel(); 
+                                createButton(shortcut.main, groupDiv, true);
+                                createButton(shortcut.next, groupDiv).addEventListener('click', (e) => {
+                                    e.stopPropagation();
+                                    coupletCounter++;
+                                    let btn = document.getElementById(COUPLET_BUTTON_ID);
+                                    if (btn) btn.textContent = shortcut.main.getLabel();
                                 });
                             } else {
                                 createButton(shortcut, groupDiv);
                             }
                         });
-                        buttonGroupsContainer.appendChild(groupDiv); 
+                        buttonGroupsContainer.appendChild(groupDiv);
                     });
                 }
 
@@ -3649,8 +3760,8 @@ function initLyricsEditorEnhancer() {
 
                 if (SHORTCUTS.GLOBAL_FIXES && SHORTCUTS.GLOBAL_FIXES.length > 0) {
                     const hrGlobal = document.createElement('hr'); shortcutsContainerElement.appendChild(hrGlobal);
-                    const globalFixesDiv = document.createElement('div'); 
-                    SHORTCUTS.GLOBAL_FIXES.forEach(s => createButton(s, globalFixesDiv)); 
+                    const globalFixesDiv = document.createElement('div');
+                    SHORTCUTS.GLOBAL_FIXES.forEach(s => createButton(s, globalFixesDiv));
                     shortcutsContainerElement.appendChild(globalFixesDiv);
                 }
 
@@ -3661,7 +3772,7 @@ function initLyricsEditorEnhancer() {
                 footerContainer.style.justifyContent = 'space-between';
                 footerContainer.style.alignItems = 'center';
                 footerContainer.style.marginTop = '8px';
-                
+
                 const creditLabel = document.createElement('div');
                 creditLabel.id = 'gft-credit-label';
                 creditLabel.textContent = 'Made with ❤️ by Lnkhey';
@@ -3669,19 +3780,19 @@ function initLyricsEditorEnhancer() {
                 creditLabel.style.color = '#888';
                 creditLabel.style.opacity = '0.6';
                 creditLabel.style.userSelect = 'none';
-                
+
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v2.3.3';
-                versionLabel.title = 'Genius Fast Transcriber version 2.3.3 - Fix : Curseur ne saute plus à la fin + Surlignage majuscules';
-                
+                versionLabel.textContent = 'v2.5';
+                versionLabel.title = 'Genius Fast Transcriber version 2.5 - Fix : Curseur ne saute plus à la fin + Surlignage majuscules';
+
                 footerContainer.appendChild(creditLabel);
                 footerContainer.appendChild(versionLabel);
                 shortcutsContainerElement.appendChild(footerContainer);
-                
+
                 // 4. Injecte le panneau complet dans la page.
                 targetStickySection.prepend(shortcutsContainerElement);
-                
+
                 // Lance le tutoriel au premier lancement
                 if (isFirstLaunch()) {
                     setTimeout(() => {
@@ -3690,24 +3801,24 @@ function initLyricsEditorEnhancer() {
                 }
 
             } else {
-                 // Si le panneau existe déjà, on met à jour les données si la page a changé (navigation SPA)
-                 if (document.title !== (window._gftLastPageTitle || "")) {
+                // Si le panneau existe déjà, on met à jour les données si la page a changé (navigation SPA)
+                if (document.title !== (window._gftLastPageTitle || "")) {
                     extractSongData();
                     const artistSelContainer = shortcutsContainerElement.querySelector(`#${ARTIST_SELECTOR_CONTAINER_ID}`);
-                    if(artistSelContainer && artistSelContainer.parentNode) createArtistSelectors(artistSelContainer.parentNode);
+                    if (artistSelContainer && artistSelContainer.parentNode) createArtistSelectors(artistSelContainer.parentNode);
                     else if (shortcutsContainerElement) createArtistSelectors(shortcutsContainerElement);
-                 }
-                 if (shortcutsContainerElement) loadDarkModePreference();
+                }
+                if (shortcutsContainerElement) loadDarkModePreference();
             }
             window._gftLastPageTitle = document.title;
             hideGeniusFormattingHelper();
             // Met à jour le label du bouton couplet
-            if (shortcutsContainerElement) { 
-                const coupletButton = shortcutsContainerElement.querySelector(`#${COUPLET_BUTTON_ID}`); 
+            if (shortcutsContainerElement) {
+                const coupletButton = shortcutsContainerElement.querySelector(`#${COUPLET_BUTTON_ID}`);
                 if (coupletButton && SHORTCUTS.TAGS_STRUCTURAUX && SHORTCUTS.TAGS_STRUCTURAUX[0]) {
                     const coupletManagerConfig = SHORTCUTS.TAGS_STRUCTURAUX[0].buttons.find(b => b.type === 'coupletManager');
                     if (coupletManagerConfig) {
-                        coupletButton.textContent = coupletManagerConfig.main.getLabel(); 
+                        coupletButton.textContent = coupletManagerConfig.main.getLabel();
                     }
                 }
             }
@@ -3733,7 +3844,7 @@ function startObserver() {
         const editorNowExistsInDOM = document.querySelector(SELECTORS.TEXTAREA_EDITOR) || document.querySelector(SELECTORS.DIV_EDITOR);
         const editorVanished = currentActiveEditor && !document.body.contains(currentActiveEditor);
         // Si l'éditeur apparaît ou disparaît, on relance l'initialisation.
-        if (editorAppeared || controlsAppeared || (!currentActiveEditor && editorNowExistsInDOM) || editorVanished ) {
+        if (editorAppeared || controlsAppeared || (!currentActiveEditor && editorNowExistsInDOM) || editorVanished) {
             // On se déconnecte temporairement pour éviter les boucles infinies.
             currentObsInstance.disconnect();
             initLyricsEditorEnhancer();
@@ -3745,6 +3856,13 @@ function startObserver() {
     try { observer.observe(document.body, { childList: true, subtree: true }); } catch (e) { console.error("[Observer] Erreur initiale:", e); }
     // Fait un premier appel pour gérer le cas où l'éditeur est déjà présent au chargement.
     initLyricsEditorEnhancer();
+
+    // Si on est sur une page de chanson (même sans éditeur), on extrait les métadonnées et on prépare la toolbar
+    const isSongPage = document.querySelector('meta[property="og:type"][content="music.song"]') !== null || window.location.pathname.includes('-lyrics');
+    if (isSongPage) {
+        extractSongData();
+        createFloatingFormattingToolbar();
+    }
 }
 
 // ----- Démarrage du Script -----
@@ -3790,3 +3908,307 @@ window.addEventListener('beforeunload', () => {
     if (floatingFormattingToolbar) floatingFormattingToolbar.remove();
     delete window._gftLastPageTitle;
 });
+
+// ----- Fonctions pour la Lyrics Card -----
+
+/**
+ * Génère une "Lyric Card" à partir du texte sélectionné.
+ */
+function generateLyricsCard() {
+    const selection = window.getSelection();
+    if (!selection || selection.toString().trim().length === 0) {
+        showFeedbackMessage("Veuillez sélectionner du texte pour créer une Lyric Card.");
+        return;
+    }
+
+    const text = selection.toString().trim();
+    const songTitle = currentSongTitle || "Titre Inconnu";
+    const artistName = currentMainArtists.length > 0 ? currentMainArtists.join(' & ') : "Artiste Inconnu";
+
+    // Récupère les URLs potentielles pour l'image de couverture
+    const candidateUrls = [];
+
+    // 1. Meta tags
+    const ogImage = document.querySelector('meta[property="og:image"]');
+    if (ogImage && ogImage.content) candidateUrls.push(ogImage.content);
+
+    const twitterImage = document.querySelector('meta[name="twitter:image"]');
+    if (twitterImage && twitterImage.content) candidateUrls.push(twitterImage.content);
+
+    // 2. Images dans le DOM (souvent plus fiables pour le CORS car déjà chargées par le navigateur, 
+    // mais pour le canvas on a quand même besoin du crossOrigin)
+    const headerImg = document.querySelector('div[class*="SongHeader"] img') || document.querySelector('img[class*="CoverArt"]');
+    if (headerImg && headerImg.src) candidateUrls.push(headerImg.src);
+
+    // Filtre les doublons
+    const uniqueUrls = [...new Set(candidateUrls)];
+
+    if (uniqueUrls.length === 0) {
+        showFeedbackMessage("Impossible de trouver la pochette de l'album.");
+        return;
+    }
+
+    showFeedbackMessage("Génération de la Lyric Card en cours...", 2000);
+
+    // Fonction pour essayer de charger une image parmi la liste
+    const loadFirstWorkingImage = (urls, onSuccess, onFailure) => {
+        if (urls.length === 0) {
+            onFailure();
+            return;
+        }
+
+        let url = urls[0];
+        // Ajoute un paramètre pour éviter le cache (cache-busting)
+        // Cela force le navigateur à refaire une requête avec les bons headers CORS
+        // au lieu d'utiliser une version cachée sans headers (qui cause l'erreur).
+        const separator = url.includes('?') ? '&' : '?';
+        const safeUrl = `${url}${separator}t=${Date.now()}`;
+
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+
+        img.onload = () => onSuccess(img);
+        img.onerror = () => {
+            console.warn(`[GFT] Échec du chargement de l'image : ${safeUrl}. Tentative suivante...`);
+            loadFirstWorkingImage(urls.slice(1), onSuccess, onFailure);
+        };
+
+        img.src = safeUrl;
+    };
+
+    loadFirstWorkingImage(uniqueUrls, (img) => {
+        // Succès du chargement de l'image de couverture
+        const logoImg = new Image();
+        logoImg.crossOrigin = "Anonymous";
+
+        // Logique de chargement du logo (inchangée)
+        const dominantColor = getDominantColor(img);
+        const contrastColor = getContrastColor(dominantColor); // 'black' ou 'white'
+
+        const logoUrl = chrome.runtime.getURL(contrastColor === 'white' ? 'images/geniuslogowhite.png' : 'images/geniuslogoblack.png');
+
+        logoImg.onload = () => {
+            drawLyricsCard(text, artistName, songTitle, img, dominantColor, contrastColor, logoImg);
+        };
+        logoImg.onerror = () => {
+            drawLyricsCard(text, artistName, songTitle, img, dominantColor, contrastColor, null);
+        };
+        logoImg.src = logoUrl;
+
+    }, () => {
+        // Échec total
+        showFeedbackMessage("Erreur : Impossible de charger l'image de couverture (CORS ou URL invalide).");
+    });
+}
+
+/**
+ * Dessine la Lyric Card sur un canvas et déclenche le téléchargement.
+ */
+function drawLyricsCard(text, artistName, songTitle, imageObj, footerColor, textColor, logoObj) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    const WIDTH = 1280;
+    const HEIGHT = 720;
+    const FOOTER_HEIGHT = 140; // Hauteur du footer (était 160)
+
+    canvas.width = WIDTH;
+    canvas.height = HEIGHT;
+
+    // 1. Dessine le fond (Image zoomée pour remplir)
+    // On veut remplir 1280x(720-FOOTER_HEIGHT) ou tout le canvas ? Le user dit "le fond doit être la pochette du son zoomé pour fill"
+    // Le footer est par dessus ou en dessous ? "un footer avec en bas à gauche..."
+    // "le footer doit avoir un contour au dessus comme dans le screen"
+    // On va dessiner l'image sur tout le canvas
+
+    const imgRatio = imageObj.width / imageObj.height;
+    const canvasRatio = WIDTH / HEIGHT;
+    let renderWidth, renderHeight, offsetX, offsetY;
+
+    if (imgRatio > canvasRatio) {
+        renderHeight = HEIGHT;
+        renderWidth = imageObj.width * (HEIGHT / imageObj.height);
+        offsetX = (WIDTH - renderWidth) / 2;
+        offsetY = 0;
+    } else {
+        renderWidth = WIDTH;
+        renderHeight = imageObj.height * (WIDTH / imageObj.width);
+        offsetX = 0;
+        offsetY = (HEIGHT - renderHeight) / 2;
+    }
+    ctx.drawImage(imageObj, offsetX, offsetY, renderWidth, renderHeight);
+
+    // 2. Dessine le Footer
+    ctx.fillStyle = footerColor;
+    ctx.fillRect(0, HEIGHT - FOOTER_HEIGHT, WIDTH, FOOTER_HEIGHT);
+
+    // Contour au dessus du footer (blanc ou noir selon contraste ?) 
+    // Le user dit "le footer doit avoir un contour au dessus comme dans le screen". Dans le screen c'est blanc fin.
+    // Contour au dessus du footer
+    // "le contour du footer doit être légèrement plus fin" -> 3px (était 4px)
+    ctx.fillStyle = textColor; // 'black' ou 'white'
+    ctx.fillRect(0, HEIGHT - FOOTER_HEIGHT, WIDTH, 3); // Ligne de 3px
+
+    // 3. Texte Artiste / Titre (Bas Gauche du Footer)
+    // "la font doit être plus fine" -> normal (était bold)
+    ctx.font = 'normal 28px "Programme", "Arial", sans-serif';
+    ctx.fillStyle = textColor;
+    ctx.textBaseline = 'middle';
+    ctx.letterSpacing = "2px"; // Espacement plus grand
+    const footerText = `${artistName.toUpperCase()}, "${songTitle.toUpperCase()}"`;
+    ctx.fillText(footerText, 60, HEIGHT - (FOOTER_HEIGHT / 2));
+    ctx.letterSpacing = "0px"; // Reset pour la suite
+
+    // 4. Logo GENIUS (Bas Droite du Footer)
+    if (logoObj) {
+        // Dimensions du logo : ratio à conserver
+        // Supposons que le logo est rectangulaire large.
+        // On veut une hauteur d'environ 40px ?
+        const logoHeight = 40;
+        const logoWidth = logoObj.width * (logoHeight / logoObj.height);
+        ctx.drawImage(logoObj, WIDTH - 60 - logoWidth, HEIGHT - (FOOTER_HEIGHT / 2) - (logoHeight / 2), logoWidth, logoHeight);
+    } else {
+        // Fallback texte
+        ctx.save();
+        ctx.textAlign = 'right';
+        ctx.font = '900 36px "Programme", "Arial Black", sans-serif';
+        ctx.letterSpacing = "4px";
+        ctx.fillStyle = textColor;
+        ctx.fillText("G E N I U S", WIDTH - 60, HEIGHT - (FOOTER_HEIGHT / 2));
+        ctx.restore();
+    }
+
+    // 5. Dessine les paroles (Au dessus du footer, aligné à gauche)
+    // "par dessus en bas à gauche il doit y avoir le texte sélectionné avec une couleur de surlignage en fond carré"
+    // "le surlignage doivent prendre la couleur noire ou blanche selon la luminosité de la cover"
+
+    // On doit wrapper le texte
+    const maxTextWidth = WIDTH - 120; // Marges
+    const fontSize = 48;
+    const lineHeight = 80; // Plus d'espace entre les lignes (était 64)
+    // "fontweight plus légère" -> 300 (Light)
+    ctx.font = `300 ${fontSize}px "Programme", "Arial", sans-serif`;
+
+    // Respecter les sauts de ligne originaux
+    const originalLines = text.split(/\r?\n/);
+    const lines = [];
+
+    originalLines.forEach(originalLine => {
+        const trimmedLine = originalLine.trim();
+        if (!trimmedLine) return; // Ignorer les lignes vides
+
+        const words = trimmedLine.split(/\s+/);
+        let currentLine = words[0];
+
+        for (let i = 1; i < words.length; i++) {
+            const width = ctx.measureText(currentLine + " " + words[i]).width;
+            if (width < maxTextWidth) {
+                currentLine += " " + words[i];
+            } else {
+                lines.push(currentLine);
+                currentLine = words[i];
+            }
+        }
+        lines.push(currentLine);
+    });
+
+    // Positionnement du texte : au dessus du footer, avec une marge
+    const textBottomMargin = 35; // Descendre un peu le texte (était 40)
+    let startY = HEIGHT - FOOTER_HEIGHT - textBottomMargin - (lines.length * lineHeight);
+
+    // Couleur de fond du texte (opposé du texte)
+    // "le texte et le surlignage doivent prendre la couleur noire ou blanche selon la luminosité de la cover"
+    // C'est un peu ambigu. Dans l'exemple : Fond noir (texte blanc) sur l'image.
+    // Donc si l'image est claire -> Fond noir, texte blanc.
+    // Si l'image est sombre -> Fond blanc, texte noir ? Ou toujours fond noir texte blanc ?
+    // Le user dit "selon la luminosité de la cover (sinon illisible)".
+    // Donc on va calculer la luminosité moyenne de la zone où le texte s'affiche ? Ou globale ?
+    // Simplification : On utilise le contraste global de l'image (calculé pour le footer déjà, mais on peut réutiliser).
+    // Si dominantColor est sombre -> textColor est blanc.
+    // Donc on fait : Fond du texte = textColor (ex: Blanc), Texte = dominantColor (ex: Sombre) ?
+    // Non, généralement c'est Fond = Noir, Texte = Blanc OU Fond = Blanc, Texte = Noir.
+    // Si textColor est 'white' (donc fond sombre), on met Fond Texte = Noir, Texte = Blanc.
+    // Si textColor est 'black' (donc fond clair), on met Fond Texte = Blanc, Texte = Noir.
+
+    // "si tu as choisis que le texte du footer sois blanc, il faut que les lyrics soient écrits en noirs avec un fond blanc"
+    // textColor est la couleur du texte du footer (et du logo/border).
+    // Si textColor === 'white' (donc fond sombre), on veut Lyrics: Noir sur Blanc.
+    // Si textColor === 'black' (donc fond clair), on veut Lyrics: Blanc sur Noir (pour garder le contraste/style inversé).
+
+    const lyricsBackgroundColor = textColor === 'white' ? 'white' : 'black';
+    const lyricsTextColor = textColor === 'white' ? 'black' : 'white';
+
+    lines.forEach((line, index) => {
+        const y = startY + (index * lineHeight);
+        const lineWidth = ctx.measureText(line).width;
+        const padding = 10;
+
+        // Fond du texte
+        // "le surlignage n'est pas très bon... il devrait descendre plus bas"
+        // On augmente la hauteur du rectangle vers le bas.
+        // y est la baseline du texte.
+        // fontSize est 48.
+        // On dessine le rect de y - fontSize + correction jusqu'à y + descente.
+
+        const rectTop = y - fontSize + 12; // Un peu plus bas que le top absolu de la font
+        const rectHeight = fontSize + 24; // Plus haut pour descendre bien sous la baseline
+
+        ctx.fillStyle = lyricsBackgroundColor;
+        ctx.fillRect(60 - padding, rectTop, lineWidth + (padding * 2), rectHeight);
+
+        // Texte
+        ctx.fillStyle = lyricsTextColor;
+        ctx.fillText(line, 60, y);
+    });
+
+    // Téléchargement
+    const link = document.createElement('a');
+    link.download = `lyrics_card_${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+
+/**
+ * Calcule la couleur dominante d'une image.
+ * Version simplifiée : moyenne des pixels du centre.
+ */
+function getDominantColor(img) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = 100;
+    canvas.height = 100;
+    ctx.drawImage(img, 0, 0, 100, 100);
+
+    const imageData = ctx.getImageData(0, 0, 100, 100);
+    const data = imageData.data;
+    let r = 0, g = 0, b = 0;
+
+    for (let i = 0; i < data.length; i += 4) {
+        r += data[i];
+        g += data[i + 1];
+        b += data[i + 2];
+    }
+
+    const count = data.length / 4;
+    r = Math.floor(r / count);
+    g = Math.floor(g / count);
+    b = Math.floor(b / count);
+
+    return `rgb(${r},${g},${b})`;
+}
+
+/**
+ * Retourne 'black' ou 'white' selon la couleur donnée pour un meilleur contraste.
+ */
+function getContrastColor(rgbString) {
+    // Extrait r, g, b
+    const match = rgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (!match) return 'white';
+
+    const r = parseInt(match[1]);
+    const g = parseInt(match[2]);
+    const b = parseInt(match[3]);
+
+    // Calcul de la luminosité (YIQ)
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return (yiq >= 128) ? 'black' : 'white';
+}
