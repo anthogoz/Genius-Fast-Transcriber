@@ -1394,6 +1394,7 @@ let lastSavedContent = '';
 let isUndoRedoInProgress = false; // Flag pour éviter les sauvegardes pendant undo/redo
 let isButtonActionInProgress = false; // Flag pour éviter les sauvegardes auto pendant les actions de boutons
 let hasUnsavedChanges = false; // Flag pour savoir si des modifications non sauvegardées existent
+let draftNotificationShown = false; // Flag pour éviter d'afficher plusieurs fois la notification de brouillon
 
 /**
  * Sauvegarde l'état actuel dans l'historique avant une modification.
@@ -1466,7 +1467,171 @@ function autoSaveToHistory() {
         const finalContent = getCurrentEditorContent();
         lastSavedContent = finalContent;
         hasUnsavedChanges = false;
+
+        // Sauvegarde aussi dans le brouillon local
+        saveDraft(finalContent);
     }, 2000);
+}
+
+// ----- Gestion des Brouillons (Drafts) -----
+
+/**
+ * Génère une clé unique pour le stockage du brouillon basée sur l'URL.
+ * @returns {string} La clé de stockage.
+ */
+function getDraftKey() {
+    // Utilise le pathname pour identifier la chanson (ex: /Artiste-titre-lyrics)
+    return `gft-draft-${window.location.pathname}`;
+}
+
+/**
+ * Sauvegarde le contenu actuel comme brouillon dans localStorage.
+ * @param {string} content - Le contenu à sauvegarder.
+ */
+function saveDraft(content) {
+    if (!content || content.trim().length === 0) return;
+
+    const key = getDraftKey();
+    const draftData = {
+        content: content,
+        timestamp: Date.now(),
+        title: currentSongTitle
+    };
+
+    try {
+        localStorage.setItem(key, JSON.stringify(draftData));
+        // console.log('[GFT] Brouillon sauvegardé', new Date().toLocaleTimeString());
+    } catch (e) {
+        console.warn('[GFT] Erreur sauvegarde brouillon:', e);
+    }
+}
+
+/**
+ * Vérifie s'il existe un brouillon pour cette page et propose de le restaurer.
+ */
+function checkAndRestoreDraft() {
+    // Si la notification a déjà été affichée pour cette session, on ne la réaffiche pas
+    if (draftNotificationShown) return;
+
+    const key = getDraftKey();
+    const savedDraft = localStorage.getItem(key);
+
+    if (!savedDraft) return;
+
+    try {
+        const draftData = JSON.parse(savedDraft);
+        const currentContent = getCurrentEditorContent();
+
+        // Si le brouillon est vide ou identique au contenu actuel, on ignore
+        if (!draftData.content || draftData.content === currentContent) return;
+
+        // Si le brouillon est plus vieux que 24h, on l'ignore (optionnel, mais évite les vieux trucs)
+        const ONE_DAY = 24 * 60 * 60 * 1000;
+        if (Date.now() - draftData.timestamp > ONE_DAY) return;
+
+        // Affiche une notification pour restaurer
+        const date = new Date(draftData.timestamp);
+        const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        showRestoreDraftNotification(timeStr, draftData.content);
+        draftNotificationShown = true; // Marque comme affiché
+
+    } catch (e) {
+        console.warn('[GFT] Erreur lecture brouillon:', e);
+    }
+}
+
+/**
+ * Affiche une notification spéciale pour restaurer le brouillon.
+ */
+function showRestoreDraftNotification(timeStr, contentToRestore) {
+    // On attache directement au body pour éviter les problèmes de z-index ou de pointer-events des conteneurs parents
+    const container = document.body;
+
+    const notification = document.createElement('div');
+    notification.className = 'gft-draft-notification';
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #333;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        z-index: 2147483647; /* Max z-index pour être sûr d'être au-dessus de tout */
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        font-family: 'Programme', sans-serif;
+        border-left: 4px solid #ffff64;
+        animation: slideIn 0.3s ease-out;
+        pointer-events: auto; /* Force la réactivité aux clics */
+        cursor: default;
+    `;
+
+    const text = document.createElement('div');
+    text.innerHTML = `<strong>Brouillon trouvé !</strong><br>Sauvegardé à ${timeStr}`;
+
+    const buttons = document.createElement('div');
+    buttons.style.display = 'flex';
+    buttons.style.gap = '10px';
+
+    const restoreBtn = document.createElement('button');
+    restoreBtn.textContent = 'Restaurer';
+    restoreBtn.style.cssText = `
+        background-color: #ffff64;
+        color: black;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        pointer-events: auto;
+    `;
+    restoreBtn.onclick = (e) => {
+        e.stopPropagation(); // Empêche la propagation au cas où
+        setEditorContent(contentToRestore);
+        saveToHistory(); // Sauvegarde l'état restauré dans l'historique
+        showFeedbackMessage("Brouillon restauré avec succès !");
+        notification.remove();
+        draftNotificationShown = false; // Réinitialise le flag après restauration
+    };
+
+    const discardBtn = document.createElement('button');
+    discardBtn.textContent = 'Ignorer';
+    discardBtn.style.cssText = `
+        background-color: transparent;
+        color: #aaa;
+        border: 1px solid #555;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        pointer-events: auto;
+    `;
+    discardBtn.onclick = (e) => {
+        e.stopPropagation();
+        notification.remove();
+        // Supprime le brouillon pour ne plus le proposer
+        localStorage.removeItem(getDraftKey());
+        draftNotificationShown = false; // Réinitialise le flag après avoir ignoré
+    };
+
+    buttons.appendChild(restoreBtn);
+    buttons.appendChild(discardBtn);
+
+    notification.appendChild(text);
+    notification.appendChild(buttons);
+
+    container.appendChild(notification);
+
+    // Auto-hide après 15 secondes
+    setTimeout(() => {
+        if (document.body.contains(notification)) {
+            notification.remove();
+            draftNotificationShown = false; // Réinitialise le flag si la notification disparaît d'elle-même
+        }
+    }, 15000);
 }
 
 /**
@@ -2883,8 +3048,8 @@ function correctLineSpacing(text) {
         // Calcul simplifié : différence de lignes vides + 1 si le contenu a changé
         correctionsCount = Math.abs(originalEmptyLines - newEmptyLines);
 
-        // Si le texte a vraiment changé mais pas de différence dans les lignes vides,
-        // compte comme 1 correction minimale
+        // If the text actually changed but there's no difference in empty lines,
+        // count it as at least 1 minimal correction.
         if (correctionsCount === 0 && originalTrimmed !== newTrimmed) {
             correctionsCount = 1;
         }
@@ -3238,19 +3403,43 @@ function initLyricsEditorEnhancer() {
         ]
     };
 
+    // ... (Reste de l'initialisation) ...
+
     // 1. Détecte si un éditeur de paroles (textarea ou div) est présent sur la page.
-    const textareaEditor = document.querySelector(SELECTORS.TEXTAREA_EDITOR); if (textareaEditor) { foundEditor = textareaEditor; foundEditorType = 'textarea'; } else { const divEditor = document.querySelector(SELECTORS.DIV_EDITOR); if (divEditor) { foundEditor = divEditor; foundEditorType = 'div'; } }
-    if (foundEditor && !document.body.contains(foundEditor)) { foundEditor = null; foundEditorType = null; }
+    const textareaEditor = document.querySelector(SELECTORS.TEXTAREA_EDITOR);
+    if (textareaEditor) {
+        foundEditor = textareaEditor;
+        foundEditorType = 'textarea';
+    } else {
+        const divEditor = document.querySelector(SELECTORS.DIV_EDITOR);
+        if (divEditor) {
+            foundEditor = divEditor;
+            foundEditorType = 'div';
+        }
+    }
+
+    if (foundEditor && !document.body.contains(foundEditor)) {
+        foundEditor = null;
+        foundEditorType = null;
+    }
+
     // Gère les cas où l'éditeur apparaît, disparaît ou change (navigation SPA).
     const editorJustAppeared = foundEditor && !currentActiveEditor;
     const editorJustDisappeared = !foundEditor && currentActiveEditor;
     const editorInstanceChanged = foundEditor && currentActiveEditor && (foundEditor !== currentActiveEditor);
 
     if (editorJustAppeared || editorInstanceChanged) {
-        currentActiveEditor = foundEditor; currentEditorType = foundEditorType;
+        currentActiveEditor = foundEditor;
+        currentEditorType = foundEditorType;
         extractSongData(); // Extrait les données de la chanson à l'apparition de l'éditeur.
         hideGeniusFormattingHelper();
-        if (shortcutsContainerElement) { shortcutsContainerElement.remove(); shortcutsContainerElement = null; }
+        if (shortcutsContainerElement) {
+            shortcutsContainerElement.remove();
+            shortcutsContainerElement = null;
+        }
+
+        // Vérifie s'il y a un brouillon à restaurer (uniquement quand l'éditeur apparaît)
+        setTimeout(checkAndRestoreDraft, 1000);
 
         // Réinitialise l'historique pour le nouvel éditeur
         undoStack = [];
