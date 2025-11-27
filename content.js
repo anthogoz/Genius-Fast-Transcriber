@@ -65,6 +65,7 @@ let currentFeaturingArtists = []; // Liste des artistes en featuring.
 const DARK_MODE_CLASS = 'gft-dark-mode'; // Classe CSS pour le mode sombre du panneau.
 const DARK_MODE_STORAGE_KEY = 'gftDarkModeEnabled'; // Clé pour stocker la préférence du mode sombre dans le localStorage.
 const HEADER_FEAT_STORAGE_KEY = 'gftHeaderFeatEnabled'; // Clé pour stocker la préférence d'inclusion des feat dans l'en-tête.
+const DISABLE_TAG_NEWLINES_STORAGE_KEY = 'gftDisableTagNewlines'; // Clé pour stocker la préférence de saut de ligne après tags.
 let darkModeButton = null; // Référence au bouton pour activer/désactiver le mode sombre.
 let floatingFormattingToolbar = null; // Référence à la barre d'outils flottante pour le formatage (gras/italique).
 let undoStack = []; // Stack pour l'historique des modifications (max 10 entrées).
@@ -485,9 +486,34 @@ function createArtistSelectors(container) {
 }
 
 /**
+ * Vérifie si l'ajout automatique de saut de ligne après les tags est désactivé.
+ * @returns {boolean} true si désactivé, false sinon.
+ */
+function isTagNewlinesDisabled() {
+    return localStorage.getItem(DISABLE_TAG_NEWLINES_STORAGE_KEY) === 'true';
+}
+
+/**
+ * Active ou désactive l'ajout automatique de saut de ligne après les tags.
+ * @param {boolean} disabled - true pour désactiver, false pour activer.
+ */
+function setTagNewlinesDisabled(disabled) {
+    localStorage.setItem(DISABLE_TAG_NEWLINES_STORAGE_KEY, disabled.toString());
+}
+
+/**
+ * Formatte un tag simple en ajoutant ou non un saut de ligne selon la préférence.
+ * @param {string} tag - Le tag à formater (ex: "[Instrumental]").
+ * @returns {string} Le tag formaté.
+ */
+function formatSimpleTag(tag) {
+    return isTagNewlinesDisabled() ? tag : `${tag}\n`;
+}
+
+/**
  * Ajoute les noms des artistes sélectionnés au tag de section (ex: "[Couplet 1]").
  * @param {string} baseTextWithBrackets - Le tag de base, ex: "[Couplet 1]".
- * @returns {string} Le tag final, ex: "[Couplet 1 : Artiste 1 & Artiste 2]\n".
+ * @returns {string} Le tag final, ex: "[Couplet 1 : Artiste 1 & Artiste 2]\n" ou sans \n.
  */
 function addArtistToText(baseTextWithBrackets) {
     const checkedArtistsCheckboxes = document.querySelectorAll('input[name="selectedGeniusArtist_checkbox_GFT"]:checked');
@@ -496,10 +522,15 @@ function addArtistToText(baseTextWithBrackets) {
     if (selectedArtistNames.length > 0) {
         const tagPart = baseTextWithBrackets.slice(0, -1); // Enlève le ']' final
         const artistsString = formatArtistList(selectedArtistNames);
-        resultText = `${tagPart} : ${artistsString}]\n`;
+        resultText = `${tagPart} : ${artistsString}]`;
     } else {
-        resultText = `${baseTextWithBrackets}\n`;
+        resultText = baseTextWithBrackets;
     }
+
+    if (!isTagNewlinesDisabled()) {
+        resultText += '\n';
+    }
+
     return resultText;
 }
 
@@ -2398,6 +2429,23 @@ function showSettingsMenu() {
     });
     menu.appendChild(headerFeatOption);
 
+    // Option 4: Toggle saut de ligne après tags
+    const tagNewlinesOption = document.createElement('button');
+    tagNewlinesOption.className = 'gft-settings-menu-item';
+    const tagNewlinesDisabled = isTagNewlinesDisabled();
+    tagNewlinesOption.textContent = tagNewlinesDisabled ? '↵ Activer saut de ligne après tags' : '↵ Désactiver saut de ligne après tags';
+    tagNewlinesOption.addEventListener('click', () => {
+        const currentState = isTagNewlinesDisabled();
+        setTagNewlinesDisabled(!currentState);
+        closeSettingsMenu();
+        showFeedbackMessage(
+            !currentState ? 'Saut de ligne après tags DÉSACTIVÉ' : 'Saut de ligne après tags ACTIVÉ',
+            2000,
+            shortcutsContainerElement
+        );
+    });
+    menu.appendChild(tagNewlinesOption);
+
     // Positionne le menu
     const settingsButton = document.getElementById('gft-settings-button');
     if (settingsButton) {
@@ -3192,7 +3240,7 @@ function applyAllTextCorrectionsToString(text) {
     };
 
     // Correction de "y'" -> "y "
-    const yPrimePattern = /\b(Y|y)'/g;
+    const yPrimePattern = /\b(Y|y)['’]/g;
     const yPrimeReplacement = (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y ');
     const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
     if (textAfterYPrime !== currentText) {
@@ -3201,7 +3249,7 @@ function applyAllTextCorrectionsToString(text) {
     }
 
     // Correction de l'apostrophe typographique ' -> '
-    const apostrophePattern = /'/g;
+    const apostrophePattern = /['’]/g;
     const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
     if (textAfterApostrophe !== currentText) {
         corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
@@ -3268,7 +3316,7 @@ async function applyAllTextCorrectionsAsync(text) {
     showProgress(1, totalSteps, 'Correction de "y\'"...');
     await new Promise(resolve => setTimeout(resolve, 50)); // Petit délai pour l'affichage
 
-    const yPrimePattern = /\b(Y|y)'/g;
+    const yPrimePattern = /\b(Y|y)['’]/g;
     const yPrimeReplacement = (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y ');
     const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
     if (textAfterYPrime !== currentText) {
@@ -3280,7 +3328,7 @@ async function applyAllTextCorrectionsAsync(text) {
     showProgress(2, totalSteps, 'Correction des apostrophes...');
     await new Promise(resolve => setTimeout(resolve, 50));
 
-    const apostrophePattern = /'/g;
+    const apostrophePattern = /['’]/g;
     const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
     if (textAfterApostrophe !== currentText) {
         corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
@@ -3350,7 +3398,7 @@ function initLyricsEditorEnhancer() {
         TAGS_STRUCTURAUX: [
             {
                 buttons: [
-                    { label: "En-tête", getText: () => { let txt = `[Paroles de "${currentSongTitle}"`; const fts = formatArtistList(currentFeaturingArtists); if (fts && isHeaderFeatEnabled()) txt += ` ft. ${fts}`; txt += ']\n'; return txt; }, tooltip: "Insérer l'en-tête de la chanson avec les artistes" },
+                    { label: "En-tête", getText: () => { let txt = `[Paroles de "${currentSongTitle}"`; const fts = formatArtistList(currentFeaturingArtists); if (fts && isHeaderFeatEnabled()) txt += ` ft. ${fts}`; txt += ']'; if (!isTagNewlinesDisabled()) txt += '\n'; return txt; }, tooltip: "Insérer l'en-tête de la chanson avec les artistes" },
                     {
                         type: 'coupletManager',
                         prev: { label: '←', title: 'Couplet précédent', tooltip: 'Revenir au couplet précédent' },
@@ -3369,8 +3417,8 @@ function initLyricsEditorEnhancer() {
                     { label: '[Refrain]', getText: () => addArtistToText('[Refrain]'), tooltip: 'Insérer un tag [Refrain] avec les artistes (Ctrl+2)' },
                     { label: '[Pont]', getText: () => addArtistToText('[Pont]'), tooltip: 'Insérer un tag [Pont] avec les artistes (Ctrl+3)' },
                     { label: '[Outro]', getText: () => addArtistToText('[Outro]'), tooltip: 'Insérer un tag [Outro] avec les artistes (Ctrl+5)' },
-                    { label: '[Instrumental]', text: '[Instrumental]\n', tooltip: 'Insérer un tag [Instrumental] pour les sections instrumentales' },
-                    { label: '[?]', text: '[?]\n', tooltip: 'Insérer un tag [?] pour les paroles inconnues' },
+                    { label: '[Instrumental]', getText: () => formatSimpleTag('[Instrumental]'), tooltip: 'Insérer un tag [Instrumental] pour les sections instrumentales' },
+                    { label: '[?]', getText: () => formatSimpleTag('[?]'), tooltip: 'Insérer un tag [?] pour les paroles inconnues' },
                     { label: 'ZWS', text: '\u200B', tooltip: 'Insérer un Zero Width Space (espace de largeur nulle)' }
                 ]
             }
@@ -3379,12 +3427,12 @@ function initLyricsEditorEnhancer() {
             {
                 label: "y' → y ",
                 action: 'replaceText',
-                searchPattern: /\b(Y|y)'/g,
+                searchPattern: /\b(Y|y)['’]/g,
                 replacementFunction: (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y '),
                 highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
                 tooltip: "Corriger tous les y' en y (typique en français)"
             },
-            { label: "' → '", action: 'replaceText', searchPattern: /'/g, replacementText: "'", highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS, tooltip: "Remplacer les apostrophes typographiques ' par des apostrophes standard '" },
+            { label: "' → '", action: 'replaceText', searchPattern: /['’]/g, replacementText: "'", highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS, tooltip: "Remplacer les apostrophes typographiques ' par des apostrophes standard '" },
             {
                 label: "oeu → œu",
                 action: 'replaceText',
@@ -3649,6 +3697,7 @@ function initLyricsEditorEnhancer() {
                         }
 
                         let textToInsertForCouplet = null;
+                        let insertionPerformed = false; // Flag pour savoir si une insertion de texte a eu lieu
 
                         // Logique pour chaque type d'action
                         if (config.action === 'replaceText' && config.searchPattern) {
@@ -3883,6 +3932,7 @@ function initLyricsEditorEnhancer() {
                                 // Sauvegarde dans l'historique avant insertion
                                 saveToHistory();
                                 document.execCommand('insertText', false, textToInsert);
+                                insertionPerformed = true;
                             }
                         }
 
@@ -3895,7 +3945,8 @@ function initLyricsEditorEnhancer() {
                         }
 
                         // Restaure la position du curseur pour éviter le "jumpscare" du scroll
-                        if (currentEditorType === 'textarea' && savedCursorStart !== null && savedCursorEnd !== null) {
+                        // SAUF si une insertion a eu lieu, auquel cas on veut que le curseur soit à la fin du texte inséré
+                        if (!insertionPerformed && currentEditorType === 'textarea' && savedCursorStart !== null && savedCursorEnd !== null) {
                             currentActiveEditor.setSelectionRange(savedCursorStart, savedCursorEnd);
                         }
 
@@ -3972,8 +4023,8 @@ function initLyricsEditorEnhancer() {
 
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v2.5';
-                versionLabel.title = 'Genius Fast Transcriber version 2.5 - Fix : Curseur ne saute plus à la fin + Surlignage majuscules';
+                versionLabel.textContent = 'v2.5.1';
+                versionLabel.title = 'Genius Fast Transcriber version 2.5.1 - Fix : Apostrophes, Curseur après tags, Paramètre saut de ligne';
 
                 footerContainer.appendChild(creditLabel);
                 footerContainer.appendChild(versionLabel);
