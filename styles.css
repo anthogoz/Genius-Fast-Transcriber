@@ -2,7 +2,8 @@
 
 /* ----- Conteneur Principal du Panneau ----- */
 #genius-lyrics-shortcuts-container {
-  background-color: rgb(255, 255, 100); /* Ta couleur de fond jaune */
+  background-color: rgb(255, 255, 100);
+  /* Ta couleur de fond jaune */
   padding: 6px;
   border: 1px solid #000000;
   border-radius: 6px;
@@ -19,16 +20,20 @@
   font-size: 14px;
   margin-bottom: 5px;
   color: #111;
-  display: flex; /* Pour aligner le contenu du titre (logo+texte et bouton dark mode) */
-  align-items: center; /* Aligner verticalement au centre */
+  display: flex;
+  /* Pour aligner le contenu du titre (logo+texte et bouton dark mode) */
+  align-items: center;
+  /* Aligner verticalement au centre */
 }
 
 /* Span contenant le logo et le texte du titre principal */
-#gftPanelTitle > span:first-child {
-  flex-grow: 1; /* Permet au titre de prendre l'espace, poussant le bouton à droite */
+#gftPanelTitle>span:first-child {
+  flex-grow: 1;
+  /* Permet au titre de prendre l'espace, poussant le bouton à droite */
   display: flex;
   align-items: center;
-  justify-content: center; /* Centre le logo et le texte à l'intérieur de ce span */
+  justify-content: center;
+  /* Centre le logo et le texte à l'intérieur de ce span */
 }
 
 #gftPanelLogo {
@@ -39,27 +44,38 @@
 
 /* Bouton spécifique pour le Dark Mode */
 #gftDarkModeButton {
-  margin-left: auto; /* Pousse le bouton à l'extrême droite */
-  padding: 4px 8px; /* Ajustement du padding */
-  font-size: 10px;  /* Ajustement de la taille de police */
-  flex-shrink: 0; /* Empêche le bouton de rétrécir si le titre est long */
+  margin-left: auto;
+  /* Pousse le bouton à l'extrême droite */
+  padding: 4px 8px;
+  /* Ajustement du padding */
+  font-size: 10px;
+  /* Ajustement de la taille de police */
+  flex-shrink: 0;
+  /* Empêche le bouton de rétrécir si le titre est long */
 }
 
 
 /* Option B: Si tu ne veux pas ajouter de classe aux divs de groupe */
-#gftButtonGroupsContainer > div { /* Cible les divs enfants directes (chaque groupe de boutons) */
-    display: flex;
-    flex-wrap: wrap; /* Important pour que les boutons passent à la ligne si besoin */
-    align-items: center;
-    /* margin-bottom: 5px; */ /* Peut-être plus nécessaire si on n'a qu'un seul grand groupe pour la structure */
-    margin-top: 5px; /* Espace avant le groupe de boutons structuraux */
-    gap: 5px; /* Ajoute un petit espace entre les boutons eux-mêmes */
+#gftButtonGroupsContainer>div {
+  /* Cible les divs enfants directes (chaque groupe de boutons) */
+  display: flex;
+  flex-wrap: wrap;
+  /* Important pour que les boutons passent à la ligne si besoin */
+  align-items: center;
+  /* margin-bottom: 5px; */
+  /* Peut-être plus nécessaire si on n'a qu'un seul grand groupe pour la structure */
+  margin-top: 5px;
+  /* Espace avant le groupe de boutons structuraux */
+  gap: 5px;
+  /* Ajoute un petit espace entre les boutons eux-mêmes */
 }
+
 /* ----- Message de Feedback Temporaire ----- */
 #gft-feedback-message {
   visibility: hidden;
   opacity: 0;
-  max-height: 0; /* Hauteur nulle initialement */
+  max-height: 0;
+  /* Hauteur nulle initialement */
   background-color: #0e0e0e;
   color: #f9ff55;
   padding-top: 0;
@@ -74,32 +90,34 @@
   font-weight: normal;
   width: 100%;
   box-sizing: border-box;
-  overflow: hidden; /* Important pour la transition de max-height */
-  
+  overflow: hidden;
+  /* Important pour la transition de max-height */
+
   transition: opacity 0.3s ease-in-out,
-              max-height 0.3s ease-in-out,
-              padding-top 0.3s ease-in-out,
-              padding-bottom 0.3s ease-in-out,
-              margin-top 0.3s ease-in-out,
-              margin-bottom 0.3s ease-in-out,
-              visibility 0s linear 0.3s;
+    max-height 0.3s ease-in-out,
+    padding-top 0.3s ease-in-out,
+    padding-bottom 0.3s ease-in-out,
+    margin-top 0.3s ease-in-out,
+    margin-bottom 0.3s ease-in-out,
+    visibility 0s linear 0.3s;
 }
 
 #gft-feedback-message.gft-visible {
   visibility: visible;
   opacity: 1;
-  max-height: 70px; /* Hauteur suffisante pour le contenu (ajuster si besoin) */
+  max-height: 70px;
+  /* Hauteur suffisante pour le contenu (ajuster si besoin) */
   padding-top: 5px;
   padding-bottom: 5px;
   margin-top: 5px;
   margin-bottom: 5px;
   transition: opacity 0.3s ease-in-out,
-              max-height 0.3s ease-in-out,
-              padding-top 0.3s ease-in-out,
-              padding-bottom 0.3s ease-in-out,
-              margin-top 0.3s ease-in-out,
-              margin-bottom 0.3s ease-in-out,
-              visibility 0s linear 0s;
+    max-height 0.3s ease-in-out,
+    padding-top 0.3s ease-in-out,
+    padding-bottom 0.3s ease-in-out,
+    margin-top 0.3s ease-in-out,
+    margin-bottom 0.3s ease-in-out,
+    visibility 0s linear 0s;
 }
 
 
@@ -110,7 +128,8 @@
 }
 
 #artistSelectorContainerLyricsHelper p {
-  margin: 0 0 5px 0;
+  margin: 0 0 2px 0;
+  /* Réduit de 5px à 2px */
   font-weight: bold;
   font-size: 13px;
   color: #333;
@@ -131,7 +150,7 @@
 }
 
 /* ----- Séparateurs Horizontaux ----- */
-#genius-lyrics-shortcuts-container > hr {
+#genius-lyrics-shortcuts-container>hr {
   margin: 5px 0;
   border: none;
   border-top: 1px solid rgba(14, 14, 14, 0.406);
@@ -150,16 +169,248 @@
   font-size: 11px;
   font-family: Programme, sans-serif;
   min-width: 35px;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+  /* Transition fluide */
   text-align: center;
   vertical-align: middle;
   height: auto;
+  position: relative;
+  /* Pour positionner le badge */
+}
+
+.genius-lyrics-shortcut-button:active {
+  transform: scale(0.92);
+  /* Effet clic plus prononcé comme demandé */
 }
 
 .genius-lyrics-shortcut-button:hover {
   border-color: #0e0e0e;
   color: #f9ff55;
   background-color: #0e0e0e;
+  transform: translateY(-1px);
+  /* Léger soulèvement au survol */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Badge de raccourci clavier */
+.gft-shortcut-badge {
+  position: absolute;
+  top: -4px;
+  right: -2px;
+  background-color: #0e0e0e;
+  color: #f9ff55;
+  font-size: 8px;
+  padding: 1px 3px;
+  border-radius: 4px;
+  font-weight: bold;
+  border: 1px solid white;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(2px);
+  transition: all 0.2s ease;
+  pointer-events: none;
+}
+
+/* Afficher le badge au survol du bouton */
+.genius-lyrics-shortcut-button:hover .gft-shortcut-badge,
+.gft-couplet-control:hover .gft-shortcut-badge {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Dark mode pour le badge */
+.gft-dark-mode .gft-shortcut-badge {
+  background-color: #f9ff55;
+  color: #0e0e0e;
+  border-color: #404040;
+}
+
+/* --- NOUVEAU DESIGN 2.7+ --- */
+
+/* 1. Unified Couplet Control */
+.gft-couplet-control {
+  display: flex;
+  align-items: stretch;
+  /* Hauteur égale */
+  margin-right: 5px;
+  margin-bottom: 5px;
+  border: 1px solid #adadad;
+  border-radius: 100px;
+  background-color: #ffffff;
+  overflow: hidden;
+  /* Pour que les coins ronds coupent les enfants */
+}
+
+.gft-couplet-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 11px;
+  font-family: Programme, sans-serif;
+  color: #212529;
+  padding: 4px 8px;
+  padding: 4px 8px;
+  transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.gft-couplet-btn:hover {
+  background-color: #e0e0e0;
+}
+
+.gft-couplet-btn:active {
+  transform: scale(0.92);
+  /* Micro-animation clic */
+}
+
+.gft-couplet-main {
+  font-weight: bold;
+  border-left: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  padding: 4px 10px;
+  min-width: 60px;
+  text-align: center;
+}
+
+/* 2. Button Hierarchy */
+
+/* Boutons Primaires (Tout Corriger, Vérifier) - Fort visuellement */
+.gft-btn-primary {
+  background-color: #0e0e0e;
+  color: #f9ff55;
+  border: 1px solid #0e0e0e;
+  font-weight: bold;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.gft-btn-primary:hover {
+  background-color: #f9ff55;
+  color: #0e0e0e;
+  border-color: #0e0e0e;
+}
+
+/* Boutons Secondaires (Structures: Couplet, Refrain...) - Neutres */
+/* Boutons Secondaires (Structures: Couplet, Refrain...) - Neutres */
+.gft-btn-secondary {
+  background-color: #fff;
+  /* Fond blanc demandé par user */
+  color: #000;
+  border: 1px solid #ccc;
+  font-weight: 500;
+}
+
+.gft-btn-secondary:hover {
+  background-color: #e0e0e0;
+  /* Gris clair au survol */
+  color: #000;
+  /* Texte reste noir */
+  border-color: #999;
+}
+
+/* Boutons Utilitaires (Corrections: ', y', oeu) - Discrets, petits */
+/* Boutons Utilitaires (Corrections: ', y', oeu) - Discrets, petits */
+.gft-btn-utility {
+  background-color: #fff;
+  /* Fond blanc */
+  color: #000;
+  border: 1px solid #ddd;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  /* Plus carré pour les utilitaires */
+  margin-right: 3px;
+}
+
+.gft-btn-utility:hover {
+  background-color: #e0e0e0;
+  /* Gris clair */
+  border-color: #bbb;
+  color: #000;
+  /* Texte noir */
+}
+
+/* 3. Sections */
+.gft-section {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.gft-section-label {
+  width: 100%;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #777;
+  margin-bottom: 4px;
+  letter-spacing: 0.5px;
+}
+
+/* Dark Mode Adjustments for New Design */
+.gft-dark-mode .gft-couplet-control {
+  background-color: #404040;
+  border-color: #606060;
+}
+
+.gft-dark-mode .gft-couplet-btn {
+  color: #e0e0e0;
+  background-color: transparent;
+}
+
+.gft-dark-mode .gft-couplet-btn:hover {
+  background-color: #f9ff55;
+  color: #0e0e0e;
+  transform: translateY(-1px);
+}
+
+.gft-dark-mode .gft-couplet-main {
+  border-color: #555;
+}
+
+.gft-dark-mode .gft-btn-primary {
+  background-color: #f9ff55;
+  color: #0e0e0e;
+  border-color: #f9ff55;
+}
+
+.gft-dark-mode .gft-btn-primary:hover {
+  background-color: #e6ec00;
+  /* Jaune légèrement plus foncé */
+  color: #000;
+}
+
+.gft-dark-mode .gft-btn-secondary {
+  background-color: #404040;
+  color: #d0d0d0;
+  border-color: #606060;
+}
+
+.gft-dark-mode .gft-btn-secondary:hover {
+  background-color: #f9ff55;
+  color: #0e0e0e;
+  border-color: #f9ff55;
+}
+
+.gft-dark-mode .gft-btn-utility {
+  background-color: transparent;
+  color: #aaa;
+  border-color: #555;
+}
+
+.gft-dark-mode .gft-btn-utility:hover {
+  background-color: #505050;
+  color: #fff;
+  border-color: #777;
+}
+
+.gft-dark-mode .gft-section {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.gft-dark-mode .gft-section-label {
+  color: #888;
 }
 
 .lyrics-helper-highlight {
@@ -175,10 +426,12 @@
     background-color: #f9ff55;
     opacity: 0.8;
   }
+
   70% {
     background-color: #f9ff55;
     opacity: 0.5;
   }
+
   100% {
     background-color: transparent;
     opacity: 1;
@@ -188,58 +441,71 @@
 /* ----- Dark Mode Styles ----- */
 
 /* Conteneur Principal */
-.gft-dark-mode#genius-lyrics-shortcuts-container {
-  background-color: #2a2a2a; /* Fond sombre */
+.gft-dark-mode #genius-lyrics-shortcuts-container {
+  background-color: #2a2a2a;
+  /* Fond sombre */
   border-color: #555;
-  color: #e0e0e0; /* Texte clair général */
+  color: #e0e0e0;
+  /* Texte clair général */
 }
 
 /* Titre du panneau et logo en mode sombre */
 .gft-dark-mode #gftPanelTitle {
-  color: #f0f0f0; /* Texte du titre plus clair */
+  color: #f0f0f0;
+  /* Texte du titre plus clair */
 }
 
 /* Paragraphes et labels dans le sélecteur d'artistes en mode sombre */
 .gft-dark-mode #artistSelectorContainerLyricsHelper p,
 .gft-dark-mode #artistSelectorContainerLyricsHelper label {
-  color: #c5c5c5; /* Texte des labels plus clair */
+  color: #c5c5c5;
+  /* Texte des labels plus clair */
 }
 
 /* Checkboxes en mode sombre */
 .gft-dark-mode #artistSelectorContainerLyricsHelper input[type="checkbox"] {
-  accent-color: #f9ff55; /* Jaune Genius pour le check */
+  accent-color: #f9ff55;
+  /* Jaune Genius pour le check */
 }
 
 /* Séparateurs Horizontaux en mode sombre */
-.gft-dark-mode #genius-lyrics-shortcuts-container > hr {
-  border-top-color: rgba(220, 220, 220, 0.3); /* Séparateur plus clair */
+.gft-dark-mode #genius-lyrics-shortcuts-container>hr {
+  border-top-color: rgba(220, 220, 220, 0.3);
+  /* Séparateur plus clair */
 }
 
 /* Boutons de Raccourci en mode sombre */
 .gft-dark-mode .genius-lyrics-shortcut-button {
-  background-color: #404040; /* Fond de bouton sombre */
-  color: #e0e0e0; /* Texte de bouton clair */
-  border-color: #606060; /* Bordure de bouton */
+  background-color: #404040;
+  /* Fond de bouton sombre */
+  color: #e0e0e0;
+  /* Texte de bouton clair */
+  border-color: #606060;
+  /* Bordure de bouton */
 }
 
 .gft-dark-mode .genius-lyrics-shortcut-button:hover {
-  background-color: #f9ff55; /* Au survol, utiliser le jaune Genius */
-  color: #0e0e0e; /* Texte noir */
+  background-color: #f9ff55;
+  /* Au survol, utiliser le jaune Genius */
+  color: #0e0e0e;
+  /* Texte noir */
   border-color: #f9ff55;
 }
 
 /* Style spécifique pour le bouton Dark Mode lui-même en mode sombre */
 /* (Peut être utilisé pour le distinguer légèrement des autres boutons si besoin) */
 .gft-dark-mode #gftDarkModeButton {
-  background-color: #484848; 
+  background-color: #484848;
   /* Le :hover est déjà géré par .gft-dark-mode .genius-lyrics-shortcut-button:hover */
 }
 
 
 /* Message de Feedback en mode sombre */
 .gft-dark-mode #gft-feedback-message {
-  background-color: #1e1e1e; /* Fond du feedback plus sombre */
-  color: #f9ff55; /* Texte du feedback en jaune */
+  background-color: #1e1e1e;
+  /* Fond du feedback plus sombre */
+  color: #f9ff55;
+  /* Texte du feedback en jaune */
 }
 
 /* Optionnel: Surlignage en mode sombre si vous voulez un look différent */
@@ -261,7 +527,7 @@
 .gft-floating-toolbar {
   position: fixed !important;
   z-index: 10000 !important;
-  background-color: #fffdef !important;
+  background-color: #ffffff !important;
   border: 1px solid #adadad !important;
   padding: 6px !important;
   border-radius: 6px !important;
@@ -288,6 +554,7 @@
     opacity: 0;
     transform: translateY(-5px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -298,7 +565,7 @@
   padding: 5px 10px;
   border: 1px solid #adadad;
   border-radius: 4px;
-  background-color: #fffdef;
+  background-color: #ffffff;
   color: #212529;
   cursor: pointer;
   font-size: 11px;
@@ -321,25 +588,27 @@
 }
 
 /* ----- Barre d'outils flottante en mode sombre ----- */
-#gft-floating-formatting-toolbar.gft-dark-mode,
-.gft-floating-toolbar.gft-dark-mode {
+.gft-dark-mode #gft-floating-formatting-toolbar,
+.gft-dark-mode .gft-floating-toolbar {
   background-color: #2a2a2a !important;
   border-color: #555 !important;
 }
 
-#gft-floating-formatting-toolbar.gft-dark-mode .gft-floating-format-button,
-.gft-floating-toolbar.gft-dark-mode .gft-floating-format-button {
+.gft-dark-mode #gft-floating-formatting-toolbar .gft-floating-format-button,
+.gft-dark-mode .gft-floating-toolbar .gft-floating-format-button {
   background-color: #404040 !important;
   color: #e0e0e0 !important;
   border-color: #606060 !important;
 }
 
-#gft-floating-formatting-toolbar.gft-dark-mode .gft-floating-format-button:hover,
-.gft-floating-toolbar.gft-dark-mode .gft-floating-format-button:hover {
+.gft-dark-mode #gft-floating-formatting-toolbar .gft-floating-format-button:hover,
+.gft-dark-mode .gft-floating-toolbar .gft-floating-format-button:hover {
   background-color: #f9ff55 !important;
   color: #0e0e0e !important;
   border-color: #f9ff55 !important;
 }
+
+
 
 /* ----- Affichage des Statistiques ----- */
 #gft-stats-display,
@@ -428,6 +697,36 @@
 .gft-dark-mode #gft-progress-text,
 .gft-dark-mode .gft-progress-text {
   color: #e0e0e0;
+}
+
+/* ----- Surlignage d'erreurs (Brackets) ----- */
+.gft-bracket-error {
+  background-color: #ff4444 !important;
+  color: white !important;
+  padding: 0 2px;
+  border-radius: 2px;
+  font-weight: bold;
+}
+
+.gft-bracket-error-overlay {
+  background-color: rgba(255, 68, 68, 0.5);
+  color: transparent;
+  font-weight: bold;
+  position: relative;
+  z-index: 2;
+  animation: gft-overlay-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes gft-overlay-pulse {
+
+  0%,
+  100% {
+    background-color: rgba(255, 68, 68, 0.5);
+  }
+
+  50% {
+    background-color: rgba(255, 34, 34, 0.7);
+  }
 }
 
 /* ----- Modal de Prévisualisation ----- */
@@ -811,8 +1110,9 @@
 }
 
 /* Mode sombre pour le menu de paramètres */
-.gft-dark-mode#gft-settings-menu,
-.gft-dark-mode.gft-settings-menu {
+/* Mode sombre pour le menu de paramètres */
+.gft-dark-mode #gft-settings-menu,
+.gft-dark-mode .gft-settings-menu {
   background: #2a2a2a;
   border-color: #555;
 }
@@ -879,10 +1179,13 @@
 }
 
 @keyframes gft-bracket-pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     background-color: #ff4444;
     box-shadow: 0 0 0 rgba(255, 68, 68, 0);
   }
+
   50% {
     background-color: #ff2222;
     box-shadow: 0 0 8px rgba(255, 68, 68, 0.8);
@@ -895,10 +1198,13 @@
 }
 
 @keyframes gft-bracket-pulse-dark {
-  0%, 100% {
+
+  0%,
+  100% {
     background-color: #ff5555;
     box-shadow: 0 0 0 rgba(255, 85, 85, 0);
   }
+
   50% {
     background-color: #ff3333;
     box-shadow: 0 0 8px rgba(255, 85, 85, 0.8);
@@ -909,15 +1215,39 @@
   animation: gft-bracket-pulse-dark 1.5s ease-in-out infinite;
 }
 
+/* Feedback Message Intégré */
+#gft-feedback-message {
+  position: static !important;
+  /* Force static pour être dans le flux */
+  background-color: #f0f0f0;
+  color: #333;
+  border: 1px solid #ddd;
+  transform: none !important;
+  /* Annule les transfos de centrage */
+  left: auto !important;
+  top: auto !important;
+  z-index: 100;
+  box-shadow: none !important;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.gft-dark-mode #gft-feedback-message {
+  background-color: #333;
+  color: #fff;
+  border-color: #555;
+}
+
 /* ----- Media Queries pour la Responsivité ----- */
 
 /* Écrans moyens et petits */
 @media screen and (max-width: 1400px) {
+
   #gft-preview-modal,
   .gft-preview-modal {
     max-height: 85vh;
   }
-  
+
   .gft-preview-content {
     font-size: 11px;
   }
@@ -925,37 +1255,38 @@
 
 /* Petits écrans */
 @media screen and (max-height: 800px) {
+
   #gft-preview-modal,
   .gft-preview-modal {
     max-height: 95vh;
     padding: 16px;
   }
-  
+
   .gft-preview-title {
     font-size: 18px;
     margin-bottom: 10px;
   }
-  
+
   .gft-preview-summary {
     font-size: 12px;
     padding: 8px;
     margin-bottom: 10px;
   }
-  
+
   .gft-preview-comparison {
     gap: 12px;
     margin-bottom: 12px;
   }
-  
+
   .gft-preview-content {
     font-size: 11px;
     padding: 10px;
   }
-  
+
   .gft-preview-buttons {
     margin-top: 12px;
   }
-  
+
   .gft-preview-button {
     padding: 8px 16px;
     font-size: 12px;
@@ -964,17 +1295,18 @@
 
 /* Très petits écrans */
 @media screen and (max-width: 768px) {
+
   #gft-preview-modal,
   .gft-preview-modal {
     width: 98%;
     padding: 12px;
   }
-  
+
   .gft-preview-comparison {
     grid-template-columns: 1fr;
     gap: 10px;
   }
-  
+
   .gft-preview-column h3 {
     font-size: 13px;
   }
