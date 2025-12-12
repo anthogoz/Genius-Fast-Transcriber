@@ -1,4 +1,4 @@
-// content.js (Version 2.6.1 - Extension Complète)
+// content.js (Version 2.6.2 - Extension Complète)
 /**
  * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.5.
  * Ce script s'injecte dans les pages du site genius.com.
@@ -19,10 +19,10 @@
  * - Détection et surlignage des parenthèses/crochets non appariés
  * 
  * @author Lnkhey
- * @version 2.6.1
+ * @version 2.6.2
  */
 
-console.log('Genius Fast Transcriber (by Lnkhey) v2.6.1 - Toutes fonctionnalités activées ! 🎵');
+console.log('Genius Fast Transcriber (by Lnkhey) v2.6.2 - Toutes fonctionnalités activées ! 🎵');
 
 // ----- Injection des animations CSS essentielles -----
 // Injecte l'animation de surlignage pour s'assurer qu'elle fonctionne même si les styles CSS de Genius l'écrasent
@@ -71,6 +71,8 @@ let floatingFormattingToolbar = null; // Référence à la barre d'outils flotta
 let undoStack = []; // Stack pour l'historique des modifications (max 10 entrées).
 let redoStack = []; // Stack pour refaire les modifications annulées.
 const MAX_HISTORY_SIZE = 10; // Nombre maximum d'états sauvegardés dans l'historique.
+let feedbackTimeout = null; // Timer pour cacher le message de feedback.
+let feedbackAnimationTimeout = null; // Timer pour l'animation de fermeture du feedback.
 
 // ----- Constantes Utiles -----
 // Regroupement des sélecteurs CSS et des identifiants pour faciliter la maintenance.
@@ -991,71 +993,8 @@ function hideGeniusFormattingHelper() {
     if (helperElement) helperElement.style.display = 'none';
 }
 
-let feedbackTimeout = null; // Timeout pour masquer automatiquement le message de feedback.
-/**
- * Affiche un message de feedback temporaire à l'utilisateur.
- * @param {string} message - Le message à afficher.
- * @param {number} [duration=3000] - La durée d'affichage en millisecondes.
- * @param {HTMLElement} [parentElement] - L'élément parent où afficher le message.
- */
-function showFeedbackMessage(message, duration = 3000, parentElement) {
-    let container = parentElement || shortcutsContainerElement;
+// showFeedbackMessage definition and feedbackTimeout moved to global scope and end of file to avoid duplication
 
-    // Fallback sur le body si aucun conteneur n'est trouvé (ex: mode lecture)
-    if (!container) {
-        container = document.body;
-    }
-
-    let feedbackEl = document.getElementById(FEEDBACK_MESSAGE_ID);
-    if (!feedbackEl) {
-        feedbackEl = document.createElement('div');
-        feedbackEl.id = FEEDBACK_MESSAGE_ID;
-        container.appendChild(feedbackEl);
-    } else {
-        // Si l'élément existe mais n'est pas dans le conteneur actuel
-        if (!container.contains(feedbackEl)) {
-            container.appendChild(feedbackEl);
-        }
-    }
-
-    // Annuler le timer précédent s'il existe
-    if (feedbackTimeout) {
-        clearTimeout(feedbackTimeout);
-        feedbackTimeout = null;
-    }
-
-    feedbackEl.textContent = message;
-
-    // Rendre visible avec transition (Logique manuelle robuste)
-    feedbackEl.style.display = 'block';
-    requestAnimationFrame(() => {
-        feedbackEl.style.visibility = 'visible';
-        feedbackEl.style.opacity = '1';
-        feedbackEl.style.maxHeight = '100px';
-        feedbackEl.style.marginTop = '10px';
-        feedbackEl.style.marginBottom = '10px';
-        feedbackEl.style.paddingTop = '8px';
-        feedbackEl.style.paddingBottom = '8px';
-    });
-
-    if (duration > 0) {
-        feedbackTimeout = setTimeout(() => {
-            feedbackEl.style.opacity = '0';
-            feedbackEl.style.maxHeight = '0';
-            feedbackEl.style.marginTop = '0';
-            feedbackEl.style.marginBottom = '0';
-            feedbackEl.style.paddingTop = '0';
-            feedbackEl.style.paddingBottom = '0';
-
-            setTimeout(() => {
-                feedbackEl.style.visibility = 'hidden';
-                feedbackEl.style.display = 'none';
-            }, 300);
-
-            feedbackTimeout = null;
-        }, duration);
-    }
-}
 
 /**
  * Applique ou retire le mode sombre sur le panneau d'outils.
@@ -4296,8 +4235,9 @@ function initLyricsEditorEnhancer() {
 
                 // --- ZONE DE FEEDBACK & PROGRESSION (Intégré) ---
                 const feedbackContainer = document.createElement('div');
-                feedbackContainer.style.marginTop = '10px';
+                feedbackContainer.style.marginTop = '0px'; // Reduced from 10px to avoid empty space
                 feedbackContainer.style.width = '100%';
+
 
                 // Message de feedback (toast intégré)
                 const feedbackMessage = document.createElement('div');
@@ -4340,9 +4280,10 @@ function initLyricsEditorEnhancer() {
                 footerContainer.style.display = 'flex';
                 footerContainer.style.justifyContent = 'space-between';
                 footerContainer.style.alignItems = 'center';
-                footerContainer.style.marginTop = '15px';
+                footerContainer.style.marginTop = '5px'; // Reduced from 15px
                 footerContainer.style.paddingTop = '5px';
                 footerContainer.style.borderTop = '1px solid rgba(0,0,0,0.05)';
+
 
                 const creditLabel = document.createElement('div');
                 creditLabel.id = 'gft-credit-label';
@@ -4354,8 +4295,8 @@ function initLyricsEditorEnhancer() {
 
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v2.6.1'; // Bump version visuelle pour le user
-                versionLabel.title = 'Genius Fast Transcriber v2.6.1 - Nouvelle Interface Premium';
+                versionLabel.textContent = 'v2.6.2'; // Bump version visuelle pour le user
+                versionLabel.title = 'Genius Fast Transcriber v2.6.2 - Nouvelle Interface Premium';
 
                 footerContainer.appendChild(creditLabel);
                 footerContainer.appendChild(versionLabel);
@@ -4753,13 +4694,38 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
     const controls = document.createElement('div');
     controls.style.cssText = 'display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;';
 
-    // Bouton Toggle Artiste/Album
-    let useArtistImage = false;
-    const toggleImgBtn = document.createElement('button');
-    toggleImgBtn.textContent = '🖼️ Utiliser Image Artiste';
-    toggleImgBtn.className = 'gft-tutorial-button';
-    toggleImgBtn.style.background = isDarkMode ? '#444' : '#eee';
-    toggleImgBtn.style.color = isDarkMode ? 'white' : 'black';
+    // Sélecteur d'image / Artiste
+    const imageSelector = document.createElement('select');
+    imageSelector.className = 'gft-tutorial-button';
+    imageSelector.style.background = isDarkMode ? '#444' : '#eee';
+    imageSelector.style.color = isDarkMode ? 'white' : 'black';
+    imageSelector.style.maxWidth = '200px';
+    imageSelector.style.cursor = 'pointer';
+
+    // Option par défaut : Album
+    const optionAlbum = document.createElement('option');
+    optionAlbum.value = 'ALBUM';
+    optionAlbum.text = '💿 Pochette Album (Défaut)';
+    imageSelector.appendChild(optionAlbum);
+
+    // Ajout des artistes détectés
+    const allArtists = [...new Set([...currentMainArtists, ...currentFeaturingArtists])].filter(Boolean);
+
+    // Cache pour stocker les images déjà chargées : { 'ArtistName': 'url' }
+    const artistImageCache = {};
+
+    allArtists.forEach(art => {
+        const opt = document.createElement('option');
+        opt.value = art;
+        opt.text = `👤 ${art}`;
+        imageSelector.appendChild(opt);
+    });
+
+    // Option Recherche Manuelle
+    const optionSearch = document.createElement('option');
+    optionSearch.value = 'MANUAL_SEARCH';
+    optionSearch.text = '🔍 Rechercher un artiste...';
+    imageSelector.appendChild(optionSearch);
 
     // Bouton Toggle Format (16:9 vs 1:1)
     let currentFormat = '16:9';
@@ -4771,17 +4737,116 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
     toggleFormatBtn.onclick = () => {
         currentFormat = currentFormat === '16:9' ? '1:1' : '16:9';
         toggleFormatBtn.textContent = `📏 Format: ${currentFormat}`;
-        const targetUrl = useArtistImage ? artistUrl : (currentUploadedImage || albumUrl); // Use uploaded if exists
-        updateCard(targetUrl);
+        // Re-trigger update with current selection
+        imageSelector.dispatchEvent(new Event('change'));
     };
 
-    if (!artistUrl) {
-        toggleImgBtn.disabled = true;
-        toggleImgBtn.textContent = '❌ Image Artiste introuvable';
-        toggleImgBtn.title = "Impossible de trouver l'image de l'artiste sur cette page.";
-        toggleImgBtn.style.opacity = '0.5';
-        toggleImgBtn.style.cursor = 'not-allowed';
-    }
+    controls.appendChild(imageSelector);
+    controls.appendChild(toggleFormatBtn);
+
+    // --- Search UI (Live Search) ---
+    const searchWrapper = document.createElement('div');
+    searchWrapper.style.cssText = 'display: none; flex-direction: column; gap: 5px; width: 100%; align-items: center; margin-top: 10px; background: rgba(0,0,0,0.1); padding: 10px; border-radius: 8px;';
+
+    // Input Container
+    const inputContainer = document.createElement('div');
+    inputContainer.style.cssText = 'width: 100%; display: flex; justify-content: center;';
+
+    const searchInput = document.createElement('input');
+    searchInput.type = 'text';
+    searchInput.placeholder = 'Tapez un nom d\'artiste...';
+    searchInput.style.cssText = `
+        padding: 8px 12px; border-radius: 4px; border: 1px solid #555; width: 100%;
+        background: ${isDarkMode ? '#333' : '#fff'}; color: ${isDarkMode ? '#fff' : '#000'};
+    `;
+    inputContainer.appendChild(searchInput);
+
+    const searchResultsContainer = document.createElement('div');
+    searchResultsContainer.style.cssText = 'display: flex; flex-direction: column; gap: 5px; width: 100%; max-height: 250px; overflow-y: auto; margin-top: 5px; scrollbar-width: thin;';
+
+    let debounceTimer;
+
+    searchInput.oninput = () => {
+        clearTimeout(debounceTimer);
+        const query = searchInput.value.trim();
+
+        if (!query) {
+            searchResultsContainer.innerHTML = '';
+            return;
+        }
+
+        debounceTimer = setTimeout(async () => {
+            searchResultsContainer.innerHTML = '<div style="text-align:center; padding:10px; opacity:0.6;">⏳ Recherche en cours...</div>';
+
+            try {
+                const candidates = await searchArtistCandidates(query);
+                searchResultsContainer.innerHTML = '';
+
+                if (candidates && candidates.length > 0) {
+                    candidates.forEach(cand => {
+                        const item = document.createElement('div');
+                        item.style.cssText = `
+                             display: flex; align-items: center; gap: 10px; padding: 6px; 
+                             border-radius: 6px; cursor: pointer; transition: background 0.1s;
+                             background: ${isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'};
+                         `;
+                        item.onmouseover = () => item.style.background = isDarkMode ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.1)';
+                        item.onmouseout = () => item.style.background = isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+
+                        const img = document.createElement('img');
+                        img.src = cand.image_url;
+                        img.style.cssText = 'width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid transparent; flex-shrink: 0;';
+
+                        const infoDiv = document.createElement('div');
+                        infoDiv.style.flex = '1';
+                        infoDiv.style.minWidth = '0'; // For ellipsis
+
+                        const nameDiv = document.createElement('div');
+                        nameDiv.textContent = cand.name;
+                        nameDiv.style.fontWeight = 'bold';
+                        nameDiv.style.whiteSpace = 'nowrap';
+                        nameDiv.style.overflow = 'hidden';
+                        nameDiv.style.textOverflow = 'ellipsis';
+
+                        infoDiv.appendChild(nameDiv);
+                        item.appendChild(img);
+                        item.appendChild(infoDiv);
+
+                        item.onclick = () => {
+                            const newOption = document.createElement('option');
+                            newOption.value = 'SEARCH_RESULT_' + Date.now();
+                            newOption.text = '👤 ' + cand.name;
+                            imageSelector.appendChild(newOption);
+                            newOption.selected = true;
+
+                            artistImageCache[newOption.value] = cand.image_url;
+                            updateCard(cand.image_url, artistName);
+
+                            // Clear results and hide
+                            searchResultsContainer.innerHTML = '';
+                            searchInput.value = '';
+                            searchWrapper.style.display = 'none';
+
+                            imageSelector.dispatchEvent(new Event('change'));
+                            showFeedbackMessage(`Image de ${cand.name} appliquée !`, 2000);
+                        };
+
+                        searchResultsContainer.appendChild(item);
+                    });
+                } else {
+                    searchResultsContainer.innerHTML = '<div style="text-align:center; padding:10px; opacity:0.6;">Aucun résultat trouvé 😕</div>';
+                }
+
+            } catch (e) {
+                console.error(e);
+                searchResultsContainer.innerHTML = '<div style="text-align:center; padding:10px; color:red;">Erreur lors de la recherche</div>';
+            }
+        }, 300); // 300ms debounce
+    };
+
+    searchWrapper.appendChild(inputContainer);
+    searchWrapper.appendChild(searchResultsContainer);
+    controls.appendChild(searchWrapper);
 
     // Feature Upload
     const fileInput = document.createElement('input');
@@ -4789,7 +4854,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
     fileInput.accept = 'image/*';
     fileInput.style.display = 'none';
 
-    let currentUploadedImage = null; // Store locally to persist when switching format
+    let currentUploadedImage = null;
 
     const uploadBtn = document.createElement('button');
     uploadBtn.textContent = '📂 Upload une image';
@@ -4803,8 +4868,20 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
             const reader = new FileReader();
             reader.onload = (event) => {
                 currentUploadedImage = event.target.result;
-                useArtistImage = false; // Reset artist toggle
-                updateCard(currentUploadedImage);
+                // Force "Custom" state in selector if possible or just override
+                // Pour simplifier, on applique l'image et on met le selecteur sur un état spécial ou on le laisse tel quel
+                // On pourrait ajouter une option "Custom" temporaire
+
+                let customOpt = imageSelector.querySelector('option[value="CUSTOM"]');
+                if (!customOpt) {
+                    customOpt = document.createElement('option');
+                    customOpt.value = 'CUSTOM';
+                    customOpt.text = '📂 Image importée';
+                    imageSelector.appendChild(customOpt);
+                }
+                customOpt.selected = true;
+
+                updateCard(currentUploadedImage, artistName); // Garde le nom actuel pour l'upload (ou full artists)
             };
             reader.readAsDataURL(e.target.files[0]);
         }
@@ -4817,15 +4894,58 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
     downloadBtn.style.color = 'black';
     downloadBtn.style.fontWeight = 'bold';
 
-    controls.appendChild(toggleFormatBtn);
-    controls.appendChild(toggleImgBtn);
+    const shareXBtn = document.createElement('button');
+    shareXBtn.textContent = '𝕏 Partager';
+    shareXBtn.className = 'gft-tutorial-button';
+    shareXBtn.style.background = 'black';
+    shareXBtn.style.color = 'white';
+    shareXBtn.style.fontWeight = 'bold';
+    shareXBtn.style.marginLeft = '5px';
+
+    shareXBtn.onclick = async () => {
+        try {
+            shareXBtn.textContent = '📋 Copie...';
+
+            // 1. Copy Image to Clipboard
+            // We need to wait for blob generation
+            canvas.toBlob(async (blob) => {
+                try {
+                    if (!blob) throw new Error("Canvas blob failed");
+                    const item = new ClipboardItem({ 'image/png': blob });
+                    await navigator.clipboard.write([item]);
+
+                    shareXBtn.textContent = '✅ Copié !';
+
+                    // 2. Open X Intent
+                    // Use specific artist name from selection if available or general one
+                    const tweetText = `${songTitle} by ${artistName}\n\n${window.location.href}\n\n#Genius #Lyrics`;
+                    const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+                    window.open(intentUrl, '_blank');
+
+                    showFeedbackMessage("Image copiée ! Collez-la (Ctrl+V) dans le tweet.", 5000);
+
+                    setTimeout(() => shareXBtn.textContent = '𝕏 Partager', 3000);
+                } catch (innerErr) {
+                    console.error("Clipboard write failed", innerErr);
+                    showFeedbackMessage("Impossible de copier l'image.");
+                    shareXBtn.textContent = '❌ Erreur';
+                }
+            }, 'image/png');
+
+        } catch (err) {
+            console.error("Share failed", err);
+            shareXBtn.textContent = '❌ Erreur';
+        }
+    };
+
     controls.appendChild(uploadBtn);
     controls.appendChild(downloadBtn);
+    controls.appendChild(shareXBtn);
     modal.appendChild(controls);
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 
-    const updateCard = (imageUrl) => {
+    const updateCard = (imageUrl, displayArtistName) => {
         const img = new Image();
 
         // Gestion spéciale pour Data URL (Upload) vs URL distante
@@ -4844,8 +4964,8 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
             const logoImg = new Image();
             logoImg.src = logoUrl;
 
-            logoImg.onload = () => renderLyricCardToCanvas(canvas, text, artistName, songTitle, img, dominantColor, contrastColor, logoImg, currentFormat);
-            logoImg.onerror = () => renderLyricCardToCanvas(canvas, text, artistName, songTitle, img, dominantColor, contrastColor, null, currentFormat);
+            logoImg.onload = () => renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, img, dominantColor, contrastColor, logoImg, currentFormat);
+            logoImg.onerror = () => renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, img, dominantColor, contrastColor, null, currentFormat);
         };
         img.onerror = (e) => {
             console.error("Image load fail", e);
@@ -4853,18 +4973,59 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
         };
     };
 
-    updateCard(albumUrl);
+    // Initial render avec Album
+    updateCard(albumUrl, artistName);
 
     // Event Listeners
-    toggleImgBtn.onclick = () => {
-        useArtistImage = !useArtistImage;
-        toggleImgBtn.textContent = '⏳ Chargement...';
-        const targetUrl = useArtistImage ? artistUrl : (currentUploadedImage || albumUrl);
-        updateCard(targetUrl);
-        setTimeout(() => {
-            toggleImgBtn.textContent = useArtistImage ? '💿 Utiliser Image Album' : '🖼️ Utiliser Image Artiste';
-        }, 500);
+    imageSelector.onchange = async () => {
+        const selectedValue = imageSelector.value;
+
+        if (selectedValue === 'MANUAL_SEARCH') {
+            searchWrapper.style.display = 'flex';
+            searchInput.focus();
+            return;
+        } else {
+            searchWrapper.style.display = 'none';
+        }
+
+        if (selectedValue === 'ALBUM') {
+            updateCard(albumUrl, artistName); // artistName = "Main & Main" (passé en paramètre initiaux)
+        } else if (selectedValue === 'CUSTOM') {
+            if (currentUploadedImage) updateCard(currentUploadedImage, artistName);
+        } else {
+            // C'est un artiste spécifique
+            const selectedArtistName = selectedValue;
+
+            // Vérifie le cache
+            if (artistImageCache[selectedArtistName]) {
+                updateCard(artistImageCache[selectedArtistName], artistName);
+            } else {
+                // Fetch image
+                const originalText = imageSelector.options[imageSelector.selectedIndex].text;
+                imageSelector.options[imageSelector.selectedIndex].text = '⏳ ' + selectedArtistName;
+
+                try {
+                    const fetchedUrl = await fetchArtistImageFromApi(selectedArtistName);
+
+                    if (fetchedUrl) {
+                        artistImageCache[selectedArtistName] = fetchedUrl;
+                        updateCard(fetchedUrl, artistName);
+                        imageSelector.options[imageSelector.selectedIndex].text = '👤 ' + selectedArtistName;
+                    } else {
+                        // Fallback ou erreur
+                        showFeedbackMessage(`Image introuvable pour ${selectedArtistName}`, 3000);
+                        updateCard(albumUrl, artistName);
+                        imageSelector.options[imageSelector.selectedIndex].text = '❌ ' + selectedArtistName;
+                    }
+                } catch (e) {
+                    console.error(e);
+                    updateCard(albumUrl, artistName);
+                    imageSelector.options[imageSelector.selectedIndex].text = '❌ ' + selectedArtistName;
+                }
+            }
+        }
     };
+
 
     fileInput.onchange = (e) => {
         const file = e.target.files[0];
@@ -4872,21 +5033,17 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
             const reader = new FileReader();
             reader.onload = (evt) => {
                 showFeedbackMessage("Image chargée !");
-                updateCard(evt.target.result);
-                // Reset toggle state visual just in case
-                toggleImgBtn.textContent = '🖼️ Revenir aux images Genius';
-                toggleImgBtn.onclick = () => {
-                    // Reset to normal toggle behavior
-                    useArtistImage = false;
-                    updateCard(albumUrl);
-                    toggleImgBtn.textContent = '🖼️ Utiliser Image Artiste';
-                    // Rebind original logic
-                    toggleImgBtn.onclick = () => {
-                        useArtistImage = !useArtistImage;
-                        toggleImgBtn.textContent = useArtistImage ? '💿 Utiliser Image Album' : '🖼️ Utiliser Image Artiste';
-                        updateCard(useArtistImage ? artistUrl : albumUrl);
-                    };
-                };
+                currentUploadedImage = evt.target.result;
+
+                let customOpt = imageSelector.querySelector('option[value="CUSTOM"]');
+                if (!customOpt) {
+                    customOpt = document.createElement('option');
+                    customOpt.value = 'CUSTOM';
+                    customOpt.text = '📂 Image importée';
+                    imageSelector.appendChild(customOpt);
+                }
+                customOpt.selected = true;
+                imageSelector.dispatchEvent(new Event('change'));
             };
             reader.readAsDataURL(file);
         }
@@ -4966,50 +5123,52 @@ async function generateLyricsCard() {
  * 2. Via le nom de l'artiste (API Search) -> Fallback si l'ID est introuvable.
  * @param {string} artistName - Nom de l'artiste pour la recherche fallback.
  */
-async function fetchArtistImageFromApi(artistName) {
+async function fetchArtistImageFromApi(artistName, forceSearch = false) {
     let songId = null;
 
     // A. TENTATIVE VIA ID CHANSON (Pour avoir l'artiste exact du morceau)
-    try {
-        // Stratégie 1: New Relic Resource Path
-        const metaNewRelic = document.querySelector('meta[name="newrelic-resource-path"]');
-        if (metaNewRelic && metaNewRelic.content) {
-            const match = metaNewRelic.content.match(/songs\/(\d+)/);
-            if (match && match[1]) songId = match[1];
-        }
-
-        // Stratégie 2: Twitter App URL
-        if (!songId) {
-            const metaApp = document.querySelector('meta[name="twitter:app:url:iphone"]') ||
-                document.querySelector('meta[name="twitter:app:url:googleplay"]');
-            if (metaApp && metaApp.content) {
-                const match = metaApp.content.match(/songs\/(\d+)/);
+    if (!forceSearch) {
+        try {
+            // Stratégie 1: New Relic Resource Path
+            const metaNewRelic = document.querySelector('meta[name="newrelic-resource-path"]');
+            if (metaNewRelic && metaNewRelic.content) {
+                const match = metaNewRelic.content.match(/songs\/(\d+)/);
                 if (match && match[1]) songId = match[1];
             }
-        }
 
-        // Stratégie 3: Regex Body
-        if (!songId) {
-            const htmlHead = document.body.innerHTML.substring(0, 50000);
-            const match = htmlHead.match(/"id":(\d+),"_type":"song"/);
-            if (match && match[1]) songId = match[1];
-        }
-
-        if (songId) {
-            console.log("[GFT] Fetching artist image via Song ID:", songId);
-            showFeedbackMessage("Récupération image artiste (via ID)...", 0);
-            const response = await fetch(`https://genius.com/api/songs/${songId}`);
-            if (response.ok) {
-                const data = await response.json();
-                const artist = data.response?.song?.primary_artist;
-                if (artist && artist.image_url) {
-                    console.log("[GFT] Found via Song API");
-                    return artist.image_url;
+            // Stratégie 2: Twitter App URL
+            if (!songId) {
+                const metaApp = document.querySelector('meta[name="twitter:app:url:iphone"]') ||
+                    document.querySelector('meta[name="twitter:app:url:googleplay"]');
+                if (metaApp && metaApp.content) {
+                    const match = metaApp.content.match(/songs\/(\d+)/);
+                    if (match && match[1]) songId = match[1];
                 }
             }
+
+            // Stratégie 3: Regex Body
+            if (!songId) {
+                const htmlHead = document.body.innerHTML.substring(0, 50000);
+                const match = htmlHead.match(/"id":(\d+),"_type":"song"/);
+                if (match && match[1]) songId = match[1];
+            }
+
+            if (songId) {
+                console.log("[GFT] Fetching artist image via Song ID:", songId);
+                showFeedbackMessage("Récupération image artiste (via ID)...", 0);
+                const response = await fetch(`https://genius.com/api/songs/${songId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const artist = data.response?.song?.primary_artist;
+                    if (artist && artist.image_url) {
+                        console.log("[GFT] Found via Song API");
+                        return artist.image_url;
+                    }
+                }
+            }
+        } catch (e) {
+            console.warn("[GFT] Song API strategy failed:", e);
         }
-    } catch (e) {
-        console.warn("[GFT] Song API strategy failed:", e);
     }
 
     // B. TENTATIVE VIA RECHERCHE (Fallback "User Suggestion")
@@ -5018,23 +5177,66 @@ async function fetchArtistImageFromApi(artistName) {
             console.log("[GFT] ID not found. Searching API for:", artistName);
             showFeedbackMessage(`Recherche image pour "${artistName}"...`, 0);
 
-            // On utilise l'API search/multi pour trouver l'artiste
-            const searchUrl = `https://genius.com/api/search/multi?per_page=3&q=${encodeURIComponent(artistName)}`;
+            // Tente de trouver l'URL de l'artiste dans le DOM pour affiner la recherche (ex: pour SCH)
+            let expectedUrl = null;
+            try {
+                // Cherche un lien contenant le nom exact de l'artiste
+                const allLinks = Array.from(document.querySelectorAll('a'));
+                const artistLink = allLinks.find(a =>
+                    a.textContent.trim() === artistName &&
+                    a.href.includes('genius.com/artists/')
+                );
+                if (artistLink) {
+                    expectedUrl = artistLink.href;
+                    console.log("[GFT] Found expected artist URL in DOM:", expectedUrl);
+                }
+            } catch (domErr) { console.error(domErr); }
+
+            // On utilise l'API search/multi
+            const searchUrl = `https://genius.com/api/search/multi?per_page=5&q=${encodeURIComponent(artistName)}`;
             const response = await fetch(searchUrl);
 
             if (response.ok) {
                 const data = await response.json();
-                // On cherche la section 'artist'
                 const sections = data.response?.sections;
+
                 if (sections) {
                     const artistSection = sections.find(s => s.type === 'artist');
                     if (artistSection && artistSection.hits && artistSection.hits.length > 0) {
-                        // On prend le premier résultat
-                        const artistParams = artistSection.hits[0].result;
-                        if (artistParams && artistParams.image_url) {
-                            console.log("[GFT] Found via Search API:", artistParams.image_url);
-                            showFeedbackMessage("Image artiste trouvée (Recherche) !", 1000);
-                            return artistParams.image_url;
+
+                        let targetHit = null;
+
+                        // Stratégie 1: Match par URL (si trouvée dans le DOM) - Le plus fiable
+                        if (expectedUrl) {
+                            targetHit = artistSection.hits.find(h => h.result && h.result.url === expectedUrl);
+                        }
+
+                        // Stratégie 2: Match exact par Nom (Case Insensitive)
+                        if (!targetHit) {
+                            targetHit = artistSection.hits.find(h => h.result && h.result.name.toLowerCase() === artistName.toLowerCase());
+                        }
+
+                        // Stratégie 3: Match "Mot Entier" (Word Boundary)
+                        // Évite que "Eva" matche "Evanescence" (qui commence par Eva mais n'est pas le mot Eva)
+                        if (!targetHit) {
+                            try {
+                                const escapedName = artistName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape regex chars
+                                const wordBoundaryRegex = new RegExp(`\\b${escapedName}\\b`, 'i');
+                                targetHit = artistSection.hits.find(h => h.result && wordBoundaryRegex.test(h.result.name));
+                                if (targetHit) console.log("[GFT] Found via Word Boundary Match:", targetHit.result.name);
+                            } catch (regexErr) { console.warn(regexErr); }
+                        }
+
+                        // Stratégie 4: Premier résultat (Ultime recours)
+                        if (!targetHit) {
+                            targetHit = artistSection.hits[0];
+                            console.log("[GFT] No exact/boundary match, using first hit (risky):", targetHit.result.name);
+                        }
+
+                        if (targetHit && targetHit.result && targetHit.result.image_url) {
+                            console.log("[GFT] Found via Search API:", targetHit.result.image_url);
+                            showFeedbackMessage("Image artiste trouvée !", 1000);
+                            return targetHit.result.image_url;
                         }
                     }
                 }
@@ -5047,6 +5249,28 @@ async function fetchArtistImageFromApi(artistName) {
     console.warn("[GFT] Failed to fetch artist image from any API.");
     showFeedbackMessage("Échec API, essai extraction locale...", 1000);
     return null;
+}
+
+/**
+ * Recherche une liste d'artistes candidats via l'API Genius.
+ * @param {string} query - Le nom à rechercher.
+ * @returns {Promise<Array>} Liste d'objets artiste { name, image_url, ... }
+ */
+async function searchArtistCandidates(query) {
+    try {
+        const searchUrl = `https://genius.com/api/search/artist?q=${encodeURIComponent(query)}`;
+        const response = await fetch(searchUrl);
+        if (response.ok) {
+            const data = await response.json();
+            const sections = data.response?.sections;
+            if (sections && sections[0] && sections[0].hits) {
+                return sections[0].hits.map(h => h.result).filter(r => r.image_url);
+            }
+        }
+    } catch (e) {
+        console.warn("[GFT] Search Candidates failed:", e);
+    }
+    return [];
 }
 
 /**
@@ -5081,24 +5305,11 @@ async function generateLyricsCard() {
     }
     const albumUrl = uniqueUrls[0];
 
-    showFeedbackMessage("Recherche de l'image artiste...", 0);
+    showFeedbackMessage("Ouverture de la Lyric Card...", 500);
 
-    // 2. Trouver l'image de l'artiste (API d'abord, puis fallback DOM)
-    // On passe le nom du premier main artist pour le fallback "Search API"
-    const primaryArtistName = currentMainArtists.length > 0 ? currentMainArtists[0] : null;
-    let artistUrl = await fetchArtistImageFromApi(primaryArtistName);
+    // On passe null pour artistUrl car on le charge dynamiquement dans le modal
+    showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, null);
 
-    if (!artistUrl) {
-        console.log("[GFT] API failed, using DOM fallback.");
-        artistUrl = extractArtistImage(albumUrl); // Utilise la version avec exclusion
-    }
-
-    // Si on a trouvé une image différente via API, pas besoin de check exclusion car logiquement c'est l'image profil.
-    // Mais on pourrait vérifier si c'est la même que l'album (cas rare où profil = album).
-    // extractArtistImage lo fait déjà pour le DOM. Pour l'API on fait confiance.
-
-    showFeedbackMessage("Génération de la Lyric Card en cours...", 2000);
-    showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artistUrl);
 }
 
 /**
@@ -5341,6 +5552,11 @@ function showFeedbackMessage(message, duration = 3000, container = null) {
         clearTimeout(feedbackTimeout);
         feedbackTimeout = null;
     }
+    // Annuler le timer d'animation de fermeture précédent
+    if (feedbackAnimationTimeout) {
+        clearTimeout(feedbackAnimationTimeout);
+        feedbackAnimationTimeout = null;
+    }
 
     feedbackEl.textContent = message;
 
@@ -5369,13 +5585,14 @@ function showFeedbackMessage(message, duration = 3000, container = null) {
                 feedbackEl.style.paddingTop = '0';
                 feedbackEl.style.paddingBottom = '0';
             }
-            setTimeout(() => {
+            feedbackAnimationTimeout = setTimeout(() => {
                 feedbackEl.style.visibility = 'hidden';
                 if (feedbackEl.id === 'gft-global-toast') {
                     // Ne pas cacher display:none car transition, mais ok pour toast
                 } else {
                     feedbackEl.style.display = 'none';
                 }
+                feedbackAnimationTimeout = null;
             }, 300);
             feedbackTimeout = null;
         }, duration);

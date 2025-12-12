@@ -1,6 +1,6 @@
 # 🎵 Genius Fast Transcriber
 
-![Version](https://img.shields.io/badge/version-2.6-blue.svg?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-2.6.2-blue.svg?style=for-the-badge)
 ![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-green.svg?style=for-the-badge&logo=google-chrome)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg?style=for-the-badge)
 
