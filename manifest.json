@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Genius Fast Transcriber + Lyric Card Maker",
-  "version": "2.6",
-  "description": "Accélérez vos transcriptions sur Genius.com ! Raccourcis intelligents, tags d'artistes auto-détectés, formatage facile.",
+  "version": "2.6.1",
+  "description": "L'outil ultime pour les contributeurs Genius, Tags intelligents, corrections automatiques, mode sombre et création de Lyric Cards.",
   "permissions": [],
   "host_permissions": [
     "*://*.genius.com/*"

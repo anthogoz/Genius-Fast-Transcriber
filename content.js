@@ -1,4 +1,4 @@
-// content.js (Version 2.6 - Extension Complète)
+// content.js (Version 2.6.1 - Extension Complète)
 /**
  * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.5.
  * Ce script s'injecte dans les pages du site genius.com.
@@ -19,10 +19,10 @@
  * - Détection et surlignage des parenthèses/crochets non appariés
  * 
  * @author Lnkhey
- * @version 2.6
+ * @version 2.6.1
  */
 
-console.log('Genius Fast Transcriber (by Lnkhey) v2.6 - Toutes fonctionnalités activées ! 🎵');
+console.log('Genius Fast Transcriber (by Lnkhey) v2.6.1 - Toutes fonctionnalités activées ! 🎵');
 
 // ----- Injection des animations CSS essentielles -----
 // Injecte l'animation de surlignage pour s'assurer qu'elle fonctionne même si les styles CSS de Genius l'écrasent
@@ -399,10 +399,24 @@ function extractSongData() {
     }
     // 3. Extrait les artistes depuis la section "Crédits" de la page si elle existe.
     document.querySelectorAll(SELECTORS.CREDITS_PAGE_ARTIST_LIST_CONTAINER).forEach(listContainer => {
-        const lt = listContainer.previousElementSibling; let isFt = false;
-        if (lt && lt.tagName === 'H3') { const txt = lt.textContent.trim().toLowerCase(); if (txt.includes('featuring') || txt.includes('feat') || txt.includes('avec')) isFt = true; }
-        if (isFt || (songData._rawFeaturingArtistsFromTitleExtract.length === 0 && songData._rawFeaturingArtistsFromSection.length === 0)) {
-            listContainer.querySelectorAll(SELECTORS.CREDITS_PAGE_ARTIST_NAME_IN_LINK).forEach(s => { const n = s.textContent.trim(); if (n && !songData._rawFeaturingArtistsFromSection.includes(n) && !songData._rawMainArtists.includes(n)) songData._rawFeaturingArtistsFromSection.push(n); });
+        const lt = listContainer.previousElementSibling;
+        let isFt = false;
+        if (lt) {
+            const txt = lt.textContent.trim().toLowerCase();
+            // Stricter check: only accept if header explicitly mentions featuring/feat/avec
+            if (txt.includes('featuring') || txt.includes('feat') || txt.includes('avec')) {
+                isFt = true;
+            }
+        }
+
+        if (isFt) {
+            listContainer.querySelectorAll(SELECTORS.CREDITS_PAGE_ARTIST_NAME_IN_LINK).forEach(s => {
+                const n = s.textContent.trim();
+                // Avoid adding main artists again
+                if (n && !songData._rawFeaturingArtistsFromSection.includes(n) && !songData._rawMainArtists.includes(n)) {
+                    songData._rawFeaturingArtistsFromSection.push(n);
+                }
+            });
         }
     });
     // 4. Extrait le titre de la chanson si non trouvé via les balises meta.
@@ -2245,7 +2259,7 @@ let tutorialModal = null;
 const TUTORIAL_STEPS = [
     {
         title: "Bienvenue sur Genius Fast Transcriber ! 🎵",
-        content: "Découvrez votre nouvel assistant de transcription. Cette extension v2.6 transforme l'éditeur Genius avec des outils puissants pour gagner du temps et améliorer la qualité de vos paroles."
+        content: "Découvrez votre nouvel assistant de transcription. Cette extension v2.6.1 transforme l'éditeur Genius avec des outils puissants pour gagner du temps et améliorer la qualité de vos paroles."
     },
     {
         title: "1. Structure & Artistes 🏗️",
@@ -4138,7 +4152,7 @@ function initLyricsEditorEnhancer() {
                     return button;
                 };
 
-                // 3. Construction du Panneau (Nouveau Design v2.6)
+                // 3. Construction du Panneau (Nouveau Design v2.6.1)
                 const buttonGroupsContainer = document.createElement('div');
                 buttonGroupsContainer.id = 'gftButtonGroupsContainer';
                 shortcutsContainerElement.appendChild(buttonGroupsContainer);
@@ -4340,8 +4354,8 @@ function initLyricsEditorEnhancer() {
 
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v2.6'; // Bump version visuelle pour le user
-                versionLabel.title = 'Genius Fast Transcriber v2.6 - Nouvelle Interface Premium';
+                versionLabel.textContent = 'v2.6.1'; // Bump version visuelle pour le user
+                versionLabel.title = 'Genius Fast Transcriber v2.6.1 - Nouvelle Interface Premium';
 
                 footerContainer.appendChild(creditLabel);
                 footerContainer.appendChild(versionLabel);
