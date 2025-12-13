@@ -4837,27 +4837,66 @@ function renderLyricCardToCanvas(canvas, text, artistName, songTitle, imageObj, 
     ctx.fillStyle = textColor;
     ctx.fillRect(0, HEIGHT - FOOTER_HEIGHT, WIDTH, 3);
 
+    // 4. Logo GENIUS
+    const logoHeight = 40;
+    let logoWidth = 0; // Sera calculé
+
+    // On prépare le logo pour connaître sa largeur et placer le texte ensuite ou avant
+    if (logoObj) {
+        logoWidth = logoObj.width * (logoHeight / logoObj.height);
+    } else {
+        // Fallback text "GENIUS" width approximation
+        ctx.save();
+        ctx.font = '900 36px "Programme", "Arial Black", sans-serif';
+        ctx.letterSpacing = "4px";
+        logoWidth = ctx.measureText("G E N I U S").width;
+        ctx.restore();
+    }
+
+    // Position du logo (droite)
+    const logoX = WIDTH - 60 - logoWidth;
+
     // 3. Texte Artiste / Titre
     ctx.font = `normal ${FONT_SIZE_FOOTER}px "Programme", "Arial", sans-serif`;
     ctx.fillStyle = textColor;
     ctx.textBaseline = 'middle';
     ctx.letterSpacing = "2px";
+
+    // Construction du texte complet
     const footerText = `${artistName.toUpperCase()}, "${songTitle.toUpperCase()}"`;
-    ctx.fillText(footerText, 60, HEIGHT - (FOOTER_HEIGHT / 2));
+
+    // Calcul de l'espace disponible
+    // Marge gauche (60) + Texte + Marge (environ 40) + Logo + Marge droite (60)
+    // Espace max pour le texte = LogoX - Marge - 60 (début texte)
+    const maxFooterTextWidth = logoX - 40 - 60;
+
+    // Mesure et troncature si nécessaire
+    let displayText = footerText;
+    let textWidth = ctx.measureText(displayText).width;
+
+    if (textWidth > maxFooterTextWidth) {
+        // Algorithme de troncature
+        // On enlève des caractères tant que ça dépasse, puis on ajoute "..."
+        while (textWidth > maxFooterTextWidth && displayText.length > 0) {
+            displayText = displayText.slice(0, -1);
+            textWidth = ctx.measureText(displayText + "...").width;
+        }
+        displayText += "...";
+    }
+
+    ctx.fillText(displayText, 60, HEIGHT - (FOOTER_HEIGHT / 2));
     ctx.letterSpacing = "0px";
 
-    // 4. Logo GENIUS
+    // Dessin du Logo après le texte
     if (logoObj) {
-        const logoHeight = 40;
-        const logoWidth = logoObj.width * (logoHeight / logoObj.height);
-        ctx.drawImage(logoObj, WIDTH - 60 - logoWidth, HEIGHT - (FOOTER_HEIGHT / 2) - (logoHeight / 2), logoWidth, logoHeight);
+        ctx.drawImage(logoObj, logoX, HEIGHT - (FOOTER_HEIGHT / 2) - (logoHeight / 2), logoWidth, logoHeight);
     } else {
         ctx.save();
-        ctx.textAlign = 'right';
+        ctx.textAlign = 'left'; // On dessine depuis logoX
         ctx.font = '900 36px "Programme", "Arial Black", sans-serif';
         ctx.letterSpacing = "4px";
         ctx.fillStyle = textColor;
-        ctx.fillText("G E N I U S", WIDTH - 60, HEIGHT - (FOOTER_HEIGHT / 2));
+        ctx.fillText("G E N I U S", logoX, HEIGHT - (FOOTER_HEIGHT / 2)); // Corrigé position Y centré
         ctx.restore();
     }
 
