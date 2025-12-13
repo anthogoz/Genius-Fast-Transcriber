@@ -70,7 +70,7 @@ Transformez votre expérience d'édition avec une suite d'outils professionnels,
 
 ## 📥 Installation
 
-1.  Rendez-vous sur le **Chrome Web Store** (lien bientôt disponible).
+1.  Rendez-vous sur le **Chrome Web Store** ici : https://chromewebstore.google.com/detail/cbldlkiakadclpjfkkafpjomilmmgdjm.
 2.  Ou installez manuellement (Mode Développeur) :
     *   Téléchargez le code.
     *   Allez sur `chrome://extensions`.
