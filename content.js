@@ -66,6 +66,7 @@ const DARK_MODE_CLASS = 'gft-dark-mode'; // Classe CSS pour le mode sombre du pa
 const DARK_MODE_STORAGE_KEY = 'gftDarkModeEnabled'; // Clé pour stocker la préférence du mode sombre dans le localStorage.
 const HEADER_FEAT_STORAGE_KEY = 'gftHeaderFeatEnabled'; // Clé pour stocker la préférence d'inclusion des feat dans l'en-tête.
 const DISABLE_TAG_NEWLINES_STORAGE_KEY = 'gftDisableTagNewlines'; // Clé pour stocker la préférence de saut de ligne après tags.
+const LYRIC_CARD_ONLY_STORAGE_KEY = 'gftLyricCardOnly'; // Clé pour stocker la préférence du mode "Lyric Card Only".
 let darkModeButton = null; // Référence au bouton pour activer/désactiver le mode sombre.
 let floatingFormattingToolbar = null; // Référence à la barre d'outils flottante pour le formatage (gras/italique).
 let undoStack = []; // Stack pour l'historique des modifications (max 10 entrées).
@@ -515,6 +516,22 @@ function isTagNewlinesDisabled() {
  */
 function setTagNewlinesDisabled(disabled) {
     localStorage.setItem(DISABLE_TAG_NEWLINES_STORAGE_KEY, disabled.toString());
+}
+
+/**
+ * Vérifie si le mode "Lyric Card Only" est activé.
+ * @returns {boolean} true si activé.
+ */
+function isLyricCardOnlyMode() {
+    return localStorage.getItem(LYRIC_CARD_ONLY_STORAGE_KEY) === 'true';
+}
+
+/**
+ * Active ou désactive le mode "Lyric Card Only".
+ * @param {boolean} enabled - true pour activer.
+ */
+function setLyricCardOnlyMode(enabled) {
+    localStorage.setItem(LYRIC_CARD_ONLY_STORAGE_KEY, enabled.toString());
 }
 
 /**
@@ -1082,7 +1099,7 @@ function createFloatingFormattingToolbar() {
 
     // Bouton Créer Lyrics Card
     const lyricsCardButton = document.createElement('button');
-    lyricsCardButton.textContent = 'Créer Lyric Card';
+    lyricsCardButton.textContent = 'Lyric Card';
     lyricsCardButton.classList.add('gft-floating-format-button');
     lyricsCardButton.title = 'Générer une image avec les paroles sélectionnées';
     lyricsCardButton.type = 'button';
@@ -2197,8 +2214,21 @@ let tutorialModal = null;
 
 const TUTORIAL_STEPS = [
     {
-        title: "Bienvenue sur Genius Fast Transcriber ! 🎵",
-        content: "Découvrez votre nouvel assistant de transcription. Cette extension v2.6.1 transforme l'éditeur Genius avec des outils puissants pour gagner du temps et améliorer la qualité de vos paroles."
+        title: "Welcome! Choose your mode ⚙️",
+        content: `
+            <p>How would you like to use Genius Fast Transcriber?</p>
+            <div style="display: flex; gap: 10px; flex-direction: column; margin-top: 15px;">
+                <button id="gft-mode-full-btn" class="gft-tutorial-button" style="background:#f9ff55; color:black; border:none; padding:15px; text-align:left; cursor:pointer; border-radius:8px;">
+                    <div style="font-weight:bold; font-size:14px;">⚡ Full Mode (Recommended)</div>
+                    <div style="font-size:11px; opacity:0.8; margin-top:4px;">Transcription panel, auto-corrections, shortcuts AND Lyric Cards.<br><strong>⚠️ FRENCH ONLY 🇫🇷 : The fast transcriber is only functional for the French language for now.</strong></div>
+                </button>
+                <button id="gft-mode-simple-btn" class="gft-tutorial-button" style="background:rgba(255,255,255,0.1); border:1px solid #555; padding:15px; text-align:left; cursor:pointer; border-radius:8px;">
+                    <div style="font-weight:bold; font-size:14px;">🎨 Lyric Card Only</div>
+                    <div style="font-size:11px; opacity:0.8; margin-top:4px;">Hides the panel. Just image creation via text selection.</div>
+                </button>
+            </div>
+            <p style="font-size: 10px; color: #888; margin-top: 15px; font-style: italic;">* You can change this at any time via the extension icon.</p>
+        `
     },
     {
         title: "1. Structure & Artistes 🏗️",
@@ -2217,8 +2247,12 @@ const TUTORIAL_STEPS = [
         content: "• <strong>Annuler/Refaire :</strong> Vos 10 dernières actions sont sauvegardées. Utilisez les boutons ↩️ ↪️ ou Ctrl+Z.<br>• <strong>Sauvegarde Auto :</strong> En cas de fermeture accidentelle, votre brouillon est mémorisé."
     },
     {
-        title: "5. Raccourcis Clavier ⌨️",
-        content: "Devenez un pro avec les raccourcis :<br>• <kbd>Ctrl+1-5</kbd> : Tags de structure<br>• <kbd>Ctrl+Shift+C</kbd> : Tout Corriger<br>• <kbd>Ctrl+Z</kbd> : Annuler<br>• <kbd>Ctrl+Shift+S</kbd> : Statistiques en temps réel"
+        title: "5. Contrôle YouTube 📺",
+        content: "Contrôlez la musique sans quitter l'éditeur :<br>• <kbd>Ctrl+Alt+Espace</kbd> : Lecture / Pause<br>• <kbd>Ctrl+Alt+← / →</kbd> : Reculer / Avancer (5s)<br><em>Fonctionne même si le curseur est dans le texte !</em>"
+    },
+    {
+        title: "6. Autres Raccourcis ⌨️",
+        content: "Devenez un pro avec les autres raccourcis :<br>• <kbd>Ctrl+1-5</kbd> : Tags de structure<br>• <kbd>Ctrl+Shift+C</kbd> : Tout Corriger<br>• <kbd>Ctrl+Z/Y</kbd> : Annuler / Refaire"
     },
     {
         title: "C'est parti ! 🚀",
@@ -2322,6 +2356,32 @@ function renderTutorialStep() {
 
     buttonsDiv.appendChild(nextButton);
     tutorialModal.appendChild(buttonsDiv);
+
+    // Attache les événements spéciaux pour l'étape 0 (Choix du mode)
+    if (currentTutorialStep === 0) {
+        const fullBtn = document.getElementById('gft-mode-full-btn');
+        const simpleBtn = document.getElementById('gft-mode-simple-btn');
+
+        if (fullBtn) {
+            fullBtn.onclick = () => {
+                setLyricCardOnlyMode(false);
+                // Passe à l'étape suivante
+                currentTutorialStep++;
+                renderTutorialStep();
+            };
+        }
+        if (simpleBtn) {
+            simpleBtn.onclick = () => {
+                setLyricCardOnlyMode(true);
+                // Ferme le tutoriel et recharge pour appliquer le mode simple
+                closeTutorial();
+                window.location.reload();
+            };
+        }
+
+        // Cache les boutons de navigation standard pour cette étape spéciale
+        buttonsDiv.style.display = 'none';
+    }
 }
 
 /**
@@ -2507,6 +2567,177 @@ function closeSettingsMenuOnClickOutside(event) {
     }
 }
 
+// ----- Contrôle Player YouTube -----
+
+// État global du lecteur YouTube
+let gftYoutubePlayerState = {
+    isPlaying: null, // null = inconnu au départ (pour éviter le double-toggle)
+    currentTime: 0,
+    timestamp: 0
+};
+
+// Écoute les messages de l'iframe YouTube pour mettre à jour l'état (nécessaire pour toggle et seek)
+window.addEventListener('message', (event) => {
+    // Filtrage pour traiter les messages YouTube (incluant youtube-nocookie)
+    if (event.origin.match(/^https?:\/\/(www\.)?youtube(-nocookie)?\.com$/) || event.origin.match(/^https?:\/\/(www\.)?youtu\.be$/)) {
+        try {
+            // YouTube envoie parfois des chaînes JSON
+            const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+
+            if (data.event === 'infoDelivery' && data.info) {
+                if (data.info.currentTime) {
+                    gftYoutubePlayerState.currentTime = data.info.currentTime;
+                    // On peut aussi estimer le temps écoulé depuis le dernier update
+                    gftYoutubePlayerState.timestamp = Date.now();
+                }
+                if (data.info.playerState !== undefined) {
+                    // 1 = Playing, 2 = Paused, 3 = Buffering, ...
+                    gftYoutubePlayerState.isPlaying = data.info.playerState === 1;
+                }
+            }
+        } catch (e) {
+            // Ignore parse errors
+        }
+    }
+});
+
+/**
+ * Active l'API JS sur les iframes YouTube pour permettre le contrôle via postMessage.
+ * Doit être appelé quand le DOM change.
+ */
+function enableYoutubeJsApi() {
+    const iframes = document.querySelectorAll('iframe[src*="youtube.com"], iframe[src*="youtu.be"], iframe[src*="youtube-nocookie.com"]');
+    iframes.forEach(iframe => {
+        try {
+            // Vérifie si l'API est déjà activée
+            if (iframe.src && !iframe.src.includes('enablejsapi=1')) {
+                // Évite de recharger si c'est juste une frame publicitaire ou autre (check basique)
+                // Ajoute le paramètre
+                const separator = iframe.src.includes('?') ? '&' : '?';
+                iframe.src += `${separator}enablejsapi=1`;
+                console.log('[GFT] API YouTube activée pour iframe:', iframe.src);
+            }
+        } catch (e) {
+            console.warn('[GFT] Impossible de modifier iframe src (CORS?):', e);
+        }
+    });
+}
+
+/**
+ * Contrôle le lecteur YouTube via postMessage.
+ * @param {string} command - 'togglePlay', 'rewind', 'forward'
+ */
+function controlYoutubePlayer(command) {
+    // On s'assure d'abord que les iframes ont l'API activée
+    enableYoutubeJsApi();
+
+    const playerIframe = document.querySelector('iframe[src*="youtube.com"], iframe[src*="youtu.be"], iframe[src*="youtube-nocookie.com"]');
+
+    if (!playerIframe) {
+        showFeedbackMessage("Lecteur YouTube introuvable.", 2000);
+        return;
+    }
+
+    // Helper pour envoyer les commandes
+    const postCmd = (func, args) => {
+        playerIframe.contentWindow.postMessage(JSON.stringify({
+            'event': 'command',
+            'func': func,
+            'args': args || []
+        }), '*');
+    };
+
+    switch (command) {
+        case 'togglePlay':
+            // Si l'état est inconnu (premier chargement), on suppose que l'utilisateur veut agir.
+            // Le problème est qu'on ne sait pas si ça joue ou pas.
+            // Astuce : On envoie d'abord une commande neutre ou on force un état si on détecte du mouvement ?
+            // Mieux : Si c'est null, on regarde si on a reçu des updates récents.
+            // Sinon, on tente de "Play" par défaut car c'est souvent ce qu'on veut, 
+            // MAIS si c'est déjà playing, ça ne fera rien.
+            // ALTERNATIVE ROBUSTE : On utilise le fait que 'pauseVideo' met en pause et 'playVideo' lance.
+            // Si on ne sait pas, on peut juste envoyer "play" ? Non, ça casse le toggle.
+
+            // Correction spécifique pour le "first toggle bug" :
+            // Souvent la vidéo joue déjà MAIS on n'a pas reçu d'event (car on vient d'arriver).
+            // Donc isPlaying est false (ou null). On envoie 'playVideo' -> ça continue de jouer -> rien ne se passe visuellement.
+            // Et l'utilisateur doit refaire le raccourci.
+
+            // Solution : Si état inconnu, on ne peut pas deviner.
+            // Mais on peut écouter les événements. 
+            // Si on n'a aucune info, on assume que si le temps avance, c'est que ça joue ?
+            // Pas fiable.
+
+            // Approche pragmatique :
+            // Si gftYoutubePlayerState.isPlaying est TRUE, c'est sûr que ça joue.
+            // Si c'est FALSE ou NULL, ça peut être "en pause" OU "en lecture mais pas encore détecté".
+            // Le seul moyen d'être sûr est d'avoir reçu un event.
+
+            if (gftYoutubePlayerState.isPlaying === true) {
+                postCmd('pauseVideo');
+                gftYoutubePlayerState.isPlaying = false;
+                showFeedbackMessage('⏸️ Pause', 1000);
+            } else if (gftYoutubePlayerState.isPlaying === false) {
+                postCmd('playVideo');
+                gftYoutubePlayerState.isPlaying = true;
+                showFeedbackMessage('▶️ Lecture', 1000);
+            } else {
+                // État NULL (inconnu)
+                // C'est le cas délicat. Souvent la vidéo joue déjà en background.
+                // On va tenter de mettre en PAUSE car c'est moins destructif que de relancer une vidéo qui joue déjà ?
+                // Non, si on veut lancer la musique c'est chiant.
+                // Essayons d'envoyer une commande spéciale pour demander l'état ? Non dispo en postMessage simple.
+
+                // On va forcer PLAY. Pourquoi ?
+                // 1. Si c'est en pause -> ça lance (Super).
+                // 2. Si ça joue déjà -> ça continue de jouer (Pas d'effet visible = Bug ressenti "ça marche pas").
+
+                // Inversement, si on force PAUSE :
+                // 1. Si c'est en pause -> ça reste en pause (Bug ressenti).
+                // 2. Si ça joue -> ça met en pause (Ok).
+
+                // FIX pour le User : "La vidéo est déjà en marche quand on fait le raccourci". 
+                // Donc le user veut PAUSE.
+                // Donc si état inconnu, on privilégie PAUSE ?
+                // Essayons de détecter si ça joue en regardant si on a reçu des time updates récents ?
+                // Non, car on n'a pas reçu de messages du tout souvent.
+
+                // Hack : On envoie 'pauseVideo'. Si l'utilisateur voulait play, il reraiblera. 
+                // Mais si la vidéo joue (cas fréquent reporté), ça la coupera, ce qui est le comportement attendu (Toggle).
+                postCmd('pauseVideo');
+                gftYoutubePlayerState.isPlaying = false; // On assume qu'on a réussi à mettre en pause
+                showFeedbackMessage('⏸️ Pause (Sync)', 1000);
+            }
+            break;
+
+        case 'rewind':
+            if (gftYoutubePlayerState.currentTime !== undefined) {
+                // On recule de 5 secondes
+                const newTime = Math.max(0, gftYoutubePlayerState.currentTime - 5);
+                postCmd('seekTo', [newTime, true]);
+                gftYoutubePlayerState.currentTime = newTime; // Mise à jour optimiste
+                showFeedbackMessage('⏪ -5s', 1000);
+            } else {
+                // Fallback: Si pas d'état, on tente juste un play (souvent réveille le player)
+                postCmd('playVideo');
+                showFeedbackMessage('⚠️ Lecture requise', 1000);
+            }
+            break;
+
+        case 'forward':
+            if (gftYoutubePlayerState.currentTime !== undefined) {
+                const newTime = gftYoutubePlayerState.currentTime + 5;
+                postCmd('seekTo', [newTime, true]);
+                gftYoutubePlayerState.currentTime = newTime;
+                showFeedbackMessage('⏩ +5s', 1000);
+            } else {
+                postCmd('playVideo');
+                showFeedbackMessage('⚠️ Lecture requise', 1000);
+            }
+            break;
+    }
+}
+
 // ----- Raccourcis Clavier -----
 
 /**
@@ -2523,7 +2754,10 @@ const KEYBOARD_SHORTCUTS = {
     'Ctrl+Z': 'undo',
     'Ctrl+Y': 'redo',
     'Ctrl+Shift+Y': 'redo', // Alternative pour redo
-    'Ctrl+Shift+S': 'toggleStats'
+    'Ctrl+Shift+S': 'toggleStats',
+    'Ctrl+Alt+ ': 'togglePlay', // Espace avec Alt
+    'Ctrl+Alt+ARROWLEFT': 'rewind', // Flèche Gauche
+    'Ctrl+Alt+ARROWRIGHT': 'forward' // Flèche Droite
 };
 
 /**
@@ -2603,15 +2837,12 @@ function triggerToutCorrigerViaShortcut() {
  * @param {KeyboardEvent} event - L'événement clavier.
  */
 function handleKeyboardShortcut(event) {
-    // Ne rien faire si l'éditeur n'est pas actif
-    if (!currentActiveEditor) return;
-
-    // Ne rien faire si on n'est pas dans l'éditeur de Genius
-    if (document.activeElement !== currentActiveEditor) return;
+    // Ne pas interférer si modifier keys pressed seules (sauf nos combos)
 
     // Construire la clé du raccourci
     let shortcutKey = '';
     if (event.ctrlKey || event.metaKey) shortcutKey += 'Ctrl+';
+    if (event.altKey) shortcutKey += 'Alt+';
     if (event.shiftKey) shortcutKey += 'Shift+';
 
     // Convertir la touche en majuscule pour la correspondance
@@ -2623,7 +2854,28 @@ function handleKeyboardShortcut(event) {
 
     if (!action) return; // Pas de raccourci correspondant
 
-    // Empêcher le comportement par défaut pour les raccourcis reconnus
+    // --- LOGIQUE DE FOCUS ---
+    // Pour certaines actions (Media, Stats), on autorise l'exécution même si le focus n'est pas dans l'éditeur.
+    // Pour les actions d'édition (Tags, undo...), on exige que l'éditeur soit focus.
+
+    const GLOBAL_ACTIONS = ['togglePlay', 'rewind', 'forward', 'toggleStats'];
+    const isGlobalAction = GLOBAL_ACTIONS.includes(action);
+
+    if (isGlobalAction) {
+        // Pour les actions globales, on exige au moins que l'éditeur ait été détecté (mode GFT actif)
+        // Mais on n'exige PAS document.activeElement === currentActiveEditor
+        if (!currentActiveEditor && !document.querySelector(SELECTORS.CONTROLS_STICKY_SECTION)) {
+            // Si GFT n'est pas actif du tout, on ne fait rien (pour ne pas casser Ctrl+Shift+Space ailleurs ?)
+            // Ctrl+Shift+Space n'est pas standard, donc c'est probablement OK.
+            return;
+        }
+    } else {
+        // Actions d'édition strictes
+        if (!currentActiveEditor) return;
+        if (document.activeElement !== currentActiveEditor) return;
+    }
+
+    // Empêcher le comportement par défaut
     event.preventDefault();
     event.stopPropagation();
 
@@ -2647,6 +2899,11 @@ function handleKeyboardShortcut(event) {
             break;
         case 'toggleStats':
             toggleStatsDisplay();
+            break;
+        case 'togglePlay':
+        case 'rewind':
+        case 'forward':
+            controlYoutubePlayer(action);
             break;
     }
 }
@@ -2779,7 +3036,7 @@ function showFloatingToolbar() {
         // Cache les boutons de formatage (Gras, Italique, Nombre)
         // Affiche seulement le bouton Lyrics Card
         Array.from(floatingFormattingToolbar.children).forEach(child => {
-            if (child.textContent === 'Créer Lyric Card') {
+            if (child.textContent === 'Lyric Card') {
                 child.style.display = '';
             } else {
                 child.style.display = 'none';
@@ -3470,6 +3727,7 @@ function initLyricsEditorEnhancer() {
                     { label: '[Couplet]', getText: () => addArtistToText('[Couplet]'), tooltip: 'Insérer un tag [Couplet] sans numéro avec les artistes' },
                     { label: '[Pré-refrain]', getText: () => addArtistToText('[Pré-refrain]'), tooltip: 'Insérer un tag [Pré-refrain] avec les artistes' },
                     { label: '[Refrain]', getText: () => addArtistToText('[Refrain]'), tooltip: 'Insérer un tag [Refrain] avec les artistes (Ctrl+2)', shortcut: '2' },
+                    { label: '[Post-refrain]', getText: () => addArtistToText('[Post-refrain]'), tooltip: 'Insérer un tag [Post-refrain] avec les artistes' },
                     { label: '[Pont]', getText: () => addArtistToText('[Pont]'), tooltip: 'Insérer un tag [Pont] avec les artistes (Ctrl+3)', shortcut: '3' },
                     { label: '[Outro]', getText: () => addArtistToText('[Outro]'), tooltip: 'Insérer un tag [Outro] avec les artistes (Ctrl+5)', shortcut: '5' },
                     { label: '[Instrumental]', getText: () => formatSimpleTag('[Instrumental]'), tooltip: 'Insérer un tag [Instrumental] pour les sections instrumentales' },
@@ -3621,6 +3879,20 @@ function initLyricsEditorEnhancer() {
     if (foundEditor) {
         const targetStickySection = document.querySelector(SELECTORS.CONTROLS_STICKY_SECTION);
         if (targetStickySection) {
+            // Si le mode "Lyric Card Only" est activé, on NE CRÉE PAS le panneau.
+            if (isLyricCardOnlyMode()) {
+                if (shortcutsContainerElement) {
+                    shortcutsContainerElement.remove();
+                    shortcutsContainerElement = null;
+                }
+                // On s'assure quand même que l'extractSongData est fait pour la Lyric Card
+                if (editorJustAppeared || editorInstanceChanged) {
+                    extractSongData();
+                    hideGeniusFormattingHelper();
+                }
+                return;
+            }
+
             // Crée le conteneur principal du panneau seulement s'il n'existe pas déjà.
             if (!shortcutsContainerElement || editorInstanceChanged || editorJustAppeared) {
                 if (shortcutsContainerElement) shortcutsContainerElement.remove();
@@ -4295,8 +4567,8 @@ function initLyricsEditorEnhancer() {
 
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v2.6.2'; // Bump version visuelle pour le user
-                versionLabel.title = 'Genius Fast Transcriber v2.6.2 - Nouvelle Interface Premium';
+                versionLabel.textContent = 'v2.6.5'; // Bump version visuelle pour le user
+                versionLabel.title = 'Genius Fast Transcriber v2.6.5 - Nouvelle Interface Premium';
 
                 footerContainer.appendChild(creditLabel);
                 footerContainer.appendChild(versionLabel);
@@ -4360,8 +4632,15 @@ function startObserver() {
             // On se déconnecte temporairement pour éviter les boucles infinies.
             currentObsInstance.disconnect();
             initLyricsEditorEnhancer();
+
+            // On vérifie aussi les iframes YouTube pour injecter l'API
+            enableYoutubeJsApi();
+
             // On se reconnecte après un court délai.
             setTimeout(() => { startObserver(); }, 200);
+        } else {
+            // Même sans re-init complet, on vérifie si de nouveaux iframes sont apparus
+            enableYoutubeJsApi();
         }
     });
     // Commence à observer le `body` et tous ses descendants.
@@ -5598,3 +5877,15 @@ function showFeedbackMessage(message, duration = 3000, container = null) {
         }, duration);
     }
 }
+
+// ----- Communication avec le Popup -----
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === "GET_MODE") {
+        sendResponse({ lyricCardOnly: isLyricCardOnlyMode() });
+    } else if (request.action === "SET_MODE") {
+        setLyricCardOnlyMode(request.lyricCardOnly);
+        sendResponse({ success: true });
+        // Recharge la page pour appliquer le changement
+        window.location.reload();
+    }
+});

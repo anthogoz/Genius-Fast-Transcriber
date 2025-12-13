@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <style>
+    body {
+      width: 300px;
+      font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+      background: #222;
+      color: white;
+      padding: 15px;
+      margin: 0;
+      user-select: none;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px solid #ffff64;
+      padding-bottom: 8px;
+      margin-bottom: 15px;
+    }
+
+    .header img {
+      width: 30px;
+      height: 30px;
+    }
+
+    .header h2 {
+      margin: 0;
+      font-size: 15px;
+      border: none;
+      padding: 0;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .option {
+      background: #333;
+      padding: 12px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .option:hover {
+      background: #444;
+    }
+
+    .option.active {
+      border-color: #ffff64;
+      background: #3a3a3a;
+      box-shadow: 0 0 10px rgba(255, 255, 100, 0.1);
+    }
+
+    .option h3 {
+      margin: 0 0 5px 0;
+      font-size: 14px;
+      color: #ffff64;
+    }
+
+    .option p {
+      margin: 0;
+      font-size: 12px;
+      color: #ccc;
+      line-height: 1.4;
+    }
+
+    .status {
+      font-size: 11px;
+      color: #888;
+      text-align: center;
+      margin-top: 15px;
+      font-style: italic;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <img src="images/icon128.png" alt="Logo">
+    <h2>Genius Fast Transcriber</h2>
+  </div>
+  <div class="option" id="mode-full">
+    <h3>⚡ Full Mode</h3>
+    <p>Enable transcription panel, shortcuts and Lyric Cards.</p>
+  </div>
+  <div class="option" id="mode-lyriconly">
+    <h3>🎨 Lyric Card Only</h3>
+    <p>Hide panel to keep only Lyric Card (text selection).</p>
+  </div>
+  <div class="status" id="status">Loading...</div>
+  <script src="popup.js"></script>
+</body>
+
+</html>

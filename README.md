@@ -38,6 +38,13 @@ Transformez votre expérience d'édition avec une suite d'outils professionnels,
     *   **Nouveau v2.6** : Choisissez entre la **Pochette de l'Album** ou l'**Image de l'Artiste** pour le fond ! 🖼️
     *   Prévisualisation avant téléchargement.
 *   **Nombres en Lettres** : Sélectionnez "42", cliquez, ça devient "quarante-deux". Magique pour les nombres jusqu'à 999 milliards.
+*   **Mode Lecture Seule** : Masquez le panneau latéral pour ne garder que la fonctionnalité Lyric Card.
+
+### 📺 Contrôle YouTube
+*   **Pilotez la musique** sans quitter l'éditeur des yeux :
+    *   Lecture / Pause
+    *   Reculer / Avancer de 5 secondes
+    *   Compatible avec les intégrations "nocookie" (protection vie privée).
 
 ### 🛡️ Sécurité & Historique
 *   **Undo/Redo Visuel** : Annulez vos actions (Ctrl+Z) avec un historique de 10 états.
@@ -55,6 +62,9 @@ Transformez votre expérience d'édition avec une suite d'outils professionnels,
 | `Ctrl + Z` | Annuler |
 | `Ctrl + Y` | Refaire |
 | `Ctrl + Shift + S` | Afficher/Masquer les statistiques |
+| `Ctrl + Alt + Espace` | **Lecture / Pause** YouTube |
+| `Ctrl + Alt + ←` | Reculer de 5s |
+| `Ctrl + Alt + →` | Avancer de 5s |
 
 ---
 
