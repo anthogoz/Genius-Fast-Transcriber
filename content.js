@@ -1,6 +1,6 @@
-// content.js (Version 2.6.2 - Extension Complète)
+// content.js (Version 2.7 - Extension Complète)
 /**
- * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.5.
+ * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.7.
  * Ce script s'injecte dans les pages du site genius.com.
  * Il détecte la présence de l'éditeur de paroles et y ajoute un panneau d'outils
  * pour accélérer et fiabiliser la transcription (ajout de tags, correction de texte, etc.).
@@ -19,10 +19,10 @@
  * - Détection et surlignage des parenthèses/crochets non appariés
  * 
  * @author Lnkhey
- * @version 2.6.2
+ * @version 2.7
  */
 
-console.log('Genius Fast Transcriber (by Lnkhey) v2.6.2 - Toutes fonctionnalités activées ! 🎵');
+console.log('Genius Fast Transcriber (by Lnkhey) v2.7 - Toutes fonctionnalités activées ! 🎵');
 
 // ----- Injection des animations CSS essentielles -----
 // Injecte l'animation de surlignage pour s'assurer qu'elle fonctionne même si les styles CSS de Genius l'écrasent
@@ -108,6 +108,309 @@ const SELECTORS = {
     LYRICS_CONTAINER: '[data-lyrics-container="true"]' // Conteneur des paroles en mode lecture
 };
 
+// ----- Traductions & Internationalisation -----
+
+const TRANSLATIONS = {
+    fr: {
+        panel_title: "Genius Fast Transcriber v2.7",
+        artist_selection: "Attribuer la section à :",
+        no_artist: "Aucun artiste détecté.",
+        shortcuts_title: "Raccourcis",
+        add_couplet: "Ajouter Couplet",
+        format_numbers: "Formater les numéros",
+        create_lyric_card: "Créer Lyric Card",
+        preview: "Aperçu",
+        copy: "Copier",
+        undo: "Annuler",
+        redo: "Refaire",
+        feedback_copied: "Copié !",
+        feedback_restored: "Restauré",
+        onboarding_title: "Bienvenue",
+        next_btn: "Suivant",
+        finish_btn: "Terminer",
+        mode_full_title: "Mode Complet",
+        mode_full_desc: "Outils de transcription + Lyric Cards",
+        mode_lyric_title: "Lyric Card Uniquement",
+        mode_lyric_desc: "Création d'image uniquement",
+        lang_select_title: "Langue",
+        mode_select_title: "Mode",
+        full_mode_label: "Complet (Transcription + Lyric Cards)",
+        lyric_only_label: "Lyric Card Uniquement",
+        settings_saved: "Préférences sauvegardées !",
+        open_panel: "Ouvrir le panneau",
+        close_panel: "Fermer le panneau",
+        onboarding_intro: "Configurez votre expérience Genius Fast Transcriber.",
+        // Settings & Tooltips
+        settings_menu: "Menu Paramètres",
+        dark_mode_toggle_light: "☀️ Mode Clair",
+        dark_mode_toggle_dark: "🌙 Mode Sombre",
+        stats_show: "📊 Afficher Statistiques",
+        stats_hide: "📊 Masquer Statistiques",
+        header_feat_show: "🎤 Afficher feat dans l'en-tête",
+        header_feat_hide: "🎤 Masquer feat dans l'en-tête",
+        newline_enable: "↵ Activer saut de ligne après tags",
+        newline_disable: "↵ Désactiver saut de ligne après tags",
+        tutorial_link: "❓ Tutoriel / Aide",
+        undo_tooltip: "Annuler la dernière modification (Ctrl+Z)",
+        redo_tooltip: "Refaire la dernière modification annulée (Ctrl+Y)",
+        panel_title_img_alt: "GFT Logo",
+        // Sections
+        section_structure: "Structure & Artistes",
+        section_cleanup: "Outils de nettoyage",
+        // Buttons & Tooltips
+        btn_header: "En-tête",
+        btn_header_tooltip: "Insérer l'en-tête de la chanson avec les artistes",
+        btn_intro: "[Intro]",
+        btn_intro_tooltip: "Insérer un tag [Intro] avec les artistes (Ctrl+4)",
+        btn_verse_unique: "[Couplet unique]",
+        btn_verse_unique_tooltip: "Insérer un tag [Couplet unique] avec les artistes",
+        btn_verse: "[Couplet]",
+        btn_verse_tooltip: "Insérer un tag [Couplet] sans numéro avec les artistes",
+        btn_verse_num: "[Couplet 1]",
+        btn_verse_num_tooltip: "Insérer un tag [Couplet X] avec gestion du numéro",
+        btn_chorus: "[Refrain]",
+        btn_chorus_tooltip: "Insérer un tag [Refrain] avec les artistes (Ctrl+1, Ctrl+2)",
+        btn_pre_chorus: "[Pont]",
+        btn_pre_chorus_tooltip: "Insérer un tag [Pont] ou Pre-Chorus (Ctrl+3)",
+        btn_bridge: "[Pont: ...]",
+        btn_bridge_tooltip: "Insérer un tag [Pont] avec les artistes (Ctrl+5)",
+        btn_outro: "[Outro]",
+        btn_outro_tooltip: "Insérer un tag [Outro] avec les artistes",
+        btn_instrumental: "[Instrumental]",
+        btn_instrumental_tooltip: "Insérer un tag [Instrumental]",
+        btn_break: "[Pause]",
+        btn_break_tooltip: "Insérer un tag [Pause]",
+        // Cleanup Tools
+        cleanup_capitalize: "Maj. Début",
+        cleanup_capitalize_tooltip: "Met une majuscule au début de chaque ligne",
+        cleanup_punct: "Ponctuation",
+        cleanup_punct_tooltip: "Supprime la ponctuation en fin de ligne (. , ;)",
+        cleanup_quotes: "Guillemets",
+        cleanup_quotes_tooltip: "Transforme les apostrophes droites (') en courbes (’) et corrige les guillemets",
+        cleanup_parens: "Parenthèses",
+        cleanup_parens_tooltip: "Vérifie les parenthèses et crochets manquants ou mal fermés",
+        cleanup_all: "Tout Corriger",
+        cleanup_all_tooltip: "Applique toutes les corrections d'un coup (Ctrl+Shift+C)",
+        // Button Labels (Cleanup)
+        btn_y_label: "y' → y",
+        btn_apostrophe_label: "' → '",
+        btn_oeu_label: "oeu → œu",
+        btn_capitalize_label: "Maj. début ligne",
+        btn_punctuation_label: "Suppr. ., fin ligne",
+        btn_spacing_label: "Corriger Espacement",
+        btn_check_label: "🔍 Vérifier ( ) [ ]",
+        btn_fix_all_label: "Tout Corriger (Texte)",
+        btn_capitalize_short: "Majuscules",
+        btn_punctuation_short: "Ponctuation",
+        btn_spacing_short: "Espacement",
+        btn_fix_all_short: "✨ Tout Corriger",
+        // Tutorial Steps
+        tuto_step1_title: "1. Structure & Artistes 🏗️",
+        tuto_step1_content: "• <strong>Artistes :</strong> Cochez les cases en haut pour attribuer automatiquement les sections sur les anciens editeurs.<br>• <strong>Couplets :</strong> Utilisez le nouveau bouton central <strong>[Couplet 1]</strong>. Les flèches ← → changent le numéro.<br>• <strong>Tags :</strong> Insérez Refrain, Intro, Pont en un clic.",
+        tuto_step2_title: "2. Corrections Intelligentes ✨",
+        tuto_step2_content: "• <strong>Tout Corriger :</strong> Nettoie apostrophes, majuscules, spaces.<br>• <strong>Vérifier ( ) [ ] :</strong> Scanne les parenthèses oubliées.",
+        tuto_step3_title: "3. Outils de Formatage 🎨",
+        tuto_step3_content: "• <strong>Barre Flottante :</strong> Sélectionnez du texte pour mettre en gras, italique ou créer une <strong>Lyric Card</strong>.<br>• <strong>Nombres en Lettres :</strong> Convertit '42' en 'quarante-deux'.",
+        tuto_step4_title: "4. Historique & Sécurité 🛡️",
+        tuto_step4_content: "• <strong>Annuler/Refaire :</strong> Vos 10 dernières actions sont sauvegardées (Ctrl+Z).<br>• <strong>Sauvegarde Auto :</strong> Brouillons mémorisés en cas de crash.",
+        tuto_step5_title: "5. Contrôle YouTube 📺",
+        tuto_step5_content: "• <kbd>Ctrl+Alt+Espace</kbd> : Lecture / Pause<br>• <kbd>Ctrl+Alt+← / →</kbd> : Reculer / Avancer (5s)",
+        tuto_step6_title: "6. Autres Raccourcis ⌨️",
+        tuto_step6_content: "• <kbd>Ctrl+1-5</kbd> : Tags de structure<br>• <kbd>Ctrl+Shift+C</kbd> : Tout Corriger",
+        tuto_finish_title: "C'est parti ! 🚀",
+        tuto_finish_content: "Vous êtes prêt ! Explorez les paramètres ⚙️ pour personnaliser votre expérience.<br><br>💡 <strong>Note :</strong> Vous pouvez changer de mode/langue à tout moment en cliquant sur l'icône de l'extension.",
+        // Lyric Mode Specific Tutorial
+        tuto_lyric_mode_title: "Mode Lyric Card Activé 🎨",
+        tuto_lyric_mode_content: "Pour créer une Lyric Card :<br>1. <strong>Surlignez</strong> les paroles de votre choix.<br>2. Cliquez sur le bouton <strong>'Créer Lyric Card'</strong> qui apparaît.<br><br>💡 <strong>Note :</strong> Changez les paramètres via l'icône de l'extension.",
+        tuto_lyric_mode_btn: "C'est compris !",
+        // Lyric Card Modal
+        lc_modal_title: "Aperçu Lyric Card",
+        lc_album_default: "💿 Pochette Album (Défaut)",
+        lc_manual_search: "🔍 Rechercher un artiste...",
+        lc_format_btn: "📏 Format: ",
+        lc_search_placeholder: "Tapez un nom d'artiste...",
+        lc_upload_btn: "📂 Upload une image",
+        lc_download_btn: "⬇️ Télécharger",
+        lc_download_done: "✅ Téléchargé !",
+        lc_share_btn: "𝕏 Partager",
+        lc_share_copying: "📋 Copie...",
+        lc_share_copied: "✅ Copié !",
+        lc_share_error: "❌ Erreur",
+        lc_feedback_load_error: "Erreur chargement image.",
+        lc_search_searching: "⏳ Recherche en cours...",
+        lc_search_none: "Aucun résultat trouvé 😕",
+        lc_custom_img: "📂 Image importée",
+        lc_select_text_error: "Veuillez sélectionner du texte pour créer une Lyric Card.",
+        // Lyric Card Feedback
+        lc_error_search: "Erreur lors de la recherche",
+        lc_img_copied_tweet: "Image copiée ! Collez-la (Ctrl+V) dans le tweet.",
+        lc_error_copy: "Impossible de copier l'image.",
+        lc_error_img_not_found: "Image introuvable pour",
+        lc_img_loaded: "Image chargée !",
+        lc_error_album_not_found: "Impossible de trouver la pochette de l'album.",
+        lc_searching_artist: "Recherche de l'image artiste...",
+        lc_generating: "Génération de la Lyric Card en cours...",
+        lc_error_internal: "Erreur interne: Fonction introuvable.",
+        lc_fetching_id: "Récupération image artiste (via ID)...",
+        lc_searching_name: "Recherche image pour",
+        lc_img_applied: "Image appliquée :",
+    },
+    en: {
+        panel_title: "Genius Fast Transcriber v2.7",
+        artist_selection: "Assign section to:", // Generic UI can stay English
+        no_artist: "No artist detected.",
+        shortcuts_title: "Shortcuts", // Title can be English
+        add_couplet: "Ajouter Couplet", // REVERT TO FRENCH
+        format_numbers: "Format Numbers", // Tool name can be English or French? Let's keep English for generic tool
+        create_lyric_card: "Create Lyric Card",
+        preview: "Preview",
+        copy: "Copy",
+        undo: "Undo",
+        redo: "Redo",
+        feedback_copied: "Copied!",
+        feedback_restored: "Restored",
+        onboarding_title: "Welcome",
+        next_btn: "Next",
+        finish_btn: "Finish",
+        mode_full_title: "Full Mode",
+        mode_full_desc: "Transcription tools + Lyric Cards",
+        mode_lyric_title: "Lyric Card Only",
+        mode_lyric_desc: "Image creation only",
+        lang_select_title: "Language",
+        mode_select_title: "Mode",
+        full_mode_label: "Full (Transcription + Lyric Cards)",
+        lyric_only_label: "Lyric Card Only",
+        settings_saved: "Settings saved!",
+        open_panel: "Open Panel",
+        close_panel: "Close Panel",
+        onboarding_intro: "Configure your Genius Fast Transcriber experience.",
+        // Settings & Tooltips
+        settings_menu: "Settings Menu",
+        dark_mode_toggle_light: "☀️ Light Mode",
+        dark_mode_toggle_dark: "🌙 Dark Mode",
+        stats_show: "📊 Show Stats",
+        stats_hide: "📊 Hide Stats",
+        header_feat_show: "🎤 Show feat in header",
+        header_feat_hide: "🎤 Hide feat in header",
+        newline_enable: "↵ Enable newline after tags",
+        newline_disable: "↵ Disable newline after tags",
+        tutorial_link: "❓ Tutorial / Help",
+        undo_tooltip: "Undo last change (Ctrl+Z)",
+        redo_tooltip: "Redo last change (Ctrl+Y)",
+        panel_title_img_alt: "GFT Logo", // Generic
+        // Sections - REVERT TO FRENCH for Transcription tools
+        section_structure: "Structure & Artistes", // REVERT
+        section_cleanup: "Outils de nettoyage", // REVERT
+        // Buttons & Tooltips - REVERT TO FRENCH for Transcription tags
+        btn_header: "En-tête",
+        btn_header_tooltip: "Insérer l'en-tête de la chanson avec les artistes",
+        btn_intro: "[Intro]",
+        btn_intro_tooltip: "Insérer un tag [Intro] avec les artistes (Ctrl+4)",
+        btn_verse_unique: "[Couplet unique]",
+        btn_verse_unique_tooltip: "Insérer un tag [Couplet unique] avec les artistes",
+        btn_verse: "[Couplet]",
+        btn_verse_tooltip: "Insérer un tag [Couplet] sans numéro avec les artistes",
+        btn_verse_num: "[Couplet 1]",
+        btn_verse_num_tooltip: "Insérer un tag [Couplet X] avec gestion du numéro",
+        btn_chorus: "[Refrain]",
+        btn_chorus_tooltip: "Insérer un tag [Refrain] avec les artistes (Ctrl+1, Ctrl+2)",
+        btn_pre_chorus: "[Pont]",
+        btn_pre_chorus_tooltip: "Insérer un tag [Pont] ou Pre-Chorus (Ctrl+3)",
+        btn_bridge: "[Pont: ...]",
+        btn_bridge_tooltip: "Insérer un tag [Pont] avec les artistes (Ctrl+5)",
+        btn_outro: "[Outro]",
+        btn_outro_tooltip: "Insérer un tag [Outro] avec les artistes",
+        btn_instrumental: "[Instrumental]",
+        btn_instrumental_tooltip: "Insérer un tag [Instrumental]",
+        btn_break: "[Pause]",
+        btn_break_tooltip: "Insérer un tag [Pause]",
+        // Cleanup Tools - REVERT TO FRENCH (Specific to French typography)
+        cleanup_capitalize: "Maj. Début",
+        cleanup_capitalize_tooltip: "Met une majuscule au début de chaque ligne",
+        cleanup_punct: "Ponctuation",
+        cleanup_punct_tooltip: "Supprime la ponctuation en fin de ligne (. , ;)",
+        cleanup_quotes: "Guillemets",
+        cleanup_quotes_tooltip: "Transforme les apostrophes droites (') en courbes (’) et corrige les guillemets",
+        cleanup_parens: "Parenthèses",
+        cleanup_parens_tooltip: "Vérifie les parenthèses et crochets manquants ou mal fermés",
+        cleanup_all: "Tout Corriger",
+        cleanup_all_tooltip: "Applique toutes les corrections d'un coup (Ctrl+Shift+C)",
+        // Button Labels (Cleanup) - REVERT
+        btn_y_label: "y' → y",
+        btn_apostrophe_label: "' → '",
+        btn_oeu_label: "oeu → œu",
+        btn_capitalize_label: "Maj. début ligne",
+        btn_punctuation_label: "Suppr. ., fin ligne",
+        btn_spacing_label: "Corriger Espacement",
+        btn_check_label: "🔍 Vérifier ( ) [ ]",
+        btn_fix_all_label: "Tout Corriger (Texte)",
+        btn_capitalize_short: "Majuscules",
+        btn_punctuation_short: "Ponctuation",
+        btn_spacing_short: "Espacement",
+        btn_fix_all_short: "✨ Tout Corriger",
+        // Tutorial Steps - STAY ENGLISH (To explain the tool)
+        tuto_step1_title: "1. Structure & Artists 🏗️",
+        tuto_step1_content: "• <strong>Artists:</strong> Check boxes at top to auto-assign sections.<br>• <strong>Verses:</strong> Use the central <strong>[Couplet 1]</strong> button. Arrows ← → change the number.<br>• <strong>Tags:</strong> Insert [Refrain], [Intro], [Pont] in one click.",
+        tuto_step2_title: "2. Smart Corrections ✨",
+        tuto_step2_content: "• <strong>Correct All:</strong> Cleans apostrophes, capitals, spaces.<br>• <strong>Verify ( ) [ ]:</strong> Scans for missing parentheses.",
+        tuto_step3_title: "3. Formatting Tools 🎨",
+        tuto_step3_content: "• <strong>Floating Bar:</strong> Select text to bold, italic, or create a <strong>Lyric Card</strong>.<br>• <strong>Number Format:</strong> Converts '42' to 'forty-two'.",
+        tuto_step4_title: "4. History & Safety 🛡️",
+        tuto_step4_content: "• <strong>Undo/Redo:</strong> Your last 10 actions are saved (Ctrl+Z).<br>• <strong>Auto Save:</strong> Drafts saved in case of crash.",
+        tuto_step5_title: "5. YouTube Control 📺",
+        tuto_step5_content: "• <kbd>Ctrl+Alt+Space</kbd>: Play / Pause<br>• <kbd>Ctrl+Alt+← / →</kbd>: Rewind / Forward (5s)",
+        tuto_step6_title: "6. Other Shortcuts ⌨️",
+        tuto_step6_content: "• <kbd>Ctrl+1-5</kbd>: Structure tags<br>• <kbd>Ctrl+Shift+C</kbd>: Correct All",
+        tuto_finish_title: "Let's go! 🚀",
+        tuto_finish_content: "You're ready! Explore settings ⚙️ to customize your experience.<br><br>💡 <strong>Note:</strong> You can switch modes/language at any time by clicking the extension icon.",
+        // Lyric Mode Specific Tutorial
+        tuto_lyric_mode_title: "Lyric Card Mode Active 🎨",
+        tuto_lyric_mode_content: "To create a Lyric Card:<br>1. <strong>Highlight</strong> the lyrics of your choice.<br>2. Click on the <strong>'Create Lyric Card'</strong> button that appears.<br><br>💡 <strong>Note:</strong> Change settings via the extension icon.",
+        tuto_lyric_mode_btn: "Got it!",
+        // Lyric Card Modal - STAY ENGLISH
+        lc_modal_title: "Lyric Card Preview",
+        lc_album_default: "💿 Album Cover (Default)",
+        lc_manual_search: "🔍 Search artist...",
+        lc_format_btn: "📏 Format: ",
+        lc_search_placeholder: "Type an artist name...",
+        lc_upload_btn: "📂 Upload image",
+        lc_download_btn: "⬇️ Download",
+        lc_download_done: "✅ Downloaded!",
+        lc_share_btn: "𝕏 Share",
+        lc_share_copying: "📋 Copying...",
+        lc_share_copied: "✅ Copied!",
+        lc_share_error: "❌ Error",
+        lc_feedback_load_error: "Image load error.",
+        lc_search_searching: "⏳ Searching...",
+        lc_search_none: "No results found 😕",
+        lc_custom_img: "📂 Imported Image",
+        lc_select_text_error: "Please select text to create a Lyric Card.",
+        // Lyric Card Feedback
+        lc_error_search: "Error during search",
+        lc_img_copied_tweet: "Image copied! Paste it (Ctrl+V) in the tweet.",
+        lc_error_copy: "Unable to copy image.",
+        lc_error_img_not_found: "Image not found for",
+        lc_img_loaded: "Image loaded!",
+        lc_error_album_not_found: "Unable to find album cover.",
+        lc_searching_artist: "Searching for artist image...",
+        lc_generating: "Generating Lyric Card...",
+        lc_error_internal: "Internal error: Function not found.",
+        lc_fetching_id: "Fetching artist image (via ID)...",
+        lc_searching_name: "Searching image for",
+        lc_img_applied: "Image applied:",
+    }
+};
+
+/**
+ * Récupère la traduction pour une clé donnée selon la langue préférée.
+ * @param {string} key - La clé de traduction.
+ * @returns {string} Le texte traduit.
+ */
+function getTranslation(key) {
+    const lang = localStorage.getItem('gftLanguage') || 'fr'; // 'fr' par défaut
+    return (TRANSLATIONS[lang] && TRANSLATIONS[lang][key]) || TRANSLATIONS['fr'][key] || key;
+}
+
 /**
  * Décode les entités HTML (ex: &amp;) en caractères normaux (ex: &).
  * @param {string} text - Le texte à décoder.
@@ -129,7 +432,7 @@ function cleanArtistName(name) {
     if (!name) return "";
     let cleaned = name.trim();
     cleaned = decodeHtmlEntities(cleaned);
-    // Regex pour enlever les suffixes courants comme (FRA), (Feat. ...), etc.
+    // Regex pour enlever les suffixes courants comme (FRA), (FR), (UK), (US), (Feat. ...), etc.
     const commonSuffixRegex = /\s*\((?:FRA|FR|UK|US|Feat\.|Featuring|Trad\.|Producer|Mix|Remix|Edit|Version|Live|Demo)[^)]*?\)\s*$/i;
     if (commonSuffixRegex.test(cleaned)) {
         cleaned = cleaned.replace(commonSuffixRegex, '').trim();
@@ -480,11 +783,11 @@ function createArtistSelectors(container) {
     artistSelectorContainer.id = ARTIST_SELECTOR_CONTAINER_ID;
     artistSelectorContainer.style.display = 'flex'; artistSelectorContainer.style.flexWrap = 'wrap'; artistSelectorContainer.style.gap = '2px 10px'; artistSelectorContainer.style.alignItems = 'center';
     const title = document.createElement('p');
-    title.textContent = 'Attribuer la section à :';
+    title.textContent = getTranslation('artist_selection');
     title.style.width = '100%'; title.style.margin = '0 0 1px 0'; // Réduit au minimum, le gap fait le reste
     artistSelectorContainer.appendChild(title);
     if (!detectedArtists || detectedArtists.length === 0) {
-        const noArtistsMsg = document.createElement('span'); noArtistsMsg.textContent = "Aucun artiste détecté."; noArtistsMsg.style.fontStyle = 'italic';
+        const noArtistsMsg = document.createElement('span'); noArtistsMsg.textContent = getTranslation('no_artist'); noArtistsMsg.style.fontStyle = 'italic';
         artistSelectorContainer.appendChild(noArtistsMsg);
     } else {
         detectedArtists.forEach((artistName, index) => {
@@ -2212,53 +2515,72 @@ let currentTutorialStep = 0;
 let tutorialOverlay = null;
 let tutorialModal = null;
 
-const TUTORIAL_STEPS = [
-    {
-        title: "Welcome! Choose your mode ⚙️",
-        content: `
-            <p>How would you like to use Genius Fast Transcriber?</p>
-            <div style="display: flex; gap: 10px; flex-direction: column; margin-top: 15px;">
-                <button id="gft-mode-full-btn" class="gft-tutorial-button" style="background:#f9ff55; color:black; border:none; padding:15px; text-align:left; cursor:pointer; border-radius:8px;">
-                    <div style="font-weight:bold; font-size:14px;">⚡ Full Mode (Recommended)</div>
-                    <div style="font-size:11px; opacity:0.8; margin-top:4px;">Transcription panel, auto-corrections, shortcuts AND Lyric Cards.<br><strong>⚠️ FRENCH ONLY 🇫🇷 : The fast transcriber is only functional for the French language for now.</strong></div>
-                </button>
-                <button id="gft-mode-simple-btn" class="gft-tutorial-button" style="background:rgba(255,255,255,0.1); border:1px solid #555; padding:15px; text-align:left; cursor:pointer; border-radius:8px;">
-                    <div style="font-weight:bold; font-size:14px;">🎨 Lyric Card Only</div>
-                    <div style="font-size:11px; opacity:0.8; margin-top:4px;">Hides the panel. Just image creation via text selection.</div>
-                </button>
-            </div>
-            <p style="font-size: 10px; color: #888; margin-top: 15px; font-style: italic;">* You can change this at any time via the extension icon.</p>
-        `
-    },
-    {
-        title: "1. Structure & Artistes 🏗️",
-        content: "• <strong>Artistes :</strong> Cochez les cases en haut pour attribuer automatiquement les sections sur les anciens editeurs.<br>• <strong>Couplets :</strong> Utilisez le nouveau bouton central <strong>[Couplet 1]</strong>. Les flèches ← → permettent de changer le numéro instantanément.<br>• <strong>Tags :</strong> Insérez Refrain, Intro, Pont en un clic."
-    },
-    {
-        title: "2. Corrections Intelligentes ✨",
-        content: "• <strong>Tout Corriger :</strong> Le bouton magique qui nettoie tout (apostrophes, majuscules, espaces) avec prévisualisation.<br>• <strong>Vérifier ( ) [ ] :</strong> Scanne vos paroles pour trouver les parenthèses ou crochets oubliés (surlignage rouge)."
-    },
-    {
-        title: "3. Outils de Formatage 🎨",
-        content: "• <strong>Barre Flottante :</strong> Sélectionnez du texte pour mettre en gras, italique ou créer une <strong>Lyric Card</strong> à partager.<br>• <strong>Nombres en Lettres :</strong> Sélectionnez un chiffre (ex: '42') pour le convertir en 'quarante-deux'."
-    },
-    {
-        title: "4. Historique & Sécurité 🛡️",
-        content: "• <strong>Annuler/Refaire :</strong> Vos 10 dernières actions sont sauvegardées. Utilisez les boutons ↩️ ↪️ ou Ctrl+Z.<br>• <strong>Sauvegarde Auto :</strong> En cas de fermeture accidentelle, votre brouillon est mémorisé."
-    },
-    {
-        title: "5. Contrôle YouTube 📺",
-        content: "Contrôlez la musique sans quitter l'éditeur :<br>• <kbd>Ctrl+Alt+Espace</kbd> : Lecture / Pause<br>• <kbd>Ctrl+Alt+← / →</kbd> : Reculer / Avancer (5s)<br><em>Fonctionne même si le curseur est dans le texte !</em>"
-    },
-    {
-        title: "6. Autres Raccourcis ⌨️",
-        content: "Devenez un pro avec les autres raccourcis :<br>• <kbd>Ctrl+1-5</kbd> : Tags de structure<br>• <kbd>Ctrl+Shift+C</kbd> : Tout Corriger<br>• <kbd>Ctrl+Z/Y</kbd> : Annuler / Refaire"
-    },
-    {
-        title: "C'est parti ! 🚀",
-        content: "Vous êtes prêt ! Explorez les paramètres ⚙️ pour personnaliser votre expérience (Mode Sombre, Tooltips, etc).<br><br>Bonne transcription !"
-    }
-];
+/**
+ * Retourne les étapes du tutoriel, potentiellement localisées.
+ * Incorpore l'étape de sélection de langue au début.
+ */
+function getTutorialSteps() {
+    return [
+        {
+            title: "Language Selection / Choix de la langue 🌍",
+            content: `
+                <p style="text-align:center; font-size:16px;">Please select your preferred language.<br>Veuillez choisir votre langue préférée.</p>
+                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;">
+                    <button id="gft-lang-fr-btn" class="gft-tutorial-button" style="background:#333; color:white; border:2px solid #555; padding:15px 25px; cursor:pointer; border-radius:8px; font-size:16px; transition:0.2s;">
+                        Français 🇫🇷
+                    </button>
+                    <button id="gft-lang-en-btn" class="gft-tutorial-button" style="background:#333; color:white; border:2px solid #555; padding:15px 25px; cursor:pointer; border-radius:8px; font-size:16px; transition:0.2s;">
+                        English 🇬🇧
+                    </button>
+                </div>
+            `
+        },
+        {
+            title: `${getTranslation('onboarding_title')}! Choose your mode ⚙️`,
+            content: `
+                <p>${getTranslation('onboarding_intro')}</p>
+                <div style="display: flex; gap: 10px; flex-direction: column; margin-top: 15px;">
+                    <button id="gft-mode-full-btn" class="gft-tutorial-button" style="background:#f9ff55; color:black; border:none; padding:15px; text-align:left; cursor:pointer; border-radius:8px;">
+                        <div style="font-weight:bold; font-size:14px;">⚡ ${getTranslation('mode_full_title')}</div>
+                        <div style="font-size:11px; opacity:0.8; margin-top:4px;">${getTranslation('mode_full_desc')}</div>
+                    </button>
+                    <button id="gft-mode-simple-btn" class="gft-tutorial-button" style="background:rgba(255,255,255,0.1); border:1px solid #555; padding:15px; text-align:left; cursor:pointer; border-radius:8px;">
+                        <div style="font-weight:bold; font-size:14px;">🎨 ${getTranslation('mode_lyric_title')}</div>
+                        <div style="font-size:11px; opacity:0.8; margin-top:4px;">${getTranslation('mode_lyric_desc')}</div>
+                    </button>
+                </div>
+            `
+        },
+        {
+            title: getTranslation('tuto_step1_title'),
+            content: getTranslation('tuto_step1_content')
+        },
+        {
+            title: getTranslation('tuto_step2_title'),
+            content: getTranslation('tuto_step2_content')
+        },
+        {
+            title: getTranslation('tuto_step3_title'),
+            content: getTranslation('tuto_step3_content')
+        },
+        {
+            title: getTranslation('tuto_step4_title'),
+            content: getTranslation('tuto_step4_content')
+        },
+        {
+            title: getTranslation('tuto_step5_title'),
+            content: getTranslation('tuto_step5_content')
+        },
+        {
+            title: getTranslation('tuto_step6_title'),
+            content: getTranslation('tuto_step6_content')
+        },
+        {
+            title: getTranslation('tuto_finish_title'),
+            content: getTranslation('tuto_finish_content')
+        }
+    ];
+}
 
 /**
  * Affiche le tutoriel guidé.
@@ -2291,17 +2613,22 @@ function showTutorial() {
 /**
  * Affiche une étape spécifique du tutoriel.
  */
+/**
+ * Affiche une étape spécifique du tutoriel.
+ */
 function renderTutorialStep() {
     if (!tutorialModal) return;
 
-    const step = TUTORIAL_STEPS[currentTutorialStep];
+    // Récupère les étapes dynamiques (potentiellement traduites)
+    const steps = getTutorialSteps();
+    const step = steps[currentTutorialStep];
 
     tutorialModal.innerHTML = '';
 
     // Titre
     const title = document.createElement('h2');
     title.className = 'gft-tutorial-title';
-    title.textContent = step.title;
+    title.innerHTML = step.title; // innerHTML pour autoriser les emojis/HTML
     tutorialModal.appendChild(title);
 
     // Contenu
@@ -2313,22 +2640,24 @@ function renderTutorialStep() {
     // Indicateur de progression
     const progress = document.createElement('div');
     progress.className = 'gft-tutorial-progress';
-    progress.textContent = `Étape ${currentTutorialStep + 1} sur ${TUTORIAL_STEPS.length}`;
+    progress.textContent = `Étape ${currentTutorialStep + 1} sur ${steps.length}`;
     tutorialModal.appendChild(progress);
 
     // Boutons
     const buttonsDiv = document.createElement('div');
     buttonsDiv.className = 'gft-tutorial-buttons';
 
-    // Bouton "Passer"
-    const skipButton = document.createElement('button');
-    skipButton.textContent = 'Passer le tutoriel';
-    skipButton.className = 'gft-tutorial-button gft-tutorial-button-skip';
-    skipButton.addEventListener('click', closeTutorial);
-    buttonsDiv.appendChild(skipButton);
+    // Bouton "Passer" (Sauf étape 0 et 1 qui sont obligatoires pour config)
+    if (currentTutorialStep > 1) {
+        const skipButton = document.createElement('button');
+        skipButton.textContent = 'Passer le tutoriel';
+        skipButton.className = 'gft-tutorial-button gft-tutorial-button-skip';
+        skipButton.addEventListener('click', closeTutorial);
+        buttonsDiv.appendChild(skipButton);
+    }
 
-    // Bouton "Précédent" (sauf première étape)
-    if (currentTutorialStep > 0) {
+    // Bouton "Précédent" (sauf étapes critiques 0 et 1)
+    if (currentTutorialStep > 1) {
         const prevButton = document.createElement('button');
         prevButton.textContent = '← Précédent';
         prevButton.className = 'gft-tutorial-button gft-tutorial-button-prev';
@@ -2340,32 +2669,55 @@ function renderTutorialStep() {
     }
 
     // Bouton "Suivant" ou "Terminer"
-    const nextButton = document.createElement('button');
-    nextButton.className = 'gft-tutorial-button gft-tutorial-button-next';
+    // On cache le bouton "Suivant" pour les étapes interactives (0 et 1)
+    if (currentTutorialStep > 1) {
+        const nextButton = document.createElement('button');
+        nextButton.className = 'gft-tutorial-button gft-tutorial-button-next';
 
-    if (currentTutorialStep < TUTORIAL_STEPS.length - 1) {
-        nextButton.textContent = 'Suivant →';
-        nextButton.addEventListener('click', () => {
-            currentTutorialStep++;
-            renderTutorialStep();
-        });
-    } else {
-        nextButton.textContent = 'Terminer ✓';
-        nextButton.addEventListener('click', closeTutorial);
+        if (currentTutorialStep < steps.length - 1) {
+            nextButton.textContent = 'Suivant →';
+            nextButton.addEventListener('click', () => {
+                currentTutorialStep++;
+                renderTutorialStep();
+            });
+        } else {
+            nextButton.textContent = 'Terminer ✓';
+            nextButton.addEventListener('click', closeTutorial);
+        }
+        buttonsDiv.appendChild(nextButton);
     }
 
-    buttonsDiv.appendChild(nextButton);
     tutorialModal.appendChild(buttonsDiv);
 
-    // Attache les événements spéciaux pour l'étape 0 (Choix du mode)
+    // --- LOGIQUE INTERACTIVE POUR LES ÉTAPES DE CONFIG ---
+
+    // ÉTAPE 0 : CHOIX DE LA LANGUE
     if (currentTutorialStep === 0) {
+        const btnFr = document.getElementById('gft-lang-fr-btn');
+        const btnEn = document.getElementById('gft-lang-en-btn');
+
+        const handleLangSelection = (lang) => {
+            localStorage.setItem('gftLanguage', lang);
+            // Rafraîchit l'étape suivante pour appliquer la langue
+            currentTutorialStep++;
+            renderTutorialStep();
+        }
+
+        if (btnFr) btnFr.onclick = () => handleLangSelection('fr');
+        if (btnEn) btnEn.onclick = () => handleLangSelection('en');
+
+        // Cache les boutons de navigation standard
+        buttonsDiv.style.display = 'none';
+    }
+
+    // ÉTAPE 1 : CHOIX DU MODE
+    else if (currentTutorialStep === 1) {
         const fullBtn = document.getElementById('gft-mode-full-btn');
         const simpleBtn = document.getElementById('gft-mode-simple-btn');
 
         if (fullBtn) {
             fullBtn.onclick = () => {
                 setLyricCardOnlyMode(false);
-                // Passe à l'étape suivante
                 currentTutorialStep++;
                 renderTutorialStep();
             };
@@ -2373,15 +2725,48 @@ function renderTutorialStep() {
         if (simpleBtn) {
             simpleBtn.onclick = () => {
                 setLyricCardOnlyMode(true);
-                // Ferme le tutoriel et recharge pour appliquer le mode simple
-                closeTutorial();
-                window.location.reload();
+                localStorage.setItem('gft-tutorial-completed', 'true');
+                // Affiche l'étape explicative pour le mode Lyric Card
+                renderLyricModeTutorialEnd();
             };
         }
-
-        // Cache les boutons de navigation standard pour cette étape spéciale
         buttonsDiv.style.display = 'none';
     }
+}
+
+/**
+ * Affiche l'écran de fin spécifique au mode Lyric Card Only.
+ */
+function renderLyricModeTutorialEnd() {
+    if (!tutorialModal) return;
+    tutorialModal.innerHTML = '';
+
+    // Titre
+    const title = document.createElement('h2');
+    title.className = 'gft-tutorial-title';
+    title.innerHTML = getTranslation('tuto_lyric_mode_title');
+    tutorialModal.appendChild(title);
+
+    // Contenu
+    const content = document.createElement('div');
+    content.className = 'gft-tutorial-content';
+    content.innerHTML = getTranslation('tuto_lyric_mode_content');
+    tutorialModal.appendChild(content);
+
+    // Bouton de fin
+    const buttonsDiv = document.createElement('div');
+    buttonsDiv.className = 'gft-tutorial-buttons';
+
+    const finishBtn = document.createElement('button');
+    finishBtn.className = 'gft-tutorial-button gft-tutorial-button-next'; // Style primaire
+    finishBtn.textContent = getTranslation('tuto_lyric_mode_btn');
+    finishBtn.onclick = () => {
+        closeTutorial();
+        window.location.reload();
+    };
+
+    buttonsDiv.appendChild(finishBtn);
+    tutorialModal.appendChild(buttonsDiv);
 }
 
 /**
@@ -3709,58 +4094,99 @@ function initLyricsEditorEnhancer() {
         TAGS_STRUCTURAUX: [
             {
                 buttons: [
-                    { label: "En-tête", getText: () => { let txt = `[Paroles de "${currentSongTitle}"`; const fts = formatArtistList(currentFeaturingArtists); if (fts && isHeaderFeatEnabled()) txt += ` ft. ${fts}`; txt += ']'; if (!isTagNewlinesDisabled()) txt += '\n'; return txt; }, tooltip: "Insérer l'en-tête de la chanson avec les artistes" },
+                    { label: getTranslation('btn_header'), getText: () => { let txt = `[Paroles de "${currentSongTitle}"`; const fts = formatArtistList(currentFeaturingArtists); if (fts && isHeaderFeatEnabled()) txt += ` ft. ${fts}`; txt += ']'; if (!isTagNewlinesDisabled()) txt += '\n'; return txt; }, tooltip: getTranslation('btn_header_tooltip') },
                     {
                         type: 'coupletManager',
                         prev: { label: '←', title: 'Couplet précédent', tooltip: 'Revenir au couplet précédent' },
                         main: {
                             id: COUPLET_BUTTON_ID,
-                            getLabel: () => `[Couplet ${coupletCounter}]`,
+                            getLabel: () => `[Couplet ${coupletCounter}]`, // Retaining [Couplet N] for now as per plan
                             getText: () => addArtistToText(`[Couplet ${coupletCounter}]`),
-                            tooltip: 'Insérer un tag [Couplet] avec les artistes sélectionnés (Ctrl+1)',
+                            tooltip: getTranslation('add_couplet'),
                             shortcut: '1' // Badge Ctrl+1
                         },
                         next: { label: '→', title: 'Couplet suivant', tooltip: 'Passer au couplet suivant' }
                     },
-                    { label: '[Intro]', getText: () => addArtistToText('[Intro]'), tooltip: 'Insérer un tag [Intro] avec les artistes (Ctrl+4)', shortcut: '4' },
-                    { label: '[Couplet unique]', getText: () => addArtistToText('[Couplet unique]'), tooltip: 'Insérer un tag [Couplet unique] avec les artistes' },
-                    { label: '[Couplet]', getText: () => addArtistToText('[Couplet]'), tooltip: 'Insérer un tag [Couplet] sans numéro avec les artistes' },
-                    { label: '[Pré-refrain]', getText: () => addArtistToText('[Pré-refrain]'), tooltip: 'Insérer un tag [Pré-refrain] avec les artistes' },
-                    { label: '[Refrain]', getText: () => addArtistToText('[Refrain]'), tooltip: 'Insérer un tag [Refrain] avec les artistes (Ctrl+2)', shortcut: '2' },
-                    { label: '[Post-refrain]', getText: () => addArtistToText('[Post-refrain]'), tooltip: 'Insérer un tag [Post-refrain] avec les artistes' },
-                    { label: '[Pont]', getText: () => addArtistToText('[Pont]'), tooltip: 'Insérer un tag [Pont] avec les artistes (Ctrl+3)', shortcut: '3' },
-                    { label: '[Outro]', getText: () => addArtistToText('[Outro]'), tooltip: 'Insérer un tag [Outro] avec les artistes (Ctrl+5)', shortcut: '5' },
-                    { label: '[Instrumental]', getText: () => formatSimpleTag('[Instrumental]'), tooltip: 'Insérer un tag [Instrumental] pour les sections instrumentales' },
-                    { label: '[?]', getText: () => formatSimpleTag('[?]', true), tooltip: 'Insérer un tag [?] pour les paroles inconnues' },
-                    { label: 'ZWS', text: '\u200B', tooltip: 'Insérer un Zero Width Space (espace de largeur nulle)' }
+                    { label: getTranslation('btn_intro'), getText: () => addArtistToText('[Intro]'), tooltip: getTranslation('btn_intro_tooltip'), shortcut: '4' },
+                    { label: getTranslation('btn_verse_unique'), getText: () => addArtistToText('[Couplet unique]'), tooltip: getTranslation('btn_verse_unique_tooltip') },
+                    { label: getTranslation('btn_verse'), getText: () => addArtistToText('[Couplet]'), tooltip: getTranslation('btn_verse_tooltip') },
+                    { label: getTranslation('btn_pre_chorus'), getText: () => addArtistToText('[Pré-refrain]'), tooltip: getTranslation('btn_pre_chorus_tooltip') },
+                    { label: getTranslation('btn_chorus'), getText: () => addArtistToText('[Refrain]'), tooltip: getTranslation('btn_chorus_tooltip'), shortcut: '2' },
+                    { label: getTranslation('btn_post_chorus'), getText: () => addArtistToText('[Post-refrain]'), tooltip: getTranslation('btn_post_chorus_tooltip') },
+                    { label: getTranslation('btn_bridge'), getText: () => addArtistToText('[Pont]'), tooltip: getTranslation('btn_bridge_tooltip'), shortcut: '3' },
+                    { label: getTranslation('btn_outro'), getText: () => addArtistToText('[Outro]'), tooltip: getTranslation('btn_outro_tooltip'), shortcut: '5' },
+                    { label: getTranslation('btn_instrumental'), getText: () => formatSimpleTag('[Instrumental]'), tooltip: getTranslation('btn_instrumental_tooltip') },
+                    { label: getTranslation('btn_unknown'), getText: () => formatSimpleTag('[?]', true), tooltip: getTranslation('btn_unknown_tooltip') },
+                    { label: getTranslation('btn_zws'), text: '\u200B', tooltip: getTranslation('btn_zws_tooltip') }
                 ]
             }
         ],
         TEXT_CLEANUP: [
             {
-                label: "y' → y ",
+                label: getTranslation('btn_y_label'),
                 action: 'replaceText',
                 searchPattern: /\b(Y|y)['’]/g,
                 replacementFunction: (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y '),
                 highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
-                tooltip: "Corriger tous les y' en y (typique en français)"
+                tooltip: getTranslation('cleanup_y_tooltip')
             },
-            { label: "' → '", action: 'replaceText', searchPattern: /['’]/g, replacementText: "'", highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS, tooltip: "Remplacer les apostrophes typographiques ' par des apostrophes standard '" },
             {
-                label: "oeu → œu",
+                label: getTranslation('btn_apostrophe_label'),
+                action: 'replaceText',
+                searchPattern: /['’]/g,
+                replacementText: "'",
+                highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+                tooltip: getTranslation('cleanup_apostrophe_tooltip')
+            },
+            {
+                label: getTranslation('btn_oeu_label'),
                 action: 'replaceText',
                 searchPattern: /([Oo])eu/g,
                 replacementFunction: (match, firstLetter) => (firstLetter === 'O' ? 'Œu' : 'œu'),
                 highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
-                tooltip: "Remplacer oeu par œu (ligature française)"
+                tooltip: getTranslation('cleanup_oeu_tooltip')
             },
-            { label: "Maj. début ligne", action: 'lineCorrection', correctionType: 'capitalize', title: "Met en majuscule la première lettre de chaque ligne.", tooltip: "Mettre en majuscule la première lettre de chaque ligne" },
-            { label: "Suppr. ., fin ligne", action: 'lineCorrection', correctionType: 'removePunctuation', title: "Supprime les points et virgules en fin de ligne.", tooltip: "Supprimer les points et virgules en fin de ligne" },
-            { label: "Corriger Espacement", action: 'lineCorrection', correctionType: 'spacing', title: "Corrige les espacements (lignes vides inutiles ou manquantes).", tooltip: "Corriger les espacements (lignes vides inutiles ou manquantes)" }
+            {
+                label: getTranslation('btn_capitalize_label'),
+                shortLabel: getTranslation('btn_capitalize_short'),
+                action: 'lineCorrection',
+                correctionType: 'capitalize',
+                title: getTranslation('cleanup_capitalize_tooltip'),
+                tooltip: getTranslation('cleanup_capitalize_tooltip')
+            },
+            {
+                label: getTranslation('btn_punctuation_label'),
+                shortLabel: getTranslation('btn_punctuation_short'),
+                action: 'lineCorrection',
+                correctionType: 'removePunctuation',
+                title: getTranslation('cleanup_punctuation_tooltip'),
+                tooltip: getTranslation('cleanup_punctuation_tooltip')
+            },
+            {
+                label: getTranslation('btn_spacing_label'),
+                shortLabel: getTranslation('btn_spacing_short'),
+                action: 'lineCorrection',
+                correctionType: 'spacing',
+                title: getTranslation('cleanup_spacing_tooltip'),
+                tooltip: getTranslation('cleanup_spacing_tooltip')
+            }
         ],
         GLOBAL_FIXES: [
-            { label: "🔍 Vérifier ( ) [ ]", action: 'checkBrackets', title: "Vérifie et surligne les parenthèses et crochets non appariés.", tooltip: "Détecter et surligner les parenthèses et crochets non appariés (Ctrl+Shift+S)", shortcut: 'S' },
-            { label: "Tout Corriger (Texte)", action: 'globalTextFix', title: "Applique toutes les corrections de texte (y', apostrophes, oeu, majuscules, ponctuation, espacement).", tooltip: "Appliquer toutes les corrections automatiques avec prévisualisation (Ctrl+Shift+C)", shortcut: 'C' }
+            {
+                label: getTranslation('btn_check_label'),
+                action: 'checkBrackets',
+                title: getTranslation('global_check_tooltip'),
+                tooltip: getTranslation('global_check_tooltip'),
+                shortcut: 'S'
+            },
+            {
+                label: getTranslation('btn_fix_all_label'), // Tout Corriger (Texte)
+                shortLabel: getTranslation('btn_fix_all_short'), // ✨ Tout Corriger
+                action: 'globalTextFix',
+                title: getTranslation('global_fix_tooltip'),
+                tooltip: getTranslation('global_fix_tooltip'),
+                shortcut: 'C'
+            }
         ]
     };
 
@@ -3905,7 +4331,7 @@ function initLyricsEditorEnhancer() {
 
                 const titleAndLogoContainer = document.createElement('span');
                 const logoURL = chrome.runtime.getURL('images/icon16.png');
-                titleAndLogoContainer.innerHTML = `<img src="${logoURL}" alt="GFT Logo" id="gftPanelLogo" /> Genius Fast Transcriber`;
+                titleAndLogoContainer.innerHTML = `<img src="${logoURL}" alt="${getTranslation('panel_title_img_alt')}" id="gftPanelLogo" /> ${getTranslation('panel_title')}`;
                 panelTitle.appendChild(titleAndLogoContainer);
 
                 // Bouton Undo
@@ -3921,7 +4347,7 @@ function initLyricsEditorEnhancer() {
                     undoLastChange();
                 });
                 panelTitle.appendChild(undoButton);
-                addTooltip(undoButton, 'Annuler la dernière modification (Ctrl+Z)');
+                addTooltip(undoButton, getTranslation('undo_tooltip'));
 
                 // Bouton Redo
                 const redoButton = document.createElement('button');
@@ -3936,13 +4362,13 @@ function initLyricsEditorEnhancer() {
                     redoLastChange();
                 });
                 panelTitle.appendChild(redoButton);
-                addTooltip(redoButton, 'Refaire la dernière modification annulée (Ctrl+Y)');
+                addTooltip(redoButton, getTranslation('redo_tooltip'));
 
                 // Bouton Paramètres (Ouvre le menu)
                 const settingsButton = document.createElement('button');
                 settingsButton.id = 'gft-settings-button';
                 settingsButton.textContent = '⚙️';
-                settingsButton.title = 'Menu Paramètres';
+                settingsButton.title = getTranslation('settings_menu');
                 settingsButton.classList.add('genius-lyrics-shortcut-button');
 
                 settingsButton.addEventListener('click', (event) => {
@@ -3969,7 +4395,7 @@ function initLyricsEditorEnhancer() {
                     // Item 1: Mode Sombre
                     const darkModeItem = document.createElement('button');
                     darkModeItem.className = 'gft-settings-menu-item';
-                    darkModeItem.textContent = document.body.classList.contains('gft-dark-mode') ? '☀️ Mode Clair' : '🌙 Mode Sombre';
+                    darkModeItem.textContent = document.body.classList.contains('gft-dark-mode') ? getTranslation('dark_mode_toggle_light') : getTranslation('dark_mode_toggle_dark');
                     darkModeItem.onclick = () => {
                         gftToggleDarkMode();
                         // On ferme le menu pour voir l'effet global, et au prochain appel le texte sera mis à jour.
@@ -3981,14 +4407,14 @@ function initLyricsEditorEnhancer() {
                     const statsItem = document.createElement('button');
                     statsItem.className = 'gft-settings-menu-item';
                     const areStatsVisible = document.getElementById('gft-stats-display')?.classList.contains('gft-stats-visible');
-                    statsItem.textContent = areStatsVisible ? '📊 Masquer Statistiques' : '📊 Afficher Statistiques';
+                    statsItem.textContent = areStatsVisible ? getTranslation('stats_hide') : getTranslation('stats_show');
                     statsItem.onclick = () => { toggleStatsDisplay(); menu.remove(); };
                     menu.appendChild(statsItem);
 
                     // Item 3: Masquer les Feats dans l'en-tête
                     const featItem = document.createElement('button');
                     featItem.className = 'gft-settings-menu-item';
-                    featItem.textContent = isHeaderFeatEnabled() ? '✅ Inclure Feats dans l\'en-tête' : '❌ Inclure Feats dans l\'en-tête';
+                    featItem.textContent = isHeaderFeatEnabled() ? getTranslation('header_feat_show') : getTranslation('header_feat_hide');
                     featItem.onclick = () => {
                         gftToggleHeaderFeat();
                         menu.remove();
@@ -3998,7 +4424,7 @@ function initLyricsEditorEnhancer() {
                     // Item 4: Saut de ligne après tag
                     const newlineItem = document.createElement('button');
                     newlineItem.className = 'gft-settings-menu-item';
-                    newlineItem.textContent = !isTagNewlinesDisabled() ? '✅ Saut de ligne après tags' : '❌ Saut de ligne après tags';
+                    newlineItem.textContent = !isTagNewlinesDisabled() ? getTranslation('newline_enable') : getTranslation('newline_disable');
                     newlineItem.onclick = () => {
                         gftToggleTagNewlines();
                         menu.remove();
@@ -4008,7 +4434,7 @@ function initLyricsEditorEnhancer() {
                     // Item 5: Tutoriel
                     const tutorialItem = document.createElement('button');
                     tutorialItem.className = 'gft-settings-menu-item';
-                    tutorialItem.textContent = '❓ Tutoriel / Aide';
+                    tutorialItem.textContent = getTranslation('tutorial_link');
                     tutorialItem.onclick = () => { showTutorial(); menu.remove(); };
                     menu.appendChild(tutorialItem);
 
@@ -4375,7 +4801,7 @@ function initLyricsEditorEnhancer() {
 
                 const structureLabel = document.createElement('div');
                 structureLabel.className = 'gft-section-label';
-                structureLabel.textContent = 'Structure';
+                structureLabel.textContent = getTranslation('section_structure');
                 structureSection.appendChild(structureLabel);
 
                 // Conteneur unique pour tout le monde (Couplet Control + Autres boutons)
@@ -4450,7 +4876,7 @@ function initLyricsEditorEnhancer() {
 
                 const toolsLabel = document.createElement('div');
                 toolsLabel.className = 'gft-section-label';
-                toolsLabel.textContent = 'Outils de nettoyage';
+                toolsLabel.textContent = getTranslation('section_cleanup');
                 toolsSection.appendChild(toolsLabel);
 
                 const utilityContainer = document.createElement('div');
@@ -4465,11 +4891,13 @@ function initLyricsEditorEnhancer() {
                         // Uniformisation du style pour tous les boutons de nettoyage
                         btn.classList.add('gft-btn-utility');
 
-                        // Raccourcir les labels pour un look plus compact et uniforme
-                        if (s.label === "Maj. début ligne") btn.textContent = "Majuscules";
-                        else if (s.label === "Suppr. ., fin ligne") btn.textContent = "Ponctuation";
-                        else if (s.label === "Corriger Espacement") btn.textContent = "Espacement";
-                        else btn.textContent = s.label.replace(' → ', '→'); // Compacte les flèches
+                        // Raccourcir les labels si défini dans la config (via shortLabel)
+                        if (s.shortLabel) {
+                            btn.textContent = s.shortLabel;
+                        } else {
+                            // Nettoyage cosmétique par défaut pour les flèches
+                            btn.textContent = s.label.replace(' → ', '→');
+                        }
 
                         // Ajouter une tooltip si elle n'existe pas déjà (déjà géré par createButton via s.tooltip, mais on s'assure que le bouton reste compréhensible)
                     });
@@ -4496,9 +4924,10 @@ function initLyricsEditorEnhancer() {
                         btn.style.flex = '1'; // Boutons pleine largeur
                         btn.style.justifyContent = 'center';
 
-                        // Ajout d'icônes si possible
-                        if (s.label.includes('Tout Corriger')) btn.innerHTML = '✨ Tout Corriger'; // 'Tout Corriger (Texte)';
-                        if (s.label.includes('Vérifier')) btn.innerHTML = '🔍 Vérifier ( ) [ ]';
+                        // Ajout d'icônes si possible et usage de shortLabel
+                        if (s.shortLabel) btn.textContent = s.shortLabel;
+                        else if (s.label.includes('Tout Corriger')) btn.innerHTML = s.label; // Fallback
+                        else if (s.label.includes('Vérifier')) btn.innerHTML = s.label; // Fallback
                     });
                 }
                 mainActionsSection.appendChild(mainActionsContainer);
@@ -4997,8 +5426,24 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
     modal.appendChild(closeIcon);
 
     const title = document.createElement('h3');
-    title.textContent = 'Aperçu Lyric Card';
     title.style.margin = '0';
+    title.style.display = 'flex';
+    title.style.alignItems = 'baseline';
+    title.style.gap = '8px';
+
+    // Texte du titre
+    const titleText = document.createTextNode(getTranslation('lc_modal_title'));
+    title.appendChild(titleText);
+
+    // Indicateur de version
+    const versionSpan = document.createElement('span');
+    versionSpan.textContent = 'v2.7';
+    versionSpan.style.fontSize = '11px';
+    versionSpan.style.color = isDarkMode ? '#888' : '#aaa';
+    versionSpan.style.fontWeight = 'normal';
+    versionSpan.style.fontFamily = 'monospace';
+    title.appendChild(versionSpan);
+
     modal.appendChild(title);
 
     const canvasContainer = document.createElement('div');
@@ -5023,7 +5468,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
     // Option par défaut : Album
     const optionAlbum = document.createElement('option');
     optionAlbum.value = 'ALBUM';
-    optionAlbum.text = '💿 Pochette Album (Défaut)';
+    optionAlbum.text = getTranslation('lc_album_default');
     imageSelector.appendChild(optionAlbum);
 
     // Ajout des artistes détectés
@@ -5042,19 +5487,19 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
     // Option Recherche Manuelle
     const optionSearch = document.createElement('option');
     optionSearch.value = 'MANUAL_SEARCH';
-    optionSearch.text = '🔍 Rechercher un artiste...';
+    optionSearch.text = getTranslation('lc_manual_search');
     imageSelector.appendChild(optionSearch);
 
     // Bouton Toggle Format (16:9 vs 1:1)
     let currentFormat = '16:9';
     const toggleFormatBtn = document.createElement('button');
-    toggleFormatBtn.textContent = '📏 Format: 16:9';
+    toggleFormatBtn.textContent = getTranslation('lc_format_btn') + '16:9';
     toggleFormatBtn.className = 'gft-tutorial-button';
     toggleFormatBtn.style.background = isDarkMode ? '#444' : '#eee';
     toggleFormatBtn.style.color = isDarkMode ? 'white' : 'black';
     toggleFormatBtn.onclick = () => {
         currentFormat = currentFormat === '16:9' ? '1:1' : '16:9';
-        toggleFormatBtn.textContent = `📏 Format: ${currentFormat}`;
+        toggleFormatBtn.textContent = getTranslation('lc_format_btn') + currentFormat;
         // Re-trigger update with current selection
         imageSelector.dispatchEvent(new Event('change'));
     };
@@ -5072,7 +5517,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
 
     const searchInput = document.createElement('input');
     searchInput.type = 'text';
-    searchInput.placeholder = 'Tapez un nom d\'artiste...';
+    searchInput.placeholder = getTranslation('lc_search_placeholder');
     searchInput.style.cssText = `
         padding: 8px 12px; border-radius: 4px; border: 1px solid #555; width: 100%;
         background: ${isDarkMode ? '#333' : '#fff'}; color: ${isDarkMode ? '#fff' : '#000'};
@@ -5094,7 +5539,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
         }
 
         debounceTimer = setTimeout(async () => {
-            searchResultsContainer.innerHTML = '<div style="text-align:center; padding:10px; opacity:0.6;">⏳ Recherche en cours...</div>';
+            searchResultsContainer.innerHTML = '<div style="text-align:center; padding:10px; opacity:0.6;">' + getTranslation('lc_search_searching') + '</div>';
 
             try {
                 const candidates = await searchArtistCandidates(query);
@@ -5146,18 +5591,18 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
                             searchWrapper.style.display = 'none';
 
                             imageSelector.dispatchEvent(new Event('change'));
-                            showFeedbackMessage(`Image de ${cand.name} appliquée !`, 2000);
+                            showFeedbackMessage(getTranslation('lc_img_applied') + ' ' + cand.name, 2000);
                         };
 
                         searchResultsContainer.appendChild(item);
                     });
                 } else {
-                    searchResultsContainer.innerHTML = '<div style="text-align:center; padding:10px; opacity:0.6;">Aucun résultat trouvé 😕</div>';
+                    searchResultsContainer.innerHTML = '<div style="text-align:center; padding:10px; opacity:0.6;">' + getTranslation('lc_search_none') + '</div>';
                 }
 
             } catch (e) {
                 console.error(e);
-                searchResultsContainer.innerHTML = '<div style="text-align:center; padding:10px; color:red;">Erreur lors de la recherche</div>';
+                searchResultsContainer.innerHTML = '<div style="text-align:center; padding:10px; color:red;">' + getTranslation('lc_error_search') + '</div>';
             }
         }, 300); // 300ms debounce
     };
@@ -5175,7 +5620,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
     let currentUploadedImage = null;
 
     const uploadBtn = document.createElement('button');
-    uploadBtn.textContent = '📂 Upload une image';
+    uploadBtn.textContent = getTranslation('lc_upload_btn');
     uploadBtn.className = 'gft-tutorial-button';
     uploadBtn.style.background = isDarkMode ? '#444' : '#eee';
     uploadBtn.style.color = isDarkMode ? 'white' : 'black';
@@ -5206,14 +5651,14 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
     };
 
     const downloadBtn = document.createElement('button');
-    downloadBtn.textContent = '⬇️ Télécharger';
+    downloadBtn.textContent = getTranslation('lc_download_btn');
     downloadBtn.className = 'gft-tutorial-button';
     downloadBtn.style.background = '#f9ff55';
     downloadBtn.style.color = 'black';
     downloadBtn.style.fontWeight = 'bold';
 
     const shareXBtn = document.createElement('button');
-    shareXBtn.textContent = '𝕏 Partager';
+    shareXBtn.textContent = getTranslation('lc_share_btn');
     shareXBtn.className = 'gft-tutorial-button';
     shareXBtn.style.background = 'black';
     shareXBtn.style.color = 'white';
@@ -5222,7 +5667,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
 
     shareXBtn.onclick = async () => {
         try {
-            shareXBtn.textContent = '📋 Copie...';
+            shareXBtn.textContent = getTranslation('lc_share_copying');
 
             // 1. Copy Image to Clipboard
             // We need to wait for blob generation
@@ -5232,7 +5677,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
                     const item = new ClipboardItem({ 'image/png': blob });
                     await navigator.clipboard.write([item]);
 
-                    shareXBtn.textContent = '✅ Copié !';
+                    shareXBtn.textContent = getTranslation('lc_share_copied');
 
                     // 2. Open X Intent
                     // Use specific artist name from selection if available or general one
@@ -5240,19 +5685,19 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
                     const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
                     window.open(intentUrl, '_blank');
 
-                    showFeedbackMessage("Image copiée ! Collez-la (Ctrl+V) dans le tweet.", 5000);
+                    showFeedbackMessage(getTranslation('lc_img_copied_tweet'), 5000);
 
-                    setTimeout(() => shareXBtn.textContent = '𝕏 Partager', 3000);
+                    setTimeout(() => shareXBtn.textContent = getTranslation('lc_share_btn'), 3000);
                 } catch (innerErr) {
                     console.error("Clipboard write failed", innerErr);
-                    showFeedbackMessage("Impossible de copier l'image.");
-                    shareXBtn.textContent = '❌ Erreur';
+                    showFeedbackMessage(getTranslation('lc_error_copy'));
+                    shareXBtn.textContent = getTranslation('lc_share_error');
                 }
             }, 'image/png');
 
         } catch (err) {
             console.error("Share failed", err);
-            shareXBtn.textContent = '❌ Erreur';
+            shareXBtn.textContent = getTranslation('lc_share_error');
         }
     };
 
@@ -5287,7 +5732,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
         };
         img.onerror = (e) => {
             console.error("Image load fail", e);
-            showFeedbackMessage("Erreur chargement image.");
+            showFeedbackMessage(getTranslation('lc_feedback_load_error'));
         };
     };
 
@@ -5331,7 +5776,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
                         imageSelector.options[imageSelector.selectedIndex].text = '👤 ' + selectedArtistName;
                     } else {
                         // Fallback ou erreur
-                        showFeedbackMessage(`Image introuvable pour ${selectedArtistName}`, 3000);
+                        showFeedbackMessage(getTranslation('lc_error_img_not_found') + ' ' + selectedArtistName, 3000);
                         updateCard(albumUrl, artistName);
                         imageSelector.options[imageSelector.selectedIndex].text = '❌ ' + selectedArtistName;
                     }
@@ -5350,14 +5795,14 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
         if (file) {
             const reader = new FileReader();
             reader.onload = (evt) => {
-                showFeedbackMessage("Image chargée !");
+                showFeedbackMessage(getTranslation('lc_img_loaded'));
                 currentUploadedImage = evt.target.result;
 
                 let customOpt = imageSelector.querySelector('option[value="CUSTOM"]');
                 if (!customOpt) {
                     customOpt = document.createElement('option');
                     customOpt.value = 'CUSTOM';
-                    customOpt.text = '📂 Image importée';
+                    customOpt.text = getTranslation('lc_custom_img');
                     imageSelector.appendChild(customOpt);
                 }
                 customOpt.selected = true;
@@ -5372,8 +5817,8 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
         link.download = `genius_lyric_card_${Date.now()}.png`;
         link.href = canvas.toDataURL('image/png');
         link.click();
-        downloadBtn.textContent = '✅ Téléchargé !';
-        setTimeout(() => { downloadBtn.textContent = '⬇️ Télécharger'; }, 2000);
+        downloadBtn.textContent = getTranslation('lc_download_done');
+        setTimeout(() => { downloadBtn.textContent = getTranslation('lc_download_btn'); }, 2000);
     };
 
     overlay.onclick = (e) => {
@@ -5387,7 +5832,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
 async function generateLyricsCard() {
     const selection = window.getSelection();
     if (!selection || selection.toString().trim().length === 0) {
-        showFeedbackMessage("Veuillez sélectionner du texte pour créer une Lyric Card.");
+        showFeedbackMessage(getTranslation('lc_select_text_error'));
         return;
     }
 
@@ -5408,12 +5853,12 @@ async function generateLyricsCard() {
 
     const uniqueUrls = [...new Set(candidateUrls)];
     if (uniqueUrls.length === 0) {
-        showFeedbackMessage("Impossible de trouver la pochette de l'album.");
+        showFeedbackMessage(getTranslation('lc_error_album_not_found'));
         return;
     }
     const albumUrl = uniqueUrls[0];
 
-    showFeedbackMessage("Recherche de l'image artiste...", 0);
+    showFeedbackMessage(getTranslation('lc_searching_artist'), 0);
 
     // 2. Trouver l'image de l'artiste (API d'abord, puis fallback DOM)
     // On passe le nom du premier main artist pour le fallback "Search API"
@@ -5425,13 +5870,13 @@ async function generateLyricsCard() {
         artistUrl = extractArtistImage(albumUrl); // Utilise la version avec exclusion
     }
 
-    showFeedbackMessage("Génération de la Lyric Card en cours...", 2000);
+    showFeedbackMessage(getTranslation('lc_generating'), 2000);
 
     if (typeof showLyricCardPreviewModal === 'function') {
         showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artistUrl);
     } else {
         console.error("[GFT] CRITICAL: showLyricCardPreviewModal is undefined!");
-        showFeedbackMessage("Erreur interne: Fonction introuvable.");
+        showFeedbackMessage(getTranslation('lc_error_internal'));
     }
 }
 /**
@@ -5473,7 +5918,7 @@ async function fetchArtistImageFromApi(artistName, forceSearch = false) {
 
             if (songId) {
                 console.log("[GFT] Fetching artist image via Song ID:", songId);
-                showFeedbackMessage("Récupération image artiste (via ID)...", 0);
+                showFeedbackMessage(getTranslation('lc_fetching_id'), 0);
                 const response = await fetch(`https://genius.com/api/songs/${songId}`);
                 if (response.ok) {
                     const data = await response.json();
@@ -5493,7 +5938,7 @@ async function fetchArtistImageFromApi(artistName, forceSearch = false) {
     if (artistName && artistName !== "Artiste Inconnu") {
         try {
             console.log("[GFT] ID not found. Searching API for:", artistName);
-            showFeedbackMessage(`Recherche image pour "${artistName}"...`, 0);
+            showFeedbackMessage(getTranslation('lc_searching_name') + ' "' + artistName + '"...', 0);
 
             // Tente de trouver l'URL de l'artiste dans le DOM pour affiner la recherche (ex: pour SCH)
             let expectedUrl = null;
@@ -5921,10 +6366,51 @@ function showFeedbackMessage(message, duration = 3000, container = null) {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "GET_MODE") {
         sendResponse({ lyricCardOnly: isLyricCardOnlyMode() });
-    } else if (request.action === "SET_MODE") {
+    }
+    else if (request.action === "GET_STATUS") {
+        // Renvoie l'état complet (Mode + Langue)
+        sendResponse({
+            lyricCardOnly: isLyricCardOnlyMode(),
+            language: localStorage.getItem('gftLanguage') || 'fr'
+        });
+    }
+    else if (request.action === "SET_MODE") {
         setLyricCardOnlyMode(request.lyricCardOnly);
         sendResponse({ success: true });
         // Recharge la page pour appliquer le changement
         window.location.reload();
     }
+    else if (request.action === "SET_LANGUAGE") {
+        localStorage.setItem('gftLanguage', request.language);
+        sendResponse({ success: true });
+        window.location.reload();
+    }
+    else if (request.action === "RESET_TUTORIAL") {
+        // Réinitialise les flags
+        localStorage.removeItem('gft-tutorial-completed');
+        // On pourrait aussi reset la langue si on veut un full onboarding
+        // localStorage.removeItem('gftLanguage'); 
+
+        // Lance le tutoriel
+        showTutorial();
+        sendResponse({ success: true });
+    }
 });
+
+// Initialisation globale
+(function init() {
+    // Vérifie si le tutoriel est terminé ou si la langue n'est pas définie
+    // Le tutoriel fait office d'onboarding désormais
+    const tutorialCompleted = localStorage.getItem('gft-tutorial-completed') === 'true';
+    const languageSet = localStorage.getItem('gftLanguage');
+
+    if (!tutorialCompleted || !languageSet) {
+        // Applique un petit délai pour s'assurer que le DOM est prêt
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', showTutorial);
+        } else {
+            // Petit délai supplémentaire pour être sûr que le CSS/styles sont chargés
+            setTimeout(showTutorial, 500);
+        }
+    }
+})();

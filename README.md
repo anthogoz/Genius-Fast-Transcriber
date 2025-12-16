@@ -1,6 +1,6 @@
 # 🎵 Genius Fast Transcriber
 
-![Version](https://img.shields.io/badge/version-2.6.2-blue.svg?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-2.7-blue.svg?style=for-the-badge)
 ![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-green.svg?style=for-the-badge&logo=google-chrome)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg?style=for-the-badge)
 
@@ -14,6 +14,7 @@ Transformez votre expérience d'édition avec une suite d'outils professionnels,
 🚀 **Gagnez du temps** : Insérez des structures entières et corrigez la typographie en un clic.
 🧠 **Restez concentré** : L'interface s'intègre parfaitement et anticipe vos besoins.
 🎨 **Résultats impeccables** : Vos paroles respectent automatiquement les standards de qualité Genius.
+🌍 **International** : Disponible en **Français** et **Anglais** !
 
 ---
 
@@ -37,8 +38,11 @@ Transformez votre expérience d'édition avec une suite d'outils professionnels,
 *   **Lyric Card Personnalisable** : Créez une image magnifique des paroles.
     *   **Nouveau v2.6** : Choisissez entre la **Pochette de l'Album** ou l'**Image de l'Artiste** pour le fond ! 🖼️
     *   Prévisualisation avant téléchargement.
-*   **Nombres en Lettres** : Sélectionnez "42", cliquez, ça devient "quarante-deux". Magique pour les nombres jusqu'à 999 milliards.
 *   **Mode Lecture Seule** : Masquez le panneau latéral pour ne garder que la fonctionnalité Lyric Card.
+
+### ❓ Tutoriel & Support (v2.6.5)
+*   **Tutoriel Interactif** : Un guide pas à pas lors de la première installation pour choisir votre langue et votre mode.
+*   **Relancer le Tutoriel** : Accédez au popup pour rejouer le tutoriel à tout moment.
 
 ### 📺 Contrôle YouTube
 *   **Pilotez la musique** sans quitter l'éditeur des yeux :

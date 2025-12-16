@@ -66,7 +66,7 @@
     .option p {
       margin: 0;
       font-size: 12px;
-      color: #ccc;
+      color: white;
       line-height: 1.4;
     }
 
@@ -76,6 +76,29 @@
       text-align: center;
       margin-top: 15px;
       font-style: italic;
+    }
+
+    .lang-btn {
+      flex: 1;
+      background: #333;
+      border: 2px solid transparent;
+      color: white;
+      padding: 8px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 13px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .lang-btn:hover {
+      background: #444;
+    }
+
+    .lang-btn.active {
+      border-color: #ffff64;
+      background: #3a3a3a;
+      box-shadow: 0 0 5px rgba(255, 255, 100, 0.1);
     }
   </style>
 </head>
@@ -93,6 +116,23 @@
     <h3>🎨 Lyric Card Only</h3>
     <p>Hide panel to keep only Lyric Card (text selection).</p>
   </div>
+
+  <div style="border-top: 1px solid #444; margin: 15px 0; padding-top: 15px;">
+    <div style="font-size: 11px; color: #ccc; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">
+      Language / Langue</div>
+    <div style="display: flex; gap: 8px;">
+      <button id="lang-fr" class="lang-btn">Français 🇫🇷</button>
+      <button id="lang-en" class="lang-btn">English 🇬🇧</button>
+    </div>
+  </div>
+
+  <div style="border-top: 1px solid #444; margin-top: 15px; padding-top: 15px; text-align: center;">
+    <button id="restart-tutorial"
+      style="background: transparent; border: 1px solid #555; color: #aaa; padding: 8px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; width: 100%;">
+      ❓ Restart Tutorial / Relancer le tutoriel
+    </button>
+  </div>
+
   <div class="status" id="status">Loading...</div>
   <script src="popup.js"></script>
 </body>
