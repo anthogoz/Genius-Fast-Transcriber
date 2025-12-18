@@ -1,6 +1,6 @@
-// content.js (Version 2.7 - Extension Complète)
+// content.js (Version 2.7.1 - Extension Complète)
 /**
- * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.7.
+ * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.7.1.
  * Ce script s'injecte dans les pages du site genius.com.
  * Il détecte la présence de l'éditeur de paroles et y ajoute un panneau d'outils
  * pour accélérer et fiabiliser la transcription (ajout de tags, correction de texte, etc.).
@@ -19,10 +19,10 @@
  * - Détection et surlignage des parenthèses/crochets non appariés
  * 
  * @author Lnkhey
- * @version 2.7
+ * @version 2.7.1
  */
 
-console.log('Genius Fast Transcriber (by Lnkhey) v2.7 - Toutes fonctionnalités activées ! 🎵');
+console.log('Genius Fast Transcriber (by Lnkhey) v2.7.1 - Toutes fonctionnalités activées ! 🎵');
 
 // ----- Injection des animations CSS essentielles -----
 // Injecte l'animation de surlignage pour s'assurer qu'elle fonctionne même si les styles CSS de Genius l'écrasent
@@ -112,7 +112,7 @@ const SELECTORS = {
 
 const TRANSLATIONS = {
     fr: {
-        panel_title: "Genius Fast Transcriber v2.7",
+        panel_title: "Genius Fast Transcriber",
         artist_selection: "Attribuer la section à :",
         no_artist: "Aucun artiste détecté.",
         shortcuts_title: "Raccourcis",
@@ -170,9 +170,9 @@ const TRANSLATIONS = {
         btn_verse_num_tooltip: "Insérer un tag [Couplet X] avec gestion du numéro",
         btn_chorus: "[Refrain]",
         btn_chorus_tooltip: "Insérer un tag [Refrain] avec les artistes (Ctrl+1, Ctrl+2)",
-        btn_pre_chorus: "[Pont]",
-        btn_pre_chorus_tooltip: "Insérer un tag [Pont] ou Pre-Chorus (Ctrl+3)",
-        btn_bridge: "[Pont: ...]",
+        btn_pre_chorus: "[Pré-refrain]",
+        btn_pre_chorus_tooltip: "Insérer un tag [Pré-refrain] (Ctrl+3)",
+        btn_bridge: "[Pont]",
         btn_bridge_tooltip: "Insérer un tag [Pont] avec les artistes (Ctrl+5)",
         btn_outro: "[Outro]",
         btn_outro_tooltip: "Insérer un tag [Outro] avec les artistes",
@@ -180,6 +180,12 @@ const TRANSLATIONS = {
         btn_instrumental_tooltip: "Insérer un tag [Instrumental]",
         btn_break: "[Pause]",
         btn_break_tooltip: "Insérer un tag [Pause]",
+        btn_post_chorus: "[Post-refrain]",
+        btn_post_chorus_tooltip: "Insérer un tag [Post-refrain]",
+        btn_unknown: "[?]",
+        btn_unknown_tooltip: "Insérer un tag [?]",
+        btn_zws: "ZWS",
+        btn_zws_tooltip: "Insérer un caractère invisible (Zero Width Space)",
         // Cleanup Tools
         cleanup_capitalize: "Maj. Début",
         cleanup_capitalize_tooltip: "Met une majuscule au début de chaque ligne",
@@ -256,47 +262,47 @@ const TRANSLATIONS = {
         lc_img_applied: "Image appliquée :",
     },
     en: {
-        panel_title: "Genius Fast Transcriber v2.7",
-        artist_selection: "Assign section to:", // Generic UI can stay English
-        no_artist: "No artist detected.",
-        shortcuts_title: "Shortcuts", // Title can be English
+        panel_title: "Genius Fast Transcriber",
+        artist_selection: "Attribuer la section à :", // Generic UI can stay English
+        no_artist: "Aucun artiste détecté.",
+        shortcuts_title: "Raccourcis", // Title can be English
         add_couplet: "Ajouter Couplet", // REVERT TO FRENCH
-        format_numbers: "Format Numbers", // Tool name can be English or French? Let's keep English for generic tool
+        format_numbers: "Formater les numéros", // Tool name can be English or French? Let's keep English for generic tool
         create_lyric_card: "Create Lyric Card",
-        preview: "Preview",
-        copy: "Copy",
-        undo: "Undo",
-        redo: "Redo",
-        feedback_copied: "Copied!",
-        feedback_restored: "Restored",
-        onboarding_title: "Welcome",
-        next_btn: "Next",
-        finish_btn: "Finish",
-        mode_full_title: "Full Mode",
-        mode_full_desc: "Transcription tools + Lyric Cards",
-        mode_lyric_title: "Lyric Card Only",
-        mode_lyric_desc: "Image creation only",
-        lang_select_title: "Language",
+        preview: "Aperçu",
+        copy: "Copier",
+        undo: "Annuler",
+        redo: "Refaire",
+        feedback_copied: "Copié !",
+        feedback_restored: "Restauré",
+        onboarding_title: "Bienvenue",
+        next_btn: "Suivant",
+        finish_btn: "Terminer",
+        mode_full_title: "Mode Complet",
+        mode_full_desc: "Outils de transcription + Lyric Cards",
+        mode_lyric_title: "Lyric Card Uniquement",
+        mode_lyric_desc: "Création d'image uniquement",
+        lang_select_title: "Langue",
         mode_select_title: "Mode",
-        full_mode_label: "Full (Transcription + Lyric Cards)",
-        lyric_only_label: "Lyric Card Only",
-        settings_saved: "Settings saved!",
-        open_panel: "Open Panel",
-        close_panel: "Close Panel",
-        onboarding_intro: "Configure your Genius Fast Transcriber experience.",
+        full_mode_label: "Complet (Transcription + Lyric Cards)",
+        lyric_only_label: "Lyric Card Uniquement",
+        settings_saved: "Préférences sauvegardées !",
+        open_panel: "Ouvrir le panneau",
+        close_panel: "Fermer le panneau",
+        onboarding_intro: "Configurez votre expérience Genius Fast Transcriber.",
         // Settings & Tooltips
-        settings_menu: "Settings Menu",
-        dark_mode_toggle_light: "☀️ Light Mode",
-        dark_mode_toggle_dark: "🌙 Dark Mode",
-        stats_show: "📊 Show Stats",
-        stats_hide: "📊 Hide Stats",
-        header_feat_show: "🎤 Show feat in header",
-        header_feat_hide: "🎤 Hide feat in header",
-        newline_enable: "↵ Enable newline after tags",
-        newline_disable: "↵ Disable newline after tags",
-        tutorial_link: "❓ Tutorial / Help",
-        undo_tooltip: "Undo last change (Ctrl+Z)",
-        redo_tooltip: "Redo last change (Ctrl+Y)",
+        settings_menu: "Menu Paramètres",
+        dark_mode_toggle_light: "☀️ Mode Clair",
+        dark_mode_toggle_dark: "🌙 Mode Sombre",
+        stats_show: "📊 Afficher Statistiques",
+        stats_hide: "📊 Masquer Statistiques",
+        header_feat_show: "🎤 Afficher feat dans l'en-tête",
+        header_feat_hide: "🎤 Masquer feat dans l'en-tête",
+        newline_enable: "↵ Activer saut de ligne après tags",
+        newline_disable: "↵ Désactiver saut de ligne après tags",
+        tutorial_link: "❓ Tutoriel / Aide",
+        undo_tooltip: "Annuler la dernière modification (Ctrl+Z)",
+        redo_tooltip: "Refaire la dernière modification annulée (Ctrl+Y)",
         panel_title_img_alt: "GFT Logo", // Generic
         // Sections - REVERT TO FRENCH for Transcription tools
         section_structure: "Structure & Artistes", // REVERT
@@ -314,9 +320,9 @@ const TRANSLATIONS = {
         btn_verse_num_tooltip: "Insérer un tag [Couplet X] avec gestion du numéro",
         btn_chorus: "[Refrain]",
         btn_chorus_tooltip: "Insérer un tag [Refrain] avec les artistes (Ctrl+1, Ctrl+2)",
-        btn_pre_chorus: "[Pont]",
-        btn_pre_chorus_tooltip: "Insérer un tag [Pont] ou Pre-Chorus (Ctrl+3)",
-        btn_bridge: "[Pont: ...]",
+        btn_pre_chorus: "[Pré-refrain]",
+        btn_pre_chorus_tooltip: "Insérer un tag [Pré-refrain] (Ctrl+3)",
+        btn_bridge: "[Pont]",
         btn_bridge_tooltip: "Insérer un tag [Pont] avec les artistes (Ctrl+5)",
         btn_outro: "[Outro]",
         btn_outro_tooltip: "Insérer un tag [Outro] avec les artistes",
@@ -324,6 +330,12 @@ const TRANSLATIONS = {
         btn_instrumental_tooltip: "Insérer un tag [Instrumental]",
         btn_break: "[Pause]",
         btn_break_tooltip: "Insérer un tag [Pause]",
+        btn_post_chorus: "[Post-refrain]",
+        btn_post_chorus_tooltip: "Insérer un tag [Post-refrain]",
+        btn_unknown: "[?]",
+        btn_unknown_tooltip: "Insérer un tag [?]",
+        btn_zws: "ZWS",
+        btn_zws_tooltip: "Insérer un caractère invisible (Zero Width Space)",
         // Cleanup Tools - REVERT TO FRENCH (Specific to French typography)
         cleanup_capitalize: "Maj. Début",
         cleanup_capitalize_tooltip: "Met une majuscule au début de chaque ligne",
@@ -348,26 +360,26 @@ const TRANSLATIONS = {
         btn_punctuation_short: "Ponctuation",
         btn_spacing_short: "Espacement",
         btn_fix_all_short: "✨ Tout Corriger",
-        // Tutorial Steps - STAY ENGLISH (To explain the tool)
-        tuto_step1_title: "1. Structure & Artists 🏗️",
-        tuto_step1_content: "• <strong>Artists:</strong> Check boxes at top to auto-assign sections.<br>• <strong>Verses:</strong> Use the central <strong>[Couplet 1]</strong> button. Arrows ← → change the number.<br>• <strong>Tags:</strong> Insert [Refrain], [Intro], [Pont] in one click.",
-        tuto_step2_title: "2. Smart Corrections ✨",
-        tuto_step2_content: "• <strong>Correct All:</strong> Cleans apostrophes, capitals, spaces.<br>• <strong>Verify ( ) [ ]:</strong> Scans for missing parentheses.",
-        tuto_step3_title: "3. Formatting Tools 🎨",
-        tuto_step3_content: "• <strong>Floating Bar:</strong> Select text to bold, italic, or create a <strong>Lyric Card</strong>.<br>• <strong>Number Format:</strong> Converts '42' to 'forty-two'.",
-        tuto_step4_title: "4. History & Safety 🛡️",
-        tuto_step4_content: "• <strong>Undo/Redo:</strong> Your last 10 actions are saved (Ctrl+Z).<br>• <strong>Auto Save:</strong> Drafts saved in case of crash.",
-        tuto_step5_title: "5. YouTube Control 📺",
-        tuto_step5_content: "• <kbd>Ctrl+Alt+Space</kbd>: Play / Pause<br>• <kbd>Ctrl+Alt+← / →</kbd>: Rewind / Forward (5s)",
-        tuto_step6_title: "6. Other Shortcuts ⌨️",
-        tuto_step6_content: "• <kbd>Ctrl+1-5</kbd>: Structure tags<br>• <kbd>Ctrl+Shift+C</kbd>: Correct All",
-        tuto_finish_title: "Let's go! 🚀",
-        tuto_finish_content: "You're ready! Explore settings ⚙️ to customize your experience.<br><br>💡 <strong>Note:</strong> You can switch modes/language at any time by clicking the extension icon.",
+        // Tutorial Steps
+        tuto_step1_title: "1. Structure & Artistes 🏗️",
+        tuto_step1_content: "• <strong>Artistes :</strong> Cochez les cases en haut pour attribuer automatiquement les sections sur les anciens editeurs.<br>• <strong>Couplets :</strong> Utilisez le nouveau bouton central <strong>[Couplet 1]</strong>. Les flèches ← → changent le numéro.<br>• <strong>Tags :</strong> Insérez Refrain, Intro, Pont en un clic.",
+        tuto_step2_title: "2. Corrections Intelligentes ✨",
+        tuto_step2_content: "• <strong>Tout Corriger :</strong> Nettoie apostrophes, majuscules, spaces.<br>• <strong>Vérifier ( ) [ ] :</strong> Scanne les parenthèses oubliées.",
+        tuto_step3_title: "3. Outils de Formatage 🎨",
+        tuto_step3_content: "• <strong>Barre Flottante :</strong> Sélectionnez du texte pour mettre en gras, italique ou créer une <strong>Lyric Card</strong>.<br>• <strong>Nombres en Lettres :</strong> Convertit '42' en 'quarante-deux'.",
+        tuto_step4_title: "4. Historique & Sécurité 🛡️",
+        tuto_step4_content: "• <strong>Annuler/Refaire :</strong> Vos 10 dernières actions sont sauvegardées (Ctrl+Z).<br>• <strong>Sauvegarde Auto :</strong> Brouillons mémorisés en cas de crash.",
+        tuto_step5_title: "5. Contrôle YouTube 📺",
+        tuto_step5_content: "• <kbd>Ctrl+Alt+Espace</kbd> : Lecture / Pause<br>• <kbd>Ctrl+Alt+← / →</kbd> : Reculer / Avancer (5s)",
+        tuto_step6_title: "6. Autres Raccourcis ⌨️",
+        tuto_step6_content: "• <kbd>Ctrl+1-5</kbd> : Tags de structure<br>• <kbd>Ctrl+Shift+C</kbd> : Tout Corriger",
+        tuto_finish_title: "C'est parti ! 🚀",
+        tuto_finish_content: "Vous êtes prêt ! Explorez les paramètres ⚙️ pour personnaliser votre expérience.<br><br>💡 <strong>Note :</strong> Vous pouvez changer de mode/langue à tout moment en cliquant sur l'icône de l'extension.",
         // Lyric Mode Specific Tutorial
         tuto_lyric_mode_title: "Lyric Card Mode Active 🎨",
         tuto_lyric_mode_content: "To create a Lyric Card:<br>1. <strong>Highlight</strong> the lyrics of your choice.<br>2. Click on the <strong>'Create Lyric Card'</strong> button that appears.<br><br>💡 <strong>Note:</strong> Change settings via the extension icon.",
         tuto_lyric_mode_btn: "Got it!",
-        // Lyric Card Modal - STAY ENGLISH
+        // Lyric Card Modal
         lc_modal_title: "Lyric Card Preview",
         lc_album_default: "💿 Album Cover (Default)",
         lc_manual_search: "🔍 Search artist...",
@@ -4996,8 +5008,8 @@ function initLyricsEditorEnhancer() {
 
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v2.6.5'; // Bump version visuelle pour le user
-                versionLabel.title = 'Genius Fast Transcriber v2.6.5 - Nouvelle Interface Premium';
+                versionLabel.textContent = 'v2.7.1'; // Bump version visuelle pour le user
+                versionLabel.title = 'Genius Fast Transcriber v2.7.1 - Nouvelle Interface Premium';
 
                 footerContainer.appendChild(creditLabel);
                 footerContainer.appendChild(versionLabel);
@@ -5437,7 +5449,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
 
     // Indicateur de version
     const versionSpan = document.createElement('span');
-    versionSpan.textContent = 'v2.7';
+    versionSpan.textContent = 'v2.7.1';
     versionSpan.style.fontSize = '11px';
     versionSpan.style.color = isDarkMode ? '#888' : '#aaa';
     versionSpan.style.fontWeight = 'normal';
