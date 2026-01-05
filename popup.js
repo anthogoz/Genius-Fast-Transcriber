@@ -17,13 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Language
+        const disclaimer = document.getElementById('english-disclaimer');
         if (state.language === 'en') {
             langEnOption.classList.add('active');
             langFrOption.classList.remove('active');
+            if (disclaimer) disclaimer.style.display = 'block';
         } else {
             // Default FR
             langFrOption.classList.add('active');
             langEnOption.classList.remove('active');
+            if (disclaimer) disclaimer.style.display = 'none';
         }
     }
 

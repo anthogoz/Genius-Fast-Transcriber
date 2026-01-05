@@ -1,6 +1,6 @@
-// content.js (Version 2.7.1 - Extension Complète)
+// content.js (Version 2.7.5 - Extension Complète)
 /**
- * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.7.1.
+ * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.7.5.
  * Ce script s'injecte dans les pages du site genius.com.
  * Il détecte la présence de l'éditeur de paroles et y ajoute un panneau d'outils
  * pour accélérer et fiabiliser la transcription (ajout de tags, correction de texte, etc.).
@@ -17,12 +17,13 @@
  * - Mode sombre avec préférence sauvegardée
  * - Corrections automatiques avec barre de progression et surlignage visuel
  * - Détection et surlignage des parenthèses/crochets non appariés
+ * - Création de Lyric Cards avec formatage et partage
  * 
  * @author Lnkhey
- * @version 2.7.1
+ * @version 2.7.5
  */
 
-console.log('Genius Fast Transcriber (by Lnkhey) v2.7.1 - Toutes fonctionnalités activées ! 🎵');
+console.log('Genius Fast Transcriber (by Lnkhey) v2.7.5 - Toutes fonctionnalités activées ! 🎵');
 
 // ----- Injection des animations CSS essentielles -----
 // Injecte l'animation de surlignage pour s'assurer qu'elle fonctionne même si les styles CSS de Genius l'écrasent
@@ -132,6 +133,10 @@ const TRANSLATIONS = {
         mode_full_desc: "Outils de transcription + Lyric Cards",
         mode_lyric_title: "Lyric Card Uniquement",
         mode_lyric_desc: "Création d'image uniquement",
+        recommended_label: "Recommandé",
+        theme_select_title: "Choisissez votre thème 🌗",
+        theme_light_btn: "Mode Clair ☀️",
+        theme_dark_btn: "Mode Sombre 🌙",
         lang_select_title: "Langue",
         mode_select_title: "Mode",
         full_mode_label: "Complet (Transcription + Lyric Cards)",
@@ -249,7 +254,7 @@ const TRANSLATIONS = {
         lc_select_text_error: "Veuillez sélectionner du texte pour créer une Lyric Card.",
         // Lyric Card Feedback
         lc_error_search: "Erreur lors de la recherche",
-        lc_img_copied_tweet: "Image copiée ! Collez-la (Ctrl+V) dans le tweet.",
+        lc_img_copied_tweet: "Image copiée ! Faites Ctrl+V dans la fenêtre X qui vient de s'ouvrir.",
         lc_error_copy: "Impossible de copier l'image.",
         lc_error_img_not_found: "Image introuvable pour",
         lc_img_loaded: "Image chargée !",
@@ -260,6 +265,21 @@ const TRANSLATIONS = {
         lc_fetching_id: "Récupération image artiste (via ID)...",
         lc_searching_name: "Recherche image pour",
         lc_img_applied: "Image appliquée :",
+        // Toolbar
+        toolbar_bold: "Gras",
+        toolbar_italic: "Italique",
+        toolbar_num_to_words: "Nombre → Lettres",
+        toolbar_bold_tooltip: "Mettre le texte sélectionné en gras",
+        toolbar_italic_tooltip: "Mettre le texte sélectionné en italique",
+        toolbar_lyric_card_tooltip: "Générer une Lyric Card (1280x720)",
+        toolbar_num_to_words_tooltip: "Convertir le nombre sélectionné en lettres",
+        // Tutorial Buttons
+        tuto_prev: "Précédent",
+        tuto_next: "Suivant",
+        tuto_skip: "Passer",
+        tuto_finish: "Terminer",
+        tuto_step_counter: "Étape",
+        tuto_of: "sur",
     },
     en: {
         panel_title: "Genius Fast Transcriber",
@@ -275,21 +295,25 @@ const TRANSLATIONS = {
         redo: "Refaire",
         feedback_copied: "Copié !",
         feedback_restored: "Restauré",
-        onboarding_title: "Bienvenue",
+        onboarding_title: "Welcome",
         next_btn: "Suivant",
         finish_btn: "Terminer",
-        mode_full_title: "Mode Complet",
-        mode_full_desc: "Outils de transcription + Lyric Cards",
-        mode_lyric_title: "Lyric Card Uniquement",
-        mode_lyric_desc: "Création d'image uniquement",
-        lang_select_title: "Langue",
+        mode_full_title: "Full Mode",
+        mode_full_desc: "Transcription Tools + Lyric Cards<br><span style='color: #D32F2F; font-weight: bold; font-size: 0.9em; display: block; margin-top: 2px;'>⚠️ Transcription tools currently available in French only</span>",
+        mode_lyric_title: "Lyric Card Only",
+        mode_lyric_desc: "Image Creation Only",
+        recommended_label: "Recommended",
+        theme_select_title: "Choose your theme 🌗",
+        theme_light_btn: "Light Mode ☀️",
+        theme_dark_btn: "Dark Mode 🌙",
+        lang_select_title: "Language",
         mode_select_title: "Mode",
-        full_mode_label: "Complet (Transcription + Lyric Cards)",
-        lyric_only_label: "Lyric Card Uniquement",
+        full_mode_label: "Full (Transcription + Lyric Cards)",
+        lyric_only_label: "Lyric Card Only",
         settings_saved: "Préférences sauvegardées !",
         open_panel: "Ouvrir le panneau",
         close_panel: "Fermer le panneau",
-        onboarding_intro: "Configurez votre expérience Genius Fast Transcriber.",
+        onboarding_intro: "Configure your Genius Fast Transcriber experience.",
         // Settings & Tooltips
         settings_menu: "Menu Paramètres",
         dark_mode_toggle_light: "☀️ Mode Clair",
@@ -361,20 +385,20 @@ const TRANSLATIONS = {
         btn_spacing_short: "Espacement",
         btn_fix_all_short: "✨ Tout Corriger",
         // Tutorial Steps
-        tuto_step1_title: "1. Structure & Artistes 🏗️",
-        tuto_step1_content: "• <strong>Artistes :</strong> Cochez les cases en haut pour attribuer automatiquement les sections sur les anciens editeurs.<br>• <strong>Couplets :</strong> Utilisez le nouveau bouton central <strong>[Couplet 1]</strong>. Les flèches ← → changent le numéro.<br>• <strong>Tags :</strong> Insérez Refrain, Intro, Pont en un clic.",
-        tuto_step2_title: "2. Corrections Intelligentes ✨",
-        tuto_step2_content: "• <strong>Tout Corriger :</strong> Nettoie apostrophes, majuscules, spaces.<br>• <strong>Vérifier ( ) [ ] :</strong> Scanne les parenthèses oubliées.",
-        tuto_step3_title: "3. Outils de Formatage 🎨",
-        tuto_step3_content: "• <strong>Barre Flottante :</strong> Sélectionnez du texte pour mettre en gras, italique ou créer une <strong>Lyric Card</strong>.<br>• <strong>Nombres en Lettres :</strong> Convertit '42' en 'quarante-deux'.",
-        tuto_step4_title: "4. Historique & Sécurité 🛡️",
-        tuto_step4_content: "• <strong>Annuler/Refaire :</strong> Vos 10 dernières actions sont sauvegardées (Ctrl+Z).<br>• <strong>Sauvegarde Auto :</strong> Brouillons mémorisés en cas de crash.",
-        tuto_step5_title: "5. Contrôle YouTube 📺",
-        tuto_step5_content: "• <kbd>Ctrl+Alt+Espace</kbd> : Lecture / Pause<br>• <kbd>Ctrl+Alt+← / →</kbd> : Reculer / Avancer (5s)",
-        tuto_step6_title: "6. Autres Raccourcis ⌨️",
-        tuto_step6_content: "• <kbd>Ctrl+1-5</kbd> : Tags de structure<br>• <kbd>Ctrl+Shift+C</kbd> : Tout Corriger",
-        tuto_finish_title: "C'est parti ! 🚀",
-        tuto_finish_content: "Vous êtes prêt ! Explorez les paramètres ⚙️ pour personnaliser votre expérience.<br><br>💡 <strong>Note :</strong> Vous pouvez changer de mode/langue à tout moment en cliquant sur l'icône de l'extension.",
+        tuto_step1_title: "1. Structure & Artists 🏗️",
+        tuto_step1_content: "• <strong>Artists:</strong> use checkboxes on top to assign sections.<br>• <strong>Verses:</strong> Use the central <strong>[Couplet 1]</strong> button. Arrows ← → change the number.<br>• <strong>Tags:</strong> Insert Chorus, Intro, Bridge with one click.",
+        tuto_step2_title: "2. Smart Corrections ✨",
+        tuto_step2_content: "• <strong>Fix All:</strong> Cleans quotes, caps, spacing.<br>• <strong>Check ( ) [ ]:</strong> Scans for missing brackets.",
+        tuto_step3_title: "3. Formatting Tools 🎨",
+        tuto_step3_content: "• <strong>Floating Toolbar:</strong> Select text to Bold, Italic or create a <strong>Lyric Card</strong>.<br>• <strong>Number to Words:</strong> Converts '42' to 'forty-two'.",
+        tuto_step4_title: "4. History & Safety 🛡️",
+        tuto_step4_content: "• <strong>Undo/Redo:</strong> Your last 10 actions are saved (Ctrl+Z).<br>• <strong>Auto Save:</strong> Drafts saved in case of crash.",
+        tuto_step5_title: "5. YouTube Control 📺",
+        tuto_step5_content: "• <kbd>Ctrl+Alt+Space</kbd>: Play / Pause<br>• <kbd>Ctrl+Alt+← / →</kbd>: Rewind / Forward (5s)",
+        tuto_step6_title: "6. Other Shortcuts ⌨️",
+        tuto_step6_content: "• <kbd>Ctrl+1-5</kbd>: Structure tags<br>• <kbd>Ctrl+Shift+C</kbd>: Fix All",
+        tuto_finish_title: "Let's go! 🚀",
+        tuto_finish_content: "You are ready! Explore settings ⚙️ to customize your experience.<br><br>💡 <strong>Note:</strong> You can change mode/language anytime via the extension icon.",
         // Lyric Mode Specific Tutorial
         tuto_lyric_mode_title: "Lyric Card Mode Active 🎨",
         tuto_lyric_mode_content: "To create a Lyric Card:<br>1. <strong>Highlight</strong> the lyrics of your choice.<br>2. Click on the <strong>'Create Lyric Card'</strong> button that appears.<br><br>💡 <strong>Note:</strong> Change settings via the extension icon.",
@@ -399,7 +423,7 @@ const TRANSLATIONS = {
         lc_select_text_error: "Please select text to create a Lyric Card.",
         // Lyric Card Feedback
         lc_error_search: "Error during search",
-        lc_img_copied_tweet: "Image copied! Paste it (Ctrl+V) in the tweet.",
+        lc_img_copied_tweet: "Image copied! Press Ctrl+V in the X window to paste it.",
         lc_error_copy: "Unable to copy image.",
         lc_error_img_not_found: "Image not found for",
         lc_img_loaded: "Image loaded!",
@@ -410,6 +434,36 @@ const TRANSLATIONS = {
         lc_fetching_id: "Fetching artist image (via ID)...",
         lc_searching_name: "Searching image for",
         lc_img_applied: "Image applied:",
+        // Toolbar
+        toolbar_bold: "Bold",
+        toolbar_italic: "Italic",
+        toolbar_num_to_words: "Number → Words",
+        toolbar_bold_tooltip: "Make selected text bold",
+        toolbar_italic_tooltip: "Make selected text italic",
+        toolbar_lyric_card_tooltip: "Generate a Lyric Card (1280x720)",
+        toolbar_num_to_words_tooltip: "Convert selected number to words (French logic)",
+        // Tutorial Steps (Translated)
+        tuto_step1_title: "1. Structure & Artists 🏗️",
+        tuto_step1_content: "• <strong>Artists:</strong> Check boxes at top to assign sections automatically on old editors.<br>• <strong>Verses:</strong> Use the central <strong>[Verse 1]</strong> button. Arrows ← → change the number.<br>• <strong>Tags:</strong> Insert Chorus, Intro, Bridge in one click.",
+        tuto_step2_title: "2. Smart Corrections ✨",
+        tuto_step2_content: "• <strong>Fix All:</strong> Cleans apostrophes, capitalization, spaces.<br>• <strong>Verification ( ) [ ]:</strong> Scans for missing brackets.",
+        tuto_step3_title: "3. Formatting Tools 🎨",
+        tuto_step3_content: "• <strong>Floating Bar:</strong> Select text to bold, italic, or create a <strong>Lyric Card</strong>.<br>• <strong>Numbers to Words:</strong> Converts '42' to 'forty-two' (French).",
+        tuto_step4_title: "4. History & Safety 🛡️",
+        tuto_step4_content: "• <strong>Undo/Redo:</strong> Your last 10 actions are saved (Ctrl+Z).<br>• <strong>Auto Save:</strong> Drafts saved locally.",
+        tuto_step5_title: "5. YouTube Control 📺",
+        tuto_step5_content: "• <kbd>Ctrl+Alt+Space</kbd> : Play / Pause<br>• <kbd>Ctrl+Alt+← / →</kbd> : Rewind / Forward (5s)",
+        tuto_step6_title: "6. Other Shortcuts ⌨️",
+        tuto_step6_content: "• <kbd>Ctrl+1-5</kbd> : Structure tags<br>• <kbd>Ctrl+Shift+C</kbd> : Fix All",
+        tuto_finish_title: "Let's Go! 🚀",
+        tuto_finish_content: "You're ready! Explore settings ⚙️ to customize your experience.<br><br>💡 <strong>Note:</strong> You can change mode/language anytime by clicking the extension icon.",
+        // Tutorial Buttons
+        tuto_prev: "Previous",
+        tuto_next: "Next",
+        tuto_skip: "Skip",
+        tuto_finish: "Finish",
+        tuto_step_counter: "Step",
+        tuto_of: "of",
     }
 };
 
@@ -1387,62 +1441,70 @@ function createFloatingFormattingToolbar() {
     toolbar.className = 'gft-floating-toolbar';
 
     // Bouton Gras
-    const boldButton = document.createElement('button');
-    boldButton.textContent = 'Gras';
-    boldButton.classList.add('gft-floating-format-button');
-    boldButton.title = 'Mettre en gras';
-    boldButton.type = 'button';
-    boldButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        applyFormattingToSelection('bold');
-    });
-    addTooltip(boldButton, 'Mettre le texte sélectionné en gras');
+    if (!isLyricCardOnlyMode()) {
+        const boldButton = document.createElement('button');
+        boldButton.textContent = getTranslation('toolbar_bold');
+        boldButton.classList.add('gft-floating-format-button');
+        boldButton.title = getTranslation('toolbar_bold_tooltip');
+        boldButton.type = 'button';
+        boldButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            applyFormattingToSelection('bold');
+        });
+        addTooltip(boldButton, getTranslation('toolbar_bold_tooltip'));
+        toolbar.appendChild(boldButton);
+    }
 
     // Bouton Italique
-    const italicButton = document.createElement('button');
-    italicButton.textContent = 'Italique';
-    italicButton.classList.add('gft-floating-format-button');
-    italicButton.title = 'Mettre en italique';
-    italicButton.type = 'button';
-    italicButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        applyFormattingToSelection('italic');
-    });
-    addTooltip(italicButton, 'Mettre le texte sélectionné en italique');
+    if (!isLyricCardOnlyMode()) {
+        const italicButton = document.createElement('button');
+        italicButton.textContent = getTranslation('toolbar_italic');
+        italicButton.classList.add('gft-floating-format-button');
+        italicButton.title = getTranslation('toolbar_italic_tooltip');
+        italicButton.type = 'button';
+        italicButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            applyFormattingToSelection('italic');
+        });
+        addTooltip(italicButton, getTranslation('toolbar_italic_tooltip'));
+        toolbar.appendChild(italicButton);
+    }
 
     // Bouton Créer Lyrics Card
     const lyricsCardButton = document.createElement('button');
-    lyricsCardButton.textContent = 'Lyric Card';
-    lyricsCardButton.classList.add('gft-floating-format-button');
-    lyricsCardButton.title = 'Générer une image avec les paroles sélectionnées';
+    lyricsCardButton.textContent = getTranslation('create_lyric_card');
+    lyricsCardButton.classList.add('gft-floating-format-button', 'gft-lyric-card-btn');
+    lyricsCardButton.title = getTranslation('toolbar_lyric_card_tooltip');
     lyricsCardButton.type = 'button';
     lyricsCardButton.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
         generateLyricsCard();
     });
-    addTooltip(lyricsCardButton, 'Générer une Lyric Card (1280x720)');
+    addTooltip(lyricsCardButton, getTranslation('toolbar_lyric_card_tooltip'));
 
-    // Bouton Nombre → Lettres
-    const numberButton = document.createElement('button');
-    numberButton.textContent = 'Nombre → Lettres';
-    numberButton.classList.add('gft-floating-format-button', 'gft-number-button');
-    numberButton.title = 'Convertir le nombre en lettres';
-    numberButton.type = 'button';
-    numberButton.style.display = 'none'; // Caché par défaut
-    numberButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        convertNumberToWords();
-    });
-    addTooltip(numberButton, 'Convertir le nombre sélectionné en lettres');
-
-    toolbar.appendChild(boldButton);
-    toolbar.appendChild(italicButton);
     toolbar.appendChild(lyricsCardButton);
-    toolbar.appendChild(numberButton);
+
+    // Bouton Nombre → Lettres (Seulement en mode full)
+    if (!isLyricCardOnlyMode()) {
+        const numberButton = document.createElement('button');
+        numberButton.textContent = getTranslation('toolbar_num_to_words');
+        numberButton.classList.add('gft-floating-format-button', 'gft-number-button');
+        numberButton.title = getTranslation('toolbar_num_to_words_tooltip');
+        numberButton.type = 'button';
+        numberButton.style.display = 'none'; // Caché par défaut
+        numberButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            convertNumberToWords();
+        });
+        addTooltip(numberButton, getTranslation('toolbar_num_to_words_tooltip'));
+        toolbar.appendChild(numberButton);
+    }
+
+
     document.body.appendChild(toolbar);
 
     floatingFormattingToolbar = toolbar;
@@ -2534,34 +2596,83 @@ let tutorialModal = null;
 function getTutorialSteps() {
     return [
         {
-            title: "Language Selection / Choix de la langue 🌍",
-            content: `
-                <p style="text-align:center; font-size:16px;">Please select your preferred language.<br>Veuillez choisir votre langue préférée.</p>
-                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 25px;">
-                    <button id="gft-lang-fr-btn" class="gft-tutorial-button" style="background:#333; color:white; border:2px solid #555; padding:15px 25px; cursor:pointer; border-radius:8px; font-size:16px; transition:0.2s;">
+            title: "", // Hiding default title to use custom stylish header
+            content: (() => {
+                // Default to Light Mode stylings for initial launch if not set, or check system preference?
+                // Actually, initial launch is likely Light Mode default unless we detect OS preference.
+                // Let's check storage, default to false.
+                const isDark = localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true';
+                const btnBg = isDark ? '#333' : '#f9f9f9';
+                const btnColor = isDark ? 'white' : '#333';
+                const btnBorder = isDark ? '#555' : '#ccc';
+
+                return `
+                <div style="display: flex; flex-direction: column; align-items: center; gap: 15px; margin-bottom: 25px;">
+                    <img src="${chrome.runtime.getURL('images/icon128.png')}" style="width: 80px; height: 80px;">
+                    <div style="background: ${btnBg}; border: 1px solid ${btnBorder}; border-radius: 16px; padding: 15px 20px; display: inline-block; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center;">
+                        <h2 style="font-size: 22px; font-weight: 900; margin: 0; background: linear-gradient(135deg, #FFD700, #FFA500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; line-height: 1.2;">Genius Fast Transcriber</h2>
+                        <h3 style="font-size: 14px; margin: 5px 0 0 0; opacity: 0.9; font-weight: 600; color: ${btnColor}; text-transform: uppercase; letter-spacing: 1px;">+ Lyric Card Maker</h3>
+                    </div>
+                </div>
+                
+                <p style="text-align:center; font-size:15px; margin-bottom: 25px; color: ${btnColor};">
+                    <strong>Welcome! / Bienvenue !</strong><br>
+                    <span style="opacity: 0.7; font-size: 13px;">Please select your language to start.<br>Veuillez choisir votre langue pour commencer.</span>
+                </p>
+
+                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                    <button id="gft-lang-fr-btn" class="gft-tutorial-button" style="background:${btnBg}; color:${btnColor}; border:2px solid ${btnBorder}; padding:12px 20px; cursor:pointer; border-radius:8px; font-size:15px; transition:0.2s; min-width: 120px;">
                         Français 🇫🇷
                     </button>
-                    <button id="gft-lang-en-btn" class="gft-tutorial-button" style="background:#333; color:white; border:2px solid #555; padding:15px 25px; cursor:pointer; border-radius:8px; font-size:16px; transition:0.2s;">
+                    <button id="gft-lang-en-btn" class="gft-tutorial-button" style="background:${btnBg}; color:${btnColor}; border:2px solid ${btnBorder}; padding:12px 20px; cursor:pointer; border-radius:8px; font-size:15px; transition:0.2s; min-width: 120px;">
                         English 🇬🇧
+                    </button>
+                </div>
+            `;
+            })()
+        },
+        {
+            title: getTranslation('theme_select_title'),
+            content: `
+                <div style="display: flex; gap: 10px; flex-direction: column; margin-top: 20px;">
+                    <button id="gft-theme-light-btn" class="gft-tutorial-button" style="background:#f0f0f0; color:#333; border:2px solid #ccc; padding:15px; cursor:pointer; border-radius:8px; font-size:16px; font-weight:bold; transition:0.2s; display:flex; justify-content:space-between; align-items:center;">
+                        ${getTranslation('theme_light_btn')}
+                    </button>
+                    <button id="gft-theme-dark-btn" class="gft-tutorial-button" style="background:#222; color:white; border:2px solid #444; padding:15px; cursor:pointer; border-radius:8px; font-size:16px; font-weight:bold; transition:0.2s; display:flex; justify-content:space-between; align-items:center;">
+                        ${getTranslation('theme_dark_btn')}
                     </button>
                 </div>
             `
         },
         {
             title: `${getTranslation('onboarding_title')}! Choose your mode ⚙️`,
-            content: `
+            content: (() => {
+                const isDark = localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true';
+                const btnBg = isDark ? '#333' : '#f9f9f9';
+                const btnColor = isDark ? 'white' : '#333';
+                const btnBorder = isDark ? '#555' : '#ccc';
+
+                return `
                 <p>${getTranslation('onboarding_intro')}</p>
                 <div style="display: flex; gap: 10px; flex-direction: column; margin-top: 15px;">
-                    <button id="gft-mode-full-btn" class="gft-tutorial-button" style="background:#f9ff55; color:black; border:none; padding:15px; text-align:left; cursor:pointer; border-radius:8px;">
-                        <div style="font-weight:bold; font-size:14px;">⚡ ${getTranslation('mode_full_title')}</div>
-                        <div style="font-size:11px; opacity:0.8; margin-top:4px;">${getTranslation('mode_full_desc')}</div>
+                    <button id="gft-mode-full-btn" class="gft-tutorial-button" style="background:${btnBg}; color:${btnColor}; border:2px solid ${btnBorder}; padding:15px 15px 15px 15px; text-align:left; cursor:pointer; border-radius:8px; position:relative; overflow:hidden;">
+                        <span style="position:absolute; top:0; right:0; background:#f9ff55; color:black; font-size:10px; padding:2px 8px; font-weight:bold; border-bottom-left-radius:8px;">${getTranslation('recommended_label')}</span>
+                        <div style="display:flex; justify-content:space-between; align-items:center; width:100%; margin-top: 8px;">
+                            <div style="font-weight:bold; font-size:14px;">${getTranslation('mode_full_title')}</div>
+                            <div style="font-size:18px; line-height: 1;">⚡</div>
+                        </div>
+                        <div style="font-size:11px; opacity:0.8; margin-top:6px; padding-right:5px;">${getTranslation('mode_full_desc')}</div>
                     </button>
-                    <button id="gft-mode-simple-btn" class="gft-tutorial-button" style="background:rgba(255,255,255,0.1); border:1px solid #555; padding:15px; text-align:left; cursor:pointer; border-radius:8px;">
-                        <div style="font-weight:bold; font-size:14px;">🎨 ${getTranslation('mode_lyric_title')}</div>
+                    <button id="gft-mode-simple-btn" class="gft-tutorial-button" style="background:${btnBg}; color:${btnColor}; border:2px solid ${btnBorder}; padding:15px; text-align:left; cursor:pointer; border-radius:8px;">
+                         <div style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+                            <div style="font-weight:bold; font-size:14px;">${getTranslation('mode_lyric_title')}</div>
+                            <div style="font-size:18px; line-height: 1;">🎨</div>
+                        </div>
                         <div style="font-size:11px; opacity:0.8; margin-top:4px;">${getTranslation('mode_lyric_desc')}</div>
                     </button>
                 </div>
-            `
+            `;
+            })()
         },
         {
             title: getTranslation('tuto_step1_title'),
@@ -2652,26 +2763,26 @@ function renderTutorialStep() {
     // Indicateur de progression
     const progress = document.createElement('div');
     progress.className = 'gft-tutorial-progress';
-    progress.textContent = `Étape ${currentTutorialStep + 1} sur ${steps.length}`;
+    progress.textContent = `${getTranslation('tuto_step_counter')} ${currentTutorialStep + 1} ${getTranslation('tuto_of')} ${steps.length}`;
     tutorialModal.appendChild(progress);
 
     // Boutons
     const buttonsDiv = document.createElement('div');
     buttonsDiv.className = 'gft-tutorial-buttons';
 
-    // Bouton "Passer" (Sauf étape 0 et 1 qui sont obligatoires pour config)
-    if (currentTutorialStep > 1) {
+    // Bouton "Passer" (Sauf étape 0, 1 et 2 qui sont obligatoires pour config)
+    if (currentTutorialStep > 2) {
         const skipButton = document.createElement('button');
-        skipButton.textContent = 'Passer le tutoriel';
+        skipButton.textContent = getTranslation('tuto_skip');
         skipButton.className = 'gft-tutorial-button gft-tutorial-button-skip';
         skipButton.addEventListener('click', closeTutorial);
         buttonsDiv.appendChild(skipButton);
     }
 
-    // Bouton "Précédent" (sauf étapes critiques 0 et 1)
-    if (currentTutorialStep > 1) {
+    // Bouton "Précédent" (sauf étapes critiques 0, 1 et 2)
+    if (currentTutorialStep > 2) {
         const prevButton = document.createElement('button');
-        prevButton.textContent = '← Précédent';
+        prevButton.textContent = `← ${getTranslation('tuto_prev')}`;
         prevButton.className = 'gft-tutorial-button gft-tutorial-button-prev';
         prevButton.addEventListener('click', () => {
             currentTutorialStep--;
@@ -2681,19 +2792,19 @@ function renderTutorialStep() {
     }
 
     // Bouton "Suivant" ou "Terminer"
-    // On cache le bouton "Suivant" pour les étapes interactives (0 et 1)
-    if (currentTutorialStep > 1) {
+    // On cache le bouton "Suivant" pour les étapes interactives (0, 1 et 2)
+    if (currentTutorialStep > 2) {
         const nextButton = document.createElement('button');
         nextButton.className = 'gft-tutorial-button gft-tutorial-button-next';
 
         if (currentTutorialStep < steps.length - 1) {
-            nextButton.textContent = 'Suivant →';
+            nextButton.textContent = `${getTranslation('tuto_next')} →`;
             nextButton.addEventListener('click', () => {
                 currentTutorialStep++;
                 renderTutorialStep();
             });
         } else {
-            nextButton.textContent = 'Terminer ✓';
+            nextButton.textContent = `${getTranslation('tuto_finish')} ✓`;
             nextButton.addEventListener('click', closeTutorial);
         }
         buttonsDiv.appendChild(nextButton);
@@ -2722,8 +2833,38 @@ function renderTutorialStep() {
         buttonsDiv.style.display = 'none';
     }
 
-    // ÉTAPE 1 : CHOIX DU MODE
+    // ÉTAPE 1 : CHOIX DU THÈME (NOUVEAU)
     else if (currentTutorialStep === 1) {
+        const lightBtn = document.getElementById('gft-theme-light-btn');
+        const darkBtn = document.getElementById('gft-theme-dark-btn');
+
+        const toggleTheme = (isDark) => {
+            if (isDark) {
+                document.body.classList.add(DARK_MODE_CLASS);
+                localStorage.setItem(DARK_MODE_STORAGE_KEY, 'true');
+            } else {
+                document.body.classList.remove(DARK_MODE_CLASS);
+                localStorage.setItem(DARK_MODE_STORAGE_KEY, 'false');
+            }
+            // Mettre à jour les variables globales si nécessaire ou les éléments UI
+            // Reset tutorial modal classes to reflect change instantly
+            const modal = document.getElementById('gft-tutorial-modal');
+            if (modal) {
+                if (isDark) modal.classList.add(DARK_MODE_CLASS);
+                else modal.classList.remove(DARK_MODE_CLASS);
+            }
+            currentTutorialStep++;
+            renderTutorialStep();
+        };
+
+        if (lightBtn) lightBtn.onclick = () => toggleTheme(false);
+        if (darkBtn) darkBtn.onclick = () => toggleTheme(true);
+
+        buttonsDiv.style.display = 'none';
+    }
+
+    // ÉTAPE 2 : CHOIX DU MODE (DÉCALÉ)
+    else if (currentTutorialStep === 2) {
         const fullBtn = document.getElementById('gft-mode-full-btn');
         const simpleBtn = document.getElementById('gft-mode-simple-btn');
 
@@ -3433,7 +3574,7 @@ function showFloatingToolbar() {
         // Cache les boutons de formatage (Gras, Italique, Nombre)
         // Affiche seulement le bouton Lyrics Card
         Array.from(floatingFormattingToolbar.children).forEach(child => {
-            if (child.textContent === 'Lyric Card') {
+            if (child.classList.contains('gft-lyric-card-btn')) {
                 child.style.display = '';
             } else {
                 child.style.display = 'none';
@@ -3538,7 +3679,21 @@ function handleSelectionChange() {
         }
 
         if (hasSelection) {
-            setTimeout(showFloatingToolbar, 50);
+            // Check if toolbar has visible buttons
+            if (floatingFormattingToolbar) {
+                // If Lyric Card Only mode, ensure we have valid content to show
+                if (isLyricCardOnlyMode()) {
+                    // In lyric card only, we might want to check if the selection is valid text
+                    // But the loop above already checks valid containers.
+                    // Just show it.
+                    setTimeout(showFloatingToolbar, 50);
+                } else {
+                    setTimeout(showFloatingToolbar, 50);
+                }
+            } else {
+                createFloatingFormattingToolbar();
+                setTimeout(showFloatingToolbar, 50);
+            }
         } else {
             hideFloatingToolbar();
         }
@@ -5008,8 +5163,8 @@ function initLyricsEditorEnhancer() {
 
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v2.7.1'; // Bump version visuelle pour le user
-                versionLabel.title = 'Genius Fast Transcriber v2.7.1 - Nouvelle Interface Premium';
+                versionLabel.textContent = 'v2.7.5'; // Bump version visuelle pour le user
+                versionLabel.title = 'Genius Fast Transcriber v2.7.5 - Nouvelle Interface Premium';
 
                 footerContainer.appendChild(creditLabel);
                 footerContainer.appendChild(versionLabel);
@@ -5695,9 +5850,13 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
                     // Use specific artist name from selection if available or general one
                     const tweetText = `${songTitle} by ${artistName}\n\n${window.location.href}\n\n#Genius #Lyrics`;
                     const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
-                    window.open(intentUrl, '_blank');
+                    const width = 600;
+                    const height = 450;
+                    const left = (window.innerWidth / 2) - (width / 2) + window.screenX;
+                    const top = (window.innerHeight / 2) - (height / 2) + window.screenY;
+                    window.open(intentUrl, 'share-x', `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`);
 
-                    showFeedbackMessage(getTranslation('lc_img_copied_tweet'), 5000);
+                    showFeedbackMessage(getTranslation('lc_img_copied_tweet'), 6000);
 
                     setTimeout(() => shareXBtn.textContent = getTranslation('lc_share_btn'), 3000);
                 } catch (innerErr) {
