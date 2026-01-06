@@ -1,423 +1,424 @@
-# 🤝 Guide de Contribution
+# 🤝 Contribution Guide
 
-Merci de votre intérêt pour contribuer à **Genius Fast Transcriber** ! Ce document vous guidera à travers le processus de contribution.
+Thank you for your interest in contributing to **Genius Fast Transcriber**! This document will guide you through the contribution process.
 
-## 📋 Table des Matières
+## 📋 Table of Contents
 
-1. [Tester l'Extension](#tester-lextension)
-2. [Code de Conduite](#code-de-conduite)
-3. [Comment Contribuer](#comment-contribuer)
-4. [Signaler un Bug](#signaler-un-bug)
-5. [Proposer une Nouvelle Fonctionnalité](#proposer-une-nouvelle-fonctionnalité)
-6. [Soumettre une Pull Request](#soumettre-une-pull-request)
-7. [Guide de Style](#guide-de-style)
-8. [Architecture du Code](#architecture-du-code)
+1. [Test the Extension](#test-the-extension)
+2. [Code of Conduct](#code-of-conduct)
+3. [How to Contribute](#how-to-contribute)
+4. [Report a Bug](#report-a-bug)
+5. [Propose a New Feature](#propose-a-new-feature)
+6. [Submit a Pull Request](#submit-a-pull-request)
+7. [Style Guide](#style-guide)
+8. [Code Architecture](#code-architecture)
 
-## 🧪 Tester l'Extension
+## 🧪 Test the Extension
 
-Avant de contribuer, nous vous recommandons de **tester l'extension** pour bien comprendre son fonctionnement !
+Before contributing, we recommend you **test the extension** to fully understand how it works!
 
-### Installation depuis le Chrome Web Store
+### Installation from Chrome Web Store
 
-L'extension est **très facilement installable** sur tous les navigateurs Chromium (Chrome, Edge, Brave, Opera, etc.) :
+The extension is **very easily installable** on all Chromium browsers (Chrome, Edge, Brave, Opera, etc.):
 
-**[📥 Installer Genius Fast Transcriber](https://chromewebstore.google.com/detail/genius-fast-transcriber-b/cbldlkiakadclpjfkkafpjomilmmgdjm?hl=fr)**
+**[📥 Install Genius Fast Transcriber](https://chromewebstore.google.com/detail/genius-fast-transcriber-b/cbldlkiakadclpjfkkafpjomilmmgdjm?hl=en)**
 
-> ⭐ **Note 5/5** - Installation en 3 clics !
+> ⭐ **Rating 5/5** - Installed in 3 clicks!
 
-### Installation en mode développement (pour contribuer)
+### Development Mode Installation (for contributing)
 
-Si vous souhaitez tester vos modifications locales :
+If you want to test your local changes:
 
-1. **Clonez** le dépôt :
+1. **Clone** the repository:
    ```bash
    git clone https://github.com/anthogoz/genius-fast-transcriber.git
    cd genius-fast-transcriber
    ```
 
-2. **Chargez l'extension** dans votre navigateur :
-   - Chrome/Edge : Allez dans `chrome://extensions/`
-   - Activez le "Mode développeur"
-   - Cliquez sur "Charger l'extension non empaquetée"
-   - Sélectionnez le dossier du projet
+2. **Load the extension** in your browser:
+   - Chrome/Edge: Go to `chrome://extensions/`
+   - Enable "Developer mode"
+   - Click "Load unpacked"
+   - Select the project folder
 
-3. **Testez** sur [Genius.com](https://genius.com) en éditant des paroles
+3. **Test** on [Genius.com](https://genius.com) by editing lyrics
 
-## 📜 Code de Conduite
+## 📜 Code of Conduct
 
-En participant à ce projet, vous acceptez de respecter un comportement courtois et professionnel. Soyez respectueux envers les autres contributeurs.
+By participating in this project, you agree to maintain courteous and professional behavior. Be respectful to other contributors.
 
-## 🚀 Comment Contribuer
+## 🚀 How to Contribute
 
-Il existe plusieurs façons de contribuer :
+There are several ways to contribute:
 
-### 1. 🐛 Signaler des bugs
-Vous avez trouvé un bug ? Créez une Issue !
+### 1. 🐛 Report bugs
+Found a bug? Create an Issue!
 
-### 2. 💡 Proposer des améliorations
-Vous avez une idée pour améliorer l'extension ? Partagez-la !
+### 2. 💡 Propose improvements
+Have an idea to improve the extension? Share it!
 
-### 3. 📝 Améliorer la documentation
-La documentation peut toujours être améliorée (README, commentaires dans le code, etc.)
+### 3. 📝 Improve documentation
+Documentation can always be improved (README, code comments, etc.)
 
-### 4. 💻 Écrire du code
-Consultez les [Issues ouvertes](https://github.com/anthogoz/genius-fast-transcriber/issues) ou le fichier [TODO.md](TODO.md)
+### 4. 💻 Write code
+Check the [Open Issues](https://github.com/anthogoz/genius-fast-transcriber/issues) or the [TODO.md](TODO.md) file.
 
-## 🐛 Signaler un Bug
+## 🐛 Report a Bug
 
-Avant de créer une Issue pour un bug :
+Before creating an Issue for a bug:
 
-1. **Vérifiez** que le bug n'a pas déjà été signalé
-2. **Testez** avec la dernière version de l'extension
-3. **Incluez** ces informations dans votre rapport :
-   - Description claire du problème
-   - Étapes pour reproduire le bug
-   - Comportement attendu vs. comportement observé
-   - Navigateur et version (Chrome, Edge, etc.)
-   - Captures d'écran si pertinent
-   - Messages d'erreur de la console (F12)
+1. **Check** that the bug hasn't already been reported
+2. **Test** with the latest version of the extension
+3. **Include** this information in your report:
+   - Clear description of the problem
+   - Steps to reproduce the bug
+   - Expected behavior vs. observed behavior
+   - Browser and version (Chrome, Edge, etc.)
+   - Screenshots if relevant
+   - Console error messages (F12)
 
-### Template d'Issue pour Bug
+### Bug Issue Template
 
 ```markdown
-**Description du bug**
-Une description claire du problème.
+**Bug Description**
+A clear description of the problem.
 
-**Étapes pour reproduire**
-1. Aller sur '...'
-2. Cliquer sur '...'
-3. Voir l'erreur
+**Steps to Reproduce**
+1. Go to '...'
+2. Click on '...'
+3. See error
 
-**Comportement attendu**
-Ce qui devrait se passer.
+**Expected Behavior**
+What should happen.
 
-**Captures d'écran**
-Si applicable, ajoutez des captures d'écran.
+**Screenshots**
+If applicable, add screenshots.
 
-**Environnement**
-- Navigateur : [ex: Chrome 120]
-- Version de l'extension : [ex: 1.5.0]
-- Page Genius : [URL de la page]
+**Environment**
+- Browser: [e.g. Chrome 120]
+- Extension Version: [e.g. 1.5.0]
+- Genius Page: [URL of the page]
 ```
 
-## 💡 Proposer une Nouvelle Fonctionnalité
+## 💡 Propose a New Feature
 
-Avant de proposer une fonctionnalité :
+Before proposing a feature:
 
-1. **Vérifiez** qu'elle n'est pas déjà dans [TODO.md](TODO.md)
-2. **Créez une Issue** avec le label `enhancement`
-3. **Expliquez** :
-   - Le problème que cela résout
-   - Comment cela améliorerait l'expérience utilisateur
-   - Des exemples d'utilisation
-   - Des captures d'écran ou maquettes si possible
+1. **Check** that it is not already in [TODO.md](TODO.md)
+2. **Create an Issue** with the label `enhancement`
+3. **Explain**:
+   - The problem it solves
+   - How it would improve the user experience
+   - Usage examples
+   - Screenshots or mockups if possible
 
-## 🔄 Soumettre une Pull Request
+## 🔄 Submit a Pull Request
 
-### Étape 1 : Préparer votre environnement
+### Step 1: Prepare your environment
 
 ```bash
-# Fork le projet sur GitHub, puis :
+# Fork the project on GitHub, then:
 git clone https://github.com/anthogoz/genius-fast-transcriber.git
 cd genius-fast-transcriber
 
-# Créez une branche pour votre fonctionnalité
-git checkout -b feature/ma-nouvelle-fonctionnalite
+# Create a branch for your feature
+git checkout -b feature/my-new-feature
 ```
 
-### Étape 2 : Faire vos modifications
+### Step 2: Make your changes
 
-- Écrivez du code propre et commenté
-- Suivez le [Guide de Style](#guide-de-style)
-- Testez vos modifications sur Genius.com
+- Write clean and commented code
+- Follow the [Style Guide](#style-guide)
+- Test your changes on Genius.com
 
-### Étape 3 : Commiter vos changements
+### Step 3: Commit your changes
 
 ```bash
 git add .
-git commit -m "feat: ajout de [description courte]"
+git commit -m "feat: add [short description]"
 ```
 
-### Conventions de Commit
+### Commit Conventions
 
-Utilisez les préfixes suivants :
+Use the following prefixes:
 
-- `feat:` Nouvelle fonctionnalité
-- `fix:` Correction de bug
-- `docs:` Documentation uniquement
-- `style:` Formatage du code (pas de changement de logique)
-- `refactor:` Refactorisation du code
-- `test:` Ajout de tests
-- `chore:` Tâches de maintenance
+- `feat:` New feature
+- `fix:` Bug fix
+- `docs:` Documentation only
+- `style:` Code formatting (no logic change)
+- `refactor:` Code refactoring
+- `test:` Adding tests
+- `chore:` Maintenance tasks
 
-### Étape 4 : Pousser et créer la PR
+### Step 4: Push and create the PR
 
 ```bash
-git push origin feature/ma-nouvelle-fonctionnalite
+git push origin feature/my-new-feature
 ```
 
-Puis créez une Pull Request sur GitHub avec :
-- Un titre clair
-- Une description détaillée des changements
-- Des références aux Issues liées (ex: `Closes #42`)
-- Des captures d'écran si pertinent
+Then create a Pull Request on GitHub with:
+- A clear title
+- A detailed description of changes
+- References to linked Issues (e.g., `Closes #42`)
+- Screenshots if relevant
 
-## 🎨 Guide de Style
+## 🎨 Style Guide
 
 ### JavaScript
 
-- **Indentation** : Utilisez des espaces (le code existant utilise un mélange, mais privilégiez la cohérence)
-- **Commentaires** : Commentez les fonctions complexes avec JSDoc
-- **Nommage** :
-  - Variables : `camelCase` (ex: `currentActiveEditor`)
-  - Constantes : `UPPER_SNAKE_CASE` (ex: `SHORTCUTS_CONTAINER_ID`)
-  - Fonctions : `camelCase` (ex: `extractSongData`)
-- **Longueur des lignes** : Essayez de ne pas dépasser 120 caractères
-- **Fonctions** : Une fonction = une responsabilité claire
+- **Indentation**: Use spaces (existing code uses a mix, but favor consistency)
+- **Comments**: Comment complex functions with JSDoc
+- **Naming**:
+  - Variables: `camelCase` (e.g., `currentActiveEditor`)
+  - Constants: `UPPER_SNAKE_CASE` (e.g., `SHORTCUTS_CONTAINER_ID`)
+  - Functions: `camelCase` (e.g., `extractSongData`)
+- **Line Length**: Try not to exceed 120 characters
+- **Functions**: One function = one clear responsibility
 
 ### CSS
 
-- Utilisez des classes préfixées par `gft-` pour éviter les conflits (ex: `gft-dark-mode`)
-- Organisez les propriétés par ordre alphabétique
-- Commentez les sections importantes
+- Use classes prefixed with `gft-` to avoid conflicts (e.g., `gft-dark-mode`)
+- Organize properties alphabetically
+- Comment important sections
 
-### Commentaires
+### Comments
 
 ```javascript
 /**
- * Description de la fonction.
- * @param {type} paramName - Description du paramètre.
- * @returns {type} Description de ce qui est retourné.
+ * Description of the function.
+ * @param {type} paramName - Description of the parameter.
+ * @returns {type} Description of what is returned.
  */
-function maFonction(paramName) {
-    // Implémentation
+function myFunction(paramName) {
+    // Implementation
 }
 ```
 
-## 🏗️ Architecture du Code
+## 🏗️ Code Architecture
 
-### Fichiers Principaux
+### Main Files
 
-#### `content.js` (3792 lignes - v2.5)
+#### `content.js` (3792 lines - v2.5)
 
-**Section 1 : Variables Globales (lignes 26-44)**
-- État de l'extension (compteurs, éditeur actif, mode sombre, historique Undo/Redo)
+**Section 1: Global Variables (lines 26-44)**
+- Extension state (counters, active editor, dark mode, Undo/Redo history)
 
-**Section 2 : Constantes et Sélecteurs (lignes 46-76)**
-- Sélecteurs CSS pour les éléments de Genius
-- IDs des composants de l'extension
-- Classes CSS utilitaires
+**Section 2: Constants and Selectors (lines 46-76)**
+- CSS selectors for Genius elements
+- Extension component IDs
+- Utility CSS classes
 
-**Section 3 : Utilitaires de Base (lignes 78-145)**
-- `decodeHtmlEntities()` : Décode les entités HTML
-- `cleanArtistName()` : Nettoie les noms d'artistes
-- `escapeRegExp()` : Échappe les caractères spéciaux pour regex
-- `formatArtistList()` : Formate une liste d'artistes
+**Section 3: Basic Utilities (lines 78-145)**
+- `decodeHtmlEntities()`: Decodes HTML entities
+- `cleanArtistName()`: Cleans artist names
+- `escapeRegExp()`: Escapes special characters for regex
+- `formatArtistList()`: Formats a list of artists
 
-**Section 4 : Conversion de Nombres (lignes 147-282) ✨ NOUVEAU v2.2.0**
-- `numberToFrenchWords()` : Convertit un nombre (0-999 milliards) en lettres françaises
-  - Gestion complète de l'orthographe française (traits d'union, "et", pluriels)
-  - Supporte jusqu'à 999 999 999 999 (milliers, millions, milliards)
-  - Cas spéciaux : 70-79 (soixante-dix), 80-89 (quatre-vingt), 90-99 (quatre-vingt-dix)
-  - Pluriels corrects : "millions", "milliards" (mais "mille" invariable)
-- `isValidNumber()` : Vérifie si une chaîne est un nombre valide
+**Section 4: Number Conversion (lines 147-282) ✨ NEW v2.2.0**
+- `numberToFrenchWords()`: Converts a number (0-999 billion) to French words
+  - Full management of French spelling (hyphens, "et", plurals)
+  - Supports up to 999 999 999 999 (thousands, millions, billions)
+  - Special cases: 70-79, 80-89, 90-99
+  - Correct plurals: "millions", "milliards" (but "mille" invariable)
+- `isValidNumber()`: Checks if a string is a valid number
 
-**Section 5 : Extraction de Données (lignes 247-760)**
-- `extractArtistsFromMetaContent()` : Extrait artistes depuis meta tags
-- `extractSongData()` : Fonction principale pour extraire titre et artistes
-- `calculateStats()` : Calcule les statistiques (lignes, mots, sections, caractères)
+**Section 5: Data Extraction (lines 247-760)**
+- `extractArtistsFromMetaContent()`: Extracts artists from meta tags
+- `extractSongData()`: Main function to extract title and artists
+- `calculateStats()`: Calculates statistics (lines, words, sections, characters)
 
-**Section 4 : Statistiques en Temps Réel (lignes 571-651)**
-- `updateStatsDisplay()` : Met à jour l'affichage des statistiques
-- `toggleStatsDisplay()` : Affiche/masque les statistiques
-- `createStatsDisplay()` : Crée l'élément d'affichage
+**Section 6: Real-time Statistics (lines 571-651)**
+- `updateStatsDisplay()`: Updates the statistics display
+- `toggleStatsDisplay()`: Shows/hides statistics
+- `createStatsDisplay()`: Creates the display element
 
-**Section 5 : Historique Undo/Redo (lignes 653-938)**
-- `saveToHistory()` : Sauvegarde l'état actuel
-- `undoLastChange()` : Annule la dernière modification
-- `redoLastChange()` : Refait la dernière modification annulée
-- `updateHistoryButtons()` : Met à jour l'état des boutons
+**Section 7: Undo/Redo History (lines 653-938)**
+- `saveToHistory()`: Saves current state
+- `undoLastChange()`: Undoes last change
+- `redoLastChange()`: Redoes last undone change
+- `updateHistoryButtons()`: Updates button state
 
-**Section 6 : Barre de Progression (lignes 940-1023)**
-- `createProgressBar()` : Crée l'élément de la barre
-- `showProgress()` : Affiche la progression
-- `hideProgress()` : Cache la barre de progression
+**Section 8: Progress Bar (lines 940-1023)**
+- `createProgressBar()`: Creates the bar element
+- `showProgress()`: Shows progress
+- `hideProgress()`: Hides progress bar
 
-**Section 7 : Prévisualisation des Corrections (lignes 1025-1148)**
-- `showCorrectionPreview()` : Affiche le modal avant/après avec détails
+**Section 9: Correction Preview (lines 1025-1148)**
+- `showCorrectionPreview()`: Shows before/after modal with details
 
-**Section 8 : Tutoriel et Tooltips (lignes 1150-1460)**
-- `showTutorial()` : Affiche le tutoriel guidé en 6 étapes
-- `renderTutorialStep()` : Affiche une étape spécifique
-- `isFirstLaunch()` : Détecte le premier lancement
-- `areTooltipsEnabled()` : Vérifie si les tooltips sont activés
+**Section 10: Tutorial and Tooltips (lines 1150-1460)**
+- `showTutorial()`: Shows guided 6-step tutorial
+- `renderTutorialStep()`: Renders a specific step
+- `isFirstLaunch()`: Detects first launch
+- `areTooltipsEnabled()`: Checks if tooltips are enabled
 
 ```javascript
-{label:'[Mon Tag]', getText:()=>addArtistToText('[Mon Tag]')}
+{label:'[My Tag]', getText:()=>addArtistToText('[My Tag]')}
 ```
 
-#### Ajouter un bouton à la barre d'outils flottante (v2.2.0)
+#### Adding a button to the floating toolbar (v2.2.0)
 
-Pour ajouter un nouveau bouton de formatage dans `createFloatingFormattingToolbar()` :
+To add a new formatting button in `createFloatingFormattingToolbar()`:
 
 ```javascript
-// Créez le bouton
-const monBouton = document.createElement('button');
-monBouton.textContent = 'Mon Action';
-monBouton.classList.add('gft-floating-format-button', 'mon-bouton-class');
-monBouton.title = 'Description de l\'action';
-monBouton.type = 'button';
-monBouton.style.display = 'none'; // Caché par défaut si conditionnel
+// Create the button
+const myButton = document.createElement('button');
+myButton.textContent = 'My Action';
+myButton.classList.add('gft-floating-format-button', 'my-button-class');
+myButton.title = 'Action Description';
+myButton.type = 'button';
+myButton.style.display = 'none'; // Hidden by default if conditional
 
-// Ajoutez l'écouteur d'événement
-monBouton.addEventListener('click', (e) => {
+// Add event listener
+myButton.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
-    maFonctionAction();
+    myActionFunction();
 });
 
-// Ajoutez le tooltip
-addTooltip(monBouton, 'Description complète');
+// Add tooltip
+addTooltip(myButton, 'Full Description');
 
-// Ajoutez le bouton à la barre
-toolbar.appendChild(monBouton);
+// Add button to toolbar
+toolbar.appendChild(myButton);
 ```
 
-Puis modifiez `showFloatingToolbar()` pour afficher/masquer le bouton selon les conditions :
+Then modify `showFloatingToolbar()` to show/hide the button based on conditions:
 ```javascript
-const monBouton = floatingFormattingToolbar.querySelector('.mon-bouton-class');
-if (monBouton) {
-    if (maCondition(selectedText)) {
-        monBouton.style.display = 'inline-block';
+const myButton = floatingFormattingToolbar.querySelector('.my-button-class');
+if (myButton) {
+    if (myCondition(selectedText)) {
+        myButton.style.display = 'inline-block';
     } else {
-        monBouton.style.display = 'none';
+        myButton.style.display = 'none';
     }
 }
 ```
 
-#### Ajouter une nouvelle correction
+#### Adding a new correction
 
-1. Créez une fonction de correction (section 13, lignes 1900-2220)
-2. Ajoutez-la à `SHORTCUTS.TEXT_CLEANUP` dans `initLyricsEditorEnhancer()`
-3. Mettez à jour `applyAllTextCorrectionsAsync()` pour inclure la nouvelle correction
+1. Create a correction function (section 13, lines 1900-2220)
+2. Add it to `SHORTCUTS.TEXT_CLEANUP` in `initLyricsEditorEnhancer()`
+3. Update `applyAllTextCorrectionsAsync()` to include the new correction
 
-#### Ajouter un raccourci clavier
+#### Adding a keyboard shortcut
 
-1. Ajoutez l'entrée dans l'objet `KEYBOARD_SHORTCUTS` (ligne ~1462)
-2. Ajoutez le cas correspondant dans `handleKeyboardShortcut()` (ligne ~1551)
-3. Créez la fonction d'action si nécessaire
+1. Add entry to `KEYBOARD_SHORTCUTS` object (line ~1462)
+2. Add corresponding case in `handleKeyboardShortcut()` (line ~1551)
+3. Create action function if necessary
 
-#### Modifier la détection des artistes
+#### Modifying artist detection
 
-Modifiez `extractSongData()` (ligne ~175) ou les `SELECTORS` (ligne ~42)
+Modify `extractSongData()` (line ~175) or `SELECTORS` (line ~42)
 
-#### Ajouter une statistique
+#### Adding a statistic
 
-1. Modifiez `calculateStats()` (ligne ~571) pour calculer la nouvelle métrique
-2. Mettez à jour `updateStatsDisplay()` (ligne ~590) pour l'afficher
+1. Modify `calculateStats()` (line ~571) to calculate the new metric
+2. Update `updateStatsDisplay()` (line ~590) to display it
 
-#### Étendre la conversion de nombres (v2.2.0)
+#### Extending number conversion (v2.2.0)
 
-La fonction `numberToFrenchWords()` supporte actuellement les nombres de 0 à 999 milliards (999 999 999 999). Pour étendre davantage :
+The `numberToFrenchWords()` function currently supports numbers from 0 to 999 billion. To extend further:
 
-1. **Ajouter les billions (mille milliards)** : Pour les nombres > 999 999 999 999
+1. **Add trillions**: For numbers > 999 999 999 999
    ```javascript
    if (num >= 1000000000000) {
-       const billions = Math.floor(num / 1000000000000);
+       const trillions = Math.floor(num / 1000000000000);
        const rest = num % 1000000000000;
-       // Note: en français, "billion" = 1 000 000 000 000 (mille milliards)
+       // Note: in French, "billion" = 1 000 000 000 000 (trillion in US English)
    }
    ```
 
-2. **Nombres décimaux** : Ajoutez la gestion des nombres à virgule
+2. **Decimal numbers**: Add management for decimal numbers
    ```javascript
    if (str.includes('.') || str.includes(',')) {
        const [integer, decimal] = str.split(/[.,]/);
-       return `${convertInteger(integer)} virgule ${convertDecimal(decimal)}`;
+       return `${convertInteger(integer)} point ${convertDecimal(decimal)}`;
    }
    ```
 
-3. **Nombres négatifs** : Ajoutez le préfixe "moins"
+3. **Negative numbers**: Add "minus" prefix
    ```javascript
    if (num < 0) {
-       return "moins " + numberToFrenchWords(Math.abs(num));
+       return "minus " + numberToFrenchWords(Math.abs(num));
    }
    ```
 
-4. **Options d'orthographe** : Paramètre pour l'orthographe traditionnelle vs réformée
-   - Traits d'union partout (réforme 1990) : "vingt-et-un", "cent-vingt"
-   - Ou orthographe traditionnelle : "vingt et un", "cent vingt"
+4. **Spelling options**: Parameter for traditional vs reformed spelling
 
 ## 🧪 Tests
 
-Avant de soumettre votre PR, testez sur Genius.com :
+Before submitting your PR, test on Genius.com:
 
-1. **Page d'édition de paroles** : Vérifiez que le panneau apparaît
-2. **Navigation SPA** : Changez de page sans recharger (l'extension doit suivre)
-3. **Différents types d'éditeurs** :
-   - Ancien éditeur (`textarea`)
-   - Nouvel éditeur (`div contenteditable`)
-4. **Différents types de pages** :
-   - Chanson solo (un seul artiste)
-   - Chanson avec featurings
-   - Chanson avec plusieurs artistes principaux
-5. **Mode sombre** : Vérifiez que la préférence est sauvegardée
-6. **Conversion de nombres (v2.2.0)** :
-   - Sélectionnez un nombre seul : le bouton "Nombre → Lettres" doit apparaître
-   - Sélectionnez du texte avec un nombre : le bouton ne doit PAS apparaître
-   - Testez différents nombres :
-     - Petits : 0, 21, 42, 71, 80, 81, 91
-     - Centaines : 100, 200, 999
-     - Milliers : 1000, 1234, 999999
-     - Millions : 1000000, 42000000, 999999999
-     - Milliards : 1000000000, 123456789012, 999999999999
-   - Vérifiez l'orthographe (traits d'union, "et", pluriels de "millions" et "milliards")
-7. **Lyric Card (v2.5)** :
-   - **Mode Édition** : Sélectionnez des paroles -> bouton "Créer Lyric Card" -> Image générée
-   - **Mode Lecture** : Sélectionnez des paroles sur une page de chanson -> bouton apparaît -> Image générée
-   - **Robustesse** : Testez sur des pages avec des pochettes problématiques (ex: Vald)
-   - **Design** : Vérifiez le logo Genius, les polices, et le contraste (noir/blanc) adapté à la pochette
+1. **Lyrics Editor Page**: Verify the panel appears
+2. **SPA Navigation**: Change page without reloading (extension should follow)
+3. **Different Editor Types**:
+   - Old editor (`textarea`)
+   - New editor (`div contenteditable`)
+4. **Different Page Types**:
+   - Solo song (single artist)
+   - Song with features
+   - Song with multiple main artists
+5. **Dark Mode**: Verify preference is saved
+6. **Number Conversion (v2.2.0)**:
+   - Select a number alone: "Number → Words" button should appear
+   - Select text with a number: button should NOT appear
+   - Test various numbers:
+     - Small: 0, 21, 42, 71, 80, 81, 91
+     - Hundreds: 100, 200, 999
+     - Thousands: 1000, 1234, 999999
+     - Millions: 1000000, 42000000, 999999999
+     - Billions: 1000000000, 123456789012, 999999999999
+   - Verify spelling
+7. **Lyric Card (v2.5)**:
+   - **Edit Mode**: Select lyrics -> "Create Lyric Card" button -> Generated Image
+   - **Read Mode**: Select lyrics on song page -> Button appears -> Generated Image
+   - **Robustness**: Test on pages with problematic covers
+   - **Design**: Verify Genius logo, fonts, and contrast
+8. **Mobile Warning Overlay (v2.7)**:
+   - **Resize Window**: Resize browser width < 1024px -> Overlay appears
+   - **Content**: Verify message "Optimized for PC"
+   - **Restore**: Resize back -> Overlay disappears
 
-### Checklist avant PR
+### Checklist before PR
 
-- [ ] Le code fonctionne sur Genius.com
-- [ ] Aucune erreur dans la console (F12)
-- [ ] Le mode sombre fonctionne correctement sur tous les nouveaux éléments
-- [ ] Les raccourcis clavier fonctionnent (si modifiés/ajoutés)
-- [ ] L'historique Undo/Redo fonctionne correctement avec les nouvelles modifications
-- [ ] Les statistiques s'actualisent correctement (si modifiées)
-- [ ] Le tutoriel est à jour (si de nouvelles fonctionnalités sont ajoutées)
-- [ ] Les commentaires JSDoc sont à jour
-- [ ] Le code suit le guide de style
-- [ ] Les versions sont cohérentes :
-  - [ ] `manifest.json` (ligne 4)
-  - [ ] `content.js` en-tête (ligne 1)
-  - [ ] `content.js` @version JSDoc (ligne 22)
-  - [ ] `content.js` console.log (ligne 25)
-  - [ ] `content.js` footer du panneau (ligne 3675)
-  - [ ] `README.md` badge (ligne 5)
-  - [ ] `CONTRIBUTING.md` titre de section (ligne 201)
-- [ ] Le README.md et TODO.md sont à jour (si fonctionnalité majeure)
-- [ ] Le changelog dans README.md est à jour avec les nouvelles fonctionnalités
+- [ ] Code works on Genius.com
+- [ ] No errors in console (F12)
+- [ ] Dark mode works correctly on all new elements
+- [ ] Keyboard shortcuts work (if modified/added)
+- [ ] Undo/Redo history works correctly with new changes
+- [ ] Stats update correctly (if modified)
+- [ ] Tutorial is up to date (if new features added)
+- [ ] JSDoc comments are up to date
+- [ ] Code follows style guide
+- [ ] Versions are consistent:
+  - [ ] `manifest.json` (line 4)
+  - [ ] `content.js` header (line 1)
+  - [ ] `content.js` @version JSDoc (line 22)
+  - [ ] `content.js` console.log (line 25)
+  - [ ] `content.js` panel footer (line 3675)
+  - [ ] `README.md` badge (line 5)
+  - [ ] `CONTRIBUTING.md` section title (line 201)
+- [ ] README.md and TODO.md are up to date (if major feature)
+- [ ] Changelog in README.md is up to date with new features
 
-## 🔍 Processus de Review
+## 🔍 Review Process
 
-1. Un mainteneur examinera votre PR
-2. Des changements peuvent être demandés
-3. Une fois approuvée, la PR sera mergée
-4. Vos contributions seront mentionnées dans le changelog
+1. A maintainer will review your PR
+2. Changes may be requested
+3. Once approved, the PR will be merged
+4. Your contributions will be mentioned in the changelog
 
 ## ❓ Questions
 
-Si vous avez des questions :
-- Ouvrez une Issue avec le label `question`
-- Décrivez clairement ce que vous ne comprenez pas
+If you have questions:
+- Open an Issue with label `question`
+- Clearly describe what you don't understand
 
-## 🎉 Merci !
+## 🎉 Thank you!
 
-Merci de contribuer à **Genius Fast Transcriber** ! Chaque contribution, petite ou grande, fait une différence.
+Thank you for contributing to **Genius Fast Transcriber**! Every contribution, small or large, makes a difference.
 
 ---
 
 **Happy Coding! 🚀**
-

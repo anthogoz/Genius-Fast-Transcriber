@@ -1,11 +1,11 @@
-# � Roadmap & Idées
+# 🚧 Roadmap & Ideas
 
-Le projet est désormais mature et fonctionnel ! 🎉
+The project is now mature and functional! 🎉
 
-## � Priorité Actuelle
-- **Modularisation du Code** : Le fichier `content.js` est devenu très volumineux. L'objectif principal est de le découper en plusieurs modules pour faciliter la maintenance et les futures contributions.
+## 🚨 Current Priority
+- **Code Modularization**: The `content.js` file has become very large. The main goal is to split it into multiple modules to facilitate maintenance and future contributions.
 
-## 💡 Appel à la Communauté
-Nous n'avons plus de liste de fonctionnalités fixes à implémenter.
-**N'hésitez pas à proposer VOS propres idées !**
-Que ce soit une petite amélioration, un nouveau raccourci ou une fonctionnalité révolutionnaire, ouvrez une Issue ou une Pull Request. Le projet évolue grâce à vous.
+## 💡 Call to the Community
+We no longer have a fixed list of features to implement.
+**Do not hesitate to propose YOUR own ideas!**
+Whether it's a small improvement, a new shortcut, or a revolutionary feature, open an Issue or a Pull Request. The project evolves thanks to you.

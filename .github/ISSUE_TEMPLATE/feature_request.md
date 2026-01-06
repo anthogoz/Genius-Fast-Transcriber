@@ -1,47 +1,46 @@
 ---
-name: Feature Request / Demande de Fonctionnalité
-about: Suggérer une nouvelle idée pour l'extension
+name: Feature Request
+about: Suggest a new idea for the extension
 title: '[FEATURE] '
 labels: enhancement
 assignees: ''
 ---
 
-## 💡 Description de la Fonctionnalité
+## 💡 Feature Description
 
-Une description claire de la fonctionnalité proposée.
+A clear description of the proposed feature.
 
-## 🎯 Problème à Résoudre
+## 🎯 Problem to Solve
 
-Cette fonctionnalité résout-elle un problème existant ? Si oui, décrivez-le.
-Ex: "Je trouve frustrant de devoir [...] parce que [...]"
+Does this feature solve an existing problem? If yes, describe it.
+Ex: "I find it frustrating to have to [...] because [...]"
 
-## 🚀 Solution Proposée
+## 🚀 Proposed Solution
 
-Une description claire de ce que vous aimeriez voir implémenté.
+A clear description of what you would like to see implemented.
 
-## 🔄 Alternatives Considérées
+## 🔄 Alternatives Considered
 
-Avez-vous pensé à d'autres façons de résoudre ce problème ?
+Have you thought of other ways to solve this problem?
 
-## 📷 Maquettes / Captures d'Écran
+## 📷 Mockups / Screenshots
 
-Si applicable, ajoutez des maquettes, captures d'écran ou exemples visuels.
+If applicable, add mockups, screenshots, or visual examples.
 
-## 🎨 Exemples d'Utilisation
+## 🎨 Usage Examples
 
-Comment utiliseriez-vous cette fonctionnalité au quotidien ?
+How would you use this feature on a daily basis?
 
-**Exemple 1** :
-1. Je clique sur [...]
-2. L'extension fait [...]
-3. Résultat : [...]
+**Example 1**:
+1. I click on [...]
+2. The extension does [...]
+3. Result: [...]
 
 ## 📊 Impact
 
-- **Fréquence d'utilisation** : [Très fréquent / Fréquent / Occasionnel / Rare]
-- **Utilisateurs concernés** : [Tous / Transcripteurs débutants / Transcripteurs avancés / etc.]
+- **Usage Frequency**: [Very frequent / Frequent / Occasional / Rare]
+- **Target Users**: [All / Beginner Transcribers / Advanced Transcribers / etc.]
 
-## ℹ️ Contexte Additionnel
+## ℹ️ Additional Context
 
-Toute autre information pertinente sur la demande.
-
+Any other relevant information about the request.

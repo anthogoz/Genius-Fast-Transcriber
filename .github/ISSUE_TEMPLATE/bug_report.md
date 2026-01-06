@@ -1,51 +1,50 @@
 ---
-name: Bug Report / Rapport de Bug
-about: Signaler un bug pour aider à améliorer l'extension
+name: Bug Report
+about: Report a bug to help improve the extension
 title: '[BUG] '
 labels: bug
 assignees: ''
 ---
 
-## 🐛 Description du Bug
+## 🐛 Bug Description
 
-Une description claire et concise du problème.
+A clear and concise description of the issue.
 
-## 📋 Étapes pour Reproduire
+## 📋 Steps to Reproduce
 
-1. Aller sur '...'
-2. Cliquer sur '...'
-3. Faire défiler jusqu'à '...'
-4. Voir l'erreur
+1. Go to '...'
+2. Click on '...'
+3. Scroll down to '...'
+4. See error
 
-## ✅ Comportement Attendu
+## ✅ Expected Behavior
 
-Une description claire de ce qui devrait se passer normalement.
+A clear description of what should happen normally.
 
-## ❌ Comportement Observé
+## ❌ Observed Behavior
 
-Ce qui se passe réellement (incluez les messages d'erreur si applicable).
+What actually happens (include error messages if applicable).
 
-## 📷 Captures d'Écran
+## 📷 Screenshots
 
-Si applicable, ajoutez des captures d'écran pour illustrer le problème.
+If applicable, add screenshots to illustrate the problem.
 
-## 🖥️ Environnement
+## 🖥️ Environment
 
-- **Navigateur** : [ex: Chrome 120, Edge 120]
-- **Système d'exploitation** : [ex: Windows 11, macOS 14]
-- **Version de l'extension** : [ex: 1.5.0]
-- **Page Genius** : [URL de la page où le bug se produit]
-- **Type d'éditeur** : [Ancien (textarea) / Nouveau (contenteditable)]
+- **Browser**: [e.g. Chrome 120, Edge 120]
+- **Operating System**: [e.g. Windows 11, macOS 14]
+- **Extension Version**: [e.g. 1.5.0]
+- **Genius Page**: [URL of the page where the bug occurs]
+- **Editor Type**: [Old (textarea) / New (contenteditable)]
 
-## 📝 Console du Navigateur
+## 📝 Browser Console
 
-Si possible, copiez les erreurs de la console (F12 > Console) :
+If possible, copy errors from the console (F12 > Console):
 
 ```
-Collez les erreurs ici
+Paste errors here
 ```
 
-## ℹ️ Contexte Additionnel
+## ℹ️ Additional Context
 
-Toute autre information utile sur le problème.
-
+Any other useful information about the problem.

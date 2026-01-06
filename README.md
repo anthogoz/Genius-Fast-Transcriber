@@ -4,92 +4,92 @@
 ![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-green.svg?style=for-the-badge&logo=google-chrome)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg?style=for-the-badge)
 
-**L'outil ultime pour les transcripteurs sur Genius.com.**
-Transformez votre expérience d'édition avec une suite d'outils professionnels, une interface moderne et des automatisations intelligentes.
+**The ultimate tool for transcribers on Genius.com.**
+Transform your editing experience with a suite of professional tools, a modern interface, and smart automations.
 
 ---
 
-## 🌟 Pourquoi utiliser Genius Fast Transcriber ?
+## 🌟 Why use Genius Fast Transcriber?
 
-🚀 **Gagnez du temps** : Insérez des structures entières et corrigez la typographie en un clic.
-🧠 **Restez concentré** : L'interface s'intègre parfaitement et anticipe vos besoins.
-🎨 **Résultats impeccables** : Vos paroles respectent automatiquement les standards de qualité Genius.
-🌍 **International** : Disponible en **Français** et **Anglais** !
-
----
-
-## 🔥 Fonctionnalités Principales
-
-### 🏗️ Structure & Tags Intelligents
-*   **Gestionnaire de Couplets Unifié** NOUVEAU : Un bouton central dynamique pour `[Couplet 1]`, `[Couplet 2]` avec navigation rapide ← →.
-*   **Détection d'Artistes** : L'extension scanne la page et propose les artistes (Main & Feat) à cocher pour une attribution automatique.
-*   **Tags Rapides** : `[Refrain]`, `[Intro]`, `[Pont]`... insérés proprement avec les bons crédits.
-
-### ✨ Corrections & Qualité
-*   **Tout Corriger** : Un bouton magique qui nettoie tout :
-    *   Apostrophes courbes `’`
-    *   Majuscules en début de ligne
-    *   Suppression de la ponctuation finale inutile
-    *   Correction des espaces `y'` -> `y `
-*   **Vérification des Parenthèses** NOUVEAU : Détecte et surligne en **ROUGE** les parenthèses `( )` ou crochets `[ ]` non fermés ou mal appariés.
-
-### 🎨 Outils de Création
-*   **Barre Flottante** : Sélectionnez du texte, une barre apparaît pour mettre en **Gras**, *Italique*...
-*   **Lyric Card Personnalisable** : Créez une image magnifique des paroles.
-    *   **Nouveau v2.6** : Choisissez entre la **Pochette de l'Album** ou l'**Image de l'Artiste** pour le fond ! 🖼️
-    *   Prévisualisation avant téléchargement.
-*   **Mode Lecture Seule** : Masquez le panneau latéral pour ne garder que la fonctionnalité Lyric Card.
-
-### ❓ Tutoriel & Support (v2.6.5)
-*   **Tutoriel Interactif** : Un guide pas à pas lors de la première installation pour choisir votre langue et votre mode.
-*   **Relancer le Tutoriel** : Accédez au popup pour rejouer le tutoriel à tout moment.
-
-### 📺 Contrôle YouTube
-*   **Pilotez la musique** sans quitter l'éditeur des yeux :
-    *   Lecture / Pause
-    *   Reculer / Avancer de 5 secondes
-    *   Compatible avec les intégrations "nocookie" (protection vie privée).
-
-### 🛡️ Sécurité & Historique
-*   **Undo/Redo Visuel** : Annulez vos actions (Ctrl+Z) avec un historique de 10 états.
-*   **Sauvegarde Brouillon** : Vos modifications sont sauvegardées localement. Un crash ? On restaure tout.
-*   **Mode Sombre** : Une interface parfaitement adaptée au thème sombre, douce pour les yeux.
+🚀 **Save time**: Insert entire structures and fix typography in one click.
+🧠 **Stay focused**: The interface integrates perfectly and anticipates your needs.
+🎨 **Impeccable results**: Your lyrics automatically respect Genius quality standards.
+🌍 **International**: Available in **French** and **English**!
 
 ---
 
-## ⌨️ Raccourcis Clavier Pro
+## 🔥 Key Features
 
-| Raccourci | Action |
+### 🏗️ Structure & Smart Tags
+*   **Unified Verse Manager** NEW: A dynamic central button for `[Couplet 1]`, `[Couplet 2]` with fast navigation ← →.
+*   **Artist Detection**: The extension scans the page and proposes artists (Main & Feat) to check for automatic attribution.
+*   **Quick Tags**: `[Refrain]`, `[Intro]`, `[Bridge]`... inserted cleanly with correct credits.
+
+### ✨ Corrections & Quality
+*   **Fix All**: A magic button that cleans everything:
+    *   Curly apostrophes `’`
+    *   Capitalization at start of lines
+    *   Removal of unnecessary final punctuation
+    *   Correction of spaces `y'` -> `y `
+*   **Parenthesis Check** NEW: Detects and highlights in **RED** unclosed or mismatched parentheses `( )` or brackets `[ ]`.
+
+### 🎨 Creation Tools
+*   **Floating Bar**: Select text, a bar appears to apply **Bold**, *Italics*...
+*   **Customizable Lyric Card**: Create a beautiful image of lyrics.
+    *   **New v2.6**: Choose between **Album Art** or **Artist Image** for the background! 🖼️
+    *   Preview before download.
+*   **Read-Only Mode**: Hide the side panel to keep only Lyric Card functionality.
+
+### ❓ Tutorial & Support (v2.6.5)
+*   **Interactive Tutorial**: A step-by-step guide on first install to choose your language and mode.
+*   **Relaunch Tutorial**: Access the popup to replay the tutorial at any time.
+
+### 📺 YouTube Control
+*   **Control music** without taking your eyes off the editor:
+    *   Play / Pause
+    *   Rewind / Forward 5 seconds
+    *   Compatible with "nocookie" integrations (privacy protection).
+
+### 🛡️ Security & History
+*   **Visual Undo/Redo**: Undo your actions (Ctrl+Z) with a history of 10 states.
+*   **Draft Save**: Your changes are saved locally. A crash? We restore everything.
+*   **Dark Mode**: An interface perfectly adapted to dark theme, gentle on the eyes.
+
+---
+
+## ⌨️ Pro Keyboard Shortcuts
+
+| Shortcut | Action |
 |-----------|--------|
-| `Ctrl + 1` à `5` | Insérer les tags de structure (Couplet, Refrain...) |
-| `Ctrl + Shift + C` | **Tout Corriger** (Ouvre la prévisualisation) |
-| `Ctrl + Z` | Annuler |
-| `Ctrl + Y` | Refaire |
-| `Ctrl + Shift + S` | Afficher/Masquer les statistiques |
-| `Ctrl + Alt + Espace` | **Lecture / Pause** YouTube |
-| `Ctrl + Alt + ←` | Reculer de 5s |
-| `Ctrl + Alt + →` | Avancer de 5s |
+| `Ctrl + 1` to `5` | Insert structure tags (Verse, Chorus...) |
+| `Ctrl + Shift + C` | **Fix All** (Opens preview) |
+| `Ctrl + Z` | Undo |
+| `Ctrl + Y` | Redo |
+| `Ctrl + Shift + S` | Show/Hide statistics |
+| `Ctrl + Alt + Space` | **Play / Pause** YouTube |
+| `Ctrl + Alt + ←` | Rewind 5s |
+| `Ctrl + Alt + →` | Forward 5s |
 
 ---
 
 ## 📥 Installation
 
-1.  Rendez-vous sur le **Chrome Web Store** ici : https://chromewebstore.google.com/detail/cbldlkiakadclpjfkkafpjomilmmgdjm.
-2.  Ou installez manuellement (Mode Développeur) :
-    *   Téléchargez le code.
-    *   Allez sur `chrome://extensions`.
-    *   Activez "Mode développeur".
-    *   "Charger l'extension non empaquetée" et sélectionnez le dossier.
+1.  Go to the **Chrome Web Store** here: https://chromewebstore.google.com/detail/cbldlkiakadclpjfkkafpjomilmmgdjm.
+2.  Or install manually (Developer Mode):
+    *   Download the code.
+    *   Go to `chrome://extensions`.
+    *   Enable "Developer mode".
+    *   "Load unpacked" and select the folder.
 
 ---
 
-## 🛠️ Contribuer
+## 🛠️ Contribute
 
-Ce projet est open-source et communautaire !
-Nous avons besoin de vos idées pour la **Modularisation** du code et de nouvelles features.
+This project is open-source and community-driven!
+We need your ideas for **Code Modularization** and new features.
 
-👉 **Voir [TODO.md](TODO.md) pour la roadmap actuelle.**
+👉 **See [TODO.md](TODO.md) for the current roadmap.**
 
 ---
 
-*Développé avec ❤️ par Lnkhey.*
+*Developed with ❤️ by Lnkhey.*
