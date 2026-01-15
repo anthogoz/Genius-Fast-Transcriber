@@ -1,6 +1,6 @@
-// content.js (Version 2.7.5 - Extension Complète)
+// content.js (Version 2.7.6 - Extension Complète)
 /**
- * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.7.5.
+ * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.7.6.
  * Ce script s'injecte dans les pages du site genius.com.
  * Il détecte la présence de l'éditeur de paroles et y ajoute un panneau d'outils
  * pour accélérer et fiabiliser la transcription (ajout de tags, correction de texte, etc.).
@@ -20,10 +20,10 @@
  * - Création de Lyric Cards avec formatage et partage
  * 
  * @author Lnkhey
- * @version 2.7.5
+ * @version 2.7.6
  */
 
-console.log('Genius Fast Transcriber (by Lnkhey) v2.7.5 - Toutes fonctionnalités activées ! 🎵');
+console.log('Genius Fast Transcriber (by Lnkhey) v2.7.6 - Toutes fonctionnalités activées ! 🎵');
 
 // ----- Injection des animations CSS essentielles -----
 // Injecte l'animation de surlignage pour s'assurer qu'elle fonctionne même si les styles CSS de Genius l'écrasent
@@ -189,8 +189,8 @@ const TRANSLATIONS = {
         btn_post_chorus_tooltip: "Insérer un tag [Post-refrain]",
         btn_unknown: "[?]",
         btn_unknown_tooltip: "Insérer un tag [?]",
-        btn_zws: "ZWS",
-        btn_zws_tooltip: "Insérer un caractère invisible (Zero Width Space)",
+        btn_zws_remove: "Suppr. ZWS",
+        btn_zws_remove_tooltip: "Supprime les caractères invisibles (Zero Width Space)",
         // Cleanup Tools
         cleanup_capitalize: "Maj. Début",
         cleanup_capitalize_tooltip: "Met une majuscule au début de chaque ligne",
@@ -206,6 +206,16 @@ const TRANSLATIONS = {
         btn_y_label: "y' → y",
         btn_apostrophe_label: "' → '",
         btn_oeu_label: "oeu → œu",
+        btn_french_quotes_label: "«» → \"",
+        cleanup_french_quotes_tooltip: "Remplace les guillemets français «» par des guillemets droits \"",
+        btn_long_dash_label: "— → -",
+        cleanup_long_dash_tooltip: "Remplace les tirets longs (— –) par des tirets courts (-)",
+        btn_double_spaces_label: "Doubles espaces",
+        cleanup_double_spaces_tooltip: "Supprime les espaces en double",
+        btn_duplicate_line_label: "📋 Dupliquer ligne",
+        cleanup_duplicate_line_tooltip: "Duplique la ligne actuelle (Ctrl+D)",
+        btn_adlib_label: "(Ad-lib)",
+        cleanup_adlib_tooltip: "Entoure le texte sélectionné de parenthèses pour les ad-libs",
         btn_capitalize_label: "Maj. début ligne",
         btn_punctuation_label: "Suppr. ., fin ligne",
         btn_spacing_label: "Corriger Espacement",
@@ -358,8 +368,8 @@ const TRANSLATIONS = {
         btn_post_chorus_tooltip: "Insérer un tag [Post-refrain]",
         btn_unknown: "[?]",
         btn_unknown_tooltip: "Insérer un tag [?]",
-        btn_zws: "ZWS",
-        btn_zws_tooltip: "Insérer un caractère invisible (Zero Width Space)",
+        btn_zws_remove: "Suppr. ZWS",
+        btn_zws_remove_tooltip: "Supprime les caractères invisibles (Zero Width Space)",
         // Cleanup Tools - REVERT TO FRENCH (Specific to French typography)
         cleanup_capitalize: "Maj. Début",
         cleanup_capitalize_tooltip: "Met une majuscule au début de chaque ligne",
@@ -375,6 +385,16 @@ const TRANSLATIONS = {
         btn_y_label: "y' → y",
         btn_apostrophe_label: "' → '",
         btn_oeu_label: "oeu → œu",
+        btn_french_quotes_label: "«» → \"",
+        cleanup_french_quotes_tooltip: "Remplace les guillemets français «» par des guillemets droits \"",
+        btn_long_dash_label: "— → -",
+        cleanup_long_dash_tooltip: "Remplace les tirets longs (— –) par des tirets courts (-)",
+        btn_double_spaces_label: "Doubles espaces",
+        cleanup_double_spaces_tooltip: "Supprime les espaces en double",
+        btn_duplicate_line_label: "📋 Dupliquer ligne",
+        cleanup_duplicate_line_tooltip: "Duplique la ligne actuelle (Ctrl+D)",
+        btn_adlib_label: "(Ad-lib)",
+        cleanup_adlib_tooltip: "Entoure le texte sélectionné de parenthèses pour les ad-libs",
         btn_capitalize_label: "Maj. début ligne",
         btn_punctuation_label: "Suppr. ., fin ligne",
         btn_spacing_label: "Corriger Espacement",
@@ -1270,6 +1290,21 @@ function highlightUnmatchedBracketsInEditor(editorNode, editorType) {
     console.log('[GFT] highlightUnmatchedBracketsInEditor appelée');
     console.log('[GFT] editorType:', editorType);
 
+    // Nettoyer les surlignages existants avant toute chose
+    if (editorType === 'div') {
+        const existingErrors = editorNode.querySelectorAll('.gft-bracket-error');
+        existingErrors.forEach(span => {
+            const text = span.textContent;
+            const textNode = document.createTextNode(text);
+            span.parentNode.replaceChild(textNode, span);
+        });
+        // Normaliser pour fusionner les nœuds texte adjacents
+        editorNode.normalize();
+    } else {
+        const existingOverlay = document.getElementById('gft-textarea-overlay');
+        if (existingOverlay) existingOverlay.remove();
+    }
+
     const text = editorType === 'textarea' ? editorNode.value : editorNode.textContent;
     console.log('[GFT] Texte à analyser (longueur):', text.length);
 
@@ -1440,6 +1475,21 @@ function createFloatingFormattingToolbar() {
     toolbar.id = FLOATING_TOOLBAR_ID;
     toolbar.className = 'gft-floating-toolbar';
 
+    // Bouton Créer Lyrics Card
+    const lyricsCardButton = document.createElement('button');
+    lyricsCardButton.textContent = getTranslation('create_lyric_card');
+    lyricsCardButton.classList.add('gft-floating-format-button', 'gft-lyric-card-btn');
+    lyricsCardButton.title = getTranslation('toolbar_lyric_card_tooltip');
+    lyricsCardButton.type = 'button';
+    lyricsCardButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        generateLyricsCard();
+    });
+    addTooltip(lyricsCardButton, getTranslation('toolbar_lyric_card_tooltip'));
+
+    toolbar.appendChild(lyricsCardButton);
+
     // Bouton Gras
     if (!isLyricCardOnlyMode()) {
         const boldButton = document.createElement('button');
@@ -1472,21 +1522,6 @@ function createFloatingFormattingToolbar() {
         toolbar.appendChild(italicButton);
     }
 
-    // Bouton Créer Lyrics Card
-    const lyricsCardButton = document.createElement('button');
-    lyricsCardButton.textContent = getTranslation('create_lyric_card');
-    lyricsCardButton.classList.add('gft-floating-format-button', 'gft-lyric-card-btn');
-    lyricsCardButton.title = getTranslation('toolbar_lyric_card_tooltip');
-    lyricsCardButton.type = 'button';
-    lyricsCardButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        generateLyricsCard();
-    });
-    addTooltip(lyricsCardButton, getTranslation('toolbar_lyric_card_tooltip'));
-
-    toolbar.appendChild(lyricsCardButton);
-
     // Bouton Nombre → Lettres (Seulement en mode full)
     if (!isLyricCardOnlyMode()) {
         const numberButton = document.createElement('button');
@@ -1504,6 +1539,21 @@ function createFloatingFormattingToolbar() {
         toolbar.appendChild(numberButton);
     }
 
+    // Bouton Ad-lib (Seulement en mode full)
+    if (!isLyricCardOnlyMode()) {
+        const adlibButton = document.createElement('button');
+        adlibButton.textContent = getTranslation('btn_adlib_label');
+        adlibButton.classList.add('gft-floating-format-button', 'gft-adlib-button');
+        adlibButton.title = getTranslation('cleanup_adlib_tooltip');
+        adlibButton.type = 'button';
+        adlibButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            wrapSelectionWithAdlib();
+        });
+        addTooltip(adlibButton, getTranslation('cleanup_adlib_tooltip'));
+        toolbar.appendChild(adlibButton);
+    }
 
     document.body.appendChild(toolbar);
 
@@ -1645,6 +1695,68 @@ function convertNumberToWords() {
     }, 100);
 
     // Cache la barre d'outils après la conversion
+    hideFloatingToolbar();
+}
+
+/**
+ * Entoure le texte sélectionné de parenthèses pour les ad-libs.
+ */
+function wrapSelectionWithAdlib() {
+    if (!currentActiveEditor) return;
+
+    // Active le flag pour désactiver la sauvegarde automatique
+    isButtonActionInProgress = true;
+    if (autoSaveTimeout) {
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = null;
+    }
+
+    // Sauvegarde dans l'historique
+    saveToHistory();
+
+    let selectedText = '';
+    let replaced = false;
+
+    if (currentEditorType === 'textarea') {
+        const start = currentActiveEditor.selectionStart;
+        const end = currentActiveEditor.selectionEnd;
+
+        if (start !== end) {
+            selectedText = currentActiveEditor.value.substring(start, end);
+            const wrappedText = '(' + selectedText + ')';
+
+            currentActiveEditor.setSelectionRange(start, end);
+            document.execCommand('insertText', false, wrappedText);
+            replaced = true;
+        }
+    } else if (currentEditorType === 'div') {
+        const selection = window.getSelection();
+        if (selection.rangeCount > 0 && !selection.isCollapsed) {
+            selectedText = selection.toString();
+            const wrappedText = '(' + selectedText + ')';
+
+            document.execCommand('insertText', false, wrappedText);
+            currentActiveEditor.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+            replaced = true;
+        }
+    }
+
+    if (replaced) {
+        showFeedbackMessage("(Ad-lib) ajouté !", 2000, shortcutsContainerElement);
+    } else {
+        showFeedbackMessage("⚠️ Sélectionnez du texte d'abord", 2000, shortcutsContainerElement);
+    }
+
+    // Désactive le flag après un court délai et met à jour lastSavedContent
+    setTimeout(() => {
+        isButtonActionInProgress = false;
+        if (currentActiveEditor) {
+            lastSavedContent = getCurrentEditorContent();
+            hasUnsavedChanges = false;
+        }
+    }, 100);
+
+    // Cache la barre d'outils après l'action
     hideFloatingToolbar();
 }
 
@@ -2383,6 +2495,9 @@ function showCorrectionPreview(originalText, correctedText, initialCorrections, 
         yPrime: true,
         apostrophes: true,
         oeuLigature: true,
+        frenchQuotes: true,
+        longDash: true,
+        doubleSpaces: true,
         capitalization: true,
         punctuation: true,
         spacing: true
@@ -2446,6 +2561,9 @@ function showCorrectionPreview(originalText, correctedText, initialCorrections, 
     optionsContainer.appendChild(createOption('yPrime', "y' → y"));
     optionsContainer.appendChild(createOption('apostrophes', "Apostrophes '"));
     optionsContainer.appendChild(createOption('oeuLigature', "oeu → œu"));
+    optionsContainer.appendChild(createOption('frenchQuotes', "Guillemets «» → \""));
+    optionsContainer.appendChild(createOption('longDash', "Tirets longs — – → -"));
+    optionsContainer.appendChild(createOption('doubleSpaces', "Doubles espaces"));
     optionsContainer.appendChild(createOption('capitalization', "Majuscules (début ligne)"));
     optionsContainer.appendChild(createOption('punctuation', "Ponctuation (fin ligne)"));
     optionsContainer.appendChild(createOption('spacing', "Espacement (lignes)"));
@@ -2517,6 +2635,9 @@ function showCorrectionPreview(originalText, correctedText, initialCorrections, 
         if (options.yPrime && currentStats.yPrime > 0) detailsArray.push(`${currentStats.yPrime} "y'"`);
         if (options.apostrophes && currentStats.apostrophes > 0) detailsArray.push(`${currentStats.apostrophes} apostrophes`);
         if (options.oeuLigature && currentStats.oeuLigature > 0) detailsArray.push(`${currentStats.oeuLigature} "oeu"`);
+        if (options.frenchQuotes && currentStats.frenchQuotes > 0) detailsArray.push(`${currentStats.frenchQuotes} guillemets «»`);
+        if (options.longDash && currentStats.longDash > 0) detailsArray.push(`${currentStats.longDash} tirets longs`);
+        if (options.doubleSpaces && currentStats.doubleSpaces > 0) detailsArray.push(`${currentStats.doubleSpaces} doubles espaces`);
         if (options.capitalization && currentStats.capitalization > 0) detailsArray.push(`${currentStats.capitalization} majuscules`);
         if (options.punctuation && currentStats.punctuation > 0) detailsArray.push(`${currentStats.punctuation} ponctuations`);
         if (options.spacing && currentStats.spacing > 0) detailsArray.push(`${currentStats.spacing} espacements`);
@@ -4072,6 +4193,9 @@ function applyAllTextCorrectionsToString(text, options = {}) {
         yPrime: options.yPrime !== false,
         apostrophes: options.apostrophes !== false,
         oeuLigature: options.oeuLigature !== false,
+        frenchQuotes: options.frenchQuotes !== false,
+        longDash: options.longDash !== false,
+        doubleSpaces: options.doubleSpaces !== false,
         capitalization: options.capitalization !== false,
         punctuation: options.punctuation !== false,
         spacing: options.spacing !== false
@@ -4085,6 +4209,9 @@ function applyAllTextCorrectionsToString(text, options = {}) {
         yPrime: 0,
         apostrophes: 0,
         oeuLigature: 0,
+        frenchQuotes: 0,
+        longDash: 0,
+        doubleSpaces: 0,
         capitalization: 0,
         punctuation: 0,
         spacing: 0
@@ -4092,7 +4219,7 @@ function applyAllTextCorrectionsToString(text, options = {}) {
 
     // Correction de "y'" -> "y "
     if (opts.yPrime) {
-        const yPrimePattern = /\b(Y|y)['’]/g;
+        const yPrimePattern = /\b(Y|y)['']/g;
         const yPrimeReplacement = (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y ');
         const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
         if (textAfterYPrime !== currentText) {
@@ -4103,7 +4230,7 @@ function applyAllTextCorrectionsToString(text, options = {}) {
 
     // Correction de l'apostrophe typographique ' -> '
     if (opts.apostrophes) {
-        const apostrophePattern = /['’]/g;
+        const apostrophePattern = /['']/g;
         const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
         if (textAfterApostrophe !== currentText) {
             corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
@@ -4119,6 +4246,36 @@ function applyAllTextCorrectionsToString(text, options = {}) {
         if (textAfterOeu !== currentText) {
             corrections.oeuLigature = (currentText.match(oeuPattern) || []).length;
             currentText = textAfterOeu;
+        }
+    }
+
+    // Correction des guillemets français «» -> "
+    if (opts.frenchQuotes) {
+        const frenchQuotesPattern = /[«»]/g;
+        const textAfterFrenchQuotes = currentText.replace(frenchQuotesPattern, '"');
+        if (textAfterFrenchQuotes !== currentText) {
+            corrections.frenchQuotes = (currentText.match(frenchQuotesPattern) || []).length;
+            currentText = textAfterFrenchQuotes;
+        }
+    }
+
+    // Correction des tirets longs — – -> -
+    if (opts.longDash) {
+        const longDashPattern = /[—–]/g;
+        const textAfterLongDash = currentText.replace(longDashPattern, '-');
+        if (textAfterLongDash !== currentText) {
+            corrections.longDash = (currentText.match(longDashPattern) || []).length;
+            currentText = textAfterLongDash;
+        }
+    }
+
+    // Correction des doubles espaces
+    if (opts.doubleSpaces) {
+        const doubleSpacesPattern = /  +/g;
+        const textAfterDoubleSpaces = currentText.replace(doubleSpacesPattern, ' ');
+        if (textAfterDoubleSpaces !== currentText) {
+            corrections.doubleSpaces = (currentText.match(doubleSpacesPattern) || []).length;
+            currentText = textAfterDoubleSpaces;
         }
     }
 
@@ -4149,7 +4306,8 @@ function applyAllTextCorrectionsToString(text, options = {}) {
 
     // Calcul du total
     const totalCorrections = corrections.yPrime + corrections.apostrophes +
-        corrections.oeuLigature + corrections.capitalization +
+        corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash +
+        corrections.doubleSpaces + corrections.capitalization +
         corrections.punctuation + corrections.spacing;
 
     return { newText: currentText, correctionsCount: totalCorrections, corrections: corrections };
@@ -4163,13 +4321,16 @@ function applyAllTextCorrectionsToString(text, options = {}) {
 async function applyAllTextCorrectionsAsync(text) {
     let currentText = text;
     let result;
-    const totalSteps = 6;
+    const totalSteps = 9;
 
     // Objet pour tracker les corrections par type
     const corrections = {
         yPrime: 0,
         apostrophes: 0,
         oeuLigature: 0,
+        frenchQuotes: 0,
+        longDash: 0,
+        doubleSpaces: 0,
         capitalization: 0,
         punctuation: 0,
         spacing: 0
@@ -4177,9 +4338,9 @@ async function applyAllTextCorrectionsAsync(text) {
 
     // Étape 1: Correction de "y'" -> "y "
     showProgress(1, totalSteps, 'Correction de "y\'"...');
-    await new Promise(resolve => setTimeout(resolve, 50)); // Petit délai pour l'affichage
+    await new Promise(resolve => setTimeout(resolve, 50));
 
-    const yPrimePattern = /\b(Y|y)['’]/g;
+    const yPrimePattern = /\b(Y|y)['']/g;
     const yPrimeReplacement = (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y ');
     const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
     if (textAfterYPrime !== currentText) {
@@ -4191,7 +4352,7 @@ async function applyAllTextCorrectionsAsync(text) {
     showProgress(2, totalSteps, 'Correction des apostrophes...');
     await new Promise(resolve => setTimeout(resolve, 50));
 
-    const apostrophePattern = /['’]/g;
+    const apostrophePattern = /['']/g;
     const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
     if (textAfterApostrophe !== currentText) {
         corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
@@ -4210,8 +4371,41 @@ async function applyAllTextCorrectionsAsync(text) {
         currentText = textAfterOeu;
     }
 
-    // Étape 4: Majuscules
-    showProgress(4, totalSteps, 'Majuscules en début de ligne...');
+    // Étape 4: Correction des guillemets français «» -> "
+    showProgress(4, totalSteps, 'Correction des guillemets «»...');
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    const frenchQuotesPattern = /[«»]/g;
+    const textAfterFrenchQuotes = currentText.replace(frenchQuotesPattern, '"');
+    if (textAfterFrenchQuotes !== currentText) {
+        corrections.frenchQuotes = (currentText.match(frenchQuotesPattern) || []).length;
+        currentText = textAfterFrenchQuotes;
+    }
+
+    // Étape 5: Correction des tirets longs
+    showProgress(5, totalSteps, 'Correction des tirets longs...');
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    const longDashPattern = /[—–]/g;
+    const textAfterLongDash = currentText.replace(longDashPattern, '-');
+    if (textAfterLongDash !== currentText) {
+        corrections.longDash = (currentText.match(longDashPattern) || []).length;
+        currentText = textAfterLongDash;
+    }
+
+    // Étape 6: Correction des doubles espaces
+    showProgress(6, totalSteps, 'Suppression des doubles espaces...');
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    const doubleSpacesPattern = /  +/g;
+    const textAfterDoubleSpaces = currentText.replace(doubleSpacesPattern, ' ');
+    if (textAfterDoubleSpaces !== currentText) {
+        corrections.doubleSpaces = (currentText.match(doubleSpacesPattern) || []).length;
+        currentText = textAfterDoubleSpaces;
+    }
+
+    // Étape 7: Majuscules
+    showProgress(7, totalSteps, 'Majuscules en début de ligne...');
     await new Promise(resolve => setTimeout(resolve, 50));
 
     result = capitalizeFirstLetterOfEachLine(currentText);
@@ -4220,8 +4414,8 @@ async function applyAllTextCorrectionsAsync(text) {
         currentText = result.newText;
     }
 
-    // Étape 5: Ponctuation
-    showProgress(5, totalSteps, 'Suppression de la ponctuation...');
+    // Étape 8: Ponctuation
+    showProgress(8, totalSteps, 'Suppression de la ponctuation...');
     await new Promise(resolve => setTimeout(resolve, 50));
 
     result = removeTrailingPunctuationFromLines(currentText);
@@ -4230,8 +4424,8 @@ async function applyAllTextCorrectionsAsync(text) {
         currentText = result.newText;
     }
 
-    // Étape 6: Espacement
-    showProgress(6, totalSteps, 'Correction de l\'espacement...');
+    // Étape 9: Espacement
+    showProgress(9, totalSteps, 'Correction de l\'espacement...');
     await new Promise(resolve => setTimeout(resolve, 50));
 
     result = correctLineSpacing(currentText);
@@ -4242,7 +4436,8 @@ async function applyAllTextCorrectionsAsync(text) {
 
     // Calcul du total
     const totalCorrections = corrections.yPrime + corrections.apostrophes +
-        corrections.oeuLigature + corrections.capitalization +
+        corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash +
+        corrections.doubleSpaces + corrections.capitalization +
         corrections.punctuation + corrections.spacing;
 
     return { newText: currentText, correctionsCount: totalCorrections, corrections: corrections };
@@ -4283,8 +4478,7 @@ function initLyricsEditorEnhancer() {
                     { label: getTranslation('btn_bridge'), getText: () => addArtistToText('[Pont]'), tooltip: getTranslation('btn_bridge_tooltip'), shortcut: '3' },
                     { label: getTranslation('btn_outro'), getText: () => addArtistToText('[Outro]'), tooltip: getTranslation('btn_outro_tooltip'), shortcut: '5' },
                     { label: getTranslation('btn_instrumental'), getText: () => formatSimpleTag('[Instrumental]'), tooltip: getTranslation('btn_instrumental_tooltip') },
-                    { label: getTranslation('btn_unknown'), getText: () => formatSimpleTag('[?]', true), tooltip: getTranslation('btn_unknown_tooltip') },
-                    { label: getTranslation('btn_zws'), text: '\u200B', tooltip: getTranslation('btn_zws_tooltip') }
+                    { label: getTranslation('btn_unknown'), getText: () => formatSimpleTag('[?]', true), tooltip: getTranslation('btn_unknown_tooltip') }
                 ]
             }
         ],
@@ -4312,6 +4506,44 @@ function initLyricsEditorEnhancer() {
                 replacementFunction: (match, firstLetter) => (firstLetter === 'O' ? 'Œu' : 'œu'),
                 highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
                 tooltip: getTranslation('cleanup_oeu_tooltip')
+            },
+            {
+                label: getTranslation('btn_french_quotes_label'),
+                action: 'replaceText',
+                searchPattern: /[«»]/g,
+                replacementText: '"',
+                highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+                tooltip: getTranslation('cleanup_french_quotes_tooltip')
+            },
+            {
+                label: getTranslation('btn_long_dash_label'),
+                action: 'replaceText',
+                searchPattern: /[—–]/g,
+                replacementText: '-',
+                highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+                tooltip: getTranslation('cleanup_long_dash_tooltip')
+            },
+            {
+                label: getTranslation('btn_double_spaces_label'),
+                action: 'replaceText',
+                searchPattern: /  +/g,
+                replacementText: ' ',
+                highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+                tooltip: getTranslation('cleanup_double_spaces_tooltip')
+            },
+            {
+                label: getTranslation('btn_zws_remove'),
+                action: 'replaceText',
+                searchPattern: /[\u200B\u200C\u200D\uFEFF]/g,
+                replacementText: '',
+                highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+                tooltip: getTranslation('btn_zws_remove_tooltip')
+            },
+            {
+                label: getTranslation('btn_duplicate_line_label'),
+                action: 'duplicateLine',
+                tooltip: getTranslation('cleanup_duplicate_line_tooltip'),
+                shortcut: 'D'
             },
             {
                 label: getTranslation('btn_capitalize_label'),
@@ -4784,23 +5016,21 @@ function initLyricsEditorEnhancer() {
                                             const unmatchedCount = highlightUnmatchedBracketsInEditor(editorRef, editorTypeRef);
                                             console.log('[GFT] unmatchedCount:', unmatchedCount);
 
-                                            // Affiche le résultat après un délai
-                                            setTimeout(() => {
-                                                if (unmatchedCount > 0) {
-                                                    const pluriel = unmatchedCount > 1 ? 's' : '';
-                                                    showFeedbackMessage(
-                                                        `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} détecté${pluriel} et surligné${pluriel} en rouge !`,
-                                                        5000,
-                                                        shortcutsContainerElement
-                                                    );
-                                                } else {
-                                                    showFeedbackMessage(
-                                                        "✅ Toutes les parenthèses et crochets sont bien appariés.",
-                                                        3000,
-                                                        shortcutsContainerElement
-                                                    );
-                                                }
-                                            }, 2100);
+                                            // Affiche le résultat immédiatement
+                                            if (unmatchedCount > 0) {
+                                                const pluriel = unmatchedCount > 1 ? 's' : '';
+                                                showFeedbackMessage(
+                                                    `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} détecté${pluriel} et surligné${pluriel} en rouge !`,
+                                                    5000,
+                                                    shortcutsContainerElement
+                                                );
+                                            } else {
+                                                showFeedbackMessage(
+                                                    "✅ Toutes les parenthèses et crochets sont bien appariés.",
+                                                    3000,
+                                                    shortcutsContainerElement
+                                                );
+                                            }
                                         } else {
                                             console.log('[GFT] editorRef est null, impossible de vérifier les brackets');
                                         }
@@ -4905,6 +5135,86 @@ function initLyricsEditorEnhancer() {
                                     3000,
                                     shortcutsContainerElement
                                 );
+                            }
+                        } else if (config.action === 'duplicateLine') {
+                            // Duplique la ligne actuelle
+                            saveToHistory();
+
+                            if (currentEditorType === 'textarea') {
+                                const text = currentActiveEditor.value;
+                                const cursorPos = currentActiveEditor.selectionStart;
+
+                                // Trouve le début et la fin de la ligne actuelle
+                                let lineStart = text.lastIndexOf('\n', cursorPos - 1) + 1;
+                                let lineEnd = text.indexOf('\n', cursorPos);
+                                if (lineEnd === -1) lineEnd = text.length;
+
+                                const currentLine = text.substring(lineStart, lineEnd);
+                                const newText = text.substring(0, lineEnd) + '\n' + currentLine + text.substring(lineEnd);
+
+                                currentActiveEditor.value = newText;
+                                currentActiveEditor.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+
+                                // Place le curseur au début de la nouvelle ligne
+                                const newCursorPos = lineEnd + 1 + currentLine.length;
+                                currentActiveEditor.setSelectionRange(newCursorPos, newCursorPos);
+
+                                showFeedbackMessage("📋 Ligne dupliquée !", 2000, shortcutsContainerElement);
+                            } else if (currentEditorType === 'div') {
+                                // Pour les divs, on utilise execCommand
+                                const selection = window.getSelection();
+                                if (selection.rangeCount > 0) {
+                                    const range = selection.getRangeAt(0);
+                                    const node = range.startContainer;
+                                    let lineText = '';
+
+                                    if (node.nodeType === Node.TEXT_NODE) {
+                                        lineText = node.textContent;
+                                    } else if (node.textContent) {
+                                        lineText = node.textContent;
+                                    }
+
+                                    if (lineText) {
+                                        document.execCommand('insertText', false, '\n' + lineText);
+                                        currentActiveEditor.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+                                        showFeedbackMessage("📋 Ligne dupliquée !", 2000, shortcutsContainerElement);
+                                    }
+                                }
+                            }
+                        } else if (config.action === 'wrapSelection') {
+                            // Entoure la sélection avec les caractères spécifiés
+                            let selectedText = '';
+
+                            if (currentEditorType === 'textarea') {
+                                const start = currentActiveEditor.selectionStart;
+                                const end = currentActiveEditor.selectionEnd;
+
+                                if (start !== end) {
+                                    saveToHistory();
+                                    selectedText = currentActiveEditor.value.substring(start, end);
+                                    const wrappedText = config.wrapStart + selectedText + config.wrapEnd;
+
+                                    currentActiveEditor.setSelectionRange(start, end);
+                                    document.execCommand('insertText', false, wrappedText);
+
+                                    showFeedbackMessage(`Texte entouré : ${config.wrapStart}...${config.wrapEnd}`, 2000, shortcutsContainerElement);
+                                } else {
+                                    showFeedbackMessage("⚠️ Sélectionnez du texte d'abord", 2000, shortcutsContainerElement);
+                                }
+                            } else if (currentEditorType === 'div') {
+                                const selection = window.getSelection();
+                                if (selection.rangeCount > 0 && !selection.isCollapsed) {
+                                    saveToHistory();
+                                    selectedText = selection.toString();
+                                    const wrappedText = config.wrapStart + selectedText + config.wrapEnd;
+
+                                    document.execCommand('insertText', false, wrappedText);
+                                    currentActiveEditor.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
+
+                                    showFeedbackMessage(`Texte entouré : ${config.wrapStart}...${config.wrapEnd}`, 2000, shortcutsContainerElement);
+                                } else {
+                                    showFeedbackMessage("⚠️ Sélectionnez du texte d'abord", 2000, shortcutsContainerElement);
+                                }
                             }
                         }
                         else {
@@ -5163,8 +5473,8 @@ function initLyricsEditorEnhancer() {
 
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v2.7.5'; // Bump version visuelle pour le user
-                versionLabel.title = 'Genius Fast Transcriber v2.7.5 - Nouvelle Interface Premium';
+                versionLabel.textContent = 'v2.7.6'; // Bump version visuelle pour le user
+                versionLabel.title = 'Genius Fast Transcriber v2.7.6 - Nouvelle Interface Premium';
 
                 footerContainer.appendChild(creditLabel);
                 footerContainer.appendChild(versionLabel);
