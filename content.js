@@ -1,6 +1,6 @@
-// content.js (Version 2.7.6 - Extension Complète)
+// content.js (Version 2.7.7 - Extension Complète)
 /**
- * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.7.6.
+ * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.7.7.
  * Ce script s'injecte dans les pages du site genius.com.
  * Il détecte la présence de l'éditeur de paroles et y ajoute un panneau d'outils
  * pour accélérer et fiabiliser la transcription (ajout de tags, correction de texte, etc.).
@@ -20,10 +20,10 @@
  * - Création de Lyric Cards avec formatage et partage
  * 
  * @author Lnkhey
- * @version 2.7.6
+ * @version 2.7.7
  */
 
-console.log('Genius Fast Transcriber (by Lnkhey) v2.7.6 - Toutes fonctionnalités activées ! 🎵');
+console.log('Genius Fast Transcriber (by Lnkhey) v2.7.7 - Toutes fonctionnalités activées ! 🎵');
 
 // ----- Injection des animations CSS essentielles -----
 // Injecte l'animation de surlignage pour s'assurer qu'elle fonctionne même si les styles CSS de Genius l'écrasent
@@ -1458,7 +1458,8 @@ function toggleDarkMode() {
  */
 function loadDarkModePreference() {
     const savedPreference = localStorage.getItem(DARK_MODE_STORAGE_KEY);
-    const shouldBeDark = savedPreference === 'true';
+    // Par défaut, dark mode activé si aucune préférence n'est sauvegardée (première utilisation)
+    const shouldBeDark = savedPreference === null ? true : savedPreference === 'true';
     applyDarkMode(shouldBeDark);
 }
 
@@ -3232,8 +3233,23 @@ function closeSettingsMenuOnClickOutside(event) {
 let gftYoutubePlayerState = {
     isPlaying: null, // null = inconnu au départ (pour éviter le double-toggle)
     currentTime: 0,
-    timestamp: 0
+    timestamp: 0, // Timestamp de la dernière mise à jour du currentTime
+    activeIframeSrc: null // Pour tracker quelle iframe est active
 };
+
+/**
+ * Estime le temps actuel de la vidéo en tenant compte du temps écoulé depuis la dernière mise à jour.
+ * @returns {number} Le temps estimé en secondes.
+ */
+function getEstimatedCurrentTime() {
+    if (gftYoutubePlayerState.isPlaying === true && gftYoutubePlayerState.timestamp > 0) {
+        // Si la vidéo joue, on ajoute le temps écoulé depuis la dernière mise à jour
+        const elapsedMs = Date.now() - gftYoutubePlayerState.timestamp;
+        const elapsedSeconds = elapsedMs / 1000;
+        return gftYoutubePlayerState.currentTime + elapsedSeconds;
+    }
+    return gftYoutubePlayerState.currentTime;
+}
 
 // Écoute les messages de l'iframe YouTube pour mettre à jour l'état (nécessaire pour toggle et seek)
 window.addEventListener('message', (event) => {
@@ -3244,21 +3260,57 @@ window.addEventListener('message', (event) => {
             const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
 
             if (data.event === 'infoDelivery' && data.info) {
-                if (data.info.currentTime) {
+                if (data.info.currentTime !== undefined) {
                     gftYoutubePlayerState.currentTime = data.info.currentTime;
-                    // On peut aussi estimer le temps écoulé depuis le dernier update
                     gftYoutubePlayerState.timestamp = Date.now();
                 }
                 if (data.info.playerState !== undefined) {
                     // 1 = Playing, 2 = Paused, 3 = Buffering, ...
+                    const wasPlaying = gftYoutubePlayerState.isPlaying;
                     gftYoutubePlayerState.isPlaying = data.info.playerState === 1;
+
+                    // Si on passe de playing à pause, on met à jour le timestamp
+                    if (wasPlaying === true && gftYoutubePlayerState.isPlaying === false) {
+                        gftYoutubePlayerState.timestamp = Date.now();
+                    }
                 }
+            }
+
+            // Réponse à l'événement "onReady" - le player est prêt
+            if (data.event === 'onReady') {
+                // Demander les mises à jour continues
+                startListeningToYoutube();
             }
         } catch (e) {
             // Ignore parse errors
         }
     }
 });
+
+/**
+ * Demande à YouTube de commencer à envoyer des mises à jour de l'état du player.
+ */
+function startListeningToYoutube() {
+    const iframes = document.querySelectorAll('iframe[src*="youtube.com"], iframe[src*="youtu.be"], iframe[src*="youtube-nocookie.com"]');
+    iframes.forEach(iframe => {
+        try {
+            // Envoie l'événement "listening" pour commencer à recevoir les mises à jour
+            iframe.contentWindow.postMessage(JSON.stringify({
+                'event': 'listening',
+                'id': 1,
+                'channel': 'widget'
+            }), '*');
+
+            // Demande aussi les infos actuelles
+            iframe.contentWindow.postMessage(JSON.stringify({
+                'event': 'command',
+                'func': 'getVideoData'
+            }), '*');
+        } catch (e) {
+            // Ignore errors
+        }
+    });
+}
 
 /**
  * Active l'API JS sur les iframes YouTube pour permettre le contrôle via postMessage.
@@ -3270,7 +3322,6 @@ function enableYoutubeJsApi() {
         try {
             // Vérifie si l'API est déjà activée
             if (iframe.src && !iframe.src.includes('enablejsapi=1')) {
-                // Évite de recharger si c'est juste une frame publicitaire ou autre (check basique)
                 // Ajoute le paramètre
                 const separator = iframe.src.includes('?') ? '&' : '?';
                 iframe.src += `${separator}enablejsapi=1`;
@@ -3280,6 +3331,31 @@ function enableYoutubeJsApi() {
             console.warn('[GFT] Impossible de modifier iframe src (CORS?):', e);
         }
     });
+
+    // Initialise l'écoute après un court délai pour que l'iframe se recharge
+    setTimeout(startListeningToYoutube, 1000);
+}
+
+/**
+ * Trouve le premier lecteur YouTube visible sur la page.
+ * @returns {HTMLIFrameElement|null} L'iframe du lecteur ou null.
+ */
+function findVisibleYoutubePlayer() {
+    const iframes = document.querySelectorAll('iframe[src*="youtube.com"], iframe[src*="youtu.be"], iframe[src*="youtube-nocookie.com"]');
+
+    for (const iframe of iframes) {
+        // Vérifie si l'iframe est visible
+        const rect = iframe.getBoundingClientRect();
+        const isVisible = rect.width > 0 && rect.height > 0 &&
+            rect.top < window.innerHeight && rect.bottom > 0;
+
+        if (isVisible) {
+            return iframe;
+        }
+    }
+
+    // Fallback : retourne la première iframe si aucune n'est visible
+    return iframes.length > 0 ? iframes[0] : null;
 }
 
 /**
@@ -3290,7 +3366,7 @@ function controlYoutubePlayer(command) {
     // On s'assure d'abord que les iframes ont l'API activée
     enableYoutubeJsApi();
 
-    const playerIframe = document.querySelector('iframe[src*="youtube.com"], iframe[src*="youtu.be"], iframe[src*="youtube-nocookie.com"]');
+    const playerIframe = findVisibleYoutubePlayer();
 
     if (!playerIframe) {
         showFeedbackMessage("Lecteur YouTube introuvable.", 2000);
@@ -3308,30 +3384,6 @@ function controlYoutubePlayer(command) {
 
     switch (command) {
         case 'togglePlay':
-            // Si l'état est inconnu (premier chargement), on suppose que l'utilisateur veut agir.
-            // Le problème est qu'on ne sait pas si ça joue ou pas.
-            // Astuce : On envoie d'abord une commande neutre ou on force un état si on détecte du mouvement ?
-            // Mieux : Si c'est null, on regarde si on a reçu des updates récents.
-            // Sinon, on tente de "Play" par défaut car c'est souvent ce qu'on veut, 
-            // MAIS si c'est déjà playing, ça ne fera rien.
-            // ALTERNATIVE ROBUSTE : On utilise le fait que 'pauseVideo' met en pause et 'playVideo' lance.
-            // Si on ne sait pas, on peut juste envoyer "play" ? Non, ça casse le toggle.
-
-            // Correction spécifique pour le "first toggle bug" :
-            // Souvent la vidéo joue déjà MAIS on n'a pas reçu d'event (car on vient d'arriver).
-            // Donc isPlaying est false (ou null). On envoie 'playVideo' -> ça continue de jouer -> rien ne se passe visuellement.
-            // Et l'utilisateur doit refaire le raccourci.
-
-            // Solution : Si état inconnu, on ne peut pas deviner.
-            // Mais on peut écouter les événements. 
-            // Si on n'a aucune info, on assume que si le temps avance, c'est que ça joue ?
-            // Pas fiable.
-
-            // Approche pragmatique :
-            // Si gftYoutubePlayerState.isPlaying est TRUE, c'est sûr que ça joue.
-            // Si c'est FALSE ou NULL, ça peut être "en pause" OU "en lecture mais pas encore détecté".
-            // Le seul moyen d'être sûr est d'avoir reçu un event.
-
             if (gftYoutubePlayerState.isPlaying === true) {
                 postCmd('pauseVideo');
                 gftYoutubePlayerState.isPlaying = false;
@@ -3339,59 +3391,39 @@ function controlYoutubePlayer(command) {
             } else if (gftYoutubePlayerState.isPlaying === false) {
                 postCmd('playVideo');
                 gftYoutubePlayerState.isPlaying = true;
+                gftYoutubePlayerState.timestamp = Date.now(); // Reset le timestamp pour l'estimation
                 showFeedbackMessage('▶️ Lecture', 1000);
             } else {
-                // État NULL (inconnu)
-                // C'est le cas délicat. Souvent la vidéo joue déjà en background.
-                // On va tenter de mettre en PAUSE car c'est moins destructif que de relancer une vidéo qui joue déjà ?
-                // Non, si on veut lancer la musique c'est chiant.
-                // Essayons d'envoyer une commande spéciale pour demander l'état ? Non dispo en postMessage simple.
-
-                // On va forcer PLAY. Pourquoi ?
-                // 1. Si c'est en pause -> ça lance (Super).
-                // 2. Si ça joue déjà -> ça continue de jouer (Pas d'effet visible = Bug ressenti "ça marche pas").
-
-                // Inversement, si on force PAUSE :
-                // 1. Si c'est en pause -> ça reste en pause (Bug ressenti).
-                // 2. Si ça joue -> ça met en pause (Ok).
-
-                // FIX pour le User : "La vidéo est déjà en marche quand on fait le raccourci". 
-                // Donc le user veut PAUSE.
-                // Donc si état inconnu, on privilégie PAUSE ?
-                // Essayons de détecter si ça joue en regardant si on a reçu des time updates récents ?
-                // Non, car on n'a pas reçu de messages du tout souvent.
-
-                // Hack : On envoie 'pauseVideo'. Si l'utilisateur voulait play, il reraiblera. 
-                // Mais si la vidéo joue (cas fréquent reporté), ça la coupera, ce qui est le comportement attendu (Toggle).
+                // État NULL (inconnu) - on privilégie PAUSE car souvent la vidéo joue déjà
                 postCmd('pauseVideo');
-                gftYoutubePlayerState.isPlaying = false; // On assume qu'on a réussi à mettre en pause
+                gftYoutubePlayerState.isPlaying = false;
                 showFeedbackMessage('⏸️ Pause (Sync)', 1000);
             }
             break;
 
         case 'rewind':
-            if (gftYoutubePlayerState.currentTime !== undefined) {
-                // On recule de 5 secondes
-                const newTime = Math.max(0, gftYoutubePlayerState.currentTime - 5);
+            {
+                // Utilise le temps estimé pour tenir compte du temps écoulé
+                const estimatedTime = getEstimatedCurrentTime();
+                const newTime = Math.max(0, estimatedTime - 5);
                 postCmd('seekTo', [newTime, true]);
-                gftYoutubePlayerState.currentTime = newTime; // Mise à jour optimiste
-                showFeedbackMessage('⏪ -5s', 1000);
-            } else {
-                // Fallback: Si pas d'état, on tente juste un play (souvent réveille le player)
-                postCmd('playVideo');
-                showFeedbackMessage('⚠️ Lecture requise', 1000);
+                // Mise à jour de l'état
+                gftYoutubePlayerState.currentTime = newTime;
+                gftYoutubePlayerState.timestamp = Date.now();
+                showFeedbackMessage(`⏪ -5s (${Math.floor(newTime / 60)}:${String(Math.floor(newTime % 60)).padStart(2, '0')})`, 1000);
             }
             break;
 
         case 'forward':
-            if (gftYoutubePlayerState.currentTime !== undefined) {
-                const newTime = gftYoutubePlayerState.currentTime + 5;
+            {
+                // Utilise le temps estimé pour tenir compte du temps écoulé
+                const estimatedTime = getEstimatedCurrentTime();
+                const newTime = estimatedTime + 5;
                 postCmd('seekTo', [newTime, true]);
+                // Mise à jour de l'état
                 gftYoutubePlayerState.currentTime = newTime;
-                showFeedbackMessage('⏩ +5s', 1000);
-            } else {
-                postCmd('playVideo');
-                showFeedbackMessage('⚠️ Lecture requise', 1000);
+                gftYoutubePlayerState.timestamp = Date.now();
+                showFeedbackMessage(`⏩ +5s (${Math.floor(newTime / 60)}:${String(Math.floor(newTime % 60)).padStart(2, '0')})`, 1000);
             }
             break;
     }
@@ -3895,6 +3927,7 @@ function capitalizeFirstLetterOfEachLine(text) {
 
 /**
  * Supprime la ponctuation (virgules, points) à la fin des lignes.
+ * Préserve les points de suspension (... ou …).
  * @param {string} text - Le texte à corriger.
  * @returns {{newText: string, correctionsCount: number}} Le texte corrigé et le nombre de corrections.
  */
@@ -3902,7 +3935,15 @@ function removeTrailingPunctuationFromLines(text) {
     let correctionsCount = 0;
     const lines = text.split('\n');
     const correctedLines = lines.map(line => {
+        const trimmedLine = line.trimEnd();
+
+        // Préserve les points de suspension (... ou le caractère Unicode …)
+        if (trimmedLine.endsWith('...') || trimmedLine.endsWith('…')) {
+            return line;
+        }
+
         const originalLineLength = line.length;
+        // Supprime seulement un point ou une virgule isolé en fin de ligne
         let correctedLine = line.replace(/([.,])\s*$/, '');
         if (correctedLine.length < originalLineLength) {
             correctionsCount++;
@@ -4568,16 +4609,16 @@ function initLyricsEditorEnhancer() {
                 correctionType: 'spacing',
                 title: getTranslation('cleanup_spacing_tooltip'),
                 tooltip: getTranslation('cleanup_spacing_tooltip')
-            }
-        ],
-        GLOBAL_FIXES: [
+            },
             {
                 label: getTranslation('btn_check_label'),
                 action: 'checkBrackets',
                 title: getTranslation('global_check_tooltip'),
                 tooltip: getTranslation('global_check_tooltip'),
                 shortcut: 'S'
-            },
+            }
+        ],
+        GLOBAL_FIXES: [
             {
                 label: getTranslation('btn_fix_all_label'), // Tout Corriger (Texte)
                 shortLabel: getTranslation('btn_fix_all_short'), // ✨ Tout Corriger
@@ -5397,14 +5438,14 @@ function initLyricsEditorEnhancer() {
                 if (SHORTCUTS.GLOBAL_FIXES && SHORTCUTS.GLOBAL_FIXES.length > 0) {
                     SHORTCUTS.GLOBAL_FIXES.forEach(s => {
                         const btn = createButton(s, mainActionsContainer);
-                        btn.classList.add('gft-btn-primary');
-                        btn.style.flex = '1'; // Boutons pleine largeur
+                        btn.classList.add('gft-btn-primary', 'gft-btn-main-action');
+                        btn.style.flex = '1';
                         btn.style.justifyContent = 'center';
 
                         // Ajout d'icônes si possible et usage de shortLabel
                         if (s.shortLabel) btn.textContent = s.shortLabel;
-                        else if (s.label.includes('Tout Corriger')) btn.innerHTML = s.label; // Fallback
-                        else if (s.label.includes('Vérifier')) btn.innerHTML = s.label; // Fallback
+                        else if (s.label.includes('Tout Corriger')) btn.innerHTML = s.label;
+                        else if (s.label.includes('Vérifier')) btn.innerHTML = s.label;
                     });
                 }
                 mainActionsSection.appendChild(mainActionsContainer);
@@ -5471,12 +5512,36 @@ function initLyricsEditorEnhancer() {
                 creditLabel.style.opacity = '0.6';
                 creditLabel.style.userSelect = 'none';
 
+                // Lien discret vers Transcription IA
+                const iaLink = document.createElement('a');
+                iaLink.textContent = '🤖 Transcription IA ↗';
+                iaLink.href = 'https://aistudio.google.com/apps/drive/1D16MbaGAWjUMTseOvzzvSDnccRbU-z_S?fullscreenApplet=true&showPreview=true&showAssistant=true';
+                iaLink.target = '_blank';
+                iaLink.rel = 'noopener noreferrer';
+                iaLink.style.fontSize = '10px';
+                iaLink.style.color = '#888';
+                iaLink.style.textDecoration = 'none';
+                iaLink.style.opacity = '0.6';
+                iaLink.style.cursor = 'pointer';
+                iaLink.style.transition = 'opacity 0.2s ease';
+                iaLink.title = 'Ouvrir l\'outil de transcription IA';
+
+                iaLink.addEventListener('mouseenter', () => {
+                    iaLink.style.opacity = '1';
+                    iaLink.style.textDecoration = 'underline';
+                });
+                iaLink.addEventListener('mouseleave', () => {
+                    iaLink.style.opacity = '0.6';
+                    iaLink.style.textDecoration = 'none';
+                });
+
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v2.7.6'; // Bump version visuelle pour le user
-                versionLabel.title = 'Genius Fast Transcriber v2.7.6 - Nouvelle Interface Premium';
+                versionLabel.textContent = 'v2.7.7'; // Bump version visuelle pour le user
+                versionLabel.title = 'Genius Fast Transcriber v2.7.7 - Nouvelle Interface Premium';
 
                 footerContainer.appendChild(creditLabel);
+                footerContainer.appendChild(iaLink);
                 footerContainer.appendChild(versionLabel);
                 shortcutsContainerElement.appendChild(footerContainer);
 

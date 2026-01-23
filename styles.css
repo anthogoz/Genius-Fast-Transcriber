@@ -14,6 +14,21 @@
   font-weight: bold;
   display: flex;
   flex-direction: column;
+  /* Empêche la sélection de texte dans le panneau */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
+/* Réactive la sélection pour les champs éditables */
+#genius-lyrics-shortcuts-container input,
+#genius-lyrics-shortcuts-container textarea,
+#genius-lyrics-shortcuts-container [contenteditable="true"] {
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
 }
 
 #gftPanelTitle {
@@ -415,6 +430,40 @@
 
 .gft-dark-mode .gft-section-label {
   color: #888;
+}
+
+/* Bouton principal "Tout Corriger" - Light Mode */
+.gft-btn-main-action {
+  background-color: #0e0e0e !important;
+  color: #f9ff55 !important;
+  border: 2px solid #0e0e0e !important;
+  font-weight: bold !important;
+  font-size: 14px !important;
+  padding: 8px 20px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.2s ease !important;
+}
+
+.gft-btn-main-action:hover {
+  background-color: #f9ff55 !important;
+  color: #0e0e0e !important;
+  border-color: #0e0e0e !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Bouton principal "Tout Corriger" - Dark Mode */
+.gft-dark-mode .gft-btn-main-action {
+  background-color: #f9ff55 !important;
+  color: #0e0e0e !important;
+  border: 2px solid #f9ff55 !important;
+}
+
+.gft-dark-mode .gft-btn-main-action:hover {
+  background-color: #e6ec00 !important;
+  color: #0e0e0e !important;
+  border-color: #e6ec00 !important;
 }
 
 .lyrics-helper-highlight {
