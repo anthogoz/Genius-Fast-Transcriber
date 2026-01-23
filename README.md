@@ -1,6 +1,6 @@
-# 🎵 Genius Fast Transcriber
+# 🎵 Genius Fast Transcriber + Lyric Card Maker
 
-![Version](https://img.shields.io/badge/version-2.7-blue.svg?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-2.7.7-blue.svg?style=for-the-badge)
 ![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-green.svg?style=for-the-badge&logo=google-chrome)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg?style=for-the-badge)
 
@@ -15,34 +15,43 @@ Transform your editing experience with a suite of professional tools, a modern i
 🧠 **Stay focused**: The interface integrates perfectly and anticipates your needs.
 🎨 **Impeccable results**: Your lyrics automatically respect Genius quality standards.
 🌍 **International**: Available in **French** and **English**!
+🌙 **Dark Mode by default**: Beautiful dark interface that's easy on the eyes.
 
 ---
 
 ## 🔥 Key Features
 
 ### 🏗️ Structure & Smart Tags
-*   **Unified Verse Manager** NEW: A dynamic central button for `[Couplet 1]`, `[Couplet 2]` with fast navigation ← →.
+*   **Unified Verse Manager**: A dynamic central button for `[Couplet 1]`, `[Couplet 2]` with fast navigation ← →.
 *   **Artist Detection**: The extension scans the page and proposes artists (Main & Feat) to check for automatic attribution.
 *   **Quick Tags**: `[Refrain]`, `[Intro]`, `[Bridge]`... inserted cleanly with correct credits.
 
 ### ✨ Corrections & Quality
-*   **Fix All**: A magic button that cleans everything:
-    *   Curly apostrophes `’`
+*   **Fix All** ✨: A prominent button that cleans everything in one click:
+    *   Curly apostrophes `'` → `'`
     *   Capitalization at start of lines
-    *   Removal of unnecessary final punctuation
-    *   Correction of spaces `y'` -> `y `
-*   **Parenthesis Check** NEW: Detects and highlights in **RED** unclosed or mismatched parentheses `( )` or brackets `[ ]`.
+    *   Removal of unnecessary final punctuation (preserves `...` ellipsis!)
+    *   Correction of spaces `y'` → `y `
+    *   French quotes `«»` → `"`
+    *   Long dashes `— –` → `-`
+    *   Double spaces removed
+    *   Proper line spacing between sections
+*   **Parenthesis Check**: Detects and highlights in **RED** unclosed or mismatched parentheses `( )` or brackets `[ ]`.
 
 ### 🎨 Creation Tools
-*   **Floating Bar**: Select text, a bar appears to apply **Bold**, *Italics*...
-*   **Customizable Lyric Card**: Create a beautiful image of lyrics.
-    *   **New v2.6**: Choose between **Album Art** or **Artist Image** for the background! 🖼️
+*   **Floating Bar**: Select text, a bar appears to apply **Bold**, *Italics*, convert numbers to words...
+*   **Customizable Lyric Card**: Create beautiful images of lyrics.
+    *   Choose between **Album Art** or **Artist Image** for the background! 🖼️
+    *   Multiple formats: 16:9, 9:16, 1:1
     *   Preview before download.
-*   **Read-Only Mode**: Hide the side panel to keep only Lyric Card functionality.
+*   **Lyric Card Only Mode**: Hide the transcription tools to keep only Lyric Card functionality.
 
-### ❓ Tutorial & Support (v2.6.5)
-*   **Interactive Tutorial**: A step-by-step guide on first install to choose your language and mode.
-*   **Relaunch Tutorial**: Access the popup to replay the tutorial at any time.
+### 🤖 AI Transcription
+*   **Quick access** to external AI transcription tool directly from the panel footer.
+
+### ❓ Tutorial & Support
+*   **Interactive Tutorial**: A step-by-step guide on first install to choose your language, theme, and mode.
+*   **Relaunch Tutorial**: Access via the settings menu to replay the tutorial at any time.
 
 ### 📺 YouTube Control
 *   **Control music** without taking your eyes off the editor:
@@ -53,7 +62,7 @@ Transform your editing experience with a suite of professional tools, a modern i
 ### 🛡️ Security & History
 *   **Visual Undo/Redo**: Undo your actions (Ctrl+Z) with a history of 10 states.
 *   **Draft Save**: Your changes are saved locally. A crash? We restore everything.
-*   **Dark Mode**: An interface perfectly adapted to dark theme, gentle on the eyes.
+*   **Dark Mode**: An interface perfectly adapted to dark theme, enabled by default.
 
 ---
 
@@ -63,6 +72,7 @@ Transform your editing experience with a suite of professional tools, a modern i
 |-----------|--------|
 | `Ctrl + 1` to `5` | Insert structure tags (Verse, Chorus...) |
 | `Ctrl + Shift + C` | **Fix All** (Opens preview) |
+| `Ctrl + D` | Duplicate current line |
 | `Ctrl + Z` | Undo |
 | `Ctrl + Y` | Redo |
 | `Ctrl + Shift + S` | Show/Hide statistics |
@@ -83,12 +93,23 @@ Transform your editing experience with a suite of professional tools, a modern i
 
 ---
 
+## 🆕 What's New in v2.7.7
+
+- 🌙 **Dark mode by default** for new users
+- ✨ **Redesigned "Fix All" button** - prominent dark button in light mode, yellow in dark mode
+- 🔗 **AI Transcription link** in footer for quick access to external tool
+- 🐛 **Ellipsis preservation** - punctuation cleanup now preserves `...` at end of lines
+- 🎨 **Text selection disabled** in panel UI (except input fields) for cleaner experience
+- 📦 Various bug fixes and improvements
+
+---
+
 ## 🛠️ Contribute
 
 This project is open-source and community-driven!
 We need your ideas for **Code Modularization** and new features.
 
-👉 **See [TODO.md](TODO.md) for the current roadmap.**
+👉 **See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.**
 
 ---
 
