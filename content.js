@@ -1,6 +1,6 @@
-// content.js (Version 2.7.7 - Extension Complète)
+// content.js (Version 3.0.0 - Extension Complète)
 /**
- * @file Fichier principal de l'extension "Genius Fast Transcriber" v2.7.7.
+ * @file Fichier principal de l'extension "Genius Fast Transcriber" v3.0.0.
  * Ce script s'injecte dans les pages du site genius.com.
  * Il détecte la présence de l'éditeur de paroles et y ajoute un panneau d'outils
  * pour accélérer et fiabiliser la transcription (ajout de tags, correction de texte, etc.).
@@ -20,10 +20,10 @@
  * - Création de Lyric Cards avec formatage et partage
  * 
  * @author Lnkhey
- * @version 2.7.7
+ * @version 3.0.0
  */
 
-console.log('Genius Fast Transcriber (by Lnkhey) v2.7.7 - Toutes fonctionnalités activées ! 🎵');
+console.log('Genius Fast Transcriber (by Lnkhey) v3.0.0 - Toutes fonctionnalités activées ! 🎵');
 
 // ----- Injection des animations CSS essentielles -----
 // Injecte l'animation de surlignage pour s'assurer qu'elle fonctionne même si les styles CSS de Genius l'écrasent
@@ -68,6 +68,9 @@ const DARK_MODE_STORAGE_KEY = 'gftDarkModeEnabled'; // Clé pour stocker la pré
 const HEADER_FEAT_STORAGE_KEY = 'gftHeaderFeatEnabled'; // Clé pour stocker la préférence d'inclusion des feat dans l'en-tête.
 const DISABLE_TAG_NEWLINES_STORAGE_KEY = 'gftDisableTagNewlines'; // Clé pour stocker la préférence de saut de ligne après tags.
 const LYRIC_CARD_ONLY_STORAGE_KEY = 'gftLyricCardOnly'; // Clé pour stocker la préférence du mode "Lyric Card Only".
+const PANEL_COLLAPSED_STORAGE_KEY = 'gftPanelCollapsed'; // Clé pour stocker l'état replié/déplié du panneau.
+const TRANSCRIPTION_MODE_STORAGE_KEY = 'gftTranscriptionMode'; // Clé pour stocker le mode de transcription (fr/en).
+const CUSTOM_BUTTONS_STORAGE_KEY = 'gftCustomButtons'; // Clé pour stocker les boutons personnalisés.
 let darkModeButton = null; // Référence au bouton pour activer/désactiver le mode sombre.
 let floatingFormattingToolbar = null; // Référence à la barre d'outils flottante pour le formatage (gras/italique).
 let undoStack = []; // Stack pour l'historique des modifications (max 10 entrées).
@@ -290,26 +293,59 @@ const TRANSLATIONS = {
         tuto_finish: "Terminer",
         tuto_step_counter: "Étape",
         tuto_of: "sur",
+        // Correction Preview Modal
+        preview_title: "🛠️ Configurer les corrections",
+        preview_diff_title: "Aperçu des modifications (Unified View)",
+        preview_btn_cancel: "Annuler",
+        preview_btn_apply: "Appliquer la sélection",
+        preview_summary: "📊 {count} correction(s) à appliquer :",
+        preview_no_corrections: "Aucune correction sélectionnée/nécessaire.",
+        preview_opt_yprime: "y' → y",
+        preview_opt_apostrophes: "Apostrophes '",
+        preview_opt_oeu: "oeu → œu",
+        preview_opt_quotes: "Guillemets «» → \"",
+        preview_opt_dash: "Tirets longs — – → -",
+        preview_opt_spaces: "Doubles espaces",
+        preview_opt_spacing: "Espacement (lignes)",
+        preview_stat_apostrophes: "apostrophes",
+        preview_stat_quotes: "guillemets «»",
+        preview_stat_dash: "tirets longs",
+        preview_stat_spaces: "doubles espaces",
+        preview_stat_spacing: "espacements",
+        // Draft notification
+        draft_found_title: "Brouillon trouvé !",
+        draft_saved_at: "Sauvegardé à",
+        draft_btn_restore: "Restaurer",
+        draft_btn_discard: "Ignorer",
+        draft_restored: "Brouillon restauré avec succès !",
+        // Progress steps
+        progress_step_yprime: "Correction de \"y'\"...",
+        progress_step_apostrophes: "Correction des apostrophes...",
+        progress_step_oeu: "Correction de \"oeu\"...",
+        progress_step_quotes: "Correction des guillemets «»...",
+        progress_step_dash: "Correction des tirets longs...",
+        progress_step_spaces: "Suppression des doubles espaces...",
+        progress_step_spacing: "Correction de l'espacement...",
     },
     en: {
         panel_title: "Genius Fast Transcriber",
-        artist_selection: "Attribuer la section à :", // Generic UI can stay English
-        no_artist: "Aucun artiste détecté.",
-        shortcuts_title: "Raccourcis", // Title can be English
-        add_couplet: "Ajouter Couplet", // REVERT TO FRENCH
-        format_numbers: "Formater les numéros", // Tool name can be English or French? Let's keep English for generic tool
+        artist_selection: "Assign section to:",
+        no_artist: "No artist detected.",
+        shortcuts_title: "Shortcuts",
+        add_couplet: "Add Verse",
+        format_numbers: "Format numbers",
         create_lyric_card: "Create Lyric Card",
-        preview: "Aperçu",
-        copy: "Copier",
-        undo: "Annuler",
-        redo: "Refaire",
-        feedback_copied: "Copié !",
-        feedback_restored: "Restauré",
+        preview: "Preview",
+        copy: "Copy",
+        undo: "Undo",
+        redo: "Redo",
+        feedback_copied: "Copied!",
+        feedback_restored: "Restored",
         onboarding_title: "Welcome",
-        next_btn: "Suivant",
-        finish_btn: "Terminer",
+        next_btn: "Next",
+        finish_btn: "Finish",
         mode_full_title: "Full Mode",
-        mode_full_desc: "Transcription Tools + Lyric Cards<br><span style='color: #D32F2F; font-weight: bold; font-size: 0.9em; display: block; margin-top: 2px;'>⚠️ Transcription tools currently available in French only</span>",
+        mode_full_desc: "Transcription Tools + Lyric Cards",
         mode_lyric_title: "Lyric Card Only",
         mode_lyric_desc: "Image Creation Only",
         recommended_label: "Recommended",
@@ -320,27 +356,27 @@ const TRANSLATIONS = {
         mode_select_title: "Mode",
         full_mode_label: "Full (Transcription + Lyric Cards)",
         lyric_only_label: "Lyric Card Only",
-        settings_saved: "Préférences sauvegardées !",
-        open_panel: "Ouvrir le panneau",
-        close_panel: "Fermer le panneau",
+        settings_saved: "Preferences saved!",
+        open_panel: "Open panel",
+        close_panel: "Close panel",
         onboarding_intro: "Configure your Genius Fast Transcriber experience.",
         // Settings & Tooltips
-        settings_menu: "Menu Paramètres",
-        dark_mode_toggle_light: "☀️ Mode Clair",
-        dark_mode_toggle_dark: "🌙 Mode Sombre",
-        stats_show: "📊 Afficher Statistiques",
-        stats_hide: "📊 Masquer Statistiques",
-        header_feat_show: "🎤 Afficher feat dans l'en-tête",
-        header_feat_hide: "🎤 Masquer feat dans l'en-tête",
-        newline_enable: "↵ Activer saut de ligne après tags",
-        newline_disable: "↵ Désactiver saut de ligne après tags",
-        tutorial_link: "❓ Tutoriel / Aide",
-        undo_tooltip: "Annuler la dernière modification (Ctrl+Z)",
-        redo_tooltip: "Refaire la dernière modification annulée (Ctrl+Y)",
-        panel_title_img_alt: "GFT Logo", // Generic
-        // Sections - REVERT TO FRENCH for Transcription tools
-        section_structure: "Structure & Artistes", // REVERT
-        section_cleanup: "Outils de nettoyage", // REVERT
+        settings_menu: "Settings Menu",
+        dark_mode_toggle_light: "☀️ Light Mode",
+        dark_mode_toggle_dark: "🌙 Dark Mode",
+        stats_show: "📊 Show Statistics",
+        stats_hide: "📊 Hide Statistics",
+        header_feat_show: "🎤 Show feat in header",
+        header_feat_hide: "🎤 Hide feat in header",
+        newline_enable: "↵ Enable newline after tags",
+        newline_disable: "↵ Disable newline after tags",
+        tutorial_link: "❓ Tutorial / Help",
+        undo_tooltip: "Undo last change (Ctrl+Z)",
+        redo_tooltip: "Redo last undone change (Ctrl+Y)",
+        panel_title_img_alt: "GFT Logo",
+        // Sections
+        section_structure: "Structure & Artists",
+        section_cleanup: "Cleanup Tools",
         // Buttons & Tooltips - REVERT TO FRENCH for Transcription tags
         btn_header: "En-tête",
         btn_header_tooltip: "Insérer l'en-tête de la chanson avec les artistes",
@@ -468,7 +504,7 @@ const TRANSLATIONS = {
         tuto_step2_title: "2. Smart Corrections ✨",
         tuto_step2_content: "• <strong>Fix All:</strong> Cleans apostrophes, capitalization, spaces.<br>• <strong>Verification ( ) [ ]:</strong> Scans for missing brackets.",
         tuto_step3_title: "3. Formatting Tools 🎨",
-        tuto_step3_content: "• <strong>Floating Bar:</strong> Select text to bold, italic, or create a <strong>Lyric Card</strong>.<br>• <strong>Numbers to Words:</strong> Converts '42' to 'forty-two' (French).",
+        tuto_step3_content: "• <strong>Floating Bar:</strong> Select text to bold, italic, or create a <strong>Lyric Card</strong>.<br>• <strong>Numbers to Words:</strong> Converts '42' to 'forty-two'.",
         tuto_step4_title: "4. History & Safety 🛡️",
         tuto_step4_content: "• <strong>Undo/Redo:</strong> Your last 10 actions are saved (Ctrl+Z).<br>• <strong>Auto Save:</strong> Drafts saved locally.",
         tuto_step5_title: "5. YouTube Control 📺",
@@ -484,6 +520,60 @@ const TRANSLATIONS = {
         tuto_finish: "Finish",
         tuto_step_counter: "Step",
         tuto_of: "of",
+        // Correction Preview Modal
+        preview_title: "🛠️ Configure corrections",
+        preview_diff_title: "Modification preview (Unified View)",
+        preview_btn_cancel: "Cancel",
+        preview_btn_apply: "Apply selection",
+        preview_summary: "📊 {count} correction(s) to apply:",
+        preview_no_corrections: "No corrections selected/needed.",
+        preview_opt_yprime: "y' → y",
+        preview_opt_apostrophes: "Apostrophes '",
+        preview_opt_oeu: "oeu → œu",
+        preview_opt_quotes: "Quotes «» → \"",
+        preview_opt_dash: "Long dashes — – → -",
+        preview_opt_spaces: "Double spaces",
+        preview_opt_spacing: "Spacing (lines)",
+        preview_stat_apostrophes: "apostrophes",
+        preview_stat_quotes: "quotes «»",
+        preview_stat_dash: "long dashes",
+        preview_stat_spaces: "double spaces",
+        preview_stat_spacing: "spacings",
+        // Button labels (English specific)
+        btn_y_label: "y' → y",
+        btn_apostrophe_label: "' → '",
+        btn_french_quotes_label: "«» → \"",
+        btn_double_spaces_label: "Double spaces",
+        btn_duplicate_line_label: "📋 Duplicate line",
+        btn_spacing_label: "Fix Spacing",
+        btn_check_label: "🔍 Check ( ) [ ]",
+        btn_fix_all_label: "Fix All (Text)",
+        btn_spacing_short: "Spacing",
+        btn_fix_all_short: "✨ Fix All",
+        btn_zws_remove: "⌫ ZWS",
+        // Cleanup tooltips
+        cleanup_apostrophe_tooltip: "Replace curly apostrophes with straight ones",
+        cleanup_french_quotes_tooltip: "Replace French quotes «» with straight quotes \"",
+        cleanup_double_spaces_tooltip: "Remove double spaces",
+        cleanup_duplicate_line_tooltip: "Duplicate current line (Ctrl+D)",
+        cleanup_spacing_tooltip: "Fix line spacing (remove extra empty lines)",
+        global_check_tooltip: "Check for unmatched brackets and parentheses",
+        global_fix_tooltip: "Apply all text corrections at once",
+        btn_zws_remove_tooltip: "Remove invisible zero-width space characters",
+        // Draft notification
+        draft_found_title: "Draft found!",
+        draft_saved_at: "Saved at",
+        draft_btn_restore: "Restore",
+        draft_btn_discard: "Discard",
+        draft_restored: "Draft restored successfully!",
+        // Progress steps
+        progress_step_yprime: "Fixing \"y'\"...",
+        progress_step_apostrophes: "Fixing apostrophes...",
+        progress_step_oeu: "Fixing \"oeu\"...",
+        progress_step_quotes: "Fixing quotes «»...",
+        progress_step_dash: "Fixing long dashes...",
+        progress_step_spaces: "Removing double spaces...",
+        progress_step_spacing: "Fixing spacing...",
     }
 };
 
@@ -690,6 +780,71 @@ function numberToFrenchWords(num) {
     if (rest > 0) {
         result += " " + convertUpTo999(rest);
     }
+
+    return result;
+}
+
+/**
+ * Convertit un nombre (0-999999999999) en lettres en anglais.
+ * @param {number} num - Le nombre à convertir.
+ * @returns {string} Le nombre en lettres.
+ */
+function numberToEnglishWords(num) {
+    if (num === 0) return "zero";
+
+    const ones = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+    const teens = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+    const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+
+    function convertUpTo99(n) {
+        if (n < 10) return ones[n];
+        if (n < 20) return teens[n - 10];
+
+        const ten = Math.floor(n / 10);
+        const one = n % 10;
+
+        if (one === 0) return tens[ten];
+        return tens[ten] + "-" + ones[one];
+    }
+
+    function convertUpTo999(n) {
+        if (n < 100) return convertUpTo99(n);
+
+        const hundred = Math.floor(n / 100);
+        const rest = n % 100;
+
+        let result = ones[hundred] + " hundred";
+        if (rest > 0) {
+            result += " " + convertUpTo99(rest);
+        }
+        return result;
+    }
+
+    if (num < 0 || num > 999999999999) return num.toString();
+
+    if (num < 1000) return convertUpTo999(num);
+
+    if (num >= 1000000000) {
+        const billions = Math.floor(num / 1000000000);
+        const rest = num % 1000000000;
+        let result = convertUpTo999(billions) + " billion";
+        if (rest > 0) result += " " + numberToEnglishWords(rest);
+        return result;
+    }
+
+    if (num >= 1000000) {
+        const millions = Math.floor(num / 1000000);
+        const rest = num % 1000000;
+        let result = convertUpTo999(millions) + " million";
+        if (rest > 0) result += " " + numberToEnglishWords(rest);
+        return result;
+    }
+
+    const thousand = Math.floor(num / 1000);
+    const rest = num % 1000;
+
+    let result = convertUpTo999(thousand) + " thousand";
+    if (rest > 0) result += " " + convertUpTo999(rest);
 
     return result;
 }
@@ -924,6 +1079,31 @@ function setLyricCardOnlyMode(enabled) {
 }
 
 /**
+ * Récupère le mode de transcription actuel (fr ou en).
+ * Par défaut, retourne 'fr' si non défini.
+ * @returns {string} 'fr' ou 'en'
+ */
+function getTranscriptionMode() {
+    return localStorage.getItem(TRANSCRIPTION_MODE_STORAGE_KEY) || 'fr';
+}
+
+/**
+ * Définit le mode de transcription.
+ * @param {string} mode - 'fr' ou 'en'
+ */
+function setTranscriptionMode(mode) {
+    localStorage.setItem(TRANSCRIPTION_MODE_STORAGE_KEY, mode);
+}
+
+/**
+ * Vérifie si le mode de transcription est anglais.
+ * @returns {boolean} true si mode anglais
+ */
+function isEnglishTranscriptionMode() {
+    return getTranscriptionMode() === 'en';
+}
+
+/**
  * Formatte un tag simple en ajoutant ou non un saut de ligne selon la préférence.
  * @param {string} tag - Le tag à formater (ex: "[Instrumental]").
  * @returns {string} Le tag formaté.
@@ -934,9 +1114,11 @@ function formatSimpleTag(tag, forceNoNewline = false) {
 }
 
 /**
- * Ajoute les noms des artistes sélectionnés au tag de section (ex: "[Couplet 1]").
- * @param {string} baseTextWithBrackets - Le tag de base, ex: "[Couplet 1]".
- * @returns {string} Le tag final, ex: "[Couplet 1 : Artiste 1 & Artiste 2]\n" ou sans \n.
+ * Ajoute les noms des artistes sélectionnés au tag de section.
+ * En français: "[Couplet 1 : Artiste]" (espace avant et après le :)
+ * En anglais: "[Verse 1: Artist]" (pas d'espace avant le :)
+ * @param {string} baseTextWithBrackets - Le tag de base, ex: "[Couplet 1]" ou "[Verse 1]".
+ * @returns {string} Le tag final avec artistes et saut de ligne si activé.
  */
 function addArtistToText(baseTextWithBrackets) {
     const checkedArtistsCheckboxes = document.querySelectorAll('input[name="selectedGeniusArtist_checkbox_GFT"]:checked');
@@ -945,7 +1127,9 @@ function addArtistToText(baseTextWithBrackets) {
     if (selectedArtistNames.length > 0) {
         const tagPart = baseTextWithBrackets.slice(0, -1); // Enlève le ']' final
         const artistsString = formatArtistList(selectedArtistNames);
-        resultText = `${tagPart} : ${artistsString}]`;
+        // En anglais: pas d'espace avant le ':', en français: espace avant et après
+        const separator = isEnglishTranscriptionMode() ? ': ' : ' : ';
+        resultText = `${tagPart}${separator}${artistsString}]`;
     } else {
         resultText = baseTextWithBrackets;
     }
@@ -1675,7 +1859,7 @@ function convertNumberToWords() {
     }
 
     const num = parseInt(selectedText, 10);
-    const wordsText = numberToFrenchWords(num);
+    const wordsText = isEnglishTranscriptionMode() ? numberToEnglishWords(num) : numberToFrenchWords(num);
 
     // Remplace le texte sélectionné
     if (currentEditorType === 'textarea') {
@@ -2085,14 +2269,14 @@ function showRestoreDraftNotification(timeStr, contentToRestore) {
     `;
 
     const text = document.createElement('div');
-    text.innerHTML = `<strong>Brouillon trouvé !</strong><br>Sauvegardé à ${timeStr}`;
+    text.innerHTML = `<strong>${getTranslation('draft_found_title')}</strong><br>${getTranslation('draft_saved_at')} ${timeStr}`;
 
     const buttons = document.createElement('div');
     buttons.style.display = 'flex';
     buttons.style.gap = '10px';
 
     const restoreBtn = document.createElement('button');
-    restoreBtn.textContent = 'Restaurer';
+    restoreBtn.textContent = getTranslation('draft_btn_restore');
     restoreBtn.style.cssText = `
         background-color: #ffff64;
         color: black;
@@ -2107,13 +2291,13 @@ function showRestoreDraftNotification(timeStr, contentToRestore) {
         e.stopPropagation(); // Empêche la propagation au cas où
         setEditorContent(contentToRestore);
         saveToHistory(); // Sauvegarde l'état restauré dans l'historique
-        showFeedbackMessage("Brouillon restauré avec succès !");
+        showFeedbackMessage(getTranslation('draft_restored'));
         notification.remove();
         draftNotificationShown = false; // Réinitialise le flag après restauration
     };
 
     const discardBtn = document.createElement('button');
-    discardBtn.textContent = 'Ignorer';
+    discardBtn.textContent = getTranslation('draft_btn_discard');
     discardBtn.style.cssText = `
         background-color: transparent;
         color: #aaa;
@@ -2499,8 +2683,6 @@ function showCorrectionPreview(originalText, correctedText, initialCorrections, 
         frenchQuotes: true,
         longDash: true,
         doubleSpaces: true,
-        capitalization: true,
-        punctuation: true,
         spacing: true
     };
 
@@ -2522,7 +2704,7 @@ function showCorrectionPreview(originalText, correctedText, initialCorrections, 
     header.style.marginBottom = '15px';
 
     const title = document.createElement('h2');
-    title.textContent = '🛠️ Configurer les corrections';
+    title.textContent = getTranslation('preview_title');
     title.className = 'gft-preview-title';
     header.appendChild(title);
 
@@ -2559,15 +2741,13 @@ function showCorrectionPreview(originalText, correctedText, initialCorrections, 
         return labelEl;
     };
 
-    optionsContainer.appendChild(createOption('yPrime', "y' → y"));
-    optionsContainer.appendChild(createOption('apostrophes', "Apostrophes '"));
-    optionsContainer.appendChild(createOption('oeuLigature', "oeu → œu"));
-    optionsContainer.appendChild(createOption('frenchQuotes', "Guillemets «» → \""));
-    optionsContainer.appendChild(createOption('longDash', "Tirets longs — – → -"));
-    optionsContainer.appendChild(createOption('doubleSpaces', "Doubles espaces"));
-    optionsContainer.appendChild(createOption('capitalization', "Majuscules (début ligne)"));
-    optionsContainer.appendChild(createOption('punctuation', "Ponctuation (fin ligne)"));
-    optionsContainer.appendChild(createOption('spacing', "Espacement (lignes)"));
+    optionsContainer.appendChild(createOption('yPrime', getTranslation('preview_opt_yprime')));
+    optionsContainer.appendChild(createOption('apostrophes', getTranslation('preview_opt_apostrophes')));
+    optionsContainer.appendChild(createOption('oeuLigature', getTranslation('preview_opt_oeu')));
+    optionsContainer.appendChild(createOption('frenchQuotes', getTranslation('preview_opt_quotes')));
+    optionsContainer.appendChild(createOption('longDash', getTranslation('preview_opt_dash')));
+    optionsContainer.appendChild(createOption('doubleSpaces', getTranslation('preview_opt_spaces')));
+    optionsContainer.appendChild(createOption('spacing', getTranslation('preview_opt_spacing')));
 
     header.appendChild(optionsContainer);
     modal.appendChild(header);
@@ -2579,7 +2759,7 @@ function showCorrectionPreview(originalText, correctedText, initialCorrections, 
 
     // Titre de la section de diff
     const diffTitle = document.createElement('h3');
-    diffTitle.textContent = 'Aperçu des modifications (Unified View)';
+    diffTitle.textContent = getTranslation('preview_diff_title');
     diffTitle.style.fontSize = '14px';
     diffTitle.style.marginBottom = '5px';
     diffTitle.style.color = isDarkMode ? '#aaa' : '#555';
@@ -2601,13 +2781,13 @@ function showCorrectionPreview(originalText, correctedText, initialCorrections, 
     buttonContainer.className = 'gft-preview-buttons';
 
     const cancelButton = document.createElement('button');
-    cancelButton.textContent = 'Annuler';
+    cancelButton.textContent = getTranslation('preview_btn_cancel');
     cancelButton.className = 'gft-preview-button gft-preview-button-cancel';
     cancelButton.addEventListener('click', () => close());
     buttonContainer.appendChild(cancelButton);
 
     const applyButton = document.createElement('button');
-    applyButton.textContent = 'Appliquer la sélection';
+    applyButton.textContent = getTranslation('preview_btn_apply');
     applyButton.className = 'gft-preview-button gft-preview-button-apply';
     applyButton.addEventListener('click', () => {
         close();
@@ -2634,17 +2814,16 @@ function showCorrectionPreview(originalText, correctedText, initialCorrections, 
         // Mise à jour du résumé
         const detailsArray = [];
         if (options.yPrime && currentStats.yPrime > 0) detailsArray.push(`${currentStats.yPrime} "y'"`);
-        if (options.apostrophes && currentStats.apostrophes > 0) detailsArray.push(`${currentStats.apostrophes} apostrophes`);
+        if (options.apostrophes && currentStats.apostrophes > 0) detailsArray.push(`${currentStats.apostrophes} ${getTranslation('preview_stat_apostrophes')}`);
         if (options.oeuLigature && currentStats.oeuLigature > 0) detailsArray.push(`${currentStats.oeuLigature} "oeu"`);
-        if (options.frenchQuotes && currentStats.frenchQuotes > 0) detailsArray.push(`${currentStats.frenchQuotes} guillemets «»`);
-        if (options.longDash && currentStats.longDash > 0) detailsArray.push(`${currentStats.longDash} tirets longs`);
-        if (options.doubleSpaces && currentStats.doubleSpaces > 0) detailsArray.push(`${currentStats.doubleSpaces} doubles espaces`);
-        if (options.capitalization && currentStats.capitalization > 0) detailsArray.push(`${currentStats.capitalization} majuscules`);
-        if (options.punctuation && currentStats.punctuation > 0) detailsArray.push(`${currentStats.punctuation} ponctuations`);
-        if (options.spacing && currentStats.spacing > 0) detailsArray.push(`${currentStats.spacing} espacements`);
+        if (options.frenchQuotes && currentStats.frenchQuotes > 0) detailsArray.push(`${currentStats.frenchQuotes} ${getTranslation('preview_stat_quotes')}`);
+        if (options.longDash && currentStats.longDash > 0) detailsArray.push(`${currentStats.longDash} ${getTranslation('preview_stat_dash')}`);
+        if (options.doubleSpaces && currentStats.doubleSpaces > 0) detailsArray.push(`${currentStats.doubleSpaces} ${getTranslation('preview_stat_spaces')}`);
+        if (options.spacing && currentStats.spacing > 0) detailsArray.push(`${currentStats.spacing} ${getTranslation('preview_stat_spacing')}`);
 
         const total = result.correctionsCount;
-        summary.innerHTML = `<strong>📊 ${total} correction(s) à appliquer :</strong><br>${detailsArray.length > 0 ? detailsArray.join(', ') : 'Aucune correction sélectionnée/nécessaire.'}`;
+        const summaryTemplate = getTranslation('preview_summary').replace('{count}', total);
+        summary.innerHTML = `<strong>${summaryTemplate}</strong><br>${detailsArray.length > 0 ? detailsArray.join(', ') : getTranslation('preview_no_corrections')}`;
 
         // Mise à jour du diff
         diffContainer.innerHTML = highlightDifferences(originalText, currentPreviewText);
@@ -2744,10 +2923,10 @@ function getTutorialSteps() {
 
                 <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
                     <button id="gft-lang-fr-btn" class="gft-tutorial-button" style="background:${btnBg}; color:${btnColor}; border:2px solid ${btnBorder}; padding:12px 20px; cursor:pointer; border-radius:8px; font-size:15px; transition:0.2s; min-width: 120px;">
-                        Français 🇫🇷
+                        Français (FR)
                     </button>
                     <button id="gft-lang-en-btn" class="gft-tutorial-button" style="background:${btnBg}; color:${btnColor}; border:2px solid ${btnBorder}; padding:12px 20px; cursor:pointer; border-radius:8px; font-size:15px; transition:0.2s; min-width: 120px;">
-                        English 🇬🇧
+                        English (EN)
                     </button>
                 </div>
             `;
@@ -2943,6 +3122,8 @@ function renderTutorialStep() {
 
         const handleLangSelection = (lang) => {
             localStorage.setItem('gftLanguage', lang);
+            // Définit également le mode de transcription selon la langue
+            setTranscriptionMode(lang);
             // Rafraîchit l'étape suivante pour appliquer la langue
             currentTutorialStep++;
             renderTutorialStep();
@@ -3904,56 +4085,6 @@ function handleSelectionChange() {
 
 
 /**
- * Met en majuscule la première lettre de chaque ligne non vide.
- * @param {string} text - Le texte à corriger.
- * @returns {{newText: string, correctionsCount: number}} Le texte corrigé et le nombre de corrections.
- */
-function capitalizeFirstLetterOfEachLine(text) {
-    let correctionsCount = 0;
-    const lines = text.split('\n');
-    const correctedLines = lines.map(line => {
-        if (line.trim().length > 0) {
-            const firstChar = line.charAt(0);
-            const restOfLine = line.slice(1);
-            if (firstChar !== firstChar.toUpperCase()) {
-                correctionsCount++;
-                return firstChar.toUpperCase() + restOfLine;
-            }
-        }
-        return line;
-    });
-    return { newText: correctedLines.join('\n'), correctionsCount };
-}
-
-/**
- * Supprime la ponctuation (virgules, points) à la fin des lignes.
- * Préserve les points de suspension (... ou …).
- * @param {string} text - Le texte à corriger.
- * @returns {{newText: string, correctionsCount: number}} Le texte corrigé et le nombre de corrections.
- */
-function removeTrailingPunctuationFromLines(text) {
-    let correctionsCount = 0;
-    const lines = text.split('\n');
-    const correctedLines = lines.map(line => {
-        const trimmedLine = line.trimEnd();
-
-        // Préserve les points de suspension (... ou le caractère Unicode …)
-        if (trimmedLine.endsWith('...') || trimmedLine.endsWith('…')) {
-            return line;
-        }
-
-        const originalLineLength = line.length;
-        // Supprime seulement un point ou une virgule isolé en fin de ligne
-        let correctedLine = line.replace(/([.,])\s*$/, '');
-        if (correctedLine.length < originalLineLength) {
-            correctionsCount++;
-        }
-        return correctedLine;
-    });
-    return { newText: correctedLines.join('\n'), correctionsCount };
-}
-
-/**
  * Vérifie si une ligne est un tag de section (ex: "[Refrain]").
  * @param {string} line - La ligne à vérifier.
  * @returns {boolean}
@@ -4253,8 +4384,6 @@ function applyAllTextCorrectionsToString(text, options = {}) {
         frenchQuotes: 0,
         longDash: 0,
         doubleSpaces: 0,
-        capitalization: 0,
-        punctuation: 0,
         spacing: 0
     };
 
@@ -4320,23 +4449,7 @@ function applyAllTextCorrectionsToString(text, options = {}) {
         }
     }
 
-    // Application des autres corrections
-    if (opts.capitalization) {
-        result = capitalizeFirstLetterOfEachLine(currentText);
-        if (result.correctionsCount > 0) {
-            corrections.capitalization = result.correctionsCount;
-            currentText = result.newText;
-        }
-    }
-
-    if (opts.punctuation) {
-        result = removeTrailingPunctuationFromLines(currentText);
-        if (result.correctionsCount > 0) {
-            corrections.punctuation = result.correctionsCount;
-            currentText = result.newText;
-        }
-    }
-
+    // Application de la correction d'espacement
     if (opts.spacing) {
         result = correctLineSpacing(currentText);
         if (result.correctionsCount > 0) {
@@ -4348,8 +4461,7 @@ function applyAllTextCorrectionsToString(text, options = {}) {
     // Calcul du total
     const totalCorrections = corrections.yPrime + corrections.apostrophes +
         corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash +
-        corrections.doubleSpaces + corrections.capitalization +
-        corrections.punctuation + corrections.spacing;
+        corrections.doubleSpaces + corrections.spacing;
 
     return { newText: currentText, correctionsCount: totalCorrections, corrections: corrections };
 }
@@ -4362,7 +4474,7 @@ function applyAllTextCorrectionsToString(text, options = {}) {
 async function applyAllTextCorrectionsAsync(text) {
     let currentText = text;
     let result;
-    const totalSteps = 9;
+    const totalSteps = 7;
 
     // Objet pour tracker les corrections par type
     const corrections = {
@@ -4372,13 +4484,11 @@ async function applyAllTextCorrectionsAsync(text) {
         frenchQuotes: 0,
         longDash: 0,
         doubleSpaces: 0,
-        capitalization: 0,
-        punctuation: 0,
         spacing: 0
     };
 
     // Étape 1: Correction de "y'" -> "y "
-    showProgress(1, totalSteps, 'Correction de "y\'"...');
+    showProgress(1, totalSteps, getTranslation('progress_step_yprime'));
     await new Promise(resolve => setTimeout(resolve, 50));
 
     const yPrimePattern = /\b(Y|y)['']/g;
@@ -4390,7 +4500,7 @@ async function applyAllTextCorrectionsAsync(text) {
     }
 
     // Étape 2: Correction de l'apostrophe typographique
-    showProgress(2, totalSteps, 'Correction des apostrophes...');
+    showProgress(2, totalSteps, getTranslation('progress_step_apostrophes'));
     await new Promise(resolve => setTimeout(resolve, 50));
 
     const apostrophePattern = /['']/g;
@@ -4401,7 +4511,7 @@ async function applyAllTextCorrectionsAsync(text) {
     }
 
     // Étape 3: Correction de "oeu" -> "œu"
-    showProgress(3, totalSteps, 'Correction de "oeu"...');
+    showProgress(3, totalSteps, getTranslation('progress_step_oeu'));
     await new Promise(resolve => setTimeout(resolve, 50));
 
     const oeuPattern = /([Oo])eu/g;
@@ -4413,7 +4523,7 @@ async function applyAllTextCorrectionsAsync(text) {
     }
 
     // Étape 4: Correction des guillemets français «» -> "
-    showProgress(4, totalSteps, 'Correction des guillemets «»...');
+    showProgress(4, totalSteps, getTranslation('progress_step_quotes'));
     await new Promise(resolve => setTimeout(resolve, 50));
 
     const frenchQuotesPattern = /[«»]/g;
@@ -4424,7 +4534,7 @@ async function applyAllTextCorrectionsAsync(text) {
     }
 
     // Étape 5: Correction des tirets longs
-    showProgress(5, totalSteps, 'Correction des tirets longs...');
+    showProgress(5, totalSteps, getTranslation('progress_step_dash'));
     await new Promise(resolve => setTimeout(resolve, 50));
 
     const longDashPattern = /[—–]/g;
@@ -4435,7 +4545,7 @@ async function applyAllTextCorrectionsAsync(text) {
     }
 
     // Étape 6: Correction des doubles espaces
-    showProgress(6, totalSteps, 'Suppression des doubles espaces...');
+    showProgress(6, totalSteps, getTranslation('progress_step_spaces'));
     await new Promise(resolve => setTimeout(resolve, 50));
 
     const doubleSpacesPattern = /  +/g;
@@ -4445,28 +4555,8 @@ async function applyAllTextCorrectionsAsync(text) {
         currentText = textAfterDoubleSpaces;
     }
 
-    // Étape 7: Majuscules
-    showProgress(7, totalSteps, 'Majuscules en début de ligne...');
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    result = capitalizeFirstLetterOfEachLine(currentText);
-    if (result.correctionsCount > 0) {
-        corrections.capitalization = result.correctionsCount;
-        currentText = result.newText;
-    }
-
-    // Étape 8: Ponctuation
-    showProgress(8, totalSteps, 'Suppression de la ponctuation...');
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    result = removeTrailingPunctuationFromLines(currentText);
-    if (result.correctionsCount > 0) {
-        corrections.punctuation = result.correctionsCount;
-        currentText = result.newText;
-    }
-
-    // Étape 9: Espacement
-    showProgress(9, totalSteps, 'Correction de l\'espacement...');
+    // Étape 7: Espacement
+    showProgress(7, totalSteps, getTranslation('progress_step_spacing'));
     await new Promise(resolve => setTimeout(resolve, 50));
 
     result = correctLineSpacing(currentText);
@@ -4478,8 +4568,7 @@ async function applyAllTextCorrectionsAsync(text) {
     // Calcul du total
     const totalCorrections = corrections.yPrime + corrections.apostrophes +
         corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash +
-        corrections.doubleSpaces + corrections.capitalization +
-        corrections.punctuation + corrections.spacing;
+        corrections.doubleSpaces + corrections.spacing;
 
     return { newText: currentText, correctionsCount: totalCorrections, corrections: corrections };
 }
@@ -4493,9 +4582,58 @@ function initLyricsEditorEnhancer() {
     let foundEditor = null; let foundEditorType = null;
 
     // Configuration de tous les boutons et actions du panneau.
-    const SHORTCUTS = {
-        TAGS_STRUCTURAUX: [
-            {
+    // Les tags structuraux sont dynamiques selon le mode de transcription (FR/EN)
+    const getStructuralTags = () => {
+        const isEnglish = isEnglishTranscriptionMode();
+        const customButtons = getCustomButtons().filter(b => b.type === 'structure').map(b => ({
+            label: b.label,
+            getText: () => {
+                // Si le contenu ressemble à un tag (commence par [), on utilise addArtistToText
+                // Sinon on insère brut (ou formatSimpleTag)
+                if (b.content.trim().startsWith('[')) return addArtistToText(b.content);
+                return b.content;
+            },
+            tooltip: 'Custom: ' + b.label
+        }));
+
+        const plusButton = {
+            label: '+',
+            title: 'Ajouter bouton structure',
+            isPlusButton: true,
+            managerType: 'structure'
+        };
+
+        if (isEnglish) {
+            // Mode anglais : tags en anglais, pas d'en-tête, pas de "Couplet unique"
+            return {
+                buttons: [
+                    {
+                        type: 'coupletManager',
+                        prev: { label: '←', title: 'Previous Verse', tooltip: 'Go to previous verse' },
+                        main: {
+                            id: COUPLET_BUTTON_ID,
+                            getLabel: () => `[Verse ${coupletCounter}]`,
+                            getText: () => addArtistToText(`[Verse ${coupletCounter}]`),
+                            tooltip: 'Insert Verse tag with current number',
+                            shortcut: '1'
+                        },
+                        next: { label: '→', title: 'Next Verse', tooltip: 'Go to next verse' }
+                    },
+                    { label: '[Intro]', getText: () => addArtistToText('[Intro]'), tooltip: 'Insert [Intro] tag', shortcut: '4' },
+                    { label: '[Pre-Chorus]', getText: () => addArtistToText('[Pre-Chorus]'), tooltip: 'Insert [Pre-Chorus] tag' },
+                    { label: '[Chorus]', getText: () => addArtistToText('[Chorus]'), tooltip: 'Insert [Chorus] tag', shortcut: '2' },
+                    { label: '[Post-Chorus]', getText: () => addArtistToText('[Post-Chorus]'), tooltip: 'Insert [Post-Chorus] tag' },
+                    { label: '[Bridge]', getText: () => addArtistToText('[Bridge]'), tooltip: 'Insert [Bridge] tag', shortcut: '3' },
+                    { label: '[Outro]', getText: () => addArtistToText('[Outro]'), tooltip: 'Insert [Outro] tag', shortcut: '5' },
+                    { label: '[Instrumental]', getText: () => formatSimpleTag('[Instrumental]'), tooltip: 'Insert [Instrumental] tag' },
+                    { label: '[?]', getText: () => formatSimpleTag('[?]', true), tooltip: 'Insert [?] tag for unknown section' },
+                    ...customButtons,
+                    plusButton
+                ]
+            };
+        } else {
+            // Mode français : tags en français avec en-tête et couplet unique
+            return {
                 buttons: [
                     { label: getTranslation('btn_header'), getText: () => { let txt = `[Paroles de "${currentSongTitle}"`; const fts = formatArtistList(currentFeaturingArtists); if (fts && isHeaderFeatEnabled()) txt += ` ft. ${fts}`; txt += ']'; if (!isTagNewlinesDisabled()) txt += '\n'; return txt; }, tooltip: getTranslation('btn_header_tooltip') },
                     {
@@ -4503,10 +4641,10 @@ function initLyricsEditorEnhancer() {
                         prev: { label: '←', title: 'Couplet précédent', tooltip: 'Revenir au couplet précédent' },
                         main: {
                             id: COUPLET_BUTTON_ID,
-                            getLabel: () => `[Couplet ${coupletCounter}]`, // Retaining [Couplet N] for now as per plan
+                            getLabel: () => `[Couplet ${coupletCounter}]`,
                             getText: () => addArtistToText(`[Couplet ${coupletCounter}]`),
                             tooltip: getTranslation('add_couplet'),
-                            shortcut: '1' // Badge Ctrl+1
+                            shortcut: '1'
                         },
                         next: { label: '→', title: 'Couplet suivant', tooltip: 'Passer au couplet suivant' }
                     },
@@ -4519,34 +4657,44 @@ function initLyricsEditorEnhancer() {
                     { label: getTranslation('btn_bridge'), getText: () => addArtistToText('[Pont]'), tooltip: getTranslation('btn_bridge_tooltip'), shortcut: '3' },
                     { label: getTranslation('btn_outro'), getText: () => addArtistToText('[Outro]'), tooltip: getTranslation('btn_outro_tooltip'), shortcut: '5' },
                     { label: getTranslation('btn_instrumental'), getText: () => formatSimpleTag('[Instrumental]'), tooltip: getTranslation('btn_instrumental_tooltip') },
-                    { label: getTranslation('btn_unknown'), getText: () => formatSimpleTag('[?]', true), tooltip: getTranslation('btn_unknown_tooltip') }
+                    { label: getTranslation('btn_unknown'), getText: () => formatSimpleTag('[?]', true), tooltip: getTranslation('btn_unknown_tooltip') },
+                    ...customButtons,
+                    plusButton
                 ]
-            }
-        ],
-        TEXT_CLEANUP: [
-            {
-                label: getTranslation('btn_y_label'),
-                action: 'replaceText',
-                searchPattern: /\b(Y|y)['’]/g,
-                replacementFunction: (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y '),
-                highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
-                tooltip: getTranslation('cleanup_y_tooltip')
-            },
+            };
+        }
+    };
+
+    // Fonction pour obtenir les outils de nettoyage selon le mode
+    const getTextCleanupTools = () => {
+        const isEnglish = isEnglishTranscriptionMode();
+
+        // Récupération des boutons personnalisés
+        const customButtons = getCustomButtons().filter(b => b.type === 'cleanup').map(b => ({
+            label: b.label,
+            action: 'replaceText',
+            searchPattern: new RegExp(b.regex, 'g'),
+            replacementText: b.replacement || '',
+            highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+            tooltip: 'Custom: ' + b.label
+        }));
+
+        const plusButton = {
+            label: '+',
+            title: 'Ajouter bouton cleanup',
+            isPlusButton: true,
+            managerType: 'cleanup'
+        };
+
+        // Outils communs aux deux langues
+        const commonTools = [
             {
                 label: getTranslation('btn_apostrophe_label'),
                 action: 'replaceText',
-                searchPattern: /['’]/g,
+                searchPattern: /['']/g,
                 replacementText: "'",
                 highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
                 tooltip: getTranslation('cleanup_apostrophe_tooltip')
-            },
-            {
-                label: getTranslation('btn_oeu_label'),
-                action: 'replaceText',
-                searchPattern: /([Oo])eu/g,
-                replacementFunction: (match, firstLetter) => (firstLetter === 'O' ? 'Œu' : 'œu'),
-                highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
-                tooltip: getTranslation('cleanup_oeu_tooltip')
             },
             {
                 label: getTranslation('btn_french_quotes_label'),
@@ -4555,14 +4703,6 @@ function initLyricsEditorEnhancer() {
                 replacementText: '"',
                 highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
                 tooltip: getTranslation('cleanup_french_quotes_tooltip')
-            },
-            {
-                label: getTranslation('btn_long_dash_label'),
-                action: 'replaceText',
-                searchPattern: /[—–]/g,
-                replacementText: '-',
-                highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
-                tooltip: getTranslation('cleanup_long_dash_tooltip')
             },
             {
                 label: getTranslation('btn_double_spaces_label'),
@@ -4587,22 +4727,6 @@ function initLyricsEditorEnhancer() {
                 shortcut: 'D'
             },
             {
-                label: getTranslation('btn_capitalize_label'),
-                shortLabel: getTranslation('btn_capitalize_short'),
-                action: 'lineCorrection',
-                correctionType: 'capitalize',
-                title: getTranslation('cleanup_capitalize_tooltip'),
-                tooltip: getTranslation('cleanup_capitalize_tooltip')
-            },
-            {
-                label: getTranslation('btn_punctuation_label'),
-                shortLabel: getTranslation('btn_punctuation_short'),
-                action: 'lineCorrection',
-                correctionType: 'removePunctuation',
-                title: getTranslation('cleanup_punctuation_tooltip'),
-                tooltip: getTranslation('cleanup_punctuation_tooltip')
-            },
-            {
                 label: getTranslation('btn_spacing_label'),
                 shortLabel: getTranslation('btn_spacing_short'),
                 action: 'lineCorrection',
@@ -4617,7 +4741,50 @@ function initLyricsEditorEnhancer() {
                 tooltip: getTranslation('global_check_tooltip'),
                 shortcut: 'S'
             }
+        ];
+
+        if (isEnglish) {
+            // Mode anglais : pas de y', oeu→œu, tirets longs
+            return [...commonTools, ...customButtons, plusButton];
+        } else {
+            // Mode français : tous les outils spécifiques
+            const frenchSpecificTools = [
+                {
+                    label: getTranslation('btn_y_label'),
+                    action: 'replaceText',
+                    searchPattern: /\b(Y|y)['']/g,
+                    replacementFunction: (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y '),
+                    highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+                    tooltip: getTranslation('cleanup_y_tooltip')
+                },
+                {
+                    label: getTranslation('btn_oeu_label'),
+                    action: 'replaceText',
+                    searchPattern: /([Oo])eu/g,
+                    replacementFunction: (match, firstLetter) => (firstLetter === 'O' ? 'Œu' : 'œu'),
+                    highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+                    tooltip: getTranslation('cleanup_oeu_tooltip')
+                },
+                {
+                    label: getTranslation('btn_long_dash_label'),
+                    action: 'replaceText',
+                    searchPattern: /[—–]/g,
+                    replacementText: '-',
+                    highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+                    tooltip: getTranslation('cleanup_long_dash_tooltip')
+                }
+            ];
+
+            // Insère les outils français au début, puis les outils communs
+            return [...frenchSpecificTools, ...commonTools, ...customButtons, plusButton];
+        }
+    };
+
+    const SHORTCUTS = {
+        TAGS_STRUCTURAUX: [
+            getStructuralTags()
         ],
+        TEXT_CLEANUP: getTextCleanupTools(),
         GLOBAL_FIXES: [
             {
                 label: getTranslation('btn_fix_all_label'), // Tout Corriger (Texte)
@@ -4769,10 +4936,91 @@ function initLyricsEditorEnhancer() {
                 const panelTitle = document.createElement('div');
                 panelTitle.id = 'gftPanelTitle';
 
-                const titleAndLogoContainer = document.createElement('span');
+                // Conteneur cliquable pour le titre et la flèche
+                const clickableTitleArea = document.createElement('span');
+                clickableTitleArea.id = 'gft-clickable-title';
+                clickableTitleArea.style.cursor = 'pointer';
+                clickableTitleArea.style.display = 'inline-flex';
+                clickableTitleArea.style.alignItems = 'center';
+                clickableTitleArea.style.userSelect = 'none';
+
                 const logoURL = chrome.runtime.getURL('images/icon16.png');
-                titleAndLogoContainer.innerHTML = `<img src="${logoURL}" alt="${getTranslation('panel_title_img_alt')}" id="gftPanelLogo" /> ${getTranslation('panel_title')}`;
-                panelTitle.appendChild(titleAndLogoContainer);
+
+                // Flèche (créée ici pour être manipulée)
+                const collapseArrow = document.createElement('span');
+                collapseArrow.id = 'gft-collapse-arrow';
+                collapseArrow.style.marginLeft = '5px';
+                collapseArrow.style.fontSize = '12px'; // Un peu plus grand pour la flèche
+                collapseArrow.style.transition = 'transform 0.3s ease'; // Animation de rotation
+
+                // Vérifie l'état initial
+                const isCollapsed = localStorage.getItem(PANEL_COLLAPSED_STORAGE_KEY) === 'true';
+                collapseArrow.textContent = isCollapsed ? '▼' : '▲';
+                // Rotation si replié (optionnel, ou juste changement de texte)
+                // Ici on change juste le texte comme demandé, mais dans un span
+
+                clickableTitleArea.innerHTML = `<img src="${logoURL}" alt="${getTranslation('panel_title_img_alt')}" id="gftPanelLogo" /> <span style="font-weight:bold;">${getTranslation('panel_title')}</span>`;
+                clickableTitleArea.appendChild(collapseArrow);
+
+                // Fonction de toggle commune
+                const togglePanel = (e) => {
+                    if (e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+
+                    const contentWrapper = document.getElementById('gft-panel-content');
+                    if (contentWrapper) {
+                        contentWrapper.classList.toggle('gft-collapsed');
+                        const currentlyCollapsed = contentWrapper.classList.contains('gft-collapsed');
+
+                        document.getElementById('gft-collapse-arrow').textContent = currentlyCollapsed ? '▼' : '▲';
+
+                        // Sauvegarde la préférence
+                        localStorage.setItem(PANEL_COLLAPSED_STORAGE_KEY, currentlyCollapsed ? 'true' : 'false');
+                    }
+                };
+
+                clickableTitleArea.addEventListener('click', togglePanel);
+                panelTitle.appendChild(clickableTitleArea);
+                addTooltip(clickableTitleArea, 'Cliquer pour replier/déplier');
+
+                // Sélecteur de mode de transcription (FR/EN)
+                const transcriptionModeSelect = document.createElement('select');
+                transcriptionModeSelect.id = 'gft-transcription-mode-select';
+                transcriptionModeSelect.classList.add('gft-transcription-mode-select');
+                transcriptionModeSelect.title = (localStorage.getItem('gftLanguage') || 'fr') === 'fr' ? 'Mode de transcription' : 'Transcription mode';
+
+                const optionFR = document.createElement('option');
+                optionFR.value = 'fr';
+                optionFR.textContent = '🇫🇷 FR';
+                transcriptionModeSelect.appendChild(optionFR);
+
+                const optionEN = document.createElement('option');
+                optionEN.value = 'en';
+                optionEN.textContent = '🇬🇧 EN';
+                transcriptionModeSelect.appendChild(optionEN);
+
+                // Définit la valeur actuelle
+                transcriptionModeSelect.value = getTranscriptionMode();
+
+                // Événement de changement
+                transcriptionModeSelect.addEventListener('change', (e) => {
+                    const newMode = e.target.value;
+                    setTranscriptionMode(newMode);
+                    // Synchronise aussi la langue d'interface pour que les traductions soient cohérentes
+                    localStorage.setItem('gftLanguage', newMode);
+                    // Recharge le panneau pour appliquer les changements
+                    if (shortcutsContainerElement) {
+                        shortcutsContainerElement.remove();
+                        shortcutsContainerElement = null;
+                    }
+                    // Force la réinitialisation
+                    setTimeout(() => initLyricsEditorEnhancer(), 100);
+                });
+
+                panelTitle.appendChild(transcriptionModeSelect);
+                addTooltip(transcriptionModeSelect, (localStorage.getItem('gftLanguage') || 'fr') === 'fr' ? 'Changer le mode de transcription (FR/EN)' : 'Change transcription mode (FR/EN)');
 
                 // Bouton Undo
                 const undoButton = document.createElement('button');
@@ -4851,15 +5099,17 @@ function initLyricsEditorEnhancer() {
                     statsItem.onclick = () => { toggleStatsDisplay(); menu.remove(); };
                     menu.appendChild(statsItem);
 
-                    // Item 3: Masquer les Feats dans l'en-tête
-                    const featItem = document.createElement('button');
-                    featItem.className = 'gft-settings-menu-item';
-                    featItem.textContent = isHeaderFeatEnabled() ? getTranslation('header_feat_show') : getTranslation('header_feat_hide');
-                    featItem.onclick = () => {
-                        gftToggleHeaderFeat();
-                        menu.remove();
-                    };
-                    menu.appendChild(featItem);
+                    // Item 3: Masquer les Feats dans l'en-tête (Seulement en FR)
+                    if (!isEnglishTranscriptionMode()) {
+                        const featItem = document.createElement('button');
+                        featItem.className = 'gft-settings-menu-item';
+                        featItem.textContent = isHeaderFeatEnabled() ? getTranslation('header_feat_show') : getTranslation('header_feat_hide');
+                        featItem.onclick = () => {
+                            gftToggleHeaderFeat();
+                            menu.remove();
+                        };
+                        menu.appendChild(featItem);
+                    }
 
                     // Item 4: Saut de ligne après tag
                     const newlineItem = document.createElement('button');
@@ -4889,15 +5139,27 @@ function initLyricsEditorEnhancer() {
                     };
                     document.addEventListener('click', closeMenuHandler);
                 });
+
+
                 panelTitle.appendChild(settingsButton);
                 addTooltip(settingsButton, 'Paramètres (Mode sombre, Stats, Aide)');
+
+
 
                 shortcutsContainerElement.appendChild(panelTitle);
                 loadDarkModePreference();
 
+                // Crée le conteneur repliable pour tout le contenu du panneau
+                const panelContent = document.createElement('div');
+                panelContent.id = 'gft-panel-content';
+                if (isCollapsed) {
+                    panelContent.classList.add('gft-collapsed');
+                }
+                // Plus de display inline ici, tout est géré par la classe .gft-collapsed et le CSS
+
                 // Crée l'affichage des statistiques
                 const statsDisplay = createStatsDisplay();
-                shortcutsContainerElement.appendChild(statsDisplay);
+                panelContent.appendChild(statsDisplay);
 
                 // Met à jour les statistiques initiales si visibles
                 if (statsDisplay.classList.contains('gft-stats-visible')) {
@@ -4906,8 +5168,8 @@ function initLyricsEditorEnhancer() {
 
                 // Crée les sélecteurs d'artistes.
                 if (detectedArtists.length === 0 && !editorJustAppeared && !editorInstanceChanged) extractSongData();
-                createArtistSelectors(shortcutsContainerElement);
-                if (currentFeaturingArtists.length > 0 || currentMainArtists.length > 1) { const hrArtists = document.createElement('hr'); shortcutsContainerElement.appendChild(hrArtists); }
+                createArtistSelectors(panelContent);
+                if (currentFeaturingArtists.length > 0 || currentMainArtists.length > 1) { const hrArtists = document.createElement('hr'); panelContent.appendChild(hrArtists); }
 
                 /**
                  * Usine (factory) à boutons : crée un bouton à partir d'une configuration.
@@ -4916,13 +5178,26 @@ function initLyricsEditorEnhancer() {
                  * @param {boolean} isCoupletMainButton - Booléen spécial pour le bouton de couplet principal.
                  * @returns {HTMLButtonElement} Le bouton créé.
                  */
-                const createButton = (config, parentEl = shortcutsContainerElement, isCoupletMainButton = false) => {
+                const createButton = (config, parentEl = panelContent, isCoupletMainButton = false) => {
                     const button = document.createElement('button');
                     button.textContent = typeof config.getLabel === 'function' ? config.getLabel() : config.label;
                     if (config.id) button.id = config.id;
                     button.classList.add('genius-lyrics-shortcut-button');
                     if (config.title) button.title = config.title;
-                    button.type = 'button'; parentEl.appendChild(button);
+                    button.type = 'button';
+                    parentEl.appendChild(button);
+
+                    if (config.isPlusButton) {
+                        button.classList.remove('genius-lyrics-shortcut-button');
+                        button.classList.add('gft-add-custom-btn');
+                        if (config.title) addTooltip(button, config.title);
+                        button.onclick = (e) => {
+                            e.preventDefault();
+                            if (typeof openCustomButtonManager === 'function') openCustomButtonManager(config.managerType || 'structure');
+                            else console.error('openCustomButtonManager not found');
+                        };
+                        return button;
+                    }
 
                     // Ajoute le badge de raccourci si défini
                     if (config.shortcut) {
@@ -5001,9 +5276,7 @@ function initLyricsEditorEnhancer() {
 
                             // Gère les corrections ligne par ligne
                             let correctionsCount = 0; let correctionFunction; let feedbackLabel = "";
-                            if (config.correctionType === 'capitalize') { correctionFunction = capitalizeFirstLetterOfEachLine; feedbackLabel = "majuscule(s) en début de ligne"; }
-                            else if (config.correctionType === 'removePunctuation') { correctionFunction = removeTrailingPunctuationFromLines; feedbackLabel = "point(s)/virgule(s) en fin de ligne"; }
-                            else if (config.correctionType === 'spacing') { correctionFunction = correctLineSpacing; feedbackLabel = "espacement(s) de ligne"; }
+                            if (config.correctionType === 'spacing') { correctionFunction = correctLineSpacing; feedbackLabel = "espacement(s) de ligne"; }
 
                             if (correctionFunction) {
                                 if (currentEditorType === 'textarea') {
@@ -5012,14 +5285,6 @@ function initLyricsEditorEnhancer() {
                                     if (originalText !== newText) {
                                         currentActiveEditor.value = newText;
                                         currentActiveEditor.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-                                        // Crée un overlay basique pour les corrections ligne par ligne
-                                        if (config.correctionType === 'capitalize') {
-                                            // Pour les majuscules, on surligne les premières lettres de chaque ligne qui ont été changées
-                                            const capitalizePattern = /^[a-z]/gm;
-                                            createTextareaReplacementOverlay(currentActiveEditor, originalText, newText, capitalizePattern);
-                                        }
-                                        // Note : Pour removePunctuation et spacing, le surlignage est complexe car ce sont des suppressions/ajouts
-                                        // On pourrait l'ajouter plus tard avec un algorithme de diff plus sophistiqué
                                     }
                                     correctionsCount = count;
                                 } else if (currentEditorType === 'div') {
@@ -5043,37 +5308,30 @@ function initLyricsEditorEnhancer() {
                                     hideProgress();
 
                                     if (result.correctionsCount === 0) {
-                                        showFeedbackMessage("Aucune correction de texte globale n'était nécessaire.", 2000, shortcutsContainerElement);
-
-                                        // Vérifie quand même les brackets même s'il n'y a pas de corrections textuelles
+                                        // Vérifie les brackets AVANT d'afficher le message "Aucune correction"
                                         const editorRef = currentActiveEditor;
                                         const editorTypeRef = currentEditorType;
+                                        let unmatchedCount = 0;
 
-                                        console.log('[GFT] Vérification des brackets (cas sans correction)...');
-                                        console.log('[GFT] editorRef:', editorRef);
-                                        console.log('[GFT] editorTypeRef:', editorTypeRef);
+                                        console.log('[GFT] Vérification des brackets (cas sans correction texte)...');
 
                                         if (editorRef) {
-                                            const unmatchedCount = highlightUnmatchedBracketsInEditor(editorRef, editorTypeRef);
+                                            unmatchedCount = highlightUnmatchedBracketsInEditor(editorRef, editorTypeRef);
                                             console.log('[GFT] unmatchedCount:', unmatchedCount);
+                                        }
 
-                                            // Affiche le résultat immédiatement
-                                            if (unmatchedCount > 0) {
-                                                const pluriel = unmatchedCount > 1 ? 's' : '';
-                                                showFeedbackMessage(
-                                                    `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} détecté${pluriel} et surligné${pluriel} en rouge !`,
-                                                    5000,
-                                                    shortcutsContainerElement
-                                                );
-                                            } else {
-                                                showFeedbackMessage(
-                                                    "✅ Toutes les parenthèses et crochets sont bien appariés.",
-                                                    3000,
-                                                    shortcutsContainerElement
-                                                );
-                                            }
+                                        if (unmatchedCount > 0) {
+                                            // Priorité à l'erreur de parenthèses
+                                            const pluriel = unmatchedCount > 1 ? 's' : '';
+                                            showFeedbackMessage(
+                                                `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} détecté${pluriel} et surligné${pluriel} en rouge !`,
+                                                5000,
+                                                shortcutsContainerElement
+                                            );
                                         } else {
-                                            console.log('[GFT] editorRef est null, impossible de vérifier les brackets');
+                                            // Vraiment rien à faire, ou le compte de brackets est à 0.
+                                            // Par prudence (si le comptage échoue mais que le surlignage a lieu), on invite à vérifier.
+                                            showFeedbackMessage("Aucune correction de texte. Vérifiez visuellement les parenthèses.", 3000, shortcutsContainerElement);
                                         }
                                         return;
                                     }
@@ -5105,8 +5363,6 @@ function initLyricsEditorEnhancer() {
                                             if (finalStats.yPrime > 0) detailsArray.push(`${finalStats.yPrime} "y'"`);
                                             if (finalStats.apostrophes > 0) detailsArray.push(`${finalStats.apostrophes} apostrophe(s)`);
                                             if (finalStats.oeuLigature > 0) detailsArray.push(`${finalStats.oeuLigature} "oeu"`);
-                                            if (finalStats.capitalization > 0) detailsArray.push(`${finalStats.capitalization} majuscule(s)`);
-                                            if (finalStats.punctuation > 0) detailsArray.push(`${finalStats.punctuation} ponctuation(s)`);
                                             if (finalStats.spacing > 0) detailsArray.push(`${finalStats.spacing} espacement(s)`);
 
                                             // Recalcule le total count
@@ -5137,11 +5393,8 @@ function initLyricsEditorEnhancer() {
                                                             shortcutsContainerElement
                                                         );
                                                     } else {
-                                                        showFeedbackMessage(
-                                                            "✅ Toutes les parenthèses et crochets sont bien appariés.",
-                                                            3000,
-                                                            shortcutsContainerElement
-                                                        );
+                                                        // Idem ici : pas de notification de succès si tout est OK, seulement les erreurs.
+                                                        // showFeedbackMessage("✅ Toutes les parenthèses et crochets sont bien appariés.", 3000, shortcutsContainerElement);
                                                     }
                                                 }, 4600);
                                             } else {
@@ -5310,7 +5563,7 @@ function initLyricsEditorEnhancer() {
                 // 3. Construction du Panneau (Nouveau Design v2.6.1)
                 const buttonGroupsContainer = document.createElement('div');
                 buttonGroupsContainer.id = 'gftButtonGroupsContainer';
-                shortcutsContainerElement.appendChild(buttonGroupsContainer);
+                panelContent.appendChild(buttonGroupsContainer);
 
                 // --- SECTION 1: STRUCTURE ---
                 const structureSection = document.createElement('div');
@@ -5490,7 +5743,7 @@ function initLyricsEditorEnhancer() {
                 progressContainer.appendChild(progressText);
                 feedbackContainer.appendChild(progressContainer);
 
-                shortcutsContainerElement.appendChild(feedbackContainer);
+                panelContent.appendChild(feedbackContainer);
 
 
                 // Ajoute le footer
@@ -5512,38 +5765,42 @@ function initLyricsEditorEnhancer() {
                 creditLabel.style.opacity = '0.6';
                 creditLabel.style.userSelect = 'none';
 
-                // Lien discret vers Transcription IA
-                const iaLink = document.createElement('a');
-                iaLink.textContent = '🤖 Transcription IA ↗';
-                iaLink.href = 'https://aistudio.google.com/apps/drive/1D16MbaGAWjUMTseOvzzvSDnccRbU-z_S?fullscreenApplet=true&showPreview=true&showAssistant=true';
-                iaLink.target = '_blank';
-                iaLink.rel = 'noopener noreferrer';
-                iaLink.style.fontSize = '10px';
-                iaLink.style.color = '#888';
-                iaLink.style.textDecoration = 'none';
-                iaLink.style.opacity = '0.6';
-                iaLink.style.cursor = 'pointer';
-                iaLink.style.transition = 'opacity 0.2s ease';
-                iaLink.title = 'Ouvrir l\'outil de transcription IA';
-
-                iaLink.addEventListener('mouseenter', () => {
-                    iaLink.style.opacity = '1';
-                    iaLink.style.textDecoration = 'underline';
-                });
-                iaLink.addEventListener('mouseleave', () => {
-                    iaLink.style.opacity = '0.6';
+                // Lien discret vers Transcription IA (uniquement en mode français)
+                if (!isEnglishTranscriptionMode()) {
+                    const iaLink = document.createElement('a');
+                    iaLink.textContent = '🤖 Transcription IA ↗';
+                    iaLink.href = 'https://aistudio.google.com/apps/drive/1D16MbaGAWjUMTseOvzzvSDnccRbU-z_S?fullscreenApplet=true&showPreview=true&showAssistant=true';
+                    iaLink.target = '_blank';
+                    iaLink.rel = 'noopener noreferrer';
+                    iaLink.style.fontSize = '10px';
+                    iaLink.style.color = '#888';
                     iaLink.style.textDecoration = 'none';
-                });
+                    iaLink.style.opacity = '0.6';
+                    iaLink.style.cursor = 'pointer';
+                    iaLink.style.transition = 'opacity 0.2s ease';
+                    iaLink.title = 'Ouvrir l\'outil de transcription IA';
+
+                    iaLink.addEventListener('mouseenter', () => {
+                        iaLink.style.opacity = '1';
+                        iaLink.style.textDecoration = 'underline';
+                    });
+                    iaLink.addEventListener('mouseleave', () => {
+                        iaLink.style.opacity = '0.6';
+                        iaLink.style.textDecoration = 'none';
+                    });
+
+                    footerContainer.appendChild(iaLink);
+                }
 
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v2.7.7'; // Bump version visuelle pour le user
-                versionLabel.title = 'Genius Fast Transcriber v2.7.7 - Nouvelle Interface Premium';
+                versionLabel.textContent = 'v3.0.0'; // Bump version visuelle pour le user
+                versionLabel.title = 'Genius Fast Transcriber v3.0.0 - Nouvelle Interface Premium';
 
                 footerContainer.appendChild(creditLabel);
-                footerContainer.appendChild(iaLink);
                 footerContainer.appendChild(versionLabel);
-                shortcutsContainerElement.appendChild(footerContainer);
+                panelContent.appendChild(footerContainer);
+                shortcutsContainerElement.appendChild(panelContent);
 
                 // 4. Injecte le panneau complet dans la page.
                 targetStickySection.prepend(shortcutsContainerElement);
@@ -6906,6 +7163,390 @@ function showFeedbackMessage(message, duration = 3000, container = null) {
             feedbackTimeout = null;
         }, duration);
     }
+}
+
+// ----- Custom Buttons Feature -----
+
+/**
+ * Récupère les boutons personnalisés sauvegardés.
+ * @returns {Array} Liste des objets boutons triés par date de création.
+ */
+function getCustomButtons() {
+    try {
+        const stored = localStorage.getItem(CUSTOM_BUTTONS_STORAGE_KEY);
+        return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+        console.error("Erreur lecture boutons custom:", e);
+        return [];
+    }
+}
+
+/**
+ * Sauvegarde un nouveau bouton ou met à jour la liste.
+ * @param {object} buttonData - Données du bouton.
+ */
+function saveCustomButton(buttonData) {
+    const buttons = getCustomButtons();
+    buttonData.id = buttonData.id || 'custom_' + Date.now();
+    buttonData.createdAt = buttonData.createdAt || Date.now();
+
+    buttons.push(buttonData);
+    localStorage.setItem(CUSTOM_BUTTONS_STORAGE_KEY, JSON.stringify(buttons));
+    return buttonData;
+}
+
+/**
+ * Supprime un bouton personnalisé par son ID.
+ * @param {string} id - ID du bouton.
+ */
+function deleteCustomButton(id) {
+    let buttons = getCustomButtons();
+    buttons = buttons.filter(b => b.id !== id);
+    localStorage.setItem(CUSTOM_BUTTONS_STORAGE_KEY, JSON.stringify(buttons));
+}
+
+/**
+ * Exporte tous les boutons personnalisés sous forme de code string.
+ * Format: "GFT-PRESET-" + Base64(JSON)
+ */
+function exportCustomButtons() {
+    const buttons = getCustomButtons();
+    const json = JSON.stringify(buttons);
+    return "GFT-PRESET-" + btoa(unescape(encodeURIComponent(json)));
+}
+
+/**
+ * Importe des boutons depuis un code string.
+ * @param {string} code - Le code preset.
+ * @returns {boolean} Succès ou échec.
+ */
+function importCustomButtons(code) {
+    try {
+        if (!code.startsWith("GFT-PRESET-")) throw new Error("Format invalide");
+        const base64 = code.replace("GFT-PRESET-", "");
+        const json = decodeURIComponent(escape(atob(base64)));
+        const newButtons = JSON.parse(json);
+
+        if (!Array.isArray(newButtons)) throw new Error("Données invalides");
+
+        // Fusionne avec les existants (ou remplace ? Fusion est plus safe)
+        const currentButtons = getCustomButtons();
+        const merged = [...currentButtons, ...newButtons];
+
+        // Dédoublonnage basique par contenu exact pour éviter le spam
+        const unique = merged.filter((btn, index, self) =>
+            index === self.findIndex((t) => (
+                t.label === btn.label && t.content === btn.content && t.regex === btn.regex
+            ))
+        );
+
+        localStorage.setItem(CUSTOM_BUTTONS_STORAGE_KEY, JSON.stringify(unique));
+        return true;
+    } catch (e) {
+        console.error("Import failed:", e);
+        return false;
+    }
+}
+
+/**
+ * Affiche le gestionnaire de boutons personnalisés (Modal).
+ * @param {string} defaultType - 'structure' ou 'cleanup' pour pré-remplir le type.
+ */
+function openCustomButtonManager(defaultType = 'structure') {
+    // Supprime l'ancien modal si ouvert
+    const existing = document.getElementById('gft-custom-manager');
+    if (existing) existing.remove();
+
+    const isDarkMode = localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true';
+
+    // Overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'gft-custom-manager';
+    overlay.style.cssText = `
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8); z-index: 10005;
+        display: flex; justify-content: center; align-items: center;
+        backdrop-filter: blur(3px);
+    `;
+
+    // Modal Container
+    const modal = document.createElement('div');
+    modal.className = `gft-custom-manager-modal ${isDarkMode ? 'gft-dark-mode' : ''}`;
+    modal.style.background = isDarkMode ? '#222' : 'white';
+    modal.style.color = isDarkMode ? '#eee' : '#222';
+    // Force text color for better readability
+    modal.style.setProperty('color', isDarkMode ? '#eee' : '#222', 'important');
+
+    modal.style.padding = '20px';
+    modal.style.borderRadius = '8px';
+    modal.style.boxShadow = '0 10px 25px rgba(0,0,0,0.5)';
+
+    // Titre
+    const header = document.createElement('div');
+    header.style.display = 'flex';
+    header.style.justifyContent = 'space-between';
+    header.style.alignItems = 'center';
+    header.innerHTML = `<h2 style="margin:0; font-size:18px;">✨ Custom Buttons Manager</h2>`;
+
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '&times;';
+    closeBtn.style.background = 'none'; closeBtn.style.border = 'none';
+    closeBtn.style.fontSize = '24px'; closeBtn.style.cursor = 'pointer';
+    closeBtn.style.color = 'inherit';
+    closeBtn.onclick = () => overlay.remove();
+    header.appendChild(closeBtn);
+    modal.appendChild(header);
+
+    // Tabs
+    const tabsContainer = document.createElement('div');
+    tabsContainer.className = 'gft-tabs';
+    const tabCreate = document.createElement('button');
+    tabCreate.className = 'gft-tab-btn active'; tabCreate.textContent = 'Create';
+    const tabManage = document.createElement('button');
+    tabManage.className = 'gft-tab-btn'; tabManage.textContent = 'Library';
+
+    tabsContainer.appendChild(tabCreate);
+    tabsContainer.appendChild(tabManage);
+    modal.appendChild(tabsContainer);
+
+    // Contenu "Créer"
+    const contentCreate = document.createElement('div');
+    contentCreate.style.display = 'flex';
+    contentCreate.style.flexDirection = 'column';
+    contentCreate.style.gap = '10px';
+
+    // Type Selector
+    const typeGroup = document.createElement('div');
+    typeGroup.className = 'gft-form-group';
+    typeGroup.innerHTML = `<label class="gft-form-label">Action Type</label>`;
+    const typeSelect = document.createElement('select');
+    typeSelect.className = 'gft-form-select';
+    typeSelect.innerHTML = `
+        <option value="structure">Structure Tag (Insertion)</option>
+        <option value="cleanup">Cleanup Tool (Search/Replace)</option>
+    `;
+    typeSelect.value = defaultType;
+    typeGroup.appendChild(typeSelect);
+    contentCreate.appendChild(typeGroup);
+
+    // Nom / Label
+    const nameGroup = document.createElement('div');
+    nameGroup.className = 'gft-form-group';
+    nameGroup.innerHTML = `<label class="gft-form-label">Button Label</label>`;
+    const nameInput = document.createElement('input');
+    nameInput.className = 'gft-form-input';
+    nameInput.placeholder = "Ex: Remove Emoji, [Verse]...";
+    nameGroup.appendChild(nameInput);
+    contentCreate.appendChild(nameGroup);
+
+    // Champs dynamiques selon le type
+    const dynamicFields = document.createElement('div');
+
+    const renderDynamicFields = () => {
+        dynamicFields.innerHTML = '';
+        const type = typeSelect.value;
+
+        if (type === 'structure') {
+            const grp = document.createElement('div');
+            grp.className = 'gft-form-group';
+            grp.innerHTML = `<label class="gft-form-label">Text to Insert</label>`;
+            const input = document.createElement('textarea');
+            input.id = 'gft-custom-content';
+            input.className = 'gft-form-textarea';
+            input.placeholder = "[Verse]\n";
+            input.rows = 3;
+            grp.appendChild(input);
+            dynamicFields.appendChild(grp);
+        } else {
+            // Cleanup: Mode Simple vs Avancé
+            const modeSwitch = document.createElement('div');
+            modeSwitch.style.display = 'flex'; modeSwitch.style.alignItems = 'center'; modeSwitch.style.gap = '5px';
+            modeSwitch.style.fontSize = '12px';
+            const chk = document.createElement('input'); chk.type = 'checkbox'; chk.id = 'gft-advanced-regex';
+            modeSwitch.appendChild(chk);
+            modeSwitch.appendChild(document.createTextNode('Advanced Regex Mode'));
+            dynamicFields.appendChild(modeSwitch);
+
+            // Rechercher
+            const grpFind = document.createElement('div');
+            grpFind.className = 'gft-form-group';
+            grpFind.innerHTML = `<label class="gft-form-label">Find Pattern</label>`;
+            const inputFind = document.createElement('input');
+            inputFind.id = 'gft-custom-find';
+            inputFind.className = 'gft-form-input';
+            grpFind.appendChild(inputFind);
+            dynamicFields.appendChild(grpFind);
+
+            // Remplacer
+            const grpRep = document.createElement('div');
+            grpRep.className = 'gft-form-group';
+            grpRep.innerHTML = `<label class="gft-form-label">Replace With</label>`;
+            const inputRep = document.createElement('input');
+            inputRep.id = 'gft-custom-replace';
+            inputRep.className = 'gft-form-input';
+            inputRep.placeholder = "(Leave empty to delete)";
+            grpRep.appendChild(inputRep);
+            dynamicFields.appendChild(grpRep);
+
+            chk.onchange = () => {
+                if (chk.checked) {
+                    inputFind.placeholder = "Regex Pattern (e.g. \\d+\\s*$)";
+                } else {
+                    inputFind.placeholder = "Exact text to remove";
+                }
+            };
+            chk.dispatchEvent(new Event('change'));
+        }
+    };
+
+    renderDynamicFields();
+    typeSelect.onchange = renderDynamicFields;
+    contentCreate.appendChild(dynamicFields);
+
+    // Bouton Sauvegarder
+    const saveBtn = document.createElement('button');
+    saveBtn.textContent = 'Save Custom Button';
+    saveBtn.style.cssText = 'background: #f9ff55; color: black; border: none; padding: 10px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 10px; width: 100%;';
+    saveBtn.onclick = () => {
+        const type = typeSelect.value;
+        const label = nameInput.value.trim();
+        if (!label) return alert("Please specify a button label.");
+
+        const btnData = {
+            label: label,
+            type: type
+        };
+
+        if (type === 'structure') {
+            const content = document.getElementById('gft-custom-content').value;
+            if (!content) return alert("Content is required.");
+            btnData.content = content;
+        } else {
+            const find = document.getElementById('gft-custom-find').value;
+            const rep = document.getElementById('gft-custom-replace').value;
+            const isRegex = document.getElementById('gft-advanced-regex').checked;
+
+            if (!find) return alert("Find pattern is required.");
+
+            btnData.regex = isRegex ? find : escapeRegExp(find); // Stocke toujours comme regex string
+            btnData.replacement = rep;
+            btnData.isExplicitRegex = isRegex; // Juste pour info si on veut rééditer plus tard
+        }
+
+        saveCustomButton(btnData);
+        showFeedbackMessage("Button created! Reloading...", 3000); // Idéalement on rafraîchit l'UI sans reload
+        overlay.remove();
+        // Force refresh of panel logic if possible, otherwise reload page
+        window.location.reload();
+    };
+    contentCreate.appendChild(saveBtn);
+    modal.appendChild(contentCreate);
+
+    // Contenu "Bibliothèque"
+    const contentManage = document.createElement('div');
+    contentManage.style.display = 'none';
+
+    const renderList = () => {
+        contentManage.innerHTML = '';
+        const list = document.createElement('div');
+        list.className = 'gft-custom-list';
+
+        const buttons = getCustomButtons();
+        if (buttons.length === 0) {
+            list.innerHTML = `<div style="padding:15px; text-align:center; opacity:0.5;">No custom buttons found.</div>`;
+        } else {
+            buttons.forEach(btn => {
+                const item = document.createElement('div');
+                item.className = 'gft-custom-item';
+
+                const info = document.createElement('div');
+                info.innerHTML = `<strong>${btn.label}</strong> <span style="font-size:10px; opacity:0.7; border:1px solid currentColor; padding:1px 3px; border-radius:3px;">${btn.type}</span>`;
+
+                const actions = document.createElement('div');
+                actions.className = 'gft-custom-actions';
+
+                const delBtn = document.createElement('button');
+                delBtn.className = 'gft-icon-btn gft-btn-delete';
+                delBtn.innerHTML = '🗑️';
+                delBtn.title = 'Delete';
+                delBtn.onclick = () => {
+                    if (confirm("Delete this button?")) {
+                        deleteCustomButton(btn.id);
+                        renderList(); // Refresh list
+                    }
+                };
+
+                actions.appendChild(delBtn);
+                item.appendChild(info);
+                item.appendChild(actions);
+                list.appendChild(item);
+            });
+        }
+        contentManage.appendChild(list);
+
+        // Zone Import / Export
+        const ioZone = document.createElement('div');
+        ioZone.className = 'gft-io-zone';
+        ioZone.innerHTML = `<strong>Share Presets</strong>`;
+
+        const codeArea = document.createElement('textarea');
+        codeArea.className = 'gft-code-area';
+        codeArea.placeholder = "Paste a preset code here to import, or click Export...";
+
+        const btnContainer = document.createElement('div');
+        btnContainer.style.display = 'flex'; btnContainer.style.gap = '10px'; btnContainer.style.marginTop = '5px';
+
+        const exportBtn = document.createElement('button');
+        exportBtn.textContent = 'Copy Export Code';
+        exportBtn.className = 'gft-tutorial-button'; /* Réutiliser style */
+        exportBtn.style.fontSize = '11px'; exportBtn.style.padding = '5px 10px';
+        exportBtn.onclick = () => {
+            const code = exportCustomButtons();
+            codeArea.value = code;
+            codeArea.select();
+            document.execCommand('copy');
+            showFeedbackMessage("Code copied!", 2000);
+        };
+
+        const importBtn = document.createElement('button');
+        importBtn.textContent = 'Import Code';
+        importBtn.className = 'gft-tutorial-button';
+        importBtn.style.fontSize = '11px'; exportBtn.style.padding = '5px 10px';
+        importBtn.style.background = '#f9ff55'; importBtn.style.color = 'black';
+        importBtn.onclick = () => {
+            const code = codeArea.value.trim();
+            if (!code) return alert("Please paste a code first.");
+            if (importCustomButtons(code)) {
+                alert("Import successful! Reloading...");
+                window.location.reload();
+            } else {
+                alert("Import failed. Invalid code.");
+            }
+        };
+
+        btnContainer.appendChild(exportBtn);
+        btnContainer.appendChild(importBtn);
+        ioZone.appendChild(codeArea);
+        ioZone.appendChild(btnContainer);
+        contentManage.appendChild(ioZone);
+    };
+
+    modal.appendChild(contentManage);
+
+    // Tab Logic
+    tabCreate.onclick = () => {
+        tabCreate.classList.add('active'); tabManage.classList.remove('active');
+        contentCreate.style.display = 'flex'; contentManage.style.display = 'none';
+        renderDynamicFields(); // refresh
+    };
+    tabManage.onclick = () => {
+        tabManage.classList.add('active'); tabCreate.classList.remove('active');
+        contentManage.style.display = 'block'; contentCreate.style.display = 'none';
+        renderList();
+    };
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
 }
 
 // ----- Communication avec le Popup -----

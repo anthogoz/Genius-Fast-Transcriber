@@ -1,30 +1,37 @@
 # 🎵 Genius Fast Transcriber + Lyric Card Maker
 
-![Version](https://img.shields.io/badge/version-2.7.7-blue.svg?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-3.0.0-blue.svg?style=for-the-badge)
 ![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-green.svg?style=for-the-badge&logo=google-chrome)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg?style=for-the-badge)
 
 **The ultimate tool for transcribers on Genius.com.**
-Transform your editing experience with a suite of professional tools, a modern interface, and smart automations.
+Transform your editing experience with a suite of professional tools, a modern interface, smart automations, and full customization.
 
 ---
 
 ## 🌟 Why use Genius Fast Transcriber?
 
 🚀 **Save time**: Insert entire structures and fix typography in one click.
-🧠 **Stay focused**: The interface integrates perfectly and anticipates your needs.
+🧠 **Customizable**: Create your own buttons and macros.
 🎨 **Impeccable results**: Your lyrics automatically respect Genius quality standards.
-🌍 **International**: Available in **French** and **English**!
+🌍 **International**: Available in **French** and **English** (with specific typography rules for each).
 🌙 **Dark Mode by default**: Beautiful dark interface that's easy on the eyes.
 
 ---
 
 ## 🔥 Key Features
 
-### 🏗️ Structure & Smart Tags
+### � New in v3.0: Custom Buttons!
+*   **Create your own buttons**: Add your own tags or complex regex cleanup tools.
+*   **Easy Interface**: A simple graphical manager to add/edit buttons.
+*   **Regex Support**: Power users can use Regular Expressions for advanced find/replace.
+*   **Share Presets**: Export your buttons as a code snippet and share them with friends!
+
+### �🏗️ Structure & Smart Tags
 *   **Unified Verse Manager**: A dynamic central button for `[Couplet 1]`, `[Couplet 2]` with fast navigation ← →.
 *   **Artist Detection**: The extension scans the page and proposes artists (Main & Feat) to check for automatic attribution.
 *   **Quick Tags**: `[Refrain]`, `[Intro]`, `[Bridge]`... inserted cleanly with correct credits.
+*   **Multi-language**: Adapts tags to English (`[Verse]`, `[Chorus]`) or French (`[Couplet]`, `[Refrain]`).
 
 ### ✨ Corrections & Quality
 *   **Fix All** ✨: A prominent button that cleans everything in one click:
@@ -39,8 +46,9 @@ Transform your editing experience with a suite of professional tools, a modern i
 *   **Parenthesis Check**: Detects and highlights in **RED** unclosed or mismatched parentheses `( )` or brackets `[ ]`.
 
 ### 🎨 Creation Tools
-*   **Floating Bar**: Select text, a bar appears to apply **Bold**, *Italics*, convert numbers to words...
-*   **Customizable Lyric Card**: Create beautiful images of lyrics.
+*   **Floating Bar**: Select text, a bar appears to format **Bold**, *Italics*...
+*   **Number to Words Converter**: Select "42" and click the magic button to get "forty-two" (or "quarante-deux" in FR mode).
+*   **Customizable Lyric Card**: Create beautiful images of lyrics for Instagram/Twitter.
     *   Choose between **Album Art** or **Artist Image** for the background! 🖼️
     *   Multiple formats: 16:9, 9:16, 1:1
     *   Preview before download.
@@ -93,14 +101,14 @@ Transform your editing experience with a suite of professional tools, a modern i
 
 ---
 
-## 🆕 What's New in v2.7.7
+## 🆕 What's New in v3.0.0
 
-- 🌙 **Dark mode by default** for new users
-- ✨ **Redesigned "Fix All" button** - prominent dark button in light mode, yellow in dark mode
-- 🔗 **AI Transcription link** in footer for quick access to external tool
-- 🐛 **Ellipsis preservation** - punctuation cleanup now preserves `...` at end of lines
-- 🎨 **Text selection disabled** in panel UI (except input fields) for cleaner experience
-- 📦 Various bug fixes and improvements
+- ✨ **Custom Buttons Manager**: Power to the users! Create your own insertion or cleanup buttons.
+- 🌍 **Full English Support**: Number conversion, tags, and tools are now fully localized.
+- � **Number to Words**: Convert digits to words in seconds (English & French supported).
+- �️ **Lyric Card Only Mode**: For users who just want to share lyrics.
+- 🎨 **Premium UI**: New animations, better spacing, and improved readability.
+- � **Bug fixes**: Stability and performance improvements.
 
 ---
 
