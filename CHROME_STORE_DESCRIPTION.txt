@@ -1,0 +1,61 @@
+🚀 THE ULTIMATE TOOL FOR GENIUS.COM CONTRIBUTORS
+
+Elevate your transcription game with Genius Fast Transcriber. Whether you are a casual contributor or a top editor, this extension transforms the Genius editor into a powerful, professional workspace.
+
+🔥 NEW IN VERSION 3.0.0
+• Custom Buttons Manager: Create your own buttons! Add custom tags or powerful Regex cleanup tools.
+• Share Presets: Export your custom buttons code and share it with the community.
+• Full English Support: The extension now fully adapts to English typography rules and tags (Verse, Chorus...).
+• Number to Words Converter: Instantly convert digits like "42" into "forty-two" (or "quarante-deux" in French mode).
+• Lyric Card Only Mode: Just want to create images? Hide the transcription tools for a cleaner experience.
+
+✨ KEY FEATURES
+
+1️⃣ Smart Structure & Tags
+• Intelligent Artist Detection: Automatically detects Main Artists and Features to credit sections correctly.
+• Unified Verse Manager: A single dynamic button for [Verse 1], [Verse 2]... with arrow navigation.
+• One-Click Tags: Insert [Chorus], [Intro], [Bridge] with proper formatting and credits instantly.
+
+2️⃣ "Fix All" Magic Button 🪄
+Save hours of editing. One click performs 10+ standard Genius corrections:
+• Fix straight apostrophes (') to curly ones (’).
+• Capitalize the start of every line.
+• Remove unnecessary punctuation at the end of lines.
+• Fix spacing around punctuation.
+• Convert "x" to "×" for multipliers.
+• French Mode specific: Handles « guillemets », thin spaces, etc.
+
+3️⃣ 🎨 Built-in Lyric Card Maker
+Create beautiful, shareable images of your favorite lyrics directly from the page.
+• Select any text and click the "Lyric Card" button.
+• Backgrounds: Use the official Album Art or the Artist's image.
+• Formats: 16:9 (YouTube), 9:16 (Story/TikTok), 1:1 (Instagram).
+• Download or Copy to clipboard instantly.
+
+4️⃣ Professional Tools
+• Dark Mode: A sleek, dark interface integrated perfectly into Genius.
+• Floating Toolbar: Select text to Bold, Italic, or format numbers.
+• Parentheses Checker: Highlights missing or unclosed brackets in RED.
+• Search & Replace: Powerful cleanup tools (remove double spaces, fix dashes...).
+
+⌨️ KEYBOARD SHORTCUTS
+• Ctrl + 1-5 : Insert Structure Tags (Verse, Chorus...)
+• Ctrl + Shift + C : "Fix All" (Opens Preview)
+• Ctrl + D : Duplicate current line
+• Ctrl + Z / Y : Undo / Redo with visual history
+• Ctrl + Alt + Space : Play/Pause YouTube video
+
+🌍 MULTI-LANGUAGE SUPPORT
+• English (International rules)
+• Français (Règles typographiques françaises, gestion des "œ", espaces insécables...)
+
+🔒 PRIVACY & SAFETY
+• No Data Collection: Your lyrics and drafts stay on your computer.
+• Local Auto-Save: Never lose your work if the browser crashes.
+
+---
+Updates & Support:
+This project is open-source and community-driven. If you have suggestions or find bugs, please contribute!
+
+Developed with ❤️ by Lnkhey.
+(Unofficial extension, not affiliated with Genius Media Group Inc.)

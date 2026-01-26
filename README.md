@@ -1,6 +1,6 @@
 # 🎵 Genius Fast Transcriber + Lyric Card Maker
 
-![Version](https://img.shields.io/badge/version-3.0.0-blue.svg?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-3.0.1-blue.svg?style=for-the-badge)
 ![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-green.svg?style=for-the-badge&logo=google-chrome)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg?style=for-the-badge)
 
@@ -14,7 +14,7 @@ Transform your editing experience with a suite of professional tools, a modern i
 🚀 **Save time**: Insert entire structures and fix typography in one click.
 🧠 **Customizable**: Create your own buttons and macros.
 🎨 **Impeccable results**: Your lyrics automatically respect Genius quality standards.
-🌍 **International**: Available in **French** and **English** (with specific typography rules for each).
+🌍 **International**: Available in **French**, **English**, and **Polish** (with specific typography rules for each).
 🌙 **Dark Mode by default**: Beautiful dark interface that's easy on the eyes.
 
 ---
@@ -39,15 +39,15 @@ Transform your editing experience with a suite of professional tools, a modern i
     *   Capitalization at start of lines
     *   Removal of unnecessary final punctuation (preserves `...` ellipsis!)
     *   Correction of spaces `y'` → `y `
-    *   French quotes `«»` → `"`
-    *   Long dashes `— –` → `-`
+    *   French quotes `«»` → `"` (or Polish `„""` → `"`)
+    *   Long dashes `— –` → `-` (or `-` → `—` for Polish)
     *   Double spaces removed
     *   Proper line spacing between sections
 *   **Parenthesis Check**: Detects and highlights in **RED** unclosed or mismatched parentheses `( )` or brackets `[ ]`.
 
 ### 🎨 Creation Tools
 *   **Floating Bar**: Select text, a bar appears to format **Bold**, *Italics*...
-*   **Number to Words Converter**: Select "42" and click the magic button to get "forty-two" (or "quarante-deux" in FR mode).
+*   **Number to Words Converter**: Select "42" and click the magic button to get "forty-two" (or "quarante-deux" in FR, "czterdzieści dwa" in PL).
 *   **Customizable Lyric Card**: Create beautiful images of lyrics for Instagram/Twitter.
     *   Choose between **Album Art** or **Artist Image** for the background! 🖼️
     *   Multiple formats: 16:9, 9:16, 1:1
@@ -100,6 +100,14 @@ Transform your editing experience with a suite of professional tools, a modern i
     *   "Load unpacked" and select the folder.
 
 ---
+
+## 🆕 What's New in v3.0.1
+
+- 🇵🇱 **Polish Language Support**: Full support for Genius Polska guidelines!
+    - **UI Translation**: Interface available in Polish.
+    - **Smart Tags**: `[Zwrotka]`, `[Refren]`, `[Przyśpiewka]`, etc.
+    - **Specific Cleanups**: Polish quotes `„""` -> `"` and Em-dashes `-` -> `—`.
+- 🐛 **Bug Fixes**: Improved notification translations and formatting fixes.
 
 ## 🆕 What's New in v3.0.0
 

@@ -1,6 +1,6 @@
-// content.js (Version 3.0.0 - Extension Complète)
+// content.js (Version 3.0.1 - Extension Complète)
 /**
- * @file Fichier principal de l'extension "Genius Fast Transcriber" v3.0.0.
+ * @file Fichier principal de l'extension "Genius Fast Transcriber" v3.0.1.
  * Ce script s'injecte dans les pages du site genius.com.
  * Il détecte la présence de l'éditeur de paroles et y ajoute un panneau d'outils
  * pour accélérer et fiabiliser la transcription (ajout de tags, correction de texte, etc.).
@@ -20,10 +20,10 @@
  * - Création de Lyric Cards avec formatage et partage
  * 
  * @author Lnkhey
- * @version 3.0.0
+ * @version 3.0.1
  */
 
-console.log('Genius Fast Transcriber (by Lnkhey) v3.0.0 - Toutes fonctionnalités activées ! 🎵');
+console.log('Genius Fast Transcriber (by Lnkhey) v3.0.1 - Toutes fonctionnalités activées ! 🎵');
 
 // ----- Injection des animations CSS essentielles -----
 // Injecte l'animation de surlignage pour s'assurer qu'elle fonctionne même si les styles CSS de Genius l'écrasent
@@ -326,6 +326,22 @@ const TRANSLATIONS = {
         progress_step_dash: "Correction des tirets longs...",
         progress_step_spaces: "Suppression des doubles espaces...",
         progress_step_spacing: "Correction de l'espacement...",
+        // Feedback messages
+        feedback_adlib_added: "(Ad-lib) ajouté !",
+        feedback_select_text_first: "⚠️ Sélectionnez du texte d'abord",
+        feedback_no_replacement: "Aucun remplacement effectué.",
+        feedback_replaced: "{count} {item} remplacé(s) !",
+        feedback_no_correction_needed: "Aucune correction de {item} nécessaire.",
+        feedback_corrected: "{count} {item} corrigé(s) !",
+        feedback_no_changes: "Aucune modification à annuler.",
+        feedback_undo: "↩️ Annulé",
+        feedback_redo: "↪️ Refait",
+        feedback_pause: "⏸️ Pause",
+        feedback_play: "▶️ Lecture",
+        feedback_duplicate_line: "📋 Ligne dupliquée !",
+        feedback_no_text_corrections: "Aucune correction de texte. Vérifiez visuellement les parenthèses.",
+        feedback_brackets_ok: "✅ Aucun problème trouvé ! Toutes les parenthèses et crochets sont bien appariés.",
+        feedback_brackets_issue: "⚠️ {count} parenthèse(s)/crochet(s) non apparié(s) trouvé(s) et surligné(s) en rouge !",
     },
     en: {
         panel_title: "Genius Fast Transcriber",
@@ -574,6 +590,266 @@ const TRANSLATIONS = {
         progress_step_dash: "Fixing long dashes...",
         progress_step_spaces: "Removing double spaces...",
         progress_step_spacing: "Fixing spacing...",
+        // Feedback messages
+        feedback_adlib_added: "(Ad-lib) added!",
+        feedback_select_text_first: "⚠️ Select text first",
+        feedback_no_replacement: "No replacement made.",
+        feedback_replaced: "{count} {item} replaced!",
+        feedback_no_correction_needed: "No {item} correction needed.",
+        feedback_corrected: "{count} {item} corrected!",
+        feedback_no_changes: "No changes to undo.",
+        feedback_undo: "↩️ Undone",
+        feedback_redo: "↪️ Redone",
+        feedback_pause: "⏸️ Pause",
+        feedback_play: "▶️ Play",
+        feedback_duplicate_line: "📋 Line duplicated!",
+        feedback_no_text_corrections: "No text correction. Visually check the brackets.",
+        feedback_brackets_ok: "✅ No issues found! All brackets are well paired.",
+        feedback_brackets_issue: "⚠️ {count} unpaired bracket(s) found and highlighted in red!",
+    },
+    // Polish translations - UI strings are placeholders for contributor PR
+    // Structure tags and cleanup tools are Polish-specific per Genius Polska guidelines
+    pl: {
+        panel_title: "Genius Fast Transcriber",
+        artist_selection: "Przypisz sekcję do:",
+        no_artist: "Nie wykryto artysty.",
+        shortcuts_title: "Skróty",
+        add_couplet: "Dodaj Zwrotkę",
+        format_numbers: "Formatuj liczby",
+        create_lyric_card: "Utwórz Lyric Card",
+        preview: "Podgląd",
+        copy: "Kopiuj",
+        undo: "Cofnij",
+        redo: "Ponów",
+        feedback_copied: "Skopiowano!",
+        feedback_restored: "Przywrócono",
+        onboarding_title: "Witaj",
+        next_btn: "Dalej",
+        finish_btn: "Zakończ",
+        mode_full_title: "Tryb Pełny",
+        mode_full_desc: "Narzędzia transkrypcji + Lyric Cards",
+        mode_lyric_title: "Tylko Lyric Card",
+        mode_lyric_desc: "Tylko tworzenie obrazów",
+        recommended_label: "Zalecane",
+        theme_select_title: "Wybierz motyw 🌗",
+        theme_light_btn: "Tryb Jasny ☀️",
+        theme_dark_btn: "Tryb Ciemny 🌙",
+        lang_select_title: "Język",
+        mode_select_title: "Tryb",
+        full_mode_label: "Pełny (Transkrypcja + Lyric Cards)",
+        lyric_only_label: "Tylko Lyric Card",
+        settings_saved: "Zapisano ustawienia!",
+        open_panel: "Otwórz panel",
+        close_panel: "Zamknij panel",
+        onboarding_intro: "Skonfiguruj swoje ustawienia Genius Fast Transcriber.",
+        // Settings & Tooltips
+        settings_menu: "Menu Ustawień",
+        dark_mode_toggle_light: "☀️ Tryb Jasny",
+        dark_mode_toggle_dark: "🌙 Tryb Ciemny",
+        stats_show: "📊 Pokaż Statystyki",
+        stats_hide: "📊 Ukryj Statystyki",
+        header_feat_show: "🎤 Pokaż feat w nagłówku",
+        header_feat_hide: "🎤 Ukryj feat w nagłówku",
+        newline_enable: "↵ Włącz nową linię po tagach",
+        newline_disable: "↵ Wyłącz nową linię po tagach",
+        tutorial_link: "❓ Samouczek / Pomoc",
+        undo_tooltip: "Cofnij ostatnią zmianę (Ctrl+Z)",
+        redo_tooltip: "Ponów ostatnią cofniętą zmianę (Ctrl+Y)",
+        panel_title_img_alt: "Logo GFT",
+        // Sections
+        section_structure: "Struktura i Artyści",
+        section_cleanup: "Narzędzia czyszczenia",
+        // Buttons & Tooltips - Polish structure tags
+        btn_header: "Nagłówek",
+        btn_header_tooltip: "Wstaw nagłówek utworu z artystami",
+        btn_intro: "[Intro]",
+        btn_intro_tooltip: "Wstaw tag [Intro] z artystami (Ctrl+4)",
+        btn_verse_unique: "[Zwrotka]",
+        btn_verse_unique_tooltip: "Wstaw tag [Zwrotka] z artystami",
+        btn_verse: "[Zwrotka]",
+        btn_verse_tooltip: "Wstaw tag [Zwrotka] bez numeru z artystami",
+        btn_verse_num: "[Zwrotka 1]",
+        btn_verse_num_tooltip: "Wstaw tag [Zwrotka X] z zarządzaniem numerem",
+        btn_chorus: "[Refren]",
+        btn_chorus_tooltip: "Wstaw tag [Refren] z artystami (Ctrl+1, Ctrl+2)",
+        btn_pre_chorus: "[Przedrefren]",
+        btn_pre_chorus_tooltip: "Wstaw tag [Przedrefren] (Ctrl+3)",
+        btn_bridge: "[Przejście]",
+        btn_bridge_tooltip: "Wstaw tag [Przejście] z artystami (Ctrl+5)",
+        btn_outro: "[Outro]",
+        btn_outro_tooltip: "Wstaw tag [Outro] z artystami",
+        btn_instrumental: "[Przerwa instrumentalna]",
+        btn_instrumental_tooltip: "Wstaw tag [Przerwa instrumentalna]",
+        btn_break: "[Przerwa]",
+        btn_break_tooltip: "Wstaw tag [Przerwa]",
+        btn_post_chorus: "[Zarefren]",
+        btn_post_chorus_tooltip: "Wstaw tag [Zarefren]",
+        btn_interlude: "[Interludium]",
+        btn_interlude_tooltip: "Wstaw tag [Interludium]",
+        btn_part: "[Część]",
+        btn_part_tooltip: "Wstaw tag [Część]",
+        btn_skit: "[Skit]",
+        btn_skit_tooltip: "Wstaw tag [Skit]",
+        btn_hook: "[Przyśpiewka]",
+        btn_hook_tooltip: "Wstaw tag [Przyśpiewka] (alternatywa dla Refren)",
+        btn_vocalization: "[Wokaliza]",
+        btn_vocalization_tooltip: "Wstaw tag [Wokaliza] dla wokali bez tekstu",
+        btn_unknown: "[?]",
+        btn_unknown_tooltip: "Wstaw tag [?]",
+        btn_zws_remove: "Usuń ZWS",
+        btn_zws_remove_tooltip: "Usuwa niewidoczne znaki (Zero Width Space)",
+        // Cleanup Tools - Polish specific
+        cleanup_capitalize: "Wielka litera",
+        cleanup_capitalize_tooltip: "Wielka litera na początku każdej linii",
+        cleanup_punct: "Interpunkcja",
+        cleanup_punct_tooltip: "Usuwa interpunkcję na końcu linii (. , ;)",
+        cleanup_quotes: "Cudzysłowy",
+        cleanup_quotes_tooltip: "Zamienia cudzysłowy \u201E\u201D \u00AB\u00BB na proste \"\"",
+        cleanup_parens: "Nawiasy",
+        cleanup_parens_tooltip: "Sprawdza brakujące lub źle zamknięte nawiasy",
+        cleanup_all: "Napraw Wszystko",
+        cleanup_all_tooltip: "Stosuje wszystkie poprawki naraz (Ctrl+Shift+C)",
+        // Button Labels (Cleanup) - Polish specific
+        btn_polish_quotes_label: "\u201E\u201D \u2192 \"",
+        cleanup_polish_quotes_tooltip: "Zamienia polskie cudzysłowy \u201E\u201D na proste \"\"",
+        btn_apostrophe_label: "' → '",
+        btn_em_dash_label: "- → —",
+        cleanup_em_dash_tooltip: "Zamienia krótkie myślniki (pauzy) na długie (—)",
+        btn_ellipsis_label: "... → …",
+        cleanup_ellipsis_tooltip: "Zamienia trzy kropki na wielokropek (…)",
+        btn_french_quotes_label: "«» → \"",
+        cleanup_french_quotes_tooltip: "Zamienia cudzysłowy «» na proste \"\"",
+        btn_double_spaces_label: "Podwójne spacje",
+        cleanup_double_spaces_tooltip: "Usuwa podwójne spacje",
+        btn_duplicate_line_label: "📋 Duplikuj linię",
+        cleanup_duplicate_line_tooltip: "Duplikuje bieżącą linię (Ctrl+D)",
+        btn_adlib_label: "(Ad-lib)",
+        cleanup_adlib_tooltip: "Otacza zaznaczony tekst nawiasami dla ad-libów",
+        btn_capitalize_label: "Wielka litera",
+        btn_punctuation_label: "Usuń ., koniec linii",
+        btn_spacing_label: "Popraw Odstępy",
+        btn_check_label: "🔍 Sprawdź ( ) [ ]",
+        btn_fix_all_label: "Napraw Wszystko (Tekst)",
+        btn_capitalize_short: "Wielkie litery",
+        btn_punctuation_short: "Interpunkcja",
+        btn_spacing_short: "Odstępy",
+        btn_fix_all_short: "✨ Napraw Wszystko",
+        // Tutorial Steps
+        tuto_step1_title: "1. Struktura i Artyści 🏗️",
+        tuto_step1_content: "• <strong>Artyści:</strong> Zaznacz pola u góry, aby automatycznie przypisać sekcje.<br>• <strong>Zwrotki:</strong> Użyj centralnego przycisku <strong>[Zwrotka 1]</strong>. Strzałki ← → zmieniają numer.<br>• <strong>Tagi:</strong> Wstaw Refren, Intro, Przejście jednym kliknięciem.",
+        tuto_step2_title: "2. Inteligentne Poprawki ✨",
+        tuto_step2_content: "• <strong>Napraw Wszystko:</strong> Czyści cudzysłowy, wielkie litery, spacje.<br>• <strong>Sprawdź ( ) [ ]:</strong> Szuka brakujących nawiasów.",
+        tuto_step3_title: "3. Narzędzia Formatowania 🎨",
+        tuto_step3_content: "• <strong>Pasek Pływający:</strong> Zaznacz tekst, aby pogrubić, pochylić lub utworzyć <strong>Lyric Card</strong>.<br>• <strong>Liczby na Słowa:</strong> Zamienia '42' na 'czterdzieści dwa'.",
+        tuto_step4_title: "4. Historia i Bezpieczeństwo 🛡️",
+        tuto_step4_content: "• <strong>Cofnij/Ponów:</strong> Twoje ostatnie 10 akcji jest zapisanych (Ctrl+Z).<br>• <strong>Autozapis:</strong> Wersje robocze zapisywane lokalnie.",
+        tuto_step5_title: "5. Kontrola YouTube 📺",
+        tuto_step5_content: "• <kbd>Ctrl+Alt+Space</kbd>: Odtwórz / Pauza<br>• <kbd>Ctrl+Alt+← / →</kbd>: Przewiń w tył / w przód (5s)",
+        tuto_step6_title: "6. Inne Skróty ⌨️",
+        tuto_step6_content: "• <kbd>Ctrl+1-5</kbd>: Tagi struktury<br>• <kbd>Ctrl+Shift+C</kbd>: Napraw Wszystko",
+        tuto_finish_title: "Zaczynamy! 🚀",
+        tuto_finish_content: "Jesteś gotowy! Sprawdź ustawienia ⚙️, aby dostosować swoje doświadczenie.<br><br>💡 <strong>Uwaga:</strong> Możesz zmienić tryb/język w dowolnym momencie, klikając ikonę rozszerzenia.",
+        // Lyric Mode Specific Tutorial
+        tuto_lyric_mode_title: "Tryb Lyric Card Aktywny 🎨",
+        tuto_lyric_mode_content: "Aby utworzyć Lyric Card:<br>1. <strong>Zaznacz</strong> wybrane teksty piosenek.<br>2. Kliknij przycisk <strong>'Utwórz Lyric Card'</strong>, który się pojawi.<br><br>💡 <strong>Uwaga:</strong> Zmień ustawienia przez ikonę rozszerzenia.",
+        tuto_lyric_mode_btn: "Rozumiem!",
+        // Lyric Card Modal
+        lc_modal_title: "Podgląd Lyric Card",
+        lc_album_default: "💿 Okładka Albumu (Domyślna)",
+        lc_manual_search: "🔍 Szukaj artysty...",
+        lc_format_btn: "📏 Format: ",
+        lc_search_placeholder: "Wpisz nazwę artysty...",
+        lc_upload_btn: "📂 Prześlij obraz",
+        lc_download_btn: "⬇️ Pobierz",
+        lc_download_done: "✅ Pobrano!",
+        lc_share_btn: "𝕏 Udostępnij",
+        lc_share_copying: "📋 Kopiowanie...",
+        lc_share_copied: "✅ Skopiowano!",
+        lc_share_error: "❌ Błąd",
+        lc_feedback_load_error: "Błąd ładowania obrazu.",
+        lc_search_searching: "⏳ Szukanie...",
+        lc_search_none: "Brak wyników 😕",
+        lc_custom_img: "📂 Zaimportowany Obraz",
+        lc_select_text_error: "Wybierz tekst, aby utworzyć Lyric Card.",
+        // Lyric Card Feedback
+        lc_error_search: "Błąd podczas wyszukiwania",
+        lc_img_copied_tweet: "Obraz skopiowany! Naciśnij Ctrl+V w oknie X, aby wkleić.",
+        lc_error_copy: "Nie można skopiować obrazu.",
+        lc_error_img_not_found: "Nie znaleziono obrazu dla",
+        lc_img_loaded: "Obraz załadowany!",
+        lc_error_album_not_found: "Nie można znaleźć okładki albumu.",
+        lc_searching_artist: "Szukanie obrazu artysty...",
+        lc_generating: "Generowanie Lyric Card...",
+        lc_error_internal: "Błąd wewnętrzny: Nie znaleziono funkcji.",
+        lc_fetching_id: "Pobieranie obrazu artysty (przez ID)...",
+        lc_searching_name: "Szukanie obrazu dla",
+        lc_img_applied: "Zastosowano obraz:",
+        // Toolbar
+        toolbar_bold: "Pogrubienie",
+        toolbar_italic: "Kursywa",
+        toolbar_num_to_words: "Liczba → Słowa",
+        toolbar_bold_tooltip: "Pogrub zaznaczony tekst",
+        toolbar_italic_tooltip: "Pochyl zaznaczony tekst",
+        toolbar_lyric_card_tooltip: "Wygeneruj Lyric Card (1280x720)",
+        toolbar_num_to_words_tooltip: "Zamień zaznaczoną liczbę na słowa",
+        // Tutorial Buttons
+        tuto_prev: "Wstecz",
+        tuto_next: "Dalej",
+        tuto_skip: "Pomiń",
+        tuto_finish: "Zakończ",
+        tuto_step_counter: "Krok",
+        tuto_of: "z",
+        // Correction Preview Modal
+        preview_title: "🛠️ Konfiguruj poprawki",
+        preview_diff_title: "Podgląd zmian (Widok ujednolicony)",
+        preview_btn_cancel: "Anuluj",
+        preview_btn_apply: "Zastosuj wybór",
+        preview_summary: "📊 {count} poprawek do zastosowania:",
+        preview_no_corrections: "Brak wybranych/potrzebnych poprawek.",
+        preview_opt_polish_quotes: "\u201E\u201D \u2192 \"",
+        preview_opt_apostrophes: "Apostrofy '",
+        preview_opt_ellipsis: "... → …",
+        preview_opt_quotes: "Cudzysłowy «» → \"",
+        preview_opt_dash: "Myślniki - → —",
+        preview_opt_spaces: "Podwójne spacje",
+        preview_opt_spacing: "Odstępy (linie)",
+        preview_stat_apostrophes: "apostrofów",
+        preview_stat_quotes: "cudzysłowów «»",
+        preview_stat_polish_quotes: "polskich cudzysłowów",
+        preview_stat_dash: "myślników",
+        preview_stat_ellipsis: "wielokropków",
+        preview_stat_spaces: "podwójnych spacji",
+        preview_stat_spacing: "odstępów",
+        // Draft notification
+        draft_found_title: "Znaleziono wersję roboczą!",
+        draft_saved_at: "Zapisano o",
+        draft_btn_restore: "Przywróć",
+        draft_btn_discard: "Odrzuć",
+        draft_restored: "Wersja robocza przywrócona!",
+        // Progress steps - Polish specific corrections
+        progress_step_polish_quotes: "Poprawianie cudzysłowów \u201E\u201D...",
+        progress_step_apostrophes: "Poprawianie apostrofów...",
+        progress_step_ellipsis: "Poprawianie wielokropków...",
+        progress_step_quotes: "Poprawianie cudzysłowów «»...",
+        progress_step_dash: "Poprawianie myślników...",
+        progress_step_spaces: "Usuwanie podwójnych spacji...",
+        progress_step_spacing: "Poprawianie odstępów...",
+        // Feedback messages
+        feedback_adlib_added: "(Ad-lib) dodane!",
+        feedback_select_text_first: "⚠️ Najpierw zaznacz tekst",
+        feedback_no_replacement: "Brak zamiany.",
+        feedback_replaced: "{count} {item} zamieniono!",
+        feedback_no_correction_needed: "Brak potrzebnych poprawek {item}.",
+        feedback_corrected: "{count} {item} poprawiono!",
+        feedback_no_changes: "Brak zmian do cofnięcia.",
+        feedback_undo: "↩️ Cofnięto",
+        feedback_redo: "↪️ Ponowiono",
+        feedback_pause: "⏸️ Pauza",
+        feedback_play: "▶️ Odtwarzanie",
+        feedback_duplicate_line: "📋 Linia zduplikowana!",
+        feedback_no_text_corrections: "Brak korekty tekstu. Sprawdź wizualnie nawiasy.",
+        feedback_brackets_ok: "✅ Nie znaleziono problemów! Wszystkie nawiasy są dobrze sparowane.",
+        feedback_brackets_issue: "⚠️ Znaleziono {count} niesparowanych nawiasów, zaznaczonych na czerwono!",
     }
 };
 
@@ -850,6 +1126,102 @@ function numberToEnglishWords(num) {
 }
 
 /**
+ * Convertit un nombre (0-999999999999) en lettres en polonais.
+ * @param {number} num - Le nombre à convertir.
+ * @returns {string} Le nombre en lettres.
+ */
+function numberToPolishWords(num) {
+    if (num === 0) return "zero";
+
+    const ones = ["", "jeden", "dwa", "trzy", "cztery", "pięć", "sześć", "siedem", "osiem", "dziewięć"];
+    const teens = ["dziesięć", "jedenaście", "dwanaście", "trzynaście", "czternaście", "piętnaście", "szesnaście", "siedemnaście", "osiemnaście", "dziewiętnaście"];
+    const tens = ["", "", "dwadzieścia", "trzydzieści", "czterdzieści", "pięćdziesiąt", "sześćdziesiąt", "siedemdziesiąt", "osiemdziesiąt", "dziewięćdziesiąt"];
+    const hundreds = ["", "sto", "dwieście", "trzysta", "czterysta", "pięćset", "sześćset", "siedemset", "osiemset", "dziewięćset"];
+
+    function convertUpTo99(n) {
+        if (n < 10) return ones[n];
+        if (n < 20) return teens[n - 10];
+
+        const ten = Math.floor(n / 10);
+        const one = n % 10;
+
+        if (one === 0) return tens[ten];
+        return tens[ten] + " " + ones[one];
+    }
+
+    function convertUpTo999(n) {
+        if (n < 100) return convertUpTo99(n);
+
+        const hundred = Math.floor(n / 100);
+        const rest = n % 100;
+
+        let result = hundreds[hundred];
+        if (rest > 0) {
+            result += " " + convertUpTo99(rest);
+        }
+        return result;
+    }
+
+    // Polish thousand forms: tysiąc, tysiące, tysięcy
+    function getThousandForm(n) {
+        if (n === 1) return "tysiąc";
+        const lastDigit = n % 10;
+        const lastTwoDigits = n % 100;
+        if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return "tysięcy";
+        if (lastDigit >= 2 && lastDigit <= 4) return "tysiące";
+        return "tysięcy";
+    }
+
+    // Polish million forms: milion, miliony, milionów
+    function getMillionForm(n) {
+        if (n === 1) return "milion";
+        const lastDigit = n % 10;
+        const lastTwoDigits = n % 100;
+        if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return "milionów";
+        if (lastDigit >= 2 && lastDigit <= 4) return "miliony";
+        return "milionów";
+    }
+
+    // Polish billion forms: miliard, miliardy, miliardów
+    function getBillionForm(n) {
+        if (n === 1) return "miliard";
+        const lastDigit = n % 10;
+        const lastTwoDigits = n % 100;
+        if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return "miliardów";
+        if (lastDigit >= 2 && lastDigit <= 4) return "miliardy";
+        return "miliardów";
+    }
+
+    if (num < 0 || num > 999999999999) return num.toString();
+
+    if (num < 1000) return convertUpTo999(num);
+
+    if (num >= 1000000000) {
+        const billions = Math.floor(num / 1000000000);
+        const rest = num % 1000000000;
+        let result = (billions === 1 ? "" : convertUpTo999(billions) + " ") + getBillionForm(billions);
+        if (rest > 0) result += " " + numberToPolishWords(rest);
+        return result.trim();
+    }
+
+    if (num >= 1000000) {
+        const millions = Math.floor(num / 1000000);
+        const rest = num % 1000000;
+        let result = (millions === 1 ? "" : convertUpTo999(millions) + " ") + getMillionForm(millions);
+        if (rest > 0) result += " " + numberToPolishWords(rest);
+        return result.trim();
+    }
+
+    const thousand = Math.floor(num / 1000);
+    const rest = num % 1000;
+
+    let result = (thousand === 1 ? "" : convertUpTo999(thousand) + " ") + getThousandForm(thousand);
+    if (rest > 0) result += " " + convertUpTo999(rest);
+
+    return result.trim();
+}
+
+/**
  * Vérifie si une chaîne est un nombre valide (entier positif).
  * @param {string} str - La chaîne à vérifier.
  * @returns {boolean} True si c'est un nombre valide.
@@ -1104,6 +1476,14 @@ function isEnglishTranscriptionMode() {
 }
 
 /**
+ * Vérifie si le mode de transcription est polonais.
+ * @returns {boolean} true si mode polonais
+ */
+function isPolishTranscriptionMode() {
+    return getTranscriptionMode() === 'pl';
+}
+
+/**
  * Formatte un tag simple en ajoutant ou non un saut de ligne selon la préférence.
  * @param {string} tag - Le tag à formater (ex: "[Instrumental]").
  * @returns {string} Le tag formaté.
@@ -1127,8 +1507,8 @@ function addArtistToText(baseTextWithBrackets) {
     if (selectedArtistNames.length > 0) {
         const tagPart = baseTextWithBrackets.slice(0, -1); // Enlève le ']' final
         const artistsString = formatArtistList(selectedArtistNames);
-        // En anglais: pas d'espace avant le ':', en français: espace avant et après
-        const separator = isEnglishTranscriptionMode() ? ': ' : ' : ';
+        // En anglais et polonais : pas d'espace avant le ':', en français : espace avant et après
+        const separator = (isEnglishTranscriptionMode() || isPolishTranscriptionMode()) ? ': ' : ' : ';
         resultText = `${tagPart}${separator}${artistsString}]`;
     } else {
         resultText = baseTextWithBrackets;
@@ -1859,7 +2239,14 @@ function convertNumberToWords() {
     }
 
     const num = parseInt(selectedText, 10);
-    const wordsText = isEnglishTranscriptionMode() ? numberToEnglishWords(num) : numberToFrenchWords(num);
+    let wordsText;
+    if (isPolishTranscriptionMode()) {
+        wordsText = numberToPolishWords(num);
+    } else if (isEnglishTranscriptionMode()) {
+        wordsText = numberToEnglishWords(num);
+    } else {
+        wordsText = numberToFrenchWords(num);
+    }
 
     // Remplace le texte sélectionné
     if (currentEditorType === 'textarea') {
@@ -1927,9 +2314,9 @@ function wrapSelectionWithAdlib() {
     }
 
     if (replaced) {
-        showFeedbackMessage("(Ad-lib) ajouté !", 2000, shortcutsContainerElement);
+        showFeedbackMessage(getTranslation('feedback_adlib_added'), 2000, shortcutsContainerElement);
     } else {
-        showFeedbackMessage("⚠️ Sélectionnez du texte d'abord", 2000, shortcutsContainerElement);
+        showFeedbackMessage(getTranslation('feedback_select_text_first'), 2000, shortcutsContainerElement);
     }
 
     // Désactive le flag après un court délai et met à jour lastSavedContent
@@ -2366,7 +2753,7 @@ async function executeButtonAction(action) {
  */
 function undoLastChange() {
     if (!currentActiveEditor || undoStack.length === 0) {
-        showFeedbackMessage("Aucune modification à annuler", 2000, shortcutsContainerElement);
+        showFeedbackMessage(getTranslation('feedback_no_changes'), 2000, shortcutsContainerElement);
         return;
     }
 
@@ -2396,7 +2783,7 @@ function undoLastChange() {
     // Met à jour les boutons
     updateHistoryButtons();
 
-    showFeedbackMessage("↩️ Modification annulée", 2000, shortcutsContainerElement);
+    showFeedbackMessage(getTranslation('feedback_undo'), 2000, shortcutsContainerElement);
 
     // Désactive le flag après un court délai
     setTimeout(() => {
@@ -2409,7 +2796,7 @@ function undoLastChange() {
  */
 function redoLastChange() {
     if (!currentActiveEditor || redoStack.length === 0) {
-        showFeedbackMessage("Aucune modification à refaire", 2000, shortcutsContainerElement);
+        showFeedbackMessage(getTranslation('feedback_no_changes'), 2000, shortcutsContainerElement);
         return;
     }
 
@@ -2444,7 +2831,7 @@ function redoLastChange() {
     // Met à jour les boutons
     updateHistoryButtons();
 
-    showFeedbackMessage("↪️ Modification refaite", 2000, shortcutsContainerElement);
+    showFeedbackMessage(getTranslation('feedback_redo'), 2000, shortcutsContainerElement);
 
     // Désactive le flag après un court délai
     setTimeout(() => {
@@ -2917,16 +3304,19 @@ function getTutorialSteps() {
                 </div>
                 
                 <p style="text-align:center; font-size:15px; margin-bottom: 25px; color: ${btnColor};">
-                    <strong>Welcome! / Bienvenue !</strong><br>
-                    <span style="opacity: 0.7; font-size: 13px;">Please select your language to start.<br>Veuillez choisir votre langue pour commencer.</span>
+                    <strong>Welcome! / Bienvenue ! / Witaj!</strong><br>
+                    <span style="opacity: 0.7; font-size: 13px;">Please select your language to start.<br>Veuillez choisir votre langue pour commencer.<br>Wybierz język, aby rozpocząć.</span>
                 </p>
 
-                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px;">
+                <div style="display: flex; gap: 15px; justify-content: center; margin-top: 20px; flex-wrap: wrap;">
                     <button id="gft-lang-fr-btn" class="gft-tutorial-button" style="background:${btnBg}; color:${btnColor}; border:2px solid ${btnBorder}; padding:12px 20px; cursor:pointer; border-radius:8px; font-size:15px; transition:0.2s; min-width: 120px;">
-                        Français (FR)
+                        🇫🇷 Français (FR)
                     </button>
                     <button id="gft-lang-en-btn" class="gft-tutorial-button" style="background:${btnBg}; color:${btnColor}; border:2px solid ${btnBorder}; padding:12px 20px; cursor:pointer; border-radius:8px; font-size:15px; transition:0.2s; min-width: 120px;">
-                        English (EN)
+                        🇬🇧 English (EN)
+                    </button>
+                    <button id="gft-lang-pl-btn" class="gft-tutorial-button" style="background:${btnBg}; color:${btnColor}; border:2px solid ${btnBorder}; padding:12px 20px; cursor:pointer; border-radius:8px; font-size:15px; transition:0.2s; min-width: 120px;">
+                        🇵🇱 Polski (PL)
                     </button>
                 </div>
             `;
@@ -3119,6 +3509,7 @@ function renderTutorialStep() {
     if (currentTutorialStep === 0) {
         const btnFr = document.getElementById('gft-lang-fr-btn');
         const btnEn = document.getElementById('gft-lang-en-btn');
+        const btnPl = document.getElementById('gft-lang-pl-btn');
 
         const handleLangSelection = (lang) => {
             localStorage.setItem('gftLanguage', lang);
@@ -3131,6 +3522,7 @@ function renderTutorialStep() {
 
         if (btnFr) btnFr.onclick = () => handleLangSelection('fr');
         if (btnEn) btnEn.onclick = () => handleLangSelection('en');
+        if (btnPl) btnPl.onclick = () => handleLangSelection('pl');
 
         // Cache les boutons de navigation standard
         buttonsDiv.style.display = 'none';
@@ -3568,12 +3960,12 @@ function controlYoutubePlayer(command) {
             if (gftYoutubePlayerState.isPlaying === true) {
                 postCmd('pauseVideo');
                 gftYoutubePlayerState.isPlaying = false;
-                showFeedbackMessage('⏸️ Pause', 1000);
+                showFeedbackMessage(getTranslation('feedback_pause'), 1000);
             } else if (gftYoutubePlayerState.isPlaying === false) {
                 postCmd('playVideo');
                 gftYoutubePlayerState.isPlaying = true;
                 gftYoutubePlayerState.timestamp = Date.now(); // Reset le timestamp pour l'estimation
-                showFeedbackMessage('▶️ Lecture', 1000);
+                showFeedbackMessage(getTranslation('feedback_play'), 1000);
             } else {
                 // État NULL (inconnu) - on privilégie PAUSE car souvent la vidéo joue déjà
                 postCmd('pauseVideo');
@@ -4582,9 +4974,10 @@ function initLyricsEditorEnhancer() {
     let foundEditor = null; let foundEditorType = null;
 
     // Configuration de tous les boutons et actions du panneau.
-    // Les tags structuraux sont dynamiques selon le mode de transcription (FR/EN)
+    // Les tags structuraux sont dynamiques selon le mode de transcription (FR/EN/PL)
     const getStructuralTags = () => {
         const isEnglish = isEnglishTranscriptionMode();
+        const isPolish = isPolishTranscriptionMode();
         const customButtons = getCustomButtons().filter(b => b.type === 'structure').map(b => ({
             label: b.label,
             getText: () => {
@@ -4603,7 +4996,41 @@ function initLyricsEditorEnhancer() {
             managerType: 'structure'
         };
 
-        if (isEnglish) {
+        if (isPolish) {
+            // Mode polonais : tags en polonais selon Genius Polska
+            return {
+                buttons: [
+                    {
+                        type: 'coupletManager',
+                        prev: { label: '←', title: 'Poprzednia Zwrotka', tooltip: 'Wróć do poprzedniej zwrotki' },
+                        main: {
+                            id: COUPLET_BUTTON_ID,
+                            getLabel: () => `[Zwrotka ${coupletCounter}]`,
+                            getText: () => addArtistToText(`[Zwrotka ${coupletCounter}]`),
+                            tooltip: getTranslation('add_couplet'),
+                            shortcut: '1'
+                        },
+                        next: { label: '→', title: 'Następna Zwrotka', tooltip: 'Przejdź do następnej zwrotki' }
+                    },
+                    { label: getTranslation('btn_intro'), getText: () => addArtistToText('[Intro]'), tooltip: getTranslation('btn_intro_tooltip'), shortcut: '4' },
+                    { label: getTranslation('btn_verse'), getText: () => addArtistToText('[Zwrotka]'), tooltip: getTranslation('btn_verse_tooltip') },
+                    { label: getTranslation('btn_pre_chorus'), getText: () => addArtistToText('[Przedrefren]'), tooltip: getTranslation('btn_pre_chorus_tooltip') },
+                    { label: getTranslation('btn_chorus'), getText: () => addArtistToText('[Refren]'), tooltip: getTranslation('btn_chorus_tooltip'), shortcut: '2' },
+                    { label: getTranslation('btn_hook'), getText: () => addArtistToText('[Przyśpiewka]'), tooltip: getTranslation('btn_hook_tooltip') },
+                    { label: getTranslation('btn_post_chorus'), getText: () => addArtistToText('[Zarefren]'), tooltip: getTranslation('btn_post_chorus_tooltip') },
+                    { label: getTranslation('btn_bridge'), getText: () => addArtistToText('[Przejście]'), tooltip: getTranslation('btn_bridge_tooltip'), shortcut: '3' },
+                    { label: getTranslation('btn_outro'), getText: () => addArtistToText('[Outro]'), tooltip: getTranslation('btn_outro_tooltip'), shortcut: '5' },
+                    { label: getTranslation('btn_instrumental'), getText: () => formatSimpleTag('[Przerwa instrumentalna]'), tooltip: getTranslation('btn_instrumental_tooltip') },
+                    { label: getTranslation('btn_interlude'), getText: () => addArtistToText('[Interludium]'), tooltip: getTranslation('btn_interlude_tooltip') },
+                    { label: getTranslation('btn_part'), getText: () => addArtistToText('[Część]'), tooltip: getTranslation('btn_part_tooltip') },
+                    { label: getTranslation('btn_skit'), getText: () => formatSimpleTag('[Skit]'), tooltip: getTranslation('btn_skit_tooltip') },
+                    { label: getTranslation('btn_vocalization'), getText: () => addArtistToText('[Wokaliza]'), tooltip: getTranslation('btn_vocalization_tooltip') },
+                    { label: getTranslation('btn_unknown'), getText: () => formatSimpleTag('[?]', true), tooltip: getTranslation('btn_unknown_tooltip') },
+                    ...customButtons,
+                    plusButton
+                ]
+            };
+        } else if (isEnglish) {
             // Mode anglais : tags en anglais, pas d'en-tête, pas de "Couplet unique"
             return {
                 buttons: [
@@ -4668,6 +5095,7 @@ function initLyricsEditorEnhancer() {
     // Fonction pour obtenir les outils de nettoyage selon le mode
     const getTextCleanupTools = () => {
         const isEnglish = isEnglishTranscriptionMode();
+        const isPolish = isPolishTranscriptionMode();
 
         // Récupération des boutons personnalisés
         const customButtons = getCustomButtons().filter(b => b.type === 'cleanup').map(b => ({
@@ -4686,7 +5114,7 @@ function initLyricsEditorEnhancer() {
             managerType: 'cleanup'
         };
 
-        // Outils communs aux deux langues
+        // Outils communs à toutes les langues
         const commonTools = [
             {
                 label: getTranslation('btn_apostrophe_label'),
@@ -4743,7 +5171,38 @@ function initLyricsEditorEnhancer() {
             }
         ];
 
-        if (isEnglish) {
+        if (isPolish) {
+            // Mode polonais : outils spécifiques selon les règles Genius Polska
+            // Note: En polonais, on convertit - → — (inverse du français !)
+            const polishSpecificTools = [
+                {
+                    label: getTranslation('btn_polish_quotes_label'),
+                    action: 'replaceText',
+                    searchPattern: /[„""]/g,  // Polish quotes „" and curly quotes ""
+                    replacementText: '"',
+                    highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+                    tooltip: getTranslation('cleanup_polish_quotes_tooltip')
+                },
+                {
+                    label: getTranslation('btn_em_dash_label'),
+                    action: 'replaceText',
+                    searchPattern: /(?<!\-)\-(?!\-)/g,  // Single hyphen (not part of --)
+                    replacementText: '—',
+                    highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+                    tooltip: getTranslation('cleanup_em_dash_tooltip')
+                },
+                {
+                    label: getTranslation('btn_ellipsis_label'),
+                    action: 'replaceText',
+                    searchPattern: /\.{3}/g,  // Three dots
+                    replacementText: '…',
+                    highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+                    tooltip: getTranslation('cleanup_ellipsis_tooltip')
+                }
+            ];
+
+            return [...polishSpecificTools, ...commonTools, ...customButtons, plusButton];
+        } else if (isEnglish) {
             // Mode anglais : pas de y', oeu→œu, tirets longs
             return [...commonTools, ...customButtons, plusButton];
         } else {
@@ -4985,11 +5444,11 @@ function initLyricsEditorEnhancer() {
                 panelTitle.appendChild(clickableTitleArea);
                 addTooltip(clickableTitleArea, 'Cliquer pour replier/déplier');
 
-                // Sélecteur de mode de transcription (FR/EN)
+                // Sélecteur de mode de transcription (FR/EN/PL)
                 const transcriptionModeSelect = document.createElement('select');
                 transcriptionModeSelect.id = 'gft-transcription-mode-select';
                 transcriptionModeSelect.classList.add('gft-transcription-mode-select');
-                transcriptionModeSelect.title = (localStorage.getItem('gftLanguage') || 'fr') === 'fr' ? 'Mode de transcription' : 'Transcription mode';
+                transcriptionModeSelect.title = getTranslation('mode_select_title') || 'Transcription mode';
 
                 const optionFR = document.createElement('option');
                 optionFR.value = 'fr';
@@ -5000,6 +5459,11 @@ function initLyricsEditorEnhancer() {
                 optionEN.value = 'en';
                 optionEN.textContent = '🇬🇧 EN';
                 transcriptionModeSelect.appendChild(optionEN);
+
+                const optionPL = document.createElement('option');
+                optionPL.value = 'pl';
+                optionPL.textContent = '🇵🇱 PL';
+                transcriptionModeSelect.appendChild(optionPL);
 
                 // Définit la valeur actuelle
                 transcriptionModeSelect.value = getTranscriptionMode();
@@ -5020,7 +5484,7 @@ function initLyricsEditorEnhancer() {
                 });
 
                 panelTitle.appendChild(transcriptionModeSelect);
-                addTooltip(transcriptionModeSelect, (localStorage.getItem('gftLanguage') || 'fr') === 'fr' ? 'Changer le mode de transcription (FR/EN)' : 'Change transcription mode (FR/EN)');
+                addTooltip(transcriptionModeSelect, getTranslation('lang_select_title') || 'Change transcription mode');
 
                 // Bouton Undo
                 const undoButton = document.createElement('button');
@@ -5266,9 +5730,9 @@ function initLyricsEditorEnhancer() {
                                 let itemLabel = "élément(s)";
                                 if (config.label.includes("y' → y ")) itemLabel = "occurrence(s) de 'y''";
                                 if (config.label.includes("’ → '")) itemLabel = "apostrophe(s) ’";
-                                showFeedbackMessage(`${replacementsCount} ${itemLabel} remplacé(s) !`, 3000, shortcutsContainerElement);
+                                showFeedbackMessage(getTranslation('feedback_replaced').replace('{count}', replacementsCount).replace('{item}', itemLabel), 3000, shortcutsContainerElement);
                             } else {
-                                showFeedbackMessage("Aucun remplacement effectué.", 2000, shortcutsContainerElement);
+                                showFeedbackMessage(getTranslation('feedback_no_replacement'), 2000, shortcutsContainerElement);
                             }
                         } else if (config.action === 'lineCorrection' && config.correctionType) {
                             // Sauvegarde dans l'historique avant modification
@@ -5290,8 +5754,8 @@ function initLyricsEditorEnhancer() {
                                 } else if (currentEditorType === 'div') {
                                     correctionsCount = applyTextTransformToDivEditor(currentActiveEditor, correctionFunction);
                                 }
-                                if (correctionsCount > 0) showFeedbackMessage(`${correctionsCount} ${feedbackLabel} corrigé(s) !`, 3000, shortcutsContainerElement);
-                                else showFeedbackMessage(`Aucune correction de ${feedbackLabel} nécessaire.`, 2000, shortcutsContainerElement);
+                                if (correctionsCount > 0) showFeedbackMessage(getTranslation('feedback_corrected').replace('{count}', correctionsCount).replace('{item}', feedbackLabel), 3000, shortcutsContainerElement);
+                                else showFeedbackMessage(getTranslation('feedback_no_correction_needed').replace('{item}', feedbackLabel), 2000, shortcutsContainerElement);
                             }
                         } else if (config.action === 'globalTextFix') {
                             // Version avec prévisualisation (mode validation)
@@ -5322,16 +5786,15 @@ function initLyricsEditorEnhancer() {
 
                                         if (unmatchedCount > 0) {
                                             // Priorité à l'erreur de parenthèses
-                                            const pluriel = unmatchedCount > 1 ? 's' : '';
                                             showFeedbackMessage(
-                                                `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} détecté${pluriel} et surligné${pluriel} en rouge !`,
+                                                getTranslation('feedback_brackets_issue').replace('{count}', unmatchedCount),
                                                 5000,
                                                 shortcutsContainerElement
                                             );
                                         } else {
                                             // Vraiment rien à faire, ou le compte de brackets est à 0.
                                             // Par prudence (si le comptage échoue mais que le surlignage a lieu), on invite à vérifier.
-                                            showFeedbackMessage("Aucune correction de texte. Vérifiez visuellement les parenthèses.", 3000, shortcutsContainerElement);
+                                            showFeedbackMessage(getTranslation('feedback_no_text_corrections'), 3000, shortcutsContainerElement);
                                         }
                                         return;
                                     }
@@ -5417,15 +5880,14 @@ function initLyricsEditorEnhancer() {
                             const unmatchedCount = highlightUnmatchedBracketsInEditor(currentActiveEditor, currentEditorType);
 
                             if (unmatchedCount > 0) {
-                                const pluriel = unmatchedCount > 1 ? 's' : '';
                                 showFeedbackMessage(
-                                    `⚠️ ${unmatchedCount} parenthèse${pluriel}/crochet${pluriel} non apparié${pluriel} trouvé${pluriel} et surligné${pluriel} en rouge !`,
+                                    getTranslation('feedback_brackets_issue').replace('{count}', unmatchedCount),
                                     5000,
                                     shortcutsContainerElement
                                 );
                             } else {
                                 showFeedbackMessage(
-                                    "✅ Aucun problème trouvé ! Toutes les parenthèses et crochets sont bien appariés.",
+                                    getTranslation('feedback_brackets_ok'),
                                     3000,
                                     shortcutsContainerElement
                                 );
@@ -5453,7 +5915,7 @@ function initLyricsEditorEnhancer() {
                                 const newCursorPos = lineEnd + 1 + currentLine.length;
                                 currentActiveEditor.setSelectionRange(newCursorPos, newCursorPos);
 
-                                showFeedbackMessage("📋 Ligne dupliquée !", 2000, shortcutsContainerElement);
+                                showFeedbackMessage(getTranslation('feedback_duplicate_line'), 2000, shortcutsContainerElement);
                             } else if (currentEditorType === 'div') {
                                 // Pour les divs, on utilise execCommand
                                 const selection = window.getSelection();
@@ -5471,7 +5933,7 @@ function initLyricsEditorEnhancer() {
                                     if (lineText) {
                                         document.execCommand('insertText', false, '\n' + lineText);
                                         currentActiveEditor.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
-                                        showFeedbackMessage("📋 Ligne dupliquée !", 2000, shortcutsContainerElement);
+                                        showFeedbackMessage(getTranslation('feedback_duplicate_line'), 2000, shortcutsContainerElement);
                                     }
                                 }
                             }
@@ -5766,7 +6228,7 @@ function initLyricsEditorEnhancer() {
                 creditLabel.style.userSelect = 'none';
 
                 // Lien discret vers Transcription IA (uniquement en mode français)
-                if (!isEnglishTranscriptionMode()) {
+                if (!isEnglishTranscriptionMode() && !isPolishTranscriptionMode()) {
                     const iaLink = document.createElement('a');
                     iaLink.textContent = '🤖 Transcription IA ↗';
                     iaLink.href = 'https://aistudio.google.com/apps/drive/1D16MbaGAWjUMTseOvzzvSDnccRbU-z_S?fullscreenApplet=true&showPreview=true&showAssistant=true';
@@ -5794,8 +6256,8 @@ function initLyricsEditorEnhancer() {
 
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v3.0.0'; // Bump version visuelle pour le user
-                versionLabel.title = 'Genius Fast Transcriber v3.0.0 - Nouvelle Interface Premium';
+                versionLabel.textContent = 'v3.0.1'; // Bump version visuelle pour le user
+                versionLabel.title = 'Genius Fast Transcriber v3.0.1 - Nouvelle Interface Premium';
 
                 footerContainer.appendChild(creditLabel);
                 footerContainer.appendChild(versionLabel);

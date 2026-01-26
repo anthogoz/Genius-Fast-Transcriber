@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const lyricOnlyOption = document.getElementById('mode-lyriconly');
     const langFrOption = document.getElementById('lang-fr');
     const langEnOption = document.getElementById('lang-en');
+    const langPlOption = document.getElementById('lang-pl');
     const status = document.getElementById('status');
     let currentTabId = null;
 
@@ -18,14 +19,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Language
         const disclaimer = document.getElementById('english-disclaimer');
+        // Reset all language buttons
+        langFrOption.classList.remove('active');
+        langEnOption.classList.remove('active');
+        langPlOption.classList.remove('active');
+
         if (state.language === 'en') {
             langEnOption.classList.add('active');
-            langFrOption.classList.remove('active');
             if (disclaimer) disclaimer.style.display = 'block';
+        } else if (state.language === 'pl') {
+            langPlOption.classList.add('active');
+            if (disclaimer) disclaimer.style.display = 'none';
         } else {
             // Default FR
             langFrOption.classList.add('active');
-            langEnOption.classList.remove('active');
             if (disclaimer) disclaimer.style.display = 'none';
         }
     }
@@ -80,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('lang-fr').addEventListener('click', () => setLanguage('fr'));
     document.getElementById('lang-en').addEventListener('click', () => setLanguage('en'));
+    document.getElementById('lang-pl').addEventListener('click', () => setLanguage('pl'));
 
     document.getElementById('restart-tutorial').addEventListener('click', () => {
         chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
