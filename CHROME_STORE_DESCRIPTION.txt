@@ -2,7 +2,8 @@
 
 Elevate your transcription game with Genius Fast Transcriber. Whether you are a casual contributor or a top editor, this extension transforms the Genius editor into a powerful, professional workspace.
 
-🔥 NEW IN VERSION 3.0.0
+🔥 NEW IN VERSION 3.0.1
+• Polish Language Support: Full support for Genius Polska guidelines!
 • Custom Buttons Manager: Create your own buttons! Add custom tags or powerful Regex cleanup tools.
 • Share Presets: Export your custom buttons code and share it with the community.
 • Full English Support: The extension now fully adapts to English typography rules and tags (Verse, Chorus...).
