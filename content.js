@@ -647,7 +647,7 @@ const TRANSLATIONS = {
         no_artist: "Nie wykryto wykonawcy.",
         shortcuts_title: "Skróty",
         add_couplet: "Dodaj Zwrotkę",
-        format_numbers: "Formatuj liczby",
+        format_numbers: "Liczby na słowa",
         create_lyric_card: "Utwórz Lyric Card",
         preview: "Podgląd",
         copy: "Kopiuj",
@@ -1504,6 +1504,22 @@ function createArtistSelectors(container) {
         });
     }
     container.appendChild(artistSelectorContainer);
+}
+
+/**
+ * Vérifie si l'inclusion des feats dans l'en-tête est activée.
+ * @returns {boolean} true si activé (défaut: true).
+ */
+function isHeaderFeatEnabled() {
+    return localStorage.getItem(HEADER_FEAT_STORAGE_KEY) !== 'false';
+}
+
+/**
+ * Active ou désactive l'inclusion des feats dans l'en-tête.
+ * @param {boolean} enabled - true pour activer.
+ */
+function setHeaderFeatEnabled(enabled) {
+    localStorage.setItem(HEADER_FEAT_STORAGE_KEY, enabled.toString());
 }
 
 /**
@@ -5676,7 +5692,7 @@ function initLyricsEditorEnhancer() {
                     if (!isEnglishTranscriptionMode()) {
                         const featItem = document.createElement('button');
                         featItem.className = 'gft-settings-menu-item';
-                        featItem.textContent = isHeaderFeatEnabled() ? getTranslation('header_feat_show') : getTranslation('header_feat_hide');
+                        featItem.textContent = isHeaderFeatEnabled() ? getTranslation('header_feat_hide') : getTranslation('header_feat_show');
                         featItem.onclick = () => {
                             gftToggleHeaderFeat();
                             menu.remove();
