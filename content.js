@@ -278,6 +278,9 @@ const TRANSLATIONS = {
         lc_fetching_id: "Récupération image artiste (via ID)...",
         lc_searching_name: "Recherche image pour",
         lc_img_applied: "Image appliquée :",
+        lc_img_found: "Image artiste trouvée !",
+        lc_api_error: "Échec API, essai extraction locale...",
+        lc_opening: "Ouverture de la Lyric Card...",
         // Toolbar
         toolbar_bold: "Gras",
         toolbar_italic: "Italique",
@@ -358,6 +361,13 @@ const TRANSLATIONS = {
         stats_words: "mot|mots",
         stats_sections: "section|sections",
         stats_characters: "caractère|caractères",
+        preview_stat_yprime: "occurrence(s) de \"y'\"",
+        preview_stat_oeu: "occurrence(s) de \"oeu\"",
+        preview_stat_apostrophes: "apostrophe(s) ’",
+        preview_stat_quotes: "guillemet(s) français",
+        preview_stat_dash: "tiret(s) long(s)",
+        preview_stat_spaces: "double(s) espace(s)",
+        preview_stat_spacing: "espacement(s) de ligne",
     },
     en: {
         panel_title: "Genius Fast Transcriber",
@@ -628,6 +638,13 @@ const TRANSLATIONS = {
         stats_words: "word|words",
         stats_sections: "section|sections",
         stats_characters: "character|characters",
+        preview_stat_yprime: "\"y'\" occurrence(s)",
+        preview_stat_oeu: "\"oeu\" occurrence(s)",
+        preview_stat_apostrophes: "apostrophe(s)",
+        preview_stat_quotes: "french quote(s)",
+        preview_stat_dash: "long dash(es)",
+        preview_stat_spaces: "double space(s)",
+        preview_stat_spacing: "line spacing",
         feedback_summary_correction: "{count} correction(s) applied",
         feedback_detail_yprime: "{count} \"y'\"",
         feedback_detail_apostrophes: "{count} apostrophe(s)",
@@ -638,6 +655,38 @@ const TRANSLATIONS = {
         feedback_detail_spacing: "{count} spacing",
         feedback_wrapped: "Text wrapped: {start}...{end}",
         feedback_corrections_cancelled: "Corrections cancelled",
+        lc_img_found: "Artist image found!",
+        lc_api_error: "API error, trying local extraction...",
+        lc_img_loaded: "Image loaded!",
+        lc_opening: "Opening Lyric Card...",
+        lc_modal_title: "Lyric Card Preview",
+        lc_album_default: "💿 Album Cover (Default)",
+        lc_manual_search: "🔍 Search an artist...",
+        lc_format_btn: "📏 Format: ",
+        lc_search_placeholder: "Type an artist name...",
+        lc_upload_btn: "📂 Upload an image",
+        lc_download_btn: "⬇️ Download",
+        lc_download_done: "✅ Downloaded!",
+        lc_share_btn: "𝕏 Share",
+        lc_share_copying: "📋 Copying...",
+        lc_share_copied: "✅ Copied!",
+        lc_share_error: "❌ Error",
+        lc_feedback_load_error: "Error loading image.",
+        lc_search_searching: "⏳ Searching...",
+        lc_search_none: "No results found 😕",
+        lc_custom_img: "📂 Imported image",
+        lc_select_text_error: "Please select text to create a Lyric Card.",
+        lc_error_search: "Error during search",
+        lc_img_copied_tweet: "Image copied! Press Ctrl+V in the X window that just opened.",
+        lc_error_copy: "Could not copy image.",
+        lc_error_img_not_found: "Image not found for",
+        lc_error_album_not_found: "Could not find album cover.",
+        lc_searching_artist: "Searching for artist image...",
+        lc_generating: "Generating Lyric Card...",
+        lc_error_internal: "Internal error: Function not found.",
+        lc_fetching_id: "Fetching artist image (via ID)...",
+        lc_searching_name: "Searching image for",
+        lc_img_applied: "Image applied:",
     },
     // Polish translations - UI strings are placeholders for contributor PR
     // Structure tags and cleanup tools are Polish-specific per Genius Polska guidelines
@@ -646,7 +695,7 @@ const TRANSLATIONS = {
         artist_selection: "Przypisz sekcję do:",
         no_artist: "Nie wykryto wykonawcy.",
         shortcuts_title: "Skróty",
-        add_couplet: "Dodaj Zwrotkę",
+        add_couplet: "Dodaj zwrotkę",
         format_numbers: "Liczby na słowa",
         create_lyric_card: "Utwórz Lyric Card",
         preview: "Podgląd",
@@ -787,7 +836,7 @@ const TRANSLATIONS = {
         tuto_lyric_mode_btn: "Rozumiem!",
         // Lyric Card Modal
         lc_modal_title: "Podgląd Lyric Card",
-        lc_album_default: "💿 Okładka albumu (domyślna)",
+        lc_album_default: "💿 Okładka albumu (domyślnie)",
         lc_manual_search: "🔍 Wyszukaj wykonawcę…",
         lc_format_btn: "📏 Format: ",
         lc_search_placeholder: "Wpisz nazwę wykonawcy…",
@@ -816,6 +865,9 @@ const TRANSLATIONS = {
         lc_fetching_id: "Pobieranie obrazu wykonawcy (za pomocą identyfikatora)…",
         lc_searching_name: "Wyszukiwanie obrazu dla",
         lc_img_applied: "Zastosowany obraz:",
+        lc_img_found: "Znaleziono obraz wykonawcy!",
+        lc_api_error: "Błąd API, próbuję wyodrębnić lokalnie…",
+        lc_opening: "Otwieranie Lyric Card…",
         // Toolbar
         toolbar_bold: "Pogrubienie",
         toolbar_italic: "Kursywa",
@@ -839,12 +891,14 @@ const TRANSLATIONS = {
         feedback_detail_dash: "{count} myślnik|{count} myślniki|{count} myślników",
         feedback_detail_spaces: "{count} podwójna spacja|{count} podwójne spacje|{count} podwójnych spacji",
         feedback_detail_spacing: "{count} odstęp|{count} odstępy|{count} odstępów",
+        feedback_detail_polish_quotes: "{count} polski cudzysłów|{count} polskie cudzysłowy|{count} polskich cudzysłowów",
+        feedback_detail_ellipsis: "{count} wielokropek|{count} wielokropki|{count} wielokropków",
         feedback_wrapped: "Otoczono tekst: {start}...{end}",
         feedback_corrections_cancelled: "Anulowano poprawki",
-        feedback_select_text_first: "⚠️ Najpierw zaznacz tekst",
-        feedback_no_text_corrections: "Brak poprawek tekstu. Sprawdź wizualnie nawiasy.",
-        feedback_brackets_ok: "✅ Nie wykryto problemów! Wszystkie nawiasy są poprawnie sparowane.",
-        feedback_brackets_issue: "⚠️ Znaleziono i podświetlono na czerwono {count} niesparowany nawias!|⚠️ Znaleziono i podświetlono na czerwono {count} niesparowane nawiasy!|⚠️ Znaleziono i podświetlono na czerwono {count} niesparowanych nawiasów!",
+        feedback_select_text_first: "⚠️ Zaznacz najpierw tekst",
+        feedback_no_text_corrections: "Brak poprawek tekstu. Zweryfikuj nawiasy.",
+        feedback_brackets_ok: "✅ Nie znaleziono żadnych problemów! Wszystkie nawiasy są domknięte.",
+        feedback_brackets_issue: "⚠️ Znaleziono {count} niesparowany nawias i zaznaczono go na czerwono!|⚠️ Znaleziono {count} niesparowane nawiasy i zaznaczono je na czerwono!|⚠️ Znaleziono {count} niesparowanych nawiasów i zaznaczono je na czerwono!",
         // Stats (Singular | Paucal | Plural)
         stats_lines: "linia|linie|linii",
         stats_words: "słowo|słowa|słów",
@@ -853,7 +907,7 @@ const TRANSLATIONS = {
         feedback_no_changes: "Brak zmian do cofnięcia.",
         feedback_undo: "↩️ Cofnięto",
         feedback_redo: "↪️ Ponowiono",
-        feedback_pause: "⏸️ Pauza",
+        feedback_pause: "⏸️ Wstrzymano",
         feedback_play: "▶️ Odtwarzanie",
         feedback_duplicate_line: "📋 Zduplikowano linię!",
         tuto_of: "z",
@@ -862,22 +916,22 @@ const TRANSLATIONS = {
         preview_diff_title: "Podgląd zmian (widok ujednolicony)",
         preview_btn_cancel: "Anuluj",
         preview_btn_apply: "Zastosuj zaznaczone",
-        preview_summary: "📊 Poprawki do zastosowania ({count}):",
+        preview_summary: "📊 {count} poprawka do zastosowania:|📊 {count} poprawki do zastosowania:|📊 {count} poprawek do zastosowania:",
         preview_no_corrections: "Brak poprawek do wprowadzenia.",
         preview_opt_polish_quotes: "\u201E\u201D \u2192 \"",
         preview_opt_apostrophes: "Apostrofy (')",
         preview_opt_ellipsis: "... → …",
-        preview_opt_quotes: "Cudzysłowy «» → \"",
-        preview_opt_dash: "Myślniki - → —",
+        preview_opt_quotes: "Cudzysłowy («» → \"\")",
+        preview_opt_dash: "Myślniki (- → —)",
         preview_opt_spaces: "Podwójne spacje",
         preview_opt_spacing: "Odstępy (linie)",
-        preview_stat_apostrophes: "apostrofów",
-        preview_stat_quotes: "cudzysłowów «»",
-        preview_stat_polish_quotes: "polskich cudzysłowów",
-        preview_stat_dash: "myślników",
-        preview_stat_ellipsis: "wielokropków",
-        preview_stat_spaces: "podwójnych spacji",
-        preview_stat_spacing: "odstępów",
+        preview_stat_apostrophes: "apostrofu|apostrofów|apostrofów",
+        preview_stat_quotes: "francuskiego cudzysłowu («»)|francuskich cudzysłowów («»)|francuskich cudzysłowów («»)",
+        preview_stat_polish_quotes: "polskiego cudzysłowu (\u201E\u201D)|polskich cudzysłowów (\u201E\u201D)|polskich cudzysłowów (\u201E\u201D)",
+        preview_stat_dash: "myślnika|myślników|myślników",
+        preview_stat_ellipsis: "wielokropka|wielokropków|wielokropków",
+        preview_stat_spaces: "podwójnej spacji|podwójnych spacji|podwójnych spacji",
+        preview_stat_spacing: "odstępu|odstępów|odstępów",
         // Draft notification
         draft_found_title: "Znaleziono wersję roboczą!",
         draft_saved_at: "Zapisano o",
@@ -896,9 +950,9 @@ const TRANSLATIONS = {
         feedback_adlib_added: "Otoczono tekst nawiasami!",
         feedback_select_text_first: "⚠️ Zaznacz najpierw tekst",
         feedback_no_replacement: "Nie dokonano żadnych zmian.",
-        feedback_replaced: "{count} {item} zamieniono!",
-        feedback_no_correction_needed: "Brak potrzebnych poprawek {item}.",
-        feedback_corrected: "{count} {item} poprawiono!",
+        feedback_replaced: "Zamieniono {count} {item}!",
+        feedback_no_correction_needed: "Zamiana {item} nie jest wymagana",
+        feedback_corrected: "Poprawiono {count} {item}!",
         feedback_no_changes: "Brak zmian do cofnięcia.",
         feedback_undo: "↩️ Cofnięto",
         feedback_redo: "↪️ Ponowiono",
@@ -907,9 +961,40 @@ const TRANSLATIONS = {
         feedback_duplicate_line: "📋 Zduplikowano linię!",
         feedback_no_text_corrections: "Brak poprawek tekstu. Zweryfikuj nawiasy.",
         feedback_brackets_ok: "✅ Nie znaleziono żadnych problemów! Wszystkie nawiasy są domknięte.",
-        feedback_brackets_issue: "⚠️ Znaleziono {count} niesparowane nawiasy i zaznaczono je na czerwono!",
+        feedback_brackets_issue: "⚠️ Znaleziono {count} niesparowany nawias i zaznaczono go na czerwono!|⚠️ Znaleziono {count} niesparowane nawiasy i zaznaczono je na czerwono!|⚠️ Znaleziono {count} niesparowanych nawiasów i zaznaczono je na czerwono!",
     }
 };
+
+/**
+ * Formate une liste de chaînes avec une conjonction naturelle (A, B et C).
+ * @param {string[]} items - Liste des éléments à formater.
+ * @param {string} lang - La langue ('fr', 'en', 'pl').
+ * @returns {string} La chaîne formatée.
+ */
+function formatListWithConjunction(items, lang) {
+    if (items.length === 0) return "";
+    if (items.length === 1) return items[0];
+
+    // Utilisation de Intl.ListFormat si disponible
+    if (typeof Intl !== 'undefined' && Intl.ListFormat) {
+        try {
+            const formatter = new Intl.ListFormat(lang, { style: 'long', type: 'conjunction' });
+            return formatter.format(items);
+        } catch (e) {
+            console.warn("[GFT] Intl.ListFormat failed, falling back to manual join.", e);
+        }
+    }
+
+    // Fallback manuel
+    const lastItem = items.pop();
+    const conjunctions = {
+        'fr': ' et ',
+        'en': ' and ',
+        'pl': ' i '
+    };
+    const conj = conjunctions[lang] || conjunctions['fr'];
+    return items.join(', ') + conj + lastItem;
+}
 
 /**
  * Détermine l'index de la forme plurielle pour une langue et un nombre donnés.
@@ -3302,19 +3387,20 @@ function showCorrectionPreview(originalText, correctedText, initialCorrections, 
         currentPreviewText = result.newText;
         currentStats = result.corrections;
 
+        const lang = localStorage.getItem('gftLanguage') || 'fr';
         // Mise à jour du résumé
         const detailsArray = [];
         if (options.yPrime && currentStats.yPrime > 0) detailsArray.push(`${currentStats.yPrime} "y'"`);
-        if (options.apostrophes && currentStats.apostrophes > 0) detailsArray.push(`${currentStats.apostrophes} ${getTranslation('preview_stat_apostrophes')}`);
+        if (options.apostrophes && currentStats.apostrophes > 0) detailsArray.push(`${currentStats.apostrophes} ${getTranslation('preview_stat_apostrophes', currentStats.apostrophes)}`);
         if (options.oeuLigature && currentStats.oeuLigature > 0) detailsArray.push(`${currentStats.oeuLigature} "oeu"`);
-        if (options.frenchQuotes && currentStats.frenchQuotes > 0) detailsArray.push(`${currentStats.frenchQuotes} ${getTranslation('preview_stat_quotes')}`);
-        if (options.longDash && currentStats.longDash > 0) detailsArray.push(`${currentStats.longDash} ${getTranslation('preview_stat_dash')}`);
-        if (options.doubleSpaces && currentStats.doubleSpaces > 0) detailsArray.push(`${currentStats.doubleSpaces} ${getTranslation('preview_stat_spaces')}`);
-        if (options.spacing && currentStats.spacing > 0) detailsArray.push(`${currentStats.spacing} ${getTranslation('preview_stat_spacing')}`);
+        if (options.frenchQuotes && currentStats.frenchQuotes > 0) detailsArray.push(`${currentStats.frenchQuotes} ${getTranslation('preview_stat_quotes', currentStats.frenchQuotes)}`);
+        if (options.longDash && currentStats.longDash > 0) detailsArray.push(`${currentStats.longDash} ${getTranslation('preview_stat_dash', currentStats.longDash)}`);
+        if (options.doubleSpaces && currentStats.doubleSpaces > 0) detailsArray.push(`${currentStats.doubleSpaces} ${getTranslation('preview_stat_spaces', currentStats.doubleSpaces)}`);
+        if (options.spacing && currentStats.spacing > 0) detailsArray.push(`${currentStats.spacing} ${getTranslation('preview_stat_spacing', currentStats.spacing)}`);
 
         const total = result.correctionsCount;
-        const summaryTemplate = getTranslation('preview_summary').replace('{count}', total);
-        summary.innerHTML = `<strong>${summaryTemplate}</strong><br>${detailsArray.length > 0 ? detailsArray.join(', ') : getTranslation('preview_no_corrections')}`;
+        const summaryTemplate = getTranslation('preview_summary', total).replace('{count}', total);
+        summary.innerHTML = `<strong>${summaryTemplate}</strong><br>${detailsArray.length > 0 ? formatListWithConjunction(detailsArray, lang) : getTranslation('preview_no_corrections')}`;
 
         // Mise à jour du diff
         diffContainer.innerHTML = highlightDifferences(originalText, currentPreviewText);
@@ -5247,7 +5333,8 @@ function initLyricsEditorEnhancer() {
                 searchPattern: /['']/g,
                 replacementText: "'",
                 highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
-                tooltip: getTranslation('cleanup_apostrophe_tooltip')
+                tooltip: getTranslation('cleanup_apostrophe_tooltip'),
+                feedbackKey: 'preview_stat_apostrophes'
             },
             {
                 label: getTranslation('btn_french_quotes_label'),
@@ -5255,7 +5342,8 @@ function initLyricsEditorEnhancer() {
                 searchPattern: /[«»]/g,
                 replacementText: '"',
                 highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
-                tooltip: getTranslation('cleanup_french_quotes_tooltip')
+                tooltip: getTranslation('cleanup_french_quotes_tooltip'),
+                feedbackKey: 'preview_stat_quotes'
             },
             {
                 label: getTranslation('btn_double_spaces_label'),
@@ -5263,7 +5351,8 @@ function initLyricsEditorEnhancer() {
                 searchPattern: /  +/g,
                 replacementText: ' ',
                 highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
-                tooltip: getTranslation('cleanup_double_spaces_tooltip')
+                tooltip: getTranslation('cleanup_double_spaces_tooltip'),
+                feedbackKey: 'preview_stat_spaces'
             },
             {
                 label: getTranslation('btn_zws_remove'),
@@ -5285,7 +5374,8 @@ function initLyricsEditorEnhancer() {
                 action: 'lineCorrection',
                 correctionType: 'spacing',
                 title: getTranslation('cleanup_spacing_tooltip'),
-                tooltip: getTranslation('cleanup_spacing_tooltip')
+                tooltip: getTranslation('cleanup_spacing_tooltip'),
+                feedbackKey: 'preview_stat_spacing'
             },
             {
                 label: getTranslation('btn_check_label'),
@@ -5306,7 +5396,8 @@ function initLyricsEditorEnhancer() {
                     searchPattern: /[„""]/g,  // Polish quotes „" and curly quotes ""
                     replacementText: '"',
                     highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
-                    tooltip: getTranslation('cleanup_polish_quotes_tooltip')
+                    tooltip: getTranslation('cleanup_polish_quotes_tooltip'),
+                    feedbackKey: 'preview_stat_polish_quotes'
                 },
                 {
                     label: getTranslation('btn_em_dash_label'),
@@ -5314,7 +5405,8 @@ function initLyricsEditorEnhancer() {
                     searchPattern: /(?<!\-)\-(?!\-)/g,  // Single hyphen (not part of --)
                     replacementText: '—',
                     highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
-                    tooltip: getTranslation('cleanup_em_dash_tooltip')
+                    tooltip: getTranslation('cleanup_em_dash_tooltip'),
+                    feedbackKey: 'preview_stat_dash'
                 },
                 {
                     label: getTranslation('btn_ellipsis_label'),
@@ -5322,7 +5414,8 @@ function initLyricsEditorEnhancer() {
                     searchPattern: /\.{3}/g,  // Three dots
                     replacementText: '…',
                     highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
-                    tooltip: getTranslation('cleanup_ellipsis_tooltip')
+                    tooltip: getTranslation('cleanup_ellipsis_tooltip'),
+                    feedbackKey: 'preview_stat_ellipsis'
                 }
             ];
 
@@ -5339,7 +5432,8 @@ function initLyricsEditorEnhancer() {
                     searchPattern: /\b(Y|y)['']/g,
                     replacementFunction: (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y '),
                     highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
-                    tooltip: getTranslation('cleanup_y_tooltip')
+                    tooltip: getTranslation('cleanup_y_tooltip'),
+                    feedbackKey: 'preview_stat_yprime'
                 },
                 {
                     label: getTranslation('btn_oeu_label'),
@@ -5347,7 +5441,8 @@ function initLyricsEditorEnhancer() {
                     searchPattern: /([Oo])eu/g,
                     replacementFunction: (match, firstLetter) => (firstLetter === 'O' ? 'Œu' : 'œu'),
                     highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
-                    tooltip: getTranslation('cleanup_oeu_tooltip')
+                    tooltip: getTranslation('cleanup_oeu_tooltip'),
+                    feedbackKey: 'preview_stat_oeu'
                 },
                 {
                     label: getTranslation('btn_long_dash_label'),
@@ -5355,7 +5450,8 @@ function initLyricsEditorEnhancer() {
                     searchPattern: /[—–]/g,
                     replacementText: '-',
                     highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
-                    tooltip: getTranslation('cleanup_long_dash_tooltip')
+                    tooltip: getTranslation('cleanup_long_dash_tooltip'),
+                    feedbackKey: 'preview_stat_dash'
                 }
             ];
 
@@ -5853,11 +5949,19 @@ function initLyricsEditorEnhancer() {
                             }
                             if (replacementsCount > 0) {
                                 let itemLabel = "élément(s)";
-                                if (config.label.includes("y' → y ")) itemLabel = "occurrence(s) de 'y''";
-                                if (config.label.includes("’ → '")) itemLabel = "apostrophe(s) ’";
-                                showFeedbackMessage(getTranslation('feedback_replaced').replace('{count}', replacementsCount).replace('{item}', itemLabel), 3000, shortcutsContainerElement);
+                                if (config.feedbackKey) {
+                                    itemLabel = getTranslation(config.feedbackKey, replacementsCount);
+                                } else {
+                                    if (config.label.includes("y' → y ")) itemLabel = "occurrence(s) de 'y''";
+                                    if (config.label.includes("’ → '")) itemLabel = "apostrophe(s) ’";
+                                }
+                                showFeedbackMessage(getTranslation('feedback_replaced', replacementsCount).replace('{count}', replacementsCount).replace('{item}', itemLabel), 3000, shortcutsContainerElement);
                             } else {
-                                showFeedbackMessage(getTranslation('feedback_no_replacement'), 2000, shortcutsContainerElement);
+                                let noCorrectionLabel = "élément(s)";
+                                if (config.feedbackKey) {
+                                    noCorrectionLabel = getTranslation(config.feedbackKey, 1); // Utilise la forme singulière (souvent génitif pour PL)
+                                }
+                                showFeedbackMessage(getTranslation('feedback_no_correction_needed').replace('{item}', noCorrectionLabel), 2000, shortcutsContainerElement);
                             }
                         } else if (config.action === 'lineCorrection' && config.correctionType) {
                             // Sauvegarde dans l'historique avant modification
@@ -5879,8 +5983,17 @@ function initLyricsEditorEnhancer() {
                                 } else if (currentEditorType === 'div') {
                                     correctionsCount = applyTextTransformToDivEditor(currentActiveEditor, correctionFunction);
                                 }
-                                if (correctionsCount > 0) showFeedbackMessage(getTranslation('feedback_corrected').replace('{count}', correctionsCount).replace('{item}', feedbackLabel), 3000, shortcutsContainerElement);
-                                else showFeedbackMessage(getTranslation('feedback_no_correction_needed').replace('{item}', feedbackLabel), 2000, shortcutsContainerElement);
+                                if (correctionsCount > 0) {
+                                    let itemLabel = "élément(s)";
+                                    if (config.feedbackKey) itemLabel = getTranslation(config.feedbackKey, correctionsCount);
+                                    else itemLabel = feedbackLabel;
+                                    showFeedbackMessage(getTranslation('feedback_corrected', correctionsCount).replace('{count}', correctionsCount).replace('{item}', itemLabel), 3000, shortcutsContainerElement);
+                                } else {
+                                    let noCorrectionLabel = "élément(s)";
+                                    if (config.feedbackKey) noCorrectionLabel = getTranslation(config.feedbackKey, 1);
+                                    else noCorrectionLabel = feedbackLabel;
+                                    showFeedbackMessage(getTranslation('feedback_no_correction_needed').replace('{item}', noCorrectionLabel), 2000, shortcutsContainerElement);
+                                }
                             }
                         } else if (config.action === 'globalTextFix') {
                             // Version avec prévisualisation (mode validation)
@@ -5958,9 +6071,10 @@ function initLyricsEditorEnhancer() {
 
                                             // Recalcule le total count
                                             const totalCount = Object.values(finalStats).reduce((a, b) => a + b, 0);
+                                            const lang = localStorage.getItem('gftLanguage') || 'fr';
 
                                             const message = detailsArray.length > 0
-                                                ? getTranslation('feedback_summary_corrected', totalCount).replace('{details}', detailsArray.join(', ')).replace('{count}', totalCount)
+                                                ? getTranslation('feedback_summary_corrected', totalCount).replace('{details}', formatListWithConjunction(detailsArray, lang)).replace('{count}', totalCount)
                                                 : getTranslation('feedback_summary_correction', totalCount).replace('{count}', totalCount);
 
                                             showFeedbackMessage(message, 4500, shortcutsContainerElement);
@@ -7391,7 +7505,7 @@ async function fetchArtistImageFromApi(artistName, forceSearch = false) {
 
                         if (targetHit && targetHit.result && targetHit.result.image_url) {
                             console.log("[GFT] Found via Search API:", targetHit.result.image_url);
-                            showFeedbackMessage("Image artiste trouvée !", 1000);
+                            showFeedbackMessage(getTranslation('lc_img_found'), 1000);
                             return targetHit.result.image_url;
                         }
                     }
@@ -7403,7 +7517,7 @@ async function fetchArtistImageFromApi(artistName, forceSearch = false) {
     }
 
     console.warn("[GFT] Failed to fetch artist image from any API.");
-    showFeedbackMessage("Échec API, essai extraction locale...", 1000);
+    showFeedbackMessage(getTranslation('lc_api_error'), 1000);
     return null;
 }
 
@@ -7456,12 +7570,12 @@ async function generateLyricsCard() {
 
     const uniqueUrls = [...new Set(candidateUrls)];
     if (uniqueUrls.length === 0) {
-        showFeedbackMessage("Impossible de trouver la pochette de l'album.");
+        showFeedbackMessage(getTranslation('lc_error_album_not_found'), 1000);
         return;
     }
     const albumUrl = uniqueUrls[0];
 
-    showFeedbackMessage("Ouverture de la Lyric Card...", 500);
+    showFeedbackMessage(getTranslation('lc_opening'), 500);
 
     // On passe null pour artistUrl car on le charge dynamiquement dans le modal
     showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, null);
