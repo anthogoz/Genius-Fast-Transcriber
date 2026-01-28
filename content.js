@@ -194,6 +194,16 @@ const TRANSLATIONS = {
         btn_unknown_tooltip: "Insérer un tag [?]",
         btn_zws_remove: "Suppr. ZWS",
         btn_zws_remove_tooltip: "Supprime les caractères invisibles (Zero Width Space)",
+        btn_hook: "[Przyśpiewka]",
+        btn_hook_tooltip: "Insérer un tag [Przyśpiewka] (règle polonaise)",
+        btn_interlude: "[Interludium]",
+        btn_interlude_tooltip: "Insérer un tag [Interludium]",
+        btn_part: "[Część]",
+        btn_part_tooltip: "Insérer un tag [Część] (Partie)",
+        btn_skit: "[Skit]",
+        btn_skit_tooltip: "Insérer un tag [Skit]",
+        btn_vocalization: "[Wokaliza]",
+        btn_vocalization_tooltip: "Insérer un tag [Wokaliza] (Vocalises)",
         // Cleanup Tools
         cleanup_capitalize: "Maj. Début",
         cleanup_capitalize_tooltip: "Met une majuscule au début de chaque ligne",
@@ -205,9 +215,12 @@ const TRANSLATIONS = {
         cleanup_parens_tooltip: "Vérifie les parenthèses et crochets manquants ou mal fermés",
         cleanup_all: "Tout Corriger",
         cleanup_all_tooltip: "Applique toutes les corrections d'un coup (Ctrl+Shift+C)",
+        global_check_tooltip: "Vérifier les parenthèses et crochets manquants ou mal fermés",
+        global_fix_tooltip: "Appliquer toutes les corrections de texte d'un coup",
         // Button Labels (Cleanup)
         btn_y_label: "y' → y",
         btn_apostrophe_label: "' → '",
+        cleanup_apostrophe_tooltip: "Remplace les apostrophes courbes par des apostrophes droites",
         btn_oeu_label: "oeu → œu",
         btn_french_quotes_label: "«» → \"",
         cleanup_french_quotes_tooltip: "Remplace les guillemets français «» par des guillemets droits \"",
@@ -217,6 +230,9 @@ const TRANSLATIONS = {
         cleanup_double_spaces_tooltip: "Supprime les espaces en double",
         btn_duplicate_line_label: "📋 Dupliquer ligne",
         cleanup_duplicate_line_tooltip: "Duplique la ligne actuelle (Ctrl+D)",
+        cleanup_spacing_tooltip: "Corrige l'espacement entre les lignes (supprime les lignes vides en trop)",
+        cleanup_y_tooltip: "Remplace les \"y'\" par des \"y \" (règle Genius)",
+        cleanup_oeu_tooltip: "Remplace \"oeu\" par le caractère spécial \"œu\"",
         btn_adlib_label: "(Ad-lib)",
         cleanup_adlib_tooltip: "Entoure le texte sélectionné de parenthèses pour les ad-libs",
         btn_capitalize_label: "Maj. début ligne",
@@ -228,6 +244,18 @@ const TRANSLATIONS = {
         btn_punctuation_short: "Ponctuation",
         btn_spacing_short: "Espacement",
         btn_fix_all_short: "✨ Tout Corriger",
+        btn_prev_couplet_title: "Couplet précédent",
+        btn_prev_couplet_tooltip: "Revenir au couplet précédent",
+        btn_next_couplet_title: "Couplet suivant",
+        btn_next_couplet_tooltip: "Passer au couplet suivant",
+        btn_add_custom_structure_title: "Ajouter un bouton de structure personnalisé",
+        btn_add_custom_cleanup_title: "Ajouter un bouton de nettoyage personnalisé",
+        btn_polish_quotes_label: "„” → \"",
+        cleanup_polish_quotes_tooltip: "Remplace les guillemets polonais par des guillemets droits",
+        btn_em_dash_label: "- → —",
+        cleanup_em_dash_tooltip: "Remplace les tirets courts par des tirets longs (règle polonaise)",
+        btn_ellipsis_label: "... → …",
+        cleanup_ellipsis_tooltip: "Remplace les trois points par un caractère d'ellipse",
         // Tutorial Steps
         tuto_step1_title: "1. Structure & Artistes 🏗️",
         tuto_step1_content: "• <strong>Artistes :</strong> Cochez les cases en haut pour attribuer automatiquement les sections sur les anciens editeurs.<br>• <strong>Couplets :</strong> Utilisez le nouveau bouton central <strong>[Couplet 1]</strong>. Les flèches ← → changent le numéro.<br>• <strong>Tags :</strong> Insérez Refrain, Intro, Pont en un clic.",
@@ -420,45 +448,61 @@ const TRANSLATIONS = {
         section_structure: "Structure & Artists",
         section_cleanup: "Cleanup Tools",
         // Buttons & Tooltips - REVERT TO FRENCH for Transcription tags
-        btn_header: "En-tête",
-        btn_header_tooltip: "Insérer l'en-tête de la chanson avec les artistes",
+        btn_header: "Header",
+        btn_header_tooltip: "Insert song header with artists",
         btn_intro: "[Intro]",
-        btn_intro_tooltip: "Insérer un tag [Intro] avec les artistes (Ctrl+4)",
-        btn_verse_unique: "[Couplet unique]",
-        btn_verse_unique_tooltip: "Insérer un tag [Couplet unique] avec les artistes",
-        btn_verse: "[Couplet]",
-        btn_verse_tooltip: "Insérer un tag [Couplet] sans numéro avec les artistes",
-        btn_verse_num: "[Couplet 1]",
-        btn_verse_num_tooltip: "Insérer un tag [Couplet X] avec gestion du numéro",
-        btn_chorus: "[Refrain]",
-        btn_chorus_tooltip: "Insérer un tag [Refrain] avec les artistes (Ctrl+1, Ctrl+2)",
-        btn_pre_chorus: "[Pré-refrain]",
-        btn_pre_chorus_tooltip: "Insérer un tag [Pré-refrain] (Ctrl+3)",
-        btn_bridge: "[Pont]",
-        btn_bridge_tooltip: "Insérer un tag [Pont] avec les artistes (Ctrl+5)",
+        btn_intro_tooltip: "Insert [Intro] tag with artists (Ctrl+4)",
+        btn_verse_unique: "[Unique Verse]",
+        btn_verse_unique_tooltip: "Insert [Unique Verse] tag with artists",
+        btn_verse: "[Verse]",
+        btn_verse_tooltip: "Insert [Verse] tag without number",
+        btn_verse_num: "[Verse 1]",
+        btn_verse_num_tooltip: "Insert [Verse X] tag with automatic numbering",
+        btn_chorus: "[Chorus]",
+        btn_chorus_tooltip: "Insert [Chorus] tag with artists (Ctrl+1, Ctrl+2)",
+        btn_pre_chorus: "[Pre-Chorus]",
+        btn_pre_chorus_tooltip: "Insert [Pre-Chorus] tag (Ctrl+3)",
+        btn_bridge: "[Bridge]",
+        btn_bridge_tooltip: "Insert [Bridge] tag with artists (Ctrl+5)",
         btn_outro: "[Outro]",
-        btn_outro_tooltip: "Insérer un tag [Outro] avec les artistes",
+        btn_outro_tooltip: "Insert [Outro] tag with artists",
         btn_instrumental: "[Instrumental]",
-        btn_instrumental_tooltip: "Insérer un tag [Instrumental]",
-        btn_break: "[Pause]",
-        btn_break_tooltip: "Insérer un tag [Pause]",
-        btn_post_chorus: "[Post-refrain]",
-        btn_post_chorus_tooltip: "Insérer un tag [Post-refrain]",
+        btn_instrumental_tooltip: "Insert [Instrumental] tag",
+        btn_break: "[Break]",
+        btn_break_tooltip: "Insert [Break] tag",
+        btn_post_chorus: "[Post-Chorus]",
+        btn_post_chorus_tooltip: "Insert [Post-Chorus] tag",
         btn_unknown: "[?]",
-        btn_unknown_tooltip: "Insérer un tag [?]",
-        btn_zws_remove: "Suppr. ZWS",
-        btn_zws_remove_tooltip: "Supprime les caractères invisibles (Zero Width Space)",
-        // Cleanup Tools - REVERT TO FRENCH (Specific to French typography)
-        cleanup_capitalize: "Maj. Début",
-        cleanup_capitalize_tooltip: "Met une majuscule au début de chaque ligne",
-        cleanup_punct: "Ponctuation",
-        cleanup_punct_tooltip: "Supprime la ponctuation en fin de ligne (. , ;)",
-        cleanup_quotes: "Guillemets",
-        cleanup_quotes_tooltip: "Transforme les apostrophes droites (') en courbes (’) et corrige les guillemets",
-        cleanup_parens: "Parenthèses",
-        cleanup_parens_tooltip: "Vérifie les parenthèses et crochets manquants ou mal fermés",
-        cleanup_all: "Tout Corriger",
-        cleanup_all_tooltip: "Applique toutes les corrections d'un coup (Ctrl+Shift+C)",
+        btn_unknown_tooltip: "Insert [?] tag for unknown section",
+        btn_hook: "[Hook]",
+        btn_hook_tooltip: "Insert [Hook] tag",
+        btn_interlude: "[Interlude]",
+        btn_interlude_tooltip: "Insert [Interlude] tag",
+        btn_part: "[Part]",
+        btn_part_tooltip: "Insert [Part] tag",
+        btn_skit: "[Skit]",
+        btn_skit_tooltip: "Insert [Skit] tag",
+        btn_vocalization: "[Vocalization]",
+        btn_vocalization_tooltip: "Insert [Vocalization] tag",
+        btn_zws_remove: "Remove ZWS",
+        btn_zws_remove_tooltip: "Remove invisible characters (Zero Width Space)",
+        // Cleanup Tools - English descriptions
+        cleanup_capitalize: "Capitalize",
+        cleanup_capitalize_tooltip: "Capitalize the start of each line",
+        cleanup_punct: "Punctuation",
+        cleanup_punct_tooltip: "Remove punctuation at the end of lines (. , ;)",
+        cleanup_quotes: "Quotes",
+        cleanup_quotes_tooltip: "Convert curly apostrophes to straight ones and fix quotes",
+        cleanup_parens: "Brackets",
+        cleanup_parens_tooltip: "Check for missing or unmatched brackets and parentheses",
+        cleanup_all: "Fix All",
+        cleanup_all_tooltip: "Apply all text corrections at once (Ctrl+Shift+C)",
+        btn_polish_quotes_label: "„” → \"",
+        cleanup_polish_quotes_tooltip: "Replace Polish quotes with straight quotes",
+        btn_em_dash_label: "- → —",
+        cleanup_em_dash_tooltip: "Replace short hyphens with em-dashes (Polish rule)",
+        btn_ellipsis_label: "... → …",
+        cleanup_ellipsis_tooltip: "Replace three dots with ellipsis character",
         // Button Labels (Cleanup) - REVERT
         btn_y_label: "y' → y",
         btn_apostrophe_label: "' → '",
@@ -592,6 +636,12 @@ const TRANSLATIONS = {
         btn_fix_all_label: "Fix All (Text)",
         btn_spacing_short: "Spacing",
         btn_fix_all_short: "✨ Fix All",
+        btn_prev_couplet_title: "Previous Verse",
+        btn_prev_couplet_tooltip: "Go to previous verse",
+        btn_next_couplet_title: "Next Verse",
+        btn_next_couplet_tooltip: "Go to next verse",
+        btn_add_custom_structure_title: "Add custom structure button",
+        btn_add_custom_cleanup_title: "Add custom cleanup button",
         btn_zws_remove: "⌫ ZWS",
         // Cleanup tooltips
         cleanup_apostrophe_tooltip: "Replace curly apostrophes with straight ones",
@@ -601,6 +651,8 @@ const TRANSLATIONS = {
         cleanup_spacing_tooltip: "Fix line spacing (remove extra empty lines)",
         global_check_tooltip: "Check for unmatched brackets and parentheses",
         global_fix_tooltip: "Apply all text corrections at once",
+        cleanup_y_tooltip: "Replace \"y'\" with \"y \" (French typography rule)",
+        cleanup_oeu_tooltip: "Replace \"oeu\" with the special character \"œu\" (French typography rule)",
         btn_zws_remove_tooltip: "Remove invisible zero-width space characters",
         // Draft notification
         draft_found_title: "Draft found!",
@@ -806,6 +858,7 @@ const TRANSLATIONS = {
         cleanup_duplicate_line_tooltip: "Duplikuje bieżącą linię (Ctrl+D)",
         btn_adlib_label: "(Ad-lib)",
         cleanup_adlib_tooltip: "Otacza zaznaczony tekst nawiasami",
+        cleanup_spacing_tooltip: "Naprawia odstępy między liniami (usuwa zbędne puste linie)",
         btn_capitalize_label: "Wielka litera",
         btn_punctuation_label: "Usuń interpunkcję",
         btn_spacing_label: "Popraw odstępy",
@@ -815,6 +868,12 @@ const TRANSLATIONS = {
         btn_punctuation_short: "Interpunkcja",
         btn_spacing_short: "Odstępy",
         btn_fix_all_short: "✨ Popraw wszystko",
+        btn_prev_couplet_title: "Poprzednia zwrotka",
+        btn_prev_couplet_tooltip: "Wróć do poprzedniej zwrotki",
+        btn_next_couplet_title: "Następna zwrotka",
+        btn_next_couplet_tooltip: "Przejdź do następnej zwrotki",
+        btn_add_custom_structure_title: "Dodaj własny przycisk struktury",
+        btn_add_custom_cleanup_title: "Dodaj własny przycisk czyszczenia",
         // Tutorial Steps
         tuto_step1_title: "1. Struktura i wykonawcy 🏗️",
         tuto_step1_content: "• <strong>Artyści</strong> — Zaznacz wykonawców, aby przypisać ich do\u00A0sekcji.<br>• <strong>Zwrotki:</strong> Użyj centralnego przycisku <strong>[Zwrotka 1]</strong>. Strzałki ←\u00A0→ zmieniają numerację.<br>• <strong>Tagi:</strong> Wstaw [Refren], [Intro] lub [Przejście] jednym kliknięciem.",
@@ -962,6 +1021,12 @@ const TRANSLATIONS = {
         feedback_no_text_corrections: "Brak poprawek tekstu. Zweryfikuj nawiasy.",
         feedback_brackets_ok: "✅ Nie znaleziono żadnych problemów! Wszystkie nawiasy są domknięte.",
         feedback_brackets_issue: "⚠️ Znaleziono {count} niesparowany nawias i zaznaczono go na czerwono!|⚠️ Znaleziono {count} niesparowane nawiasy i zaznaczono je na czerwono!|⚠️ Znaleziono {count} niesparowanych nawiasów i zaznaczono je na czerwono!",
+        btn_zws_remove: "Usuń ZWS",
+        btn_zws_remove_tooltip: "Usuwa niewidoczne znaki (Zero Width Space)",
+        global_check_tooltip: "Sprawdź brakujące lub błędnie zamknięte nawiasy",
+        global_fix_tooltip: "Zastosuj wszystkie poprawki tekstu naraz",
+        btn_fix_all_label: "Napraw wszystko (Tekst)",
+        btn_fix_all_short: "✨ Napraw wszystko",
     }
 };
 
@@ -5202,7 +5267,7 @@ function initLyricsEditorEnhancer() {
 
         const plusButton = {
             label: '+',
-            title: 'Ajouter bouton structure',
+            title: getTranslation('btn_add_custom_structure_title'),
             isPlusButton: true,
             managerType: 'structure'
         };
@@ -5213,7 +5278,7 @@ function initLyricsEditorEnhancer() {
                 buttons: [
                     {
                         type: 'coupletManager',
-                        prev: { label: '←', title: 'Poprzednia Zwrotka', tooltip: 'Wróć do poprzedniej zwrotki' },
+                        prev: { label: '←', title: getTranslation('btn_prev_couplet_title'), tooltip: getTranslation('btn_prev_couplet_tooltip') },
                         main: {
                             id: COUPLET_BUTTON_ID,
                             getLabel: () => `[Zwrotka ${coupletCounter}]`,
@@ -5221,7 +5286,7 @@ function initLyricsEditorEnhancer() {
                             tooltip: getTranslation('add_couplet'),
                             shortcut: '1'
                         },
-                        next: { label: '→', title: 'Następna Zwrotka', tooltip: 'Przejdź do następnej zwrotki' }
+                        next: { label: '→', title: getTranslation('btn_next_couplet_title'), tooltip: getTranslation('btn_next_couplet_tooltip') }
                     },
                     { label: getTranslation('btn_intro'), getText: () => addArtistToText('[Intro]'), tooltip: getTranslation('btn_intro_tooltip'), shortcut: '4' },
                     { label: getTranslation('btn_verse'), getText: () => addArtistToText('[Zwrotka]'), tooltip: getTranslation('btn_verse_tooltip') },
@@ -5247,24 +5312,24 @@ function initLyricsEditorEnhancer() {
                 buttons: [
                     {
                         type: 'coupletManager',
-                        prev: { label: '←', title: 'Previous Verse', tooltip: 'Go to previous verse' },
+                        prev: { label: '←', title: getTranslation('btn_prev_couplet_title'), tooltip: getTranslation('btn_prev_couplet_tooltip') },
                         main: {
                             id: COUPLET_BUTTON_ID,
                             getLabel: () => `[Verse ${coupletCounter}]`,
                             getText: () => addArtistToText(`[Verse ${coupletCounter}]`),
-                            tooltip: 'Insert Verse tag with current number',
+                            tooltip: getTranslation('add_couplet'),
                             shortcut: '1'
                         },
-                        next: { label: '→', title: 'Next Verse', tooltip: 'Go to next verse' }
+                        next: { label: '→', title: getTranslation('btn_next_couplet_title'), tooltip: getTranslation('btn_next_couplet_tooltip') }
                     },
-                    { label: '[Intro]', getText: () => addArtistToText('[Intro]'), tooltip: 'Insert [Intro] tag', shortcut: '4' },
-                    { label: '[Pre-Chorus]', getText: () => addArtistToText('[Pre-Chorus]'), tooltip: 'Insert [Pre-Chorus] tag' },
-                    { label: '[Chorus]', getText: () => addArtistToText('[Chorus]'), tooltip: 'Insert [Chorus] tag', shortcut: '2' },
-                    { label: '[Post-Chorus]', getText: () => addArtistToText('[Post-Chorus]'), tooltip: 'Insert [Post-Chorus] tag' },
-                    { label: '[Bridge]', getText: () => addArtistToText('[Bridge]'), tooltip: 'Insert [Bridge] tag', shortcut: '3' },
-                    { label: '[Outro]', getText: () => addArtistToText('[Outro]'), tooltip: 'Insert [Outro] tag', shortcut: '5' },
-                    { label: '[Instrumental]', getText: () => formatSimpleTag('[Instrumental]'), tooltip: 'Insert [Instrumental] tag' },
-                    { label: '[?]', getText: () => formatSimpleTag('[?]', true), tooltip: 'Insert [?] tag for unknown section' },
+                    { label: getTranslation('btn_intro'), getText: () => addArtistToText('[Intro]'), tooltip: getTranslation('btn_intro_tooltip'), shortcut: '4' },
+                    { label: getTranslation('btn_pre_chorus'), getText: () => addArtistToText('[Pre-Chorus]'), tooltip: getTranslation('btn_pre_chorus_tooltip') },
+                    { label: getTranslation('btn_chorus'), getText: () => addArtistToText('[Chorus]'), tooltip: getTranslation('btn_chorus_tooltip'), shortcut: '2' },
+                    { label: getTranslation('btn_post_chorus'), getText: () => addArtistToText('[Post-Chorus]'), tooltip: getTranslation('btn_post_chorus_tooltip') },
+                    { label: getTranslation('btn_bridge'), getText: () => addArtistToText('[Bridge]'), tooltip: getTranslation('btn_bridge_tooltip'), shortcut: '3' },
+                    { label: getTranslation('btn_outro'), getText: () => addArtistToText('[Outro]'), tooltip: getTranslation('btn_outro_tooltip'), shortcut: '5' },
+                    { label: getTranslation('btn_instrumental'), getText: () => formatSimpleTag('[Instrumental]'), tooltip: getTranslation('btn_instrumental_tooltip') },
+                    { label: getTranslation('btn_unknown'), getText: () => formatSimpleTag('[?]', true), tooltip: getTranslation('btn_unknown_tooltip') },
                     ...customButtons,
                     plusButton
                 ]
@@ -5276,7 +5341,7 @@ function initLyricsEditorEnhancer() {
                     { label: getTranslation('btn_header'), getText: () => { let txt = `[Paroles de "${currentSongTitle}"`; const fts = formatArtistList(currentFeaturingArtists); if (fts && isHeaderFeatEnabled()) txt += ` ft. ${fts}`; txt += ']'; if (!isTagNewlinesDisabled()) txt += '\n'; return txt; }, tooltip: getTranslation('btn_header_tooltip') },
                     {
                         type: 'coupletManager',
-                        prev: { label: '←', title: 'Couplet précédent', tooltip: 'Revenir au couplet précédent' },
+                        prev: { label: '←', title: getTranslation('btn_prev_couplet_title'), tooltip: getTranslation('btn_prev_couplet_tooltip') },
                         main: {
                             id: COUPLET_BUTTON_ID,
                             getLabel: () => `[Couplet ${coupletCounter}]`,
@@ -5284,7 +5349,7 @@ function initLyricsEditorEnhancer() {
                             tooltip: getTranslation('add_couplet'),
                             shortcut: '1'
                         },
-                        next: { label: '→', title: 'Couplet suivant', tooltip: 'Passer au couplet suivant' }
+                        next: { label: '→', title: getTranslation('btn_next_couplet_title'), tooltip: getTranslation('btn_next_couplet_tooltip') }
                     },
                     { label: getTranslation('btn_intro'), getText: () => addArtistToText('[Intro]'), tooltip: getTranslation('btn_intro_tooltip'), shortcut: '4' },
                     { label: getTranslation('btn_verse_unique'), getText: () => addArtistToText('[Couplet unique]'), tooltip: getTranslation('btn_verse_unique_tooltip') },
@@ -5320,7 +5385,7 @@ function initLyricsEditorEnhancer() {
 
         const plusButton = {
             label: '+',
-            title: 'Ajouter bouton cleanup',
+            title: getTranslation('btn_add_custom_cleanup_title'),
             isPlusButton: true,
             managerType: 'cleanup'
         };
@@ -5673,17 +5738,17 @@ function initLyricsEditorEnhancer() {
 
                 const optionFR = document.createElement('option');
                 optionFR.value = 'fr';
-                optionFR.textContent = '🇫🇷 FR';
+                optionFR.textContent = 'FR';
                 transcriptionModeSelect.appendChild(optionFR);
 
                 const optionEN = document.createElement('option');
                 optionEN.value = 'en';
-                optionEN.textContent = '🇬🇧 EN';
+                optionEN.textContent = 'EN';
                 transcriptionModeSelect.appendChild(optionEN);
 
                 const optionPL = document.createElement('option');
                 optionPL.value = 'pl';
-                optionPL.textContent = '🇵🇱 PL';
+                optionPL.textContent = 'PL';
                 transcriptionModeSelect.appendChild(optionPL);
 
                 // Définit la valeur actuelle
@@ -5894,6 +5959,7 @@ function initLyricsEditorEnhancer() {
 
                     // Ajoute le tooltip si défini
                     if (config.tooltip) {
+                        button.title = config.tooltip; // Fallback natif
                         addTooltip(button, config.tooltip);
                     }
                     // Ajoute l'écouteur d'événement principal qui déclenche l'action du bouton.
@@ -6306,6 +6372,10 @@ function initLyricsEditorEnhancer() {
                                 if (mainLabel) mainLabel.textContent = coupletManagerConfig.main.getLabel();
                             }
                         };
+                        if (coupletManagerConfig.prev.tooltip) {
+                            prevBtn.title = coupletManagerConfig.prev.tooltip;
+                            addTooltip(prevBtn, coupletManagerConfig.prev.tooltip);
+                        }
                         coupletControl.appendChild(prevBtn);
 
                         // Label Central (Bouton principal qui insère)
@@ -6324,6 +6394,10 @@ function initLyricsEditorEnhancer() {
                             const mainLabel = document.getElementById(COUPLET_BUTTON_ID);
                             if (mainLabel) mainLabel.textContent = coupletManagerConfig.main.getLabel();
                         };
+                        if (coupletManagerConfig.next.tooltip) {
+                            nextBtn.title = coupletManagerConfig.next.tooltip;
+                            addTooltip(nextBtn, coupletManagerConfig.next.tooltip);
+                        }
                         coupletControl.appendChild(nextBtn);
 
                         structuralButtonsContainer.appendChild(coupletControl);
@@ -8273,6 +8347,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     else if (request.action === "SET_LANGUAGE") {
         localStorage.setItem('gftLanguage', request.language);
+        // Synchroniser le mode de transcription avec la langue choisie
+        if (typeof setTranscriptionMode === 'function') {
+            setTranscriptionMode(request.language);
+        }
         sendResponse({ success: true });
         window.location.reload();
     }
