@@ -1,6 +1,6 @@
 // content.js (Version 3.0.1 - Extension Complète)
 /**
- * @file Fichier principal de l'extension "Genius Fast Transcriber" v3.0.1.
+ * @file Fichier principal de l'extension "Genius Fast Transcriber" v3.1.0.
  * Ce script s'injecte dans les pages du site genius.com.
  * Il détecte la présence de l'éditeur de paroles et y ajoute un panneau d'outils
  * pour accélérer et fiabiliser la transcription (ajout de tags, correction de texte, etc.).
@@ -20,10 +20,10 @@
  * - Création de Lyric Cards avec formatage et partage
  * 
  * @author Lnkhey
- * @version 3.0.1
+ * @version 3.1.0
  */
 
-console.log('Genius Fast Transcriber (by Lnkhey) v3.0.1 - Toutes fonctionnalités activées ! 🎵');
+console.log('Genius Fast Transcriber (by Lnkhey) v3.1.0 - Toutes fonctionnalités activées ! 🎵');
 
 // ----- Injection des animations CSS essentielles -----
 // Injecte l'animation de surlignage pour s'assurer qu'elle fonctionne même si les styles CSS de Genius l'écrasent
@@ -33,18 +33,29 @@ console.log('Genius Fast Transcriber (by Lnkhey) v3.0.1 - Toutes fonctionnalité
         style.id = 'gft-critical-animations';
         style.textContent = `
             @keyframes lyrics-helper-fadeout {
-                0% {
-                    background-color: #f9ff55;
-                    opacity: 0.8;
-                }
-                70% {
-                    background-color: #f9ff55;
-                    opacity: 0.5;
-                }
-                100% {
-                    background-color: transparent;
-                    opacity: 1;
-                }
+                0% { background-color: #f9ff55; opacity: 0.8; }
+                70% { background-color: #f9ff55; opacity: 0.5; }
+                100% { background-color: transparent; opacity: 1; }
+            }
+            .gft-shortcut-feedback {
+                animation: gft-button-glow 0.3s ease-out;
+            }
+            @keyframes gft-button-glow {
+                0% { box-shadow: 0 0 0 0 rgba(249, 255, 85, 0.7); transform: scale(1); }
+                50% { box-shadow: 0 0 20px 10px rgba(249, 255, 85, 0); transform: scale(1.05); }
+                100% { box-shadow: 0 0 0 0 rgba(249, 255, 85, 0); transform: scale(1); }
+            }
+            .gft-autosave-indicator {
+                font-size: 16px; margin-left: 10px;
+                opacity: 0.2; transition: opacity 0.3s ease;
+                cursor: default;
+            }
+            .gft-autosave-flash {
+                animation: gft-save-flash 1s ease-out;
+            }
+            @keyframes gft-save-flash {
+                0% { opacity: 1; transform: scale(1.3); }
+                100% { opacity: 0.2; transform: scale(1); }
             }
         `;
         document.head.appendChild(style);
@@ -343,6 +354,8 @@ const TRANSLATIONS = {
         preview_stat_dash: "tirets longs",
         preview_stat_spaces: "doubles espaces",
         preview_stat_spacing: "espacements",
+        preview_stat_orphans: "orphelins",
+        preview_opt_orphans: "Orphelins (Prépositions)",
         // Draft notification
         draft_found_title: "Brouillon trouvé !",
         draft_saved_at: "Sauvegardé à",
@@ -382,6 +395,7 @@ const TRANSLATIONS = {
         feedback_detail_dash: "{count} tirets",
         feedback_detail_spaces: "{count} doubles espaces",
         feedback_detail_spacing: "{count} espacement(s)",
+        feedback_detail_orphans: "{count} orphelin|{count} orphelins",
         feedback_wrapped: "Texte entouré : {start}...{end}",
         feedback_corrections_cancelled: "Corrections annulées",
         // Stats
@@ -396,6 +410,16 @@ const TRANSLATIONS = {
         preview_stat_dash: "tiret(s) long(s)",
         preview_stat_spaces: "double(s) espace(s)",
         preview_stat_spacing: "espacement(s) de ligne",
+        preview_stat_orphans: "orphelins",
+        preview_opt_orphans: "Orphelins (Prépositions Polonaises)",
+        feedback_replaced: "{count} occurrence(s) de \"{item}\" remplacée(s)",
+        feedback_no_replacement: "Aucune occurrence trouvée.",
+        find_replace_title: "Rechercher & Remplacer",
+        find_placeholder: "Rechercher...",
+        replace_placeholder: "Remplacer par...",
+        btn_replace: "Remplacer",
+        btn_replace_all: "Tout Remplacer",
+        regex_toggle: "Regex",
     },
     en: {
         panel_title: "Genius Fast Transcriber",
@@ -484,6 +508,9 @@ const TRANSLATIONS = {
         btn_skit_tooltip: "Insert [Skit] tag",
         btn_vocalization: "[Vocalization]",
         btn_vocalization_tooltip: "Insert [Vocalization] tag",
+        btn_adlib_label: "(Ad-lib)",
+        btn_orphans_label: "Orphans cleanup",
+        cleanup_orphans_tooltip: "Prevents hanging single-letter words at the end of lines",
         btn_zws_remove: "Remove ZWS",
         btn_zws_remove_tooltip: "Remove invisible characters (Zero Width Space)",
         // Cleanup Tools - English descriptions
@@ -625,6 +652,17 @@ const TRANSLATIONS = {
         preview_stat_dash: "long dashes",
         preview_stat_spaces: "double spaces",
         preview_stat_spacing: "spacings",
+        preview_stat_orphans: "orphans",
+        preview_opt_orphans: "Orphans (Polish rules)",
+        feedback_detail_orphans: "{count} orphan|{count} orphans",
+        feedback_replaced: "{count} occurrence(s) of \"{item}\" replaced",
+        feedback_no_replacement: "No occurrences found.",
+        find_replace_title: "Find & Replace",
+        find_placeholder: "Find...",
+        replace_placeholder: "Replace with...",
+        btn_replace: "Replace",
+        btn_replace_all: "Replace All",
+        regex_toggle: "Regex",
         // Button labels (English specific)
         btn_y_label: "y' → y",
         btn_apostrophe_label: "' → '",
@@ -857,6 +895,8 @@ const TRANSLATIONS = {
         btn_duplicate_line_label: "📋 Duplikuj linię",
         cleanup_duplicate_line_tooltip: "Duplikuje bieżącą linię (Ctrl+D)",
         btn_adlib_label: "(Ad-lib)",
+        btn_orphans_label: "Sierotki Typogr.",
+        cleanup_orphans_tooltip: "Łączy spójniki jednoliterowe z następnym słowem twardą spacją",
         cleanup_adlib_tooltip: "Otacza zaznaczony tekst nawiasami",
         cleanup_spacing_tooltip: "Naprawia odstępy między liniami (usuwa zbędne puste linie)",
         btn_capitalize_label: "Wielka litera",
@@ -952,6 +992,7 @@ const TRANSLATIONS = {
         feedback_detail_spacing: "{count} odstęp|{count} odstępy|{count} odstępów",
         feedback_detail_polish_quotes: "{count} polski cudzysłów|{count} polskie cudzysłowy|{count} polskich cudzysłowów",
         feedback_detail_ellipsis: "{count} wielokropek|{count} wielokropki|{count} wielokropków",
+        feedback_detail_orphans: "{count} sierotka|{count} sierotki|{count} sierotek",
         feedback_wrapped: "Otoczono tekst: {start}...{end}",
         feedback_corrections_cancelled: "Anulowano poprawki",
         feedback_select_text_first: "⚠️ Zaznacz najpierw tekst",
@@ -984,19 +1025,29 @@ const TRANSLATIONS = {
         preview_opt_dash: "Myślniki (- → —)",
         preview_opt_spaces: "Podwójne spacje",
         preview_opt_spacing: "Odstępy (linie)",
-        preview_stat_apostrophes: "apostrofów",
-        preview_stat_quotes: "cudzysłowów «»",
-        preview_stat_polish_quotes: "polskich cudzysłowów",
-        preview_stat_dash: "myślników",
-        preview_stat_ellipsis: "wielokropków",
-        preview_stat_spaces: "podwójnych spacji",
-        preview_stat_spacing: "odstępów",
+        preview_stat_apostrophes: "apostrofu|apostrofów|apostrofów",
+        preview_stat_quotes: "francuskiego cudzysłowu («»)|francuskich cudzysłowów («»)|francuskich cudzysłowów («»)",
+        preview_stat_polish_quotes: "polskiego cudzysłowu („”)|polskich cudzysłowów („”)|polskich cudzysłowów („”)",
+        preview_stat_dash: "myślnika|myślników|myślników",
+        preview_stat_ellipsis: "wielokropka|wielokropków|wielokropków",
+        preview_stat_spaces: "podwójnej spacji|podwójnych spacji|podwójnych spacji",
+        preview_stat_spacing: "odstępu|odstępów|odstępów",
+        preview_stat_orphans: "sierotki|sierotek|sierotek",
+        preview_opt_orphans: "Sierotki (spójniki)",
         // Draft notification
         draft_found_title: "Znaleziono wersję roboczą!",
         draft_saved_at: "Zapisano o",
         draft_btn_restore: "Przywróć",
         draft_btn_discard: "Odrzuć",
         draft_restored: "Pomyślnie przywrócono wersję roboczą!",
+        feedback_replaced: "{count} wystąpień \"{item}\" zostało zamienionych",
+        feedback_no_replacement: "Nie znaleziono żadnych wystąpień.",
+        find_replace_title: "Znajdź i zamień",
+        find_placeholder: "Szukaj...",
+        replace_placeholder: "Zamień na...",
+        btn_replace: "Zamień",
+        btn_replace_all: "Zamień wszystko",
+        regex_toggle: "Regex",
         // Progress steps - Polish specific corrections
         progress_step_polish_quotes: "Poprawianie polskich cudzysłowów (\u201E\u201D)…",
         progress_step_apostrophes: "Poprawianie apostrofów…",
@@ -2839,6 +2890,7 @@ function saveDraft(content) {
 
     try {
         localStorage.setItem(key, JSON.stringify(draftData));
+        visualFeedbackAutoSave();
         // console.log('[GFT] Brouillon sauvegardé', new Date().toLocaleTimeString());
     } catch (e) {
         console.warn('[GFT] Erreur sauvegarde brouillon:', e);
@@ -4406,24 +4458,121 @@ function handleKeyboardShortcut(event) {
         case 'intro':
         case 'outro':
             insertTagViaShortcut(action);
+            visualFeedback(action);
             break;
         case 'toutCorriger':
             triggerToutCorrigerViaShortcut();
+            visualFeedback('fix-all');
             break;
         case 'undo':
             undoLastChange();
+            visualFeedback('undo');
             break;
         case 'redo':
             redoLastChange();
+            visualFeedback('redo');
             break;
         case 'toggleStats':
             toggleStatsDisplay();
+            // Pas forcement de feedback visuel bouton car menu possiblement fermé
             break;
         case 'togglePlay':
         case 'rewind':
         case 'forward':
             controlYoutubePlayer(action);
             break;
+    }
+}
+
+/**
+ * Fournit un retour visuel quand un raccourci est utilisé.
+ * @param {string} action - L'identifiant de l'action ou du bouton.
+ */
+function visualFeedback(action) {
+    let btn = null;
+    if (action === 'couplet' || action === 'refrain' || action === 'pont' || action === 'intro' || action === 'outro') {
+        // Trouve le bouton correspondant dans le panneau
+        const buttons = document.querySelectorAll('.genius-lyrics-shortcut-button');
+        for (const b of buttons) {
+            if (b.textContent.toLowerCase().includes(action.toLowerCase())) {
+                btn = b;
+                break;
+            }
+        }
+    } else if (action === 'fix-all') {
+        btn = document.querySelector('.gft-btn-main-action'); // Le premier est souvent Fix All
+    } else if (action === 'undo') {
+        btn = document.getElementById('gft-undo-btn');
+    } else if (action === 'redo') {
+        btn = document.getElementById('gft-redo-btn');
+    }
+
+    if (btn) {
+        btn.classList.add('gft-shortcut-feedback');
+        setTimeout(() => btn.classList.remove('gft-shortcut-feedback'), 300);
+    }
+}
+
+/**
+ * Fournit un retour visuel lors de la sauvegarde du brouillon.
+ */
+function visualFeedbackAutoSave() {
+    const indicator = document.getElementById('gft-autosave-dot');
+    if (indicator) {
+        indicator.classList.add('gft-autosave-flash');
+        setTimeout(() => indicator.classList.remove('gft-autosave-flash'), 1000);
+    }
+}
+
+/**
+ * Applique une recherche et remplacement sur le texte de l'éditeur.
+ * @param {string} findText - Le texte ou pattern à rechercher.
+ * @param {string} replaceText - Le texte de remplacement.
+ * @param {boolean} isRegex - Si vrai, traite findText comme une expression régulière.
+ * @param {boolean} replaceAll - Si vrai, remplace toutes les occurrences.
+ */
+function applySearchReplace(findText, replaceText, isRegex, replaceAll) {
+    if (!findText) {
+        showFeedbackMessage(getTranslation('feedback_select_text_first') || 'Enter text to find');
+        return;
+    }
+
+    if (!currentActiveEditor) return;
+
+    saveToHistory();
+
+    const currentText = getCurrentEditorContent();
+    let newText = '';
+    let count = 0;
+
+    try {
+        let pattern;
+        if (isRegex) {
+            pattern = new RegExp(findText, replaceAll ? 'g' : '');
+        } else {
+            // Escape special chars for literal search
+            const escaped = findText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            pattern = new RegExp(escaped, replaceAll ? 'g' : '');
+        }
+
+        if (replaceAll) {
+            const matches = currentText.match(pattern);
+            count = matches ? matches.length : 0;
+            newText = currentText.replace(pattern, replaceText);
+        } else {
+            newText = currentText.replace(pattern, replaceText);
+            count = newText !== currentText ? 1 : 0;
+        }
+
+        if (count > 0) {
+            setEditorContent(newText);
+            showFeedbackMessage(getTranslation('feedback_replaced').replace('{count}', count).replace('{item}', findText));
+        } else {
+            showFeedbackMessage(getTranslation('feedback_no_replacement'));
+        }
+    } catch (e) {
+        console.error('Find/Replace Error:', e);
+        showFeedbackMessage('Error: ' + e.message);
     }
 }
 
@@ -5481,6 +5630,15 @@ function initLyricsEditorEnhancer() {
                     highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
                     tooltip: getTranslation('cleanup_ellipsis_tooltip'),
                     feedbackKey: 'preview_stat_ellipsis'
+                },
+                {
+                    label: getTranslation('btn_orphans_label'),
+                    action: 'replaceText',
+                    searchPattern: /\b([WwZzOoUuIiAa])\s+/g,
+                    replacementText: "$1\u00A0",
+                    highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+                    tooltip: getTranslation('cleanup_orphans_tooltip'),
+                    feedbackKey: 'preview_stat_orphans'
                 }
             ];
 
@@ -5677,7 +5835,9 @@ function initLyricsEditorEnhancer() {
                 shortcutsContainerElement = document.createElement('div');
                 shortcutsContainerElement.id = SHORTCUTS_CONTAINER_ID;
 
+
                 // Crée le titre du panneau, le logo et le bouton de mode sombre.
+                const isDarkMode = localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true';
                 const panelTitle = document.createElement('div');
                 panelTitle.id = 'gftPanelTitle';
 
@@ -5728,6 +5888,14 @@ function initLyricsEditorEnhancer() {
 
                 clickableTitleArea.addEventListener('click', togglePanel);
                 panelTitle.appendChild(clickableTitleArea);
+
+                const saveIndicator = document.createElement('span');
+                saveIndicator.id = 'gft-autosave-dot';
+                saveIndicator.className = 'gft-autosave-indicator';
+                saveIndicator.textContent = '💾'; // Icône Disquette
+                saveIndicator.title = getTranslation('draft_saved_at') || 'Draft saved';
+                panelTitle.appendChild(saveIndicator);
+
                 addTooltip(clickableTitleArea, 'Cliquer pour replier/déplier');
 
                 // Sélecteur de mode de transcription (FR/EN/PL)
@@ -5959,8 +6127,14 @@ function initLyricsEditorEnhancer() {
 
                     // Ajoute le tooltip si défini
                     if (config.tooltip) {
-                        button.title = config.tooltip; // Fallback natif
-                        addTooltip(button, config.tooltip);
+                        let tooltipText = config.tooltip;
+                        // Ajoute le raccourci formaté si présent
+                        if (config.shortcut) {
+                            const formattedShortcut = config.shortcut.length === 1 ? `[Ctrl+${config.shortcut}]` : `[${config.shortcut}]`;
+                            tooltipText += ` ${formattedShortcut}`;
+                        }
+                        button.title = tooltipText; // Fallback natif
+                        addTooltip(button, tooltipText);
                     }
                     // Ajoute l'écouteur d'événement principal qui déclenche l'action du bouton.
                     button.addEventListener('click', (event) => {
@@ -6433,12 +6607,65 @@ function initLyricsEditorEnhancer() {
                 utilityContainer.style.flexWrap = 'wrap';
                 utilityContainer.style.gap = '6px'; // Un peu plus d'espace
 
+                // Fonction helper pour créer le bouton Toggle
+                const createToggleBtn = () => {
+                    const toggleBtn = createButton({
+                        label: '🔍 ' + (getTranslation('find_replace_title') || 'Find & Replace'),
+                        tooltip: getTranslation('find_replace_title'),
+                    }, utilityContainer);
+                    toggleBtn.classList.add('gft-btn-utility');
+                    toggleBtn.style.padding = '0 6px';
+                    toggleBtn.style.minWidth = 'auto'; // Ajustement largeur
+                    // Hauteur auto pour matcher les autres boutons (pas de height forcée)
+                    toggleBtn.style.display = 'inline-flex';
+                    toggleBtn.style.alignItems = 'center';
+                    toggleBtn.style.justifyContent = 'center';
+
+                    toggleBtn.onclick = (e) => {
+                        e.preventDefault();
+                        const isClosed = findReplaceContainer.style.maxHeight === '0px' || findReplaceContainer.style.maxHeight === '0';
+                        if (isClosed) {
+                            findReplaceContainer.style.visibility = 'visible';
+                            findReplaceContainer.style.maxHeight = '300px';
+                            findReplaceContainer.style.opacity = '1';
+                            findReplaceContainer.style.marginTop = '12px';
+                            findReplaceContainer.style.padding = '12px';
+                            toggleBtn.classList.add('active');
+                        } else {
+                            findReplaceContainer.style.maxHeight = '0';
+                            findReplaceContainer.style.opacity = '0';
+                            findReplaceContainer.style.marginTop = '0';
+                            findReplaceContainer.style.padding = '0';
+                            setTimeout(() => {
+                                if (findReplaceContainer.style.maxHeight === '0px' || findReplaceContainer.style.maxHeight === '0') {
+                                    findReplaceContainer.style.visibility = 'hidden';
+                                }
+                            }, 300);
+                            toggleBtn.classList.remove('active');
+                        }
+                    };
+                    return toggleBtn;
+                };
+
+                let toggleFindReplaceBtn = null;
+
                 if (SHORTCUTS.TEXT_CLEANUP && SHORTCUTS.TEXT_CLEANUP.length > 0) {
                     SHORTCUTS.TEXT_CLEANUP.forEach(s => {
+                        // Si c'est le bouton PLUS, on insère le bouton Toggle AVANT
+                        if (s.isPlusButton && !toggleFindReplaceBtn) {
+                            toggleFindReplaceBtn = createToggleBtn();
+                        }
+
                         const btn = createButton(s, utilityContainer);
 
                         // Uniformisation du style pour tous les boutons de nettoyage
                         btn.classList.add('gft-btn-utility');
+                        // On enlève height fixe pour laisser le CSS gérer (comme les boutons structure)
+                        // On ajuste juste le padding pour que ce soit compact
+                        btn.style.padding = '2px 6px';
+                        btn.style.display = 'inline-flex';
+                        btn.style.alignItems = 'center';
+                        btn.style.justifyContent = 'center';
 
                         // Raccourcir les labels si défini dans la config (via shortLabel)
                         if (s.shortLabel) {
@@ -6447,11 +6674,97 @@ function initLyricsEditorEnhancer() {
                             // Nettoyage cosmétique par défaut pour les flèches
                             btn.textContent = s.label.replace(' → ', '→');
                         }
-
-                        // Ajouter une tooltip si elle n'existe pas déjà (déjà géré par createButton via s.tooltip, mais on s'assure que le bouton reste compréhensible)
                     });
+
+                    // Fallback: si pas de bouton plus (bug?), on l'ajoute à la fin
+                    if (!toggleFindReplaceBtn) {
+                        toggleFindReplaceBtn = createToggleBtn();
+                    }
                 }
+
                 toolsSection.appendChild(utilityContainer);
+
+                // --- FIND & REPLACE TOOL ---
+                const findReplaceContainer = document.createElement('div');
+                findReplaceContainer.className = 'gft-find-replace-container';
+                // Styles de base pour la transition et le look
+                findReplaceContainer.style.background = isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)';
+                findReplaceContainer.style.borderRadius = '10px';
+                findReplaceContainer.style.border = isDarkMode ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(0,0,0,0.1)';
+                findReplaceContainer.style.overflow = 'hidden';
+                findReplaceContainer.style.transition = 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                findReplaceContainer.style.width = '100%'; // Force la largeur totale
+                findReplaceContainer.style.boxSizing = 'border-box'; // Inclut padding/border dans la largeur
+
+                // État initial (fermé)
+                findReplaceContainer.style.maxHeight = '0';
+                findReplaceContainer.style.opacity = '0';
+                findReplaceContainer.style.marginTop = '0';
+                findReplaceContainer.style.padding = '0';
+                findReplaceContainer.style.visibility = 'hidden';
+
+                // Toujours en display: flex pour que la layout se calcule, mais caché par visibility/opacity
+                findReplaceContainer.style.display = 'flex';
+                findReplaceContainer.style.flexDirection = 'column';
+                findReplaceContainer.style.gap = '8px';
+
+
+
+                const inputsRow = document.createElement('div');
+                inputsRow.style.display = 'flex';
+                inputsRow.style.gap = '8px';
+
+                const findInput = document.createElement('input');
+                findInput.type = 'text';
+                findInput.placeholder = getTranslation('find_placeholder');
+                findInput.className = 'gft-input-small';
+                findInput.style.flex = '1';
+                findInput.style.padding = '6px 8px';
+                findInput.style.borderRadius = '6px';
+                findInput.style.border = '1px solid ' + (isDarkMode ? 'rgba(255,255,255,0.2)' : '#ccc');
+
+                const replaceInput = document.createElement('input');
+                replaceInput.type = 'text';
+                replaceInput.placeholder = getTranslation('replace_placeholder');
+                replaceInput.className = 'gft-input-small';
+                replaceInput.style.flex = '1';
+                replaceInput.style.padding = '6px 8px';
+                replaceInput.style.borderRadius = '6px';
+                replaceInput.style.border = '1px solid ' + (isDarkMode ? 'rgba(255,255,255,0.2)' : '#ccc');
+
+                inputsRow.appendChild(findInput);
+                inputsRow.appendChild(replaceInput);
+                findReplaceContainer.appendChild(inputsRow);
+
+                const controlsRow = document.createElement('div');
+                controlsRow.style.display = 'flex';
+                controlsRow.style.justifyContent = 'space-between';
+                controlsRow.style.alignItems = 'center';
+
+                const regexLabel = document.createElement('label');
+                regexLabel.style.fontSize = '12px';
+                regexLabel.style.display = 'flex';
+                regexLabel.style.alignItems = 'center';
+                regexLabel.style.gap = '6px';
+                regexLabel.style.cursor = 'pointer';
+                const regexCheck = document.createElement('input');
+                regexCheck.type = 'checkbox';
+                regexLabel.appendChild(regexCheck);
+                regexLabel.appendChild(document.createTextNode(getTranslation('regex_toggle')));
+                controlsRow.appendChild(regexLabel);
+
+                const replaceAllBtn = document.createElement('button');
+                replaceAllBtn.textContent = getTranslation('btn_replace_all');
+                replaceAllBtn.className = 'gft-btn-small gft-btn-primary';
+                replaceAllBtn.style.padding = '6px 12px';
+                replaceAllBtn.style.borderRadius = '6px';
+                replaceAllBtn.onclick = () => applySearchReplace(findInput.value, replaceInput.value, regexCheck.checked, true);
+
+                controlsRow.appendChild(replaceAllBtn);
+
+                findReplaceContainer.appendChild(controlsRow);
+                toolsSection.appendChild(findReplaceContainer);
+
                 buttonGroupsContainer.appendChild(toolsSection);
 
 
@@ -6572,8 +6885,8 @@ function initLyricsEditorEnhancer() {
 
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v3.0.1'; // Bump version visuelle pour le user
-                versionLabel.title = 'Genius Fast Transcriber v3.0.1 - Nouvelle Interface Premium';
+                versionLabel.textContent = 'v3.1.0'; // Bump version visuelle pour le user
+                versionLabel.title = 'Genius Fast Transcriber v3.1.0 - Nouvelle Interface Premium';
 
                 footerContainer.appendChild(creditLabel);
                 footerContainer.appendChild(versionLabel);

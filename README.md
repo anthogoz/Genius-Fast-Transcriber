@@ -1,6 +1,6 @@
 # 🎵 Genius Fast Transcriber + Lyric Card Maker
 
-![Version](https://img.shields.io/badge/version-3.0.1-blue.svg?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-3.1.0-blue.svg?style=for-the-badge)
 ![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-green.svg?style=for-the-badge&logo=google-chrome)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg?style=for-the-badge)
 
@@ -100,6 +100,24 @@ Transform your editing experience with a suite of professional tools, a modern i
     *   "Load unpacked" and select the folder.
 
 ---
+
+## 🆕 What's New in v3.1.0
+
+- 🇵🇱 **Polish Language Support**: Full support for Genius Polska guidelines!
+    - **UI Translation**: Interface fully localized in Polish.
+    - **Smart Tags**: `[Zwrotka]`, `[Refren]`, `[Przyśpiewka]`, etc. with correct variations.
+    - **Specific Cleanups**: Polish quotes `„”` and Em-dashes `-` → `—`.
+- 🔍 **Find & Replace Tool**:
+    - A powerful new tool integrated directly into the panel.
+    - **Regex Support**: toggleable regex mode for advanced users.
+    - **Collapsible UI**: Keeps the panel clean when not in use.
+- 🎨 **UI Overhaul**:
+    - **Transitions**: Smooth animations for opening/closing sections.
+    - **Improved Layout**: Better button placement and consistent sizing.
+    - **Auto-save Indicator**: Clearer `💾` icon pulsation when drafts are saved.
+- 🛠️ **Fixes & Optimizations**:
+    - Enhanced tooltip visibility.
+    - Improved formatting for multi-line replacements.
 
 ## 🆕 What's New in v3.0.1
 

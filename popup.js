@@ -18,22 +18,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Language
-        const disclaimer = document.getElementById('english-disclaimer');
-        // Reset all language buttons
         langFrOption.classList.remove('active');
         langEnOption.classList.remove('active');
         langPlOption.classList.remove('active');
 
         if (state.language === 'en') {
             langEnOption.classList.add('active');
-            if (disclaimer) disclaimer.style.display = 'block';
         } else if (state.language === 'pl') {
             langPlOption.classList.add('active');
-            if (disclaimer) disclaimer.style.display = 'none';
         } else {
             // Default FR
             langFrOption.classList.add('active');
-            if (disclaimer) disclaimer.style.display = 'none';
         }
     }
 
