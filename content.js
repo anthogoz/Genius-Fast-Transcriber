@@ -4385,11 +4385,7 @@
                 const newMode = e.target.value;
                 setTranscriptionMode(newMode);
                 localStorage.setItem("gftLanguage", newMode);
-                if (shortcutsContainerElement) {
-                  shortcutsContainerElement.remove();
-                  shortcutsContainerElement = null;
-                }
-                setTimeout(() => initLyricsEditorEnhancer(), 100);
+                window.location.reload();
               });
               panelTitle.appendChild(transcriptionModeSelect);
               addTooltip(transcriptionModeSelect, getTranslation("lang_select_title") || "Change transcription mode");

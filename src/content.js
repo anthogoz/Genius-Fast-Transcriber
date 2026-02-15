@@ -5913,13 +5913,8 @@ function initLyricsEditorEnhancer() {
                     setTranscriptionMode(newMode);
                     // Synchronise aussi la langue d'interface pour que les traductions soient cohérentes
                     localStorage.setItem('gftLanguage', newMode);
-                    // Recharge le panneau pour appliquer les changements
-                    if (shortcutsContainerElement) {
-                        shortcutsContainerElement.remove();
-                        shortcutsContainerElement = null;
-                    }
-                    // Force la réinitialisation
-                    setTimeout(() => initLyricsEditorEnhancer(), 100);
+                    // Recharge la page pour appliquer les changements
+                    window.location.reload();
                 });
 
                 panelTitle.appendChild(transcriptionModeSelect);
