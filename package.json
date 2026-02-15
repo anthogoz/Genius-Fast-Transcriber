@@ -1,0 +1,34 @@
+{
+  "name": "genius-fast-transcriber",
+  "version": "4.0.0",
+  "description": "The ultimate tool for Genius.com contributors — smart tags, auto-corrections, and Lyric Card creation.",
+  "scripts": {
+    "build": "node esbuild.config.js",
+    "watch": "node esbuild.config.js --watch",
+    "package:chrome": "node scripts/build-chrome-store.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anthogoz/Genius-Fast-Transcriber.git"
+  },
+  "keywords": [
+    "chrome-extension",
+    "genius",
+    "lyrics",
+    "transcription",
+    "genius.com",
+    "lyric-card",
+    "esbuild"
+  ],
+  "author": "Lnkhey",
+  "license": "MIT",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/anthogoz/Genius-Fast-Transcriber/issues"
+  },
+  "homepage": "https://github.com/anthogoz/Genius-Fast-Transcriber#readme",
+  "devDependencies": {
+    "esbuild": "^0.27.3"
+  }
+}

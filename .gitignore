@@ -1,0 +1,50 @@
+# Dependencies
+node_modules/
+
+# Build outputs (optional - some prefer to commit compiled code)
+# Uncomment if you want Git to ignore the compiled file:
+# content.js
+
+# Chrome Web Store builds
+*.zip
+Genius Fast Transcriber v*.zip
+.temp-chrome-package/
+
+# Backups
+*.backup
+*.bak
+*.pre-*
+content.original.js
+
+# Development/Test files
+content-poc.js
+test-output.js
+*-test.js
+*-old.js
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+.cache/
+
+# Optional: lock files (decide based on your preference)
+# Some teams commit lock files, some don't
+# package-lock.json
+# yarn.lock

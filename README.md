@@ -3,9 +3,13 @@
 ![Version](https://img.shields.io/badge/version-3.1.0-blue.svg?style=for-the-badge)
 ![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-green.svg?style=for-the-badge&logo=google-chrome)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg?style=for-the-badge)
+![Build](https://img.shields.io/badge/build-esbuild-yellow.svg?style=for-the-badge)
 
 **The ultimate tool for transcribers on Genius.com.**
 Transform your editing experience with a suite of professional tools, a modern interface, smart automations, and full customization.
+
+> **🔧 Developers:** This extension now uses a modular build system with **esbuild**!  
+> See [MODULARIZATION_COMPLETE.md](./MODULARIZATION_COMPLETE.md) for details.
 
 ---
 
