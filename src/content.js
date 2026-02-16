@@ -5089,23 +5089,35 @@ function renderLyricCardToCanvas(canvas, text, artistName, songTitle, imageObj, 
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
 
-    // 1. Dessine le fond (Image zoomée pour remplir)
-    const imgRatio = imageObj.width / imageObj.height;
-    const canvasRatio = WIDTH / HEIGHT;
-    let renderWidth, renderHeight, offsetX, offsetY;
+    // 1. Dessine le fond (Image zoomée pour remplir ou couleur solide)
+    if (imageObj && imageObj.width > 0) {
+        try {
+            const imgRatio = imageObj.width / imageObj.height;
+            const canvasRatio = WIDTH / HEIGHT;
+            let renderWidth, renderHeight, offsetX, offsetY;
 
-    if (imgRatio > canvasRatio) {
-        renderHeight = HEIGHT;
-        renderWidth = imageObj.width * (HEIGHT / imageObj.height);
-        offsetX = (WIDTH - renderWidth) / 2;
-        offsetY = 0;
+            if (imgRatio > canvasRatio) {
+                renderHeight = HEIGHT;
+                renderWidth = imageObj.width * (HEIGHT / imageObj.height);
+                offsetX = (WIDTH - renderWidth) / 2;
+                offsetY = 0;
+            } else {
+                renderWidth = WIDTH;
+                renderHeight = imageObj.height * (WIDTH / imageObj.width);
+                offsetX = 0;
+                offsetY = (HEIGHT - renderHeight) / 2;
+            }
+            ctx.drawImage(imageObj, offsetX, offsetY, renderWidth, renderHeight);
+        } catch (e) {
+            console.warn("[GFT] Failed to draw image on canvas (CORS?):", e);
+            ctx.fillStyle = footerColor || '#000';
+            ctx.fillRect(0, 0, WIDTH, HEIGHT);
+        }
     } else {
-        renderWidth = WIDTH;
-        renderHeight = imageObj.height * (WIDTH / imageObj.width);
-        offsetX = 0;
-        offsetY = (HEIGHT - renderHeight) / 2;
+        // Fallback fond plein si pas d'image
+        ctx.fillStyle = footerColor || '#000';
+        ctx.fillRect(0, 0, WIDTH, HEIGHT);
     }
-    ctx.drawImage(imageObj, offsetX, offsetY, renderWidth, renderHeight);
 
     // 2. Dessine le Footer
     ctx.fillStyle = footerColor;
@@ -5562,30 +5574,58 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
     document.body.appendChild(overlay);
 
     const updateCard = (imageUrl, displayArtistName) => {
-        const img = new Image();
+        // Force un premier rendu "vide" (fond noir) pour éviter l'écran blanc si c'est le premier chargement
+        if (!canvas.renderedOnce) {
+            renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, null, '#111', 'white', null, currentFormat);
+            canvas.renderedOnce = true;
+        }
 
-        // Gestion spéciale pour Data URL (Upload) vs URL distante
+        const img = new Image();
+        let isTimedOut = false;
+
+        // Sécurité chargement long
+        const timeout = setTimeout(() => {
+            isTimedOut = true;
+            console.warn("[GFT] Image load timeout. Rendering with fallback color.");
+            renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, null, '#111', 'white', null, currentFormat);
+        }, 4000);
+
         if (imageUrl.startsWith('data:')) {
             img.src = imageUrl;
         } else {
             img.crossOrigin = "Anonymous";
+            // On ajoute un timestamp pour éviter le cache navigateur agressif qui pourrait ignorer les headers CORS
             const separator = imageUrl.includes('?') ? '&' : '?';
             img.src = `${imageUrl}${separator}t=${Date.now()}`;
         }
 
         img.onload = () => {
+            if (isTimedOut) return;
+            clearTimeout(timeout);
+
             const dominantColor = getDominantColor(img);
             const contrastColor = getContrastColor(dominantColor);
-            const logoUrl = chrome.runtime.getURL(contrastColor === 'white' ? 'images/geniuslogowhite.png' : 'images/geniuslogoblack.png');
+
+            // Charge le logo de manière asynchrone aussi
             const logoImg = new Image();
+            const logoUrl = chrome.runtime.getURL(contrastColor === 'white' ? 'images/geniuslogowhite.png' : 'images/geniuslogoblack.png');
             logoImg.src = logoUrl;
 
-            logoImg.onload = () => renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, img, dominantColor, contrastColor, logoImg, currentFormat);
-            logoImg.onerror = () => renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, img, dominantColor, contrastColor, null, currentFormat);
+            logoImg.onload = () => {
+                renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, img, dominantColor, contrastColor, logoImg, currentFormat);
+            };
+            logoImg.onerror = () => {
+                renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, img, dominantColor, contrastColor, null, currentFormat);
+            };
         };
+
         img.onerror = (e) => {
-            console.error("Image load fail", e);
-            showFeedbackMessage(getTranslation('lc_feedback_load_error'));
+            if (isTimedOut) return;
+            clearTimeout(timeout);
+            console.error("[GFT] Main image load error:", imageUrl, e);
+            // On fait quand même le rendu avec un fond par défaut
+            renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, null, '#111', 'white', null, currentFormat);
+            showFeedbackMessage(getTranslation('lc_feedback_load_error'), 3000);
         };
     };
 
@@ -5894,28 +5934,33 @@ async function searchArtistCandidates(query) {
  * Version simplifiée : moyenne des pixels du centre.
  */
 function getDominantColor(img) {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = 100;
-    canvas.height = 100;
-    ctx.drawImage(img, 0, 0, 100, 100);
+    try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = 100;
+        canvas.height = 100;
+        ctx.drawImage(img, 0, 0, 100, 100);
 
-    const imageData = ctx.getImageData(0, 0, 100, 100);
-    const data = imageData.data;
-    let r = 0, g = 0, b = 0;
+        const imageData = ctx.getImageData(0, 0, 100, 100);
+        const data = imageData.data;
+        let r = 0, g = 0, b = 0;
 
-    for (let i = 0; i < data.length; i += 4) {
-        r += data[i];
-        g += data[i + 1];
-        b += data[i + 2];
+        for (let i = 0; i < data.length; i += 4) {
+            r += data[i];
+            g += data[i + 1];
+            b += data[i + 2];
+        }
+
+        const count = data.length / 4;
+        r = Math.floor(r / count);
+        g = Math.floor(g / count);
+        b = Math.floor(b / count);
+
+        return `rgb(${r},${g},${b})`;
+    } catch (e) {
+        console.warn("[GFT] Dominant color detection failed (probably CORS). Defaulting to black.", e);
+        return "rgb(0,0,0)";
     }
-
-    const count = data.length / 4;
-    r = Math.floor(r / count);
-    g = Math.floor(g / count);
-    b = Math.floor(b / count);
-
-    return `rgb(${r},${g},${b})`;
 }
 
 /**

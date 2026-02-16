@@ -5469,21 +5469,32 @@
         }
         canvas.width = WIDTH;
         canvas.height = HEIGHT;
-        const imgRatio = imageObj.width / imageObj.height;
-        const canvasRatio = WIDTH / HEIGHT;
-        let renderWidth, renderHeight, offsetX, offsetY;
-        if (imgRatio > canvasRatio) {
-          renderHeight = HEIGHT;
-          renderWidth = imageObj.width * (HEIGHT / imageObj.height);
-          offsetX = (WIDTH - renderWidth) / 2;
-          offsetY = 0;
+        if (imageObj && imageObj.width > 0) {
+          try {
+            const imgRatio = imageObj.width / imageObj.height;
+            const canvasRatio = WIDTH / HEIGHT;
+            let renderWidth, renderHeight, offsetX, offsetY;
+            if (imgRatio > canvasRatio) {
+              renderHeight = HEIGHT;
+              renderWidth = imageObj.width * (HEIGHT / imageObj.height);
+              offsetX = (WIDTH - renderWidth) / 2;
+              offsetY = 0;
+            } else {
+              renderWidth = WIDTH;
+              renderHeight = imageObj.height * (WIDTH / imageObj.width);
+              offsetX = 0;
+              offsetY = (HEIGHT - renderHeight) / 2;
+            }
+            ctx.drawImage(imageObj, offsetX, offsetY, renderWidth, renderHeight);
+          } catch (e) {
+            console.warn("[GFT] Failed to draw image on canvas (CORS?):", e);
+            ctx.fillStyle = footerColor || "#000";
+            ctx.fillRect(0, 0, WIDTH, HEIGHT);
+          }
         } else {
-          renderWidth = WIDTH;
-          renderHeight = imageObj.height * (WIDTH / imageObj.width);
-          offsetX = 0;
-          offsetY = (HEIGHT - renderHeight) / 2;
+          ctx.fillStyle = footerColor || "#000";
+          ctx.fillRect(0, 0, WIDTH, HEIGHT);
         }
-        ctx.drawImage(imageObj, offsetX, offsetY, renderWidth, renderHeight);
         ctx.fillStyle = footerColor;
         ctx.fillRect(0, HEIGHT - FOOTER_HEIGHT, WIDTH, FOOTER_HEIGHT);
         ctx.fillStyle = textColor;
@@ -5823,7 +5834,17 @@ ${window.location.href}
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
         const updateCard = (imageUrl, displayArtistName) => {
+          if (!canvas.renderedOnce) {
+            renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, null, "#111", "white", null, currentFormat);
+            canvas.renderedOnce = true;
+          }
           const img = new Image();
+          let isTimedOut = false;
+          const timeout = setTimeout(() => {
+            isTimedOut = true;
+            console.warn("[GFT] Image load timeout. Rendering with fallback color.");
+            renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, null, "#111", "white", null, currentFormat);
+          }, 4e3);
           if (imageUrl.startsWith("data:")) {
             img.src = imageUrl;
           } else {
@@ -5832,17 +5853,26 @@ ${window.location.href}
             img.src = `${imageUrl}${separator}t=${Date.now()}`;
           }
           img.onload = () => {
+            if (isTimedOut) return;
+            clearTimeout(timeout);
             const dominantColor = getDominantColor(img);
             const contrastColor = getContrastColor(dominantColor);
-            const logoUrl = chrome.runtime.getURL(contrastColor === "white" ? "images/geniuslogowhite.png" : "images/geniuslogoblack.png");
             const logoImg = new Image();
+            const logoUrl = chrome.runtime.getURL(contrastColor === "white" ? "images/geniuslogowhite.png" : "images/geniuslogoblack.png");
             logoImg.src = logoUrl;
-            logoImg.onload = () => renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, img, dominantColor, contrastColor, logoImg, currentFormat);
-            logoImg.onerror = () => renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, img, dominantColor, contrastColor, null, currentFormat);
+            logoImg.onload = () => {
+              renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, img, dominantColor, contrastColor, logoImg, currentFormat);
+            };
+            logoImg.onerror = () => {
+              renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, img, dominantColor, contrastColor, null, currentFormat);
+            };
           };
           img.onerror = (e) => {
-            console.error("Image load fail", e);
-            showFeedbackMessage(getTranslation("lc_feedback_load_error"));
+            if (isTimedOut) return;
+            clearTimeout(timeout);
+            console.error("[GFT] Main image load error:", imageUrl, e);
+            renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, null, "#111", "white", null, currentFormat);
+            showFeedbackMessage(getTranslation("lc_feedback_load_error"), 3e3);
           };
         };
         updateCard(albumUrl, artistName);
@@ -6073,24 +6103,29 @@ ${window.location.href}
         return [];
       }
       function getDominantColor(img) {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        canvas.width = 100;
-        canvas.height = 100;
-        ctx.drawImage(img, 0, 0, 100, 100);
-        const imageData = ctx.getImageData(0, 0, 100, 100);
-        const data = imageData.data;
-        let r = 0, g = 0, b = 0;
-        for (let i = 0; i < data.length; i += 4) {
-          r += data[i];
-          g += data[i + 1];
-          b += data[i + 2];
+        try {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+          canvas.width = 100;
+          canvas.height = 100;
+          ctx.drawImage(img, 0, 0, 100, 100);
+          const imageData = ctx.getImageData(0, 0, 100, 100);
+          const data = imageData.data;
+          let r = 0, g = 0, b = 0;
+          for (let i = 0; i < data.length; i += 4) {
+            r += data[i];
+            g += data[i + 1];
+            b += data[i + 2];
+          }
+          const count = data.length / 4;
+          r = Math.floor(r / count);
+          g = Math.floor(g / count);
+          b = Math.floor(b / count);
+          return `rgb(${r},${g},${b})`;
+        } catch (e) {
+          console.warn("[GFT] Dominant color detection failed (probably CORS). Defaulting to black.", e);
+          return "rgb(0,0,0)";
         }
-        const count = data.length / 4;
-        r = Math.floor(r / count);
-        g = Math.floor(g / count);
-        b = Math.floor(b / count);
-        return `rgb(${r},${g},${b})`;
       }
       function getContrastColor(rgbString) {
         const match = rgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
