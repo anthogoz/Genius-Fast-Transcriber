@@ -2,6 +2,8 @@
 // Includes: isSectionTag, correctLineSpacing, applyTextTransformToDivEditor,
 // applyAllTextCorrectionsToString, applyAllTextCorrectionsAsync
 
+import { getTranslation } from './utils.js';
+
 function isSectionTag(line) {
     const trimmed = line.trim();
 
@@ -394,9 +396,11 @@ function applyAllTextCorrectionsToString(text, options = {}) {
 /**
  * Version asynchrone de applyAllTextCorrectionsToString avec barre de progression.
  * @param {string} text - Le texte d'origine.
+ * @param {Function} [showProgressFn] - Optional callback for progress: showProgressFn(step, total, message)
  * @returns {Promise<{newText: string, correctionsCount: number, corrections: object}>} Le texte corrigé et les détails.
  */
-async function applyAllTextCorrectionsAsync(text) {
+async function applyAllTextCorrectionsAsync(text, showProgressFn) {
+    const showProgress = showProgressFn || (() => { });
     let currentText = text;
     let result;
     const totalSteps = 7;

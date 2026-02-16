@@ -497,4 +497,6 @@ export {
     numberToFrenchWords,
     numberToEnglishWords,
     numberToPolishWords,
+    isValidNumber,
+    extractArtistsFromMetaContent,
 };

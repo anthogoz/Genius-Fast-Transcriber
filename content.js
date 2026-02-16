@@ -1,78 +1,52 @@
 (() => {
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __esm = (fn, res) => function __init() {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  };
   var __commonJS = (cb, mod) => function __require() {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
 
-  // src/content.js
-  var require_content = __commonJS({
-    "src/content.js"() {
-      console.log("Genius Fast Transcriber v4.0.0 \u{1F3B5}");
-      (function injectCriticalStyles() {
-        if (!document.getElementById("gft-critical-animations")) {
-          const style = document.createElement("style");
-          style.id = "gft-critical-animations";
-          style.textContent = `
-            @keyframes lyrics-helper-fadeout {
-                0% { background-color: #f9ff55; opacity: 0.8; }
-                70% { background-color: #f9ff55; opacity: 0.5; }
-                100% { background-color: transparent; opacity: 1; }
-            }
-            .gft-shortcut-feedback {
-                animation: gft-button-glow 0.3s ease-out;
-            }
-            @keyframes gft-button-glow {
-                0% { box-shadow: 0 0 0 0 rgba(249, 255, 85, 0.7); transform: scale(1); }
-                50% { box-shadow: 0 0 20px 10px rgba(249, 255, 85, 0); transform: scale(1.05); }
-                100% { box-shadow: 0 0 0 0 rgba(249, 255, 85, 0); transform: scale(1); }
-            }
-            .gft-autosave-indicator {
-                font-size: 16px; margin-left: 10px;
-                opacity: 0.2; transition: opacity 0.3s ease;
-                cursor: default;
-            }
-            .gft-autosave-flash {
-                animation: gft-save-flash 1s ease-out;
-            }
-            @keyframes gft-save-flash {
-                0% { opacity: 1; transform: scale(1.3); }
-                100% { opacity: 0.2; transform: scale(1); }
-            }
-        `;
-          document.head.appendChild(style);
-        }
-      })();
-      var coupletCounter = 1;
-      var detectedArtists = [];
-      var currentActiveEditor = null;
-      var currentEditorType = null;
-      var shortcutsContainerElement = null;
-      var observer;
-      var currentSongTitle = "TITRE INCONNU";
-      var currentMainArtists = [];
-      var currentFeaturingArtists = [];
-      var DARK_MODE_CLASS = "gft-dark-mode";
-      var DARK_MODE_STORAGE_KEY = "gftDarkModeEnabled";
-      var HEADER_FEAT_STORAGE_KEY = "gftHeaderFeatEnabled";
-      var DISABLE_TAG_NEWLINES_STORAGE_KEY = "gftDisableTagNewlines";
-      var LYRIC_CARD_ONLY_STORAGE_KEY = "gftLyricCardOnly";
-      var PANEL_COLLAPSED_STORAGE_KEY = "gftPanelCollapsed";
-      var TRANSCRIPTION_MODE_STORAGE_KEY = "gftTranscriptionMode";
-      var CUSTOM_BUTTONS_STORAGE_KEY = "gftCustomButtons";
-      var darkModeButton = null;
-      var floatingFormattingToolbar = null;
-      var undoStack = [];
-      var redoStack = [];
-      var MAX_HISTORY_SIZE = 10;
-      var feedbackTimeout = null;
-      var feedbackAnimationTimeout = null;
-      var LYRICS_HELPER_HIGHLIGHT_CLASS = "lyrics-helper-highlight";
-      var SHORTCUTS_CONTAINER_ID = "genius-lyrics-shortcuts-container";
-      var ARTIST_SELECTOR_CONTAINER_ID = "artistSelectorContainerLyricsHelper";
-      var COUPLET_BUTTON_ID = "coupletButton_GFT";
-      var FEEDBACK_MESSAGE_ID = "gft-feedback-message";
-      var FLOATING_TOOLBAR_ID = "gft-floating-formatting-toolbar";
-      var SELECTORS = {
+  // src/modules/constants.js
+  var GFT_STATE, DARK_MODE_CLASS, DARK_MODE_STORAGE_KEY, HEADER_FEAT_STORAGE_KEY, DISABLE_TAG_NEWLINES_STORAGE_KEY, LYRIC_CARD_ONLY_STORAGE_KEY, PANEL_COLLAPSED_STORAGE_KEY, TRANSCRIPTION_MODE_STORAGE_KEY, CUSTOM_BUTTONS_STORAGE_KEY, MAX_HISTORY_SIZE, LYRICS_HELPER_HIGHLIGHT_CLASS, SHORTCUTS_CONTAINER_ID, ARTIST_SELECTOR_CONTAINER_ID, COUPLET_BUTTON_ID, FEEDBACK_MESSAGE_ID, FLOATING_TOOLBAR_ID, SELECTORS;
+  var init_constants = __esm({
+    "src/modules/constants.js"() {
+      GFT_STATE = {
+        coupletCounter: 1,
+        detectedArtists: [],
+        currentActiveEditor: null,
+        currentEditorType: null,
+        shortcutsContainerElement: null,
+        observer: null,
+        currentSongTitle: "TITRE INCONNU",
+        currentMainArtists: [],
+        currentFeaturingArtists: [],
+        darkModeButton: null,
+        floatingFormattingToolbar: null,
+        undoStack: [],
+        redoStack: [],
+        feedbackTimeout: null,
+        feedbackAnimationTimeout: null,
+        lastSavedContent: "",
+        hasUnsavedChanges: false,
+        autoSaveTimeout: null
+      };
+      DARK_MODE_CLASS = "gft-dark-mode";
+      DARK_MODE_STORAGE_KEY = "gftDarkModeEnabled";
+      HEADER_FEAT_STORAGE_KEY = "gftHeaderFeatEnabled";
+      DISABLE_TAG_NEWLINES_STORAGE_KEY = "gftDisableTagNewlines";
+      LYRIC_CARD_ONLY_STORAGE_KEY = "gftLyricCardOnly";
+      PANEL_COLLAPSED_STORAGE_KEY = "gftPanelCollapsed";
+      TRANSCRIPTION_MODE_STORAGE_KEY = "gftTranscriptionMode";
+      CUSTOM_BUTTONS_STORAGE_KEY = "gftCustomButtons";
+      MAX_HISTORY_SIZE = 10;
+      LYRICS_HELPER_HIGHLIGHT_CLASS = "lyrics-helper-highlight";
+      SHORTCUTS_CONTAINER_ID = "genius-lyrics-shortcuts-container";
+      ARTIST_SELECTOR_CONTAINER_ID = "artistSelectorContainerLyricsHelper";
+      COUPLET_BUTTON_ID = "coupletButton_GFT";
+      FEEDBACK_MESSAGE_ID = "gft-feedback-message";
+      FLOATING_TOOLBAR_ID = "gft-floating-formatting-toolbar";
+      SELECTORS = {
         TITLE: [
           'h1[class*="SongHeader-desktop_Title"] span[class*="SongHeader-desktop_HiddenMask"]',
           'h1[class*="SongHeader-desktop_Title"]',
@@ -87,17 +61,19 @@
         MAIN_ARTIST_LINK_IN_CONTAINER_FALLBACK: 'a[class*="StyledLink"]',
         FALLBACK_MAIN_ARTIST_LINKS_FALLBACK: 'a[class*="SongHeader__Artist"], a[data-testid="ArtistLink"]',
         TEXTAREA_EDITOR: 'textarea[class*="ExpandingTextarea__Textarea"]',
-        // Éditeur de paroles (ancien)
         DIV_EDITOR: 'div[data-testid="lyrics-input"]',
-        // Éditeur de paroles (nouveau, content-editable)
         CONTROLS_STICKY_SECTION: 'div[class^="LyricsEdit-desktop__Controls-sc-"]',
-        // Section où le panneau d'outils sera injecté.
         GENIUS_FORMATTING_HELPER: 'div[class*="LyricsEditExplainer__Container-sc-"][class*="LyricsEdit-desktop__Explainer-sc-"]',
-        // Aide de Genius, que nous masquons.
         LYRICS_CONTAINER: '[data-lyrics-container="true"]'
-        // Conteneur des paroles en mode lecture
       };
-      var TRANSLATIONS = {
+    }
+  });
+
+  // src/translations/index.js
+  var TRANSLATIONS;
+  var init_translations = __esm({
+    "src/translations/index.js"() {
+      TRANSLATIONS = {
         fr: {
           panel_title: "Genius Fast Transcriber",
           artist_selection: "Attribuer la section \xE0 :",
@@ -145,6 +121,8 @@
           undo_tooltip: "Annuler la derni\xE8re modification (Ctrl+Z)",
           redo_tooltip: "Refaire la derni\xE8re modification annul\xE9e (Ctrl+Y)",
           panel_title_img_alt: "GFT Logo",
+          settings_tooltip: "Param\xE8tres (Mode sombre, Stats, Aide)",
+          error_corrections: "\u274C Erreur lors des corrections",
           // Sections
           section_structure: "Structure & Artistes",
           section_cleanup: "Outils de nettoyage",
@@ -321,13 +299,13 @@
           preview_opt_dash: "Tirets longs \u2014 \u2013 \u2192 -",
           preview_opt_spaces: "Doubles espaces",
           preview_opt_spacing: "Espacement (lignes)",
-          preview_stat_apostrophes: "apostrophes",
-          preview_stat_quotes: "guillemets \xAB\xBB",
-          preview_stat_dash: "tirets longs",
-          preview_stat_spaces: "doubles espaces",
-          preview_stat_spacing: "espacements",
+          preview_stat_apostrophes: "apostrophe(s) \u2019",
+          preview_stat_quotes: "guillemet(s) fran\xE7ais",
+          preview_stat_dash: "tiret(s) long(s)",
+          preview_stat_spaces: "double(s) espace(s)",
+          preview_stat_spacing: "espacement(s) de ligne",
           preview_stat_orphans: "orphelins",
-          preview_opt_orphans: "Orphelins (Pr\xE9positions)",
+          preview_opt_orphans: "Orphelins (Pr\xE9positions Polonaises)",
           // Draft notification
           draft_found_title: "Brouillon trouv\xE9 !",
           draft_saved_at: "Sauvegard\xE9 \xE0",
@@ -345,8 +323,8 @@
           // Feedback messages
           feedback_adlib_added: "(Ad-lib) ajout\xE9 !",
           feedback_select_text_first: "\u26A0\uFE0F S\xE9lectionnez du texte d'abord",
-          feedback_no_replacement: "Aucun remplacement effectu\xE9.",
-          feedback_replaced: "{count} {item} remplac\xE9(s) !",
+          feedback_no_replacement: "Aucune occurrence trouv\xE9e.",
+          feedback_replaced: '{count} occurrence(s) de "{item}" remplac\xE9e(s)',
           feedback_no_correction_needed: "Aucune correction de {item} n\xE9cessaire.",
           feedback_corrected: "{count} {item} corrig\xE9(s) !",
           feedback_no_changes: "Aucune modification \xE0 annuler.",
@@ -357,7 +335,7 @@
           feedback_duplicate_line: "\u{1F4CB} Ligne dupliqu\xE9e !",
           feedback_no_text_corrections: "Aucune correction de texte. V\xE9rifiez visuellement les parenth\xE8ses.",
           feedback_brackets_ok: "\u2705 Aucun probl\xE8me trouv\xE9 ! Toutes les parenth\xE8ses et crochets sont bien appari\xE9s.",
-          feedback_brackets_issue: "\u26A0\uFE0F {count} parenth\xE8se(s)/crochet(s) non appari\xE9(s) trouv\xE9(s) et surlign\xE9(s) en rouge !",
+          feedback_brackets_issue: "\u26A0\uFE0F {count} parenth\xE8se(s)/crochet(s) non appari\xE9(s) d\xE9tect\xE9(s) et surlign\xE9(s) en rouge !",
           feedback_summary_corrected: "\u2705 Corrig\xE9 : {details} ({count} au total)",
           feedback_summary_correction: "{count} correction(s) appliqu\xE9e(s)",
           feedback_detail_yprime: `{count} "y'"`,
@@ -377,21 +355,39 @@
           stats_characters: "caract\xE8re|caract\xE8res",
           preview_stat_yprime: `occurrence(s) de "y'"`,
           preview_stat_oeu: 'occurrence(s) de "oeu"',
-          preview_stat_apostrophes: "apostrophe(s) \u2019",
-          preview_stat_quotes: "guillemet(s) fran\xE7ais",
-          preview_stat_dash: "tiret(s) long(s)",
-          preview_stat_spaces: "double(s) espace(s)",
-          preview_stat_spacing: "espacement(s) de ligne",
-          preview_stat_orphans: "orphelins",
-          preview_opt_orphans: "Orphelins (Pr\xE9positions Polonaises)",
-          feedback_replaced: '{count} occurrence(s) de "{item}" remplac\xE9e(s)',
-          feedback_no_replacement: "Aucune occurrence trouv\xE9e.",
           find_replace_title: "Rechercher & Remplacer",
           find_placeholder: "Rechercher...",
           replace_placeholder: "Remplacer par...",
           btn_replace: "Remplacer",
           btn_replace_all: "Tout Remplacer",
-          regex_toggle: "Regex"
+          regex_toggle: "Regex",
+          custom_manager_title: "\u2728 Gestionnaire de boutons",
+          custom_manager_tab_create: "Cr\xE9er",
+          custom_manager_tab_library: "Biblioth\xE8que",
+          custom_mgr_action_type: "Type d'action",
+          custom_mgr_type_structure: "Tag de structure (Insertion)",
+          custom_mgr_type_cleanup: "Outil de nettoyage (Recherche/Remplacer)",
+          custom_mgr_button_label: "Texte du bouton",
+          custom_mgr_btn_label_placeholder: "Ex: [Couplet], Suppr. Emojis...",
+          custom_mgr_text_to_insert: "Texte \xE0 ins\xE9rer",
+          custom_mgr_advanced_regex: "Mode Regex Avanc\xE9",
+          custom_mgr_find_pattern: "Mod\xE8le \xE0 rechercher",
+          custom_mgr_replace_with: "Remplacer par",
+          custom_mgr_save_button: "Sauvegarder le bouton",
+          custom_mgr_empty_library: "Aucun bouton personnalis\xE9 trouv\xE9.",
+          custom_mgr_share_presets: "Partage de configurations",
+          custom_mgr_import_placeholder: "Collez un code ici pour importer, ou cliquez sur Exporter...",
+          custom_mgr_export_code: "Copier le code d'export",
+          custom_mgr_import_button: "Importer le code",
+          custom_mgr_error_no_label: "Veuillez sp\xE9cifier un nom pour le bouton.",
+          custom_mgr_error_no_content: "Le contenu est requis.",
+          custom_mgr_success_created: "Bouton cr\xE9\xE9 ! Actualisation...",
+          custom_mgr_success_imported: "Importation r\xE9ussie ! Actualisation...",
+          custom_mgr_find_placeholder_exact: "Texte exact \xE0 supprimer",
+          custom_mgr_find_placeholder_regex: "Motif Regex (ex: d+s*$)",
+          custom_mgr_replace_placeholder: "(Laisser vide pour supprimer)",
+          custom_mgr_case_sensitive: "Respecter la casse",
+          settings_custom_library: "\u{1F4DA} Biblioth\xE8que de boutons"
         },
         en: {
           panel_title: "Genius Fast Transcriber",
@@ -440,6 +436,8 @@
           undo_tooltip: "Undo last change (Ctrl+Z)",
           redo_tooltip: "Redo last undone change (Ctrl+Y)",
           panel_title_img_alt: "GFT Logo",
+          settings_tooltip: "Settings (Dark Mode, Stats, Help)",
+          error_corrections: "\u274C Error during corrections",
           // Sections
           section_structure: "Structure & Artists",
           section_cleanup: "Cleanup Tools",
@@ -483,8 +481,8 @@
           btn_adlib_label: "(Ad-lib)",
           btn_orphans_label: "Orphans cleanup",
           cleanup_orphans_tooltip: "Prevents hanging single-letter words at the end of lines",
-          btn_zws_remove: "Remove ZWS",
-          btn_zws_remove_tooltip: "Remove invisible characters (Zero Width Space)",
+          btn_zws_remove: "\u232B ZWS",
+          btn_zws_remove_tooltip: "Remove invisible zero-width space characters",
           // Cleanup Tools - English descriptions
           cleanup_capitalize: "Capitalize",
           cleanup_capitalize_tooltip: "Capitalize the start of each line",
@@ -507,39 +505,38 @@
           btn_apostrophe_label: "' \u2192 '",
           btn_oeu_label: "oeu \u2192 \u0153u",
           btn_french_quotes_label: '\xAB\xBB \u2192 "',
-          cleanup_french_quotes_tooltip: 'Remplace les guillemets fran\xE7ais \xAB\xBB par des guillemets droits "',
+          cleanup_french_quotes_tooltip: 'Replace French quotes \xAB\xBB with straight quotes "',
           btn_long_dash_label: "\u2014 \u2192 -",
           cleanup_long_dash_tooltip: "Remplace les tirets longs (\u2014 \u2013) par des tirets courts (-)",
-          btn_double_spaces_label: "Doubles espaces",
-          cleanup_double_spaces_tooltip: "Supprime les espaces en double",
-          btn_duplicate_line_label: "\u{1F4CB} Dupliquer ligne",
-          cleanup_duplicate_line_tooltip: "Duplique la ligne actuelle (Ctrl+D)",
-          btn_adlib_label: "(Ad-lib)",
+          btn_double_spaces_label: "Double spaces",
+          cleanup_double_spaces_tooltip: "Remove double spaces",
+          btn_duplicate_line_label: "\u{1F4CB} Duplicate line",
+          cleanup_duplicate_line_tooltip: "Duplicate current line (Ctrl+D)",
           cleanup_adlib_tooltip: "Entoure le texte s\xE9lectionn\xE9 de parenth\xE8ses pour les ad-libs",
           btn_capitalize_label: "Maj. d\xE9but ligne",
           btn_punctuation_label: "Suppr. ., fin ligne",
-          btn_spacing_label: "Corriger Espacement",
-          btn_check_label: "\u{1F50D} V\xE9rifier ( ) [ ]",
-          btn_fix_all_label: "Tout Corriger (Texte)",
+          btn_spacing_label: "Fix Spacing",
+          btn_check_label: "\u{1F50D} Check ( ) [ ]",
+          btn_fix_all_label: "Fix All (Text)",
           btn_capitalize_short: "Majuscules",
           btn_punctuation_short: "Ponctuation",
-          btn_spacing_short: "Espacement",
-          btn_fix_all_short: "\u2728 Tout Corriger",
+          btn_spacing_short: "Spacing",
+          btn_fix_all_short: "\u2728 Fix All",
           // Tutorial Steps
           tuto_step1_title: "1. Structure & Artists \u{1F3D7}\uFE0F",
-          tuto_step1_content: "\u2022 <strong>Artists:</strong> use checkboxes on top to assign sections.<br>\u2022 <strong>Verses:</strong> Use the central <strong>[Couplet 1]</strong> button. Arrows \u2190 \u2192 change the number.<br>\u2022 <strong>Tags:</strong> Insert Chorus, Intro, Bridge with one click.",
+          tuto_step1_content: "\u2022 <strong>Artists:</strong> Check boxes at top to assign sections automatically on old editors.<br>\u2022 <strong>Verses:</strong> Use the central <strong>[Verse 1]</strong> button. Arrows \u2190 \u2192 change the number.<br>\u2022 <strong>Tags:</strong> Insert Chorus, Intro, Bridge in one click.",
           tuto_step2_title: "2. Smart Corrections \u2728",
-          tuto_step2_content: "\u2022 <strong>Fix All:</strong> Cleans quotes, caps, spacing.<br>\u2022 <strong>Check ( ) [ ]:</strong> Scans for missing brackets.",
+          tuto_step2_content: "\u2022 <strong>Fix All:</strong> Cleans apostrophes, capitalization, spaces.<br>\u2022 <strong>Verification ( ) [ ]:</strong> Scans for missing brackets.",
           tuto_step3_title: "3. Formatting Tools \u{1F3A8}",
-          tuto_step3_content: "\u2022 <strong>Floating Toolbar:</strong> Select text to Bold, Italic or create a <strong>Lyric Card</strong>.<br>\u2022 <strong>Number to Words:</strong> Converts '42' to 'forty-two'.",
+          tuto_step3_content: "\u2022 <strong>Floating Bar:</strong> Select text to bold, italic, or create a <strong>Lyric Card</strong>.<br>\u2022 <strong>Numbers to Words:</strong> Converts '42' to 'forty-two'.",
           tuto_step4_title: "4. History & Safety \u{1F6E1}\uFE0F",
-          tuto_step4_content: "\u2022 <strong>Undo/Redo:</strong> Your last 10 actions are saved (Ctrl+Z).<br>\u2022 <strong>Auto Save:</strong> Drafts saved in case of crash.",
+          tuto_step4_content: "\u2022 <strong>Undo/Redo:</strong> Your last 10 actions are saved (Ctrl+Z).<br>\u2022 <strong>Auto Save:</strong> Drafts saved locally.",
           tuto_step5_title: "5. YouTube Control \u{1F4FA}",
-          tuto_step5_content: "\u2022 <kbd>Ctrl+Alt+Space</kbd>: Play / Pause<br>\u2022 <kbd>Ctrl+Alt+\u2190 / \u2192</kbd>: Rewind / Forward (5s)",
+          tuto_step5_content: "\u2022 <kbd>Ctrl+Alt+Space</kbd> : Play / Pause<br>\u2022 <kbd>Ctrl+Alt+\u2190 / \u2192</kbd> : Rewind / Forward (5s)",
           tuto_step6_title: "6. Other Shortcuts \u2328\uFE0F",
-          tuto_step6_content: "\u2022 <kbd>Ctrl+1-5</kbd>: Structure tags<br>\u2022 <kbd>Ctrl+Shift+C</kbd>: Fix All",
-          tuto_finish_title: "Let's go! \u{1F680}",
-          tuto_finish_content: "You are ready! Explore settings \u2699\uFE0F to customize your experience.<br><br>\u{1F4A1} <strong>Note:</strong> You can change mode/language anytime via the extension icon.",
+          tuto_step6_content: "\u2022 <kbd>Ctrl+1-5</kbd> : Structure tags<br>\u2022 <kbd>Ctrl+Shift+C</kbd> : Fix All",
+          tuto_finish_title: "Let's Go! \u{1F680}",
+          tuto_finish_content: "You're ready! Explore settings \u2699\uFE0F to customize your experience.<br><br>\u{1F4A1} <strong>Note:</strong> You can change mode/language anytime by clicking the extension icon.",
           // Lyric Mode Specific Tutorial
           tuto_lyric_mode_title: "Lyric Card Mode Active \u{1F3A8}",
           tuto_lyric_mode_content: "To create a Lyric Card:<br>1. <strong>Highlight</strong> the lyrics of your choice.<br>2. Click on the <strong>'Create Lyric Card'</strong> button that appears.<br><br>\u{1F4A1} <strong>Note:</strong> Change settings via the extension icon.",
@@ -547,28 +544,28 @@
           // Lyric Card Modal
           lc_modal_title: "Lyric Card Preview",
           lc_album_default: "\u{1F4BF} Album Cover (Default)",
-          lc_manual_search: "\u{1F50D} Search artist...",
+          lc_manual_search: "\u{1F50D} Search an artist...",
           lc_format_btn: "\u{1F4CF} Format: ",
           lc_search_placeholder: "Type an artist name...",
-          lc_upload_btn: "\u{1F4C2} Upload image",
+          lc_upload_btn: "\u{1F4C2} Upload an image",
           lc_download_btn: "\u2B07\uFE0F Download",
           lc_download_done: "\u2705 Downloaded!",
           lc_share_btn: "\u{1D54F} Share",
           lc_share_copying: "\u{1F4CB} Copying...",
           lc_share_copied: "\u2705 Copied!",
           lc_share_error: "\u274C Error",
-          lc_feedback_load_error: "Image load error.",
+          lc_feedback_load_error: "Error loading image.",
           lc_search_searching: "\u23F3 Searching...",
           lc_search_none: "No results found \u{1F615}",
-          lc_custom_img: "\u{1F4C2} Imported Image",
+          lc_custom_img: "\u{1F4C2} Imported image",
           lc_select_text_error: "Please select text to create a Lyric Card.",
           // Lyric Card Feedback
           lc_error_search: "Error during search",
-          lc_img_copied_tweet: "Image copied! Press Ctrl+V in the X window to paste it.",
-          lc_error_copy: "Unable to copy image.",
+          lc_img_copied_tweet: "Image copied! Press Ctrl+V in the X window that just opened.",
+          lc_error_copy: "Could not copy image.",
           lc_error_img_not_found: "Image not found for",
           lc_img_loaded: "Image loaded!",
-          lc_error_album_not_found: "Unable to find album cover.",
+          lc_error_album_not_found: "Could not find album cover.",
           lc_searching_artist: "Searching for artist image...",
           lc_generating: "Generating Lyric Card...",
           lc_error_internal: "Internal error: Function not found.",
@@ -584,20 +581,6 @@
           toolbar_lyric_card_tooltip: "Generate a Lyric Card (1280x720)",
           toolbar_num_to_words_tooltip: "Convert selected number to words (French logic)",
           // Tutorial Steps (Translated)
-          tuto_step1_title: "1. Structure & Artists \u{1F3D7}\uFE0F",
-          tuto_step1_content: "\u2022 <strong>Artists:</strong> Check boxes at top to assign sections automatically on old editors.<br>\u2022 <strong>Verses:</strong> Use the central <strong>[Verse 1]</strong> button. Arrows \u2190 \u2192 change the number.<br>\u2022 <strong>Tags:</strong> Insert Chorus, Intro, Bridge in one click.",
-          tuto_step2_title: "2. Smart Corrections \u2728",
-          tuto_step2_content: "\u2022 <strong>Fix All:</strong> Cleans apostrophes, capitalization, spaces.<br>\u2022 <strong>Verification ( ) [ ]:</strong> Scans for missing brackets.",
-          tuto_step3_title: "3. Formatting Tools \u{1F3A8}",
-          tuto_step3_content: "\u2022 <strong>Floating Bar:</strong> Select text to bold, italic, or create a <strong>Lyric Card</strong>.<br>\u2022 <strong>Numbers to Words:</strong> Converts '42' to 'forty-two'.",
-          tuto_step4_title: "4. History & Safety \u{1F6E1}\uFE0F",
-          tuto_step4_content: "\u2022 <strong>Undo/Redo:</strong> Your last 10 actions are saved (Ctrl+Z).<br>\u2022 <strong>Auto Save:</strong> Drafts saved locally.",
-          tuto_step5_title: "5. YouTube Control \u{1F4FA}",
-          tuto_step5_content: "\u2022 <kbd>Ctrl+Alt+Space</kbd> : Play / Pause<br>\u2022 <kbd>Ctrl+Alt+\u2190 / \u2192</kbd> : Rewind / Forward (5s)",
-          tuto_step6_title: "6. Other Shortcuts \u2328\uFE0F",
-          tuto_step6_content: "\u2022 <kbd>Ctrl+1-5</kbd> : Structure tags<br>\u2022 <kbd>Ctrl+Shift+C</kbd> : Fix All",
-          tuto_finish_title: "Let's Go! \u{1F680}",
-          tuto_finish_content: "You're ready! Explore settings \u2699\uFE0F to customize your experience.<br><br>\u{1F4A1} <strong>Note:</strong> You can change mode/language anytime by clicking the extension icon.",
           // Tutorial Buttons
           tuto_prev: "Previous",
           tuto_next: "Next",
@@ -619,16 +602,16 @@
           preview_opt_dash: "Long dashes \u2014 \u2013 \u2192 -",
           preview_opt_spaces: "Double spaces",
           preview_opt_spacing: "Spacing (lines)",
-          preview_stat_apostrophes: "apostrophes",
-          preview_stat_quotes: "quotes \xAB\xBB",
-          preview_stat_dash: "long dashes",
-          preview_stat_spaces: "double spaces",
-          preview_stat_spacing: "spacings",
+          preview_stat_apostrophes: "apostrophe(s)",
+          preview_stat_quotes: "french quote(s)",
+          preview_stat_dash: "long dash(es)",
+          preview_stat_spaces: "double space(s)",
+          preview_stat_spacing: "line spacing",
           preview_stat_orphans: "orphans",
           preview_opt_orphans: "Orphans (Polish rules)",
           feedback_detail_orphans: "{count} orphan|{count} orphans",
-          feedback_replaced: '{count} occurrence(s) of "{item}" replaced',
-          feedback_no_replacement: "No occurrences found.",
+          feedback_replaced: "{count} {item} replaced!",
+          feedback_no_replacement: "No replacement made.",
           find_replace_title: "Find & Replace",
           find_placeholder: "Find...",
           replace_placeholder: "Replace with...",
@@ -636,34 +619,19 @@
           btn_replace_all: "Replace All",
           regex_toggle: "Regex",
           // Button labels (English specific)
-          btn_y_label: "y' \u2192 y",
-          btn_apostrophe_label: "' \u2192 '",
-          btn_french_quotes_label: '\xAB\xBB \u2192 "',
-          btn_double_spaces_label: "Double spaces",
-          btn_duplicate_line_label: "\u{1F4CB} Duplicate line",
-          btn_spacing_label: "Fix Spacing",
-          btn_check_label: "\u{1F50D} Check ( ) [ ]",
-          btn_fix_all_label: "Fix All (Text)",
-          btn_spacing_short: "Spacing",
-          btn_fix_all_short: "\u2728 Fix All",
           btn_prev_couplet_title: "Previous Verse",
           btn_prev_couplet_tooltip: "Go to previous verse",
           btn_next_couplet_title: "Next Verse",
           btn_next_couplet_tooltip: "Go to next verse",
           btn_add_custom_structure_title: "Add custom structure button",
           btn_add_custom_cleanup_title: "Add custom cleanup button",
-          btn_zws_remove: "\u232B ZWS",
           // Cleanup tooltips
           cleanup_apostrophe_tooltip: "Replace curly apostrophes with straight ones",
-          cleanup_french_quotes_tooltip: 'Replace French quotes \xAB\xBB with straight quotes "',
-          cleanup_double_spaces_tooltip: "Remove double spaces",
-          cleanup_duplicate_line_tooltip: "Duplicate current line (Ctrl+D)",
           cleanup_spacing_tooltip: "Fix line spacing (remove extra empty lines)",
           global_check_tooltip: "Check for unmatched brackets and parentheses",
           global_fix_tooltip: "Apply all text corrections at once",
           cleanup_y_tooltip: `Replace "y'" with "y " (French typography rule)`,
           cleanup_oeu_tooltip: 'Replace "oeu" with the special character "\u0153u" (French typography rule)',
-          btn_zws_remove_tooltip: "Remove invisible zero-width space characters",
           // Draft notification
           draft_found_title: "Draft found!",
           draft_saved_at: "Saved at",
@@ -681,8 +649,6 @@
           // Feedback messages
           feedback_adlib_added: "(Ad-lib) added!",
           feedback_select_text_first: "\u26A0\uFE0F Select text first",
-          feedback_no_replacement: "No replacement made.",
-          feedback_replaced: "{count} {item} replaced!",
           feedback_no_correction_needed: "No {item} correction needed.",
           feedback_corrected: "{count} {item} corrected!",
           feedback_no_changes: "No changes to undo.",
@@ -693,7 +659,7 @@
           feedback_duplicate_line: "\u{1F4CB} Line duplicated!",
           feedback_no_text_corrections: "No text correction. Visually check the brackets.",
           feedback_brackets_ok: "\u2705 No issues found! All brackets are well paired.",
-          feedback_brackets_issue: "\u26A0\uFE0F {count} unpaired bracket(s) found and highlighted in red!",
+          feedback_brackets_issue: "\u26A0\uFE0F {count} unmatched parenthesis/bracket(s) detected and highlighted in red!",
           feedback_summary_corrected: "\u2705 Fixed: {details} ({count} total)",
           // Stats
           stats_lines: "line|lines",
@@ -702,11 +668,6 @@
           stats_characters: "character|characters",
           preview_stat_yprime: `"y'" occurrence(s)`,
           preview_stat_oeu: '"oeu" occurrence(s)',
-          preview_stat_apostrophes: "apostrophe(s)",
-          preview_stat_quotes: "french quote(s)",
-          preview_stat_dash: "long dash(es)",
-          preview_stat_spaces: "double space(s)",
-          preview_stat_spacing: "line spacing",
           feedback_summary_correction: "{count} correction(s) applied",
           feedback_detail_yprime: `{count} "y'"`,
           feedback_detail_apostrophes: "{count} apostrophe(s)",
@@ -719,36 +680,34 @@
           feedback_corrections_cancelled: "Corrections cancelled",
           lc_img_found: "Artist image found!",
           lc_api_error: "API error, trying local extraction...",
-          lc_img_loaded: "Image loaded!",
           lc_opening: "Opening Lyric Card...",
-          lc_modal_title: "Lyric Card Preview",
-          lc_album_default: "\u{1F4BF} Album Cover (Default)",
-          lc_manual_search: "\u{1F50D} Search an artist...",
-          lc_format_btn: "\u{1F4CF} Format: ",
-          lc_search_placeholder: "Type an artist name...",
-          lc_upload_btn: "\u{1F4C2} Upload an image",
-          lc_download_btn: "\u2B07\uFE0F Download",
-          lc_download_done: "\u2705 Downloaded!",
-          lc_share_btn: "\u{1D54F} Share",
-          lc_share_copying: "\u{1F4CB} Copying...",
-          lc_share_copied: "\u2705 Copied!",
-          lc_share_error: "\u274C Error",
-          lc_feedback_load_error: "Error loading image.",
-          lc_search_searching: "\u23F3 Searching...",
-          lc_search_none: "No results found \u{1F615}",
-          lc_custom_img: "\u{1F4C2} Imported image",
-          lc_select_text_error: "Please select text to create a Lyric Card.",
-          lc_error_search: "Error during search",
-          lc_img_copied_tweet: "Image copied! Press Ctrl+V in the X window that just opened.",
-          lc_error_copy: "Could not copy image.",
-          lc_error_img_not_found: "Image not found for",
-          lc_error_album_not_found: "Could not find album cover.",
-          lc_searching_artist: "Searching for artist image...",
-          lc_generating: "Generating Lyric Card...",
-          lc_error_internal: "Internal error: Function not found.",
-          lc_fetching_id: "Fetching artist image (via ID)...",
-          lc_searching_name: "Searching image for",
-          lc_img_applied: "Image applied:"
+          custom_manager_title: "\u2728 Custom Buttons Manager",
+          custom_manager_tab_create: "Create",
+          custom_manager_tab_library: "Library",
+          custom_mgr_action_type: "Action Type",
+          custom_mgr_type_structure: "Structure Tag (Insertion)",
+          custom_mgr_type_cleanup: "Cleanup Tool (Search/Replace)",
+          custom_mgr_button_label: "Button Label",
+          custom_mgr_btn_label_placeholder: "Ex: [Verse], Remove Emojis...",
+          custom_mgr_text_to_insert: "Text to Insert",
+          custom_mgr_advanced_regex: "Advanced Regex Mode",
+          custom_mgr_find_pattern: "Find Pattern",
+          custom_mgr_replace_with: "Replace With",
+          custom_mgr_save_button: "Save Custom Button",
+          custom_mgr_empty_library: "No custom buttons found.",
+          custom_mgr_share_presets: "Share Presets",
+          custom_mgr_import_placeholder: "Paste a preset code here to import, or click Export...",
+          custom_mgr_export_code: "Copy Export Code",
+          custom_mgr_import_button: "Import Code",
+          custom_mgr_error_no_label: "Please specify a button label.",
+          custom_mgr_error_no_content: "Content is required.",
+          custom_mgr_success_created: "Button created! Reloading...",
+          custom_mgr_success_imported: "Import successful! Reloading...",
+          custom_mgr_find_placeholder_exact: "Exact text to remove",
+          custom_mgr_find_placeholder_regex: "Regex Pattern (e.g. d+s*$)",
+          custom_mgr_replace_placeholder: "(Leave empty to delete)",
+          custom_mgr_case_sensitive: "Case Sensitive",
+          settings_custom_library: "\u{1F4DA} Buttons Library"
         },
         // Polish translations - UI strings are placeholders for contributor PR
         // Structure tags and cleanup tools are Polish-specific per Genius Polska guidelines
@@ -875,7 +834,7 @@
           btn_punctuation_label: "Usu\u0144 interpunkcj\u0119",
           btn_spacing_label: "Popraw odst\u0119py",
           btn_check_label: "\u{1F50D} Sprawd\u017A (\xA0) [\xA0]",
-          btn_fix_all_label: "Popraw wszystko (tekst)",
+          btn_fix_all_label: "Popraw wszystko (Tekst)",
           btn_capitalize_short: "Wielkie litery",
           btn_punctuation_short: "Interpunkcja",
           btn_spacing_short: "Odst\u0119py",
@@ -970,7 +929,7 @@
           feedback_select_text_first: "\u26A0\uFE0F Zaznacz najpierw tekst",
           feedback_no_text_corrections: "Brak poprawek tekstu. Zweryfikuj nawiasy.",
           feedback_brackets_ok: "\u2705 Nie znaleziono \u017Cadnych problem\xF3w! Wszystkie nawiasy s\u0105 domkni\u0119te.",
-          feedback_brackets_issue: "\u26A0\uFE0F Znaleziono {count} niesparowany nawias i zaznaczono go na czerwono!|\u26A0\uFE0F Znaleziono {count} niesparowane nawiasy i zaznaczono je na czerwono!|\u26A0\uFE0F Znaleziono {count} niesparowanych nawias\xF3w i zaznaczono je na czerwono!",
+          feedback_brackets_issue: "\u26A0\uFE0F Znaleziono {count} niepasuj\u0105cych nawias\xF3w i zaznaczono je na czerwono!",
           // Stats (Singular | Paucal | Plural)
           stats_lines: "linia|linie|linii",
           stats_words: "s\u0142owo|s\u0142owa|s\u0142\xF3w",
@@ -1012,8 +971,8 @@
           draft_btn_restore: "Przywr\xF3\u0107",
           draft_btn_discard: "Odrzu\u0107",
           draft_restored: "Pomy\u015Blnie przywr\xF3cono wersj\u0119 robocz\u0105!",
-          feedback_replaced: '{count} wyst\u0105pie\u0144 "{item}" zosta\u0142o zamienionych',
-          feedback_no_replacement: "Nie znaleziono \u017Cadnych wyst\u0105pie\u0144.",
+          feedback_replaced: "Zamieniono {count} {item}!",
+          feedback_no_replacement: "Nie dokonano \u017Cadnych zmian.",
           find_replace_title: "Znajd\u017A i zamie\u0144",
           find_placeholder: "Szukaj...",
           replace_placeholder: "Zamie\u0144 na...",
@@ -1030,559 +989,1064 @@
           progress_step_spacing: "Poprawianie odst\u0119p\xF3w\u2026",
           // Feedback messages
           feedback_adlib_added: "Otoczono tekst nawiasami!",
-          feedback_select_text_first: "\u26A0\uFE0F Zaznacz najpierw tekst",
-          feedback_no_replacement: "Nie dokonano \u017Cadnych zmian.",
-          feedback_replaced: "Zamieniono {count} {item}!",
           feedback_no_correction_needed: "Zamiana {item} nie jest wymagana",
           feedback_corrected: "Poprawiono {count} {item}!",
-          feedback_no_changes: "Brak zmian do cofni\u0119cia.",
-          feedback_undo: "\u21A9\uFE0F Cofni\u0119to",
-          feedback_redo: "\u21AA\uFE0F Ponowiono",
-          feedback_pause: "\u23F8\uFE0F Wstrzymano",
-          feedback_play: "\u25B6\uFE0F Odtwarzanie",
-          feedback_duplicate_line: "\u{1F4CB} Zduplikowano lini\u0119!",
-          feedback_no_text_corrections: "Brak poprawek tekstu. Zweryfikuj nawiasy.",
-          feedback_brackets_ok: "\u2705 Nie znaleziono \u017Cadnych problem\xF3w! Wszystkie nawiasy s\u0105 domkni\u0119te.",
-          feedback_brackets_issue: "\u26A0\uFE0F Znaleziono {count} niesparowany nawias i zaznaczono go na czerwono!|\u26A0\uFE0F Znaleziono {count} niesparowane nawiasy i zaznaczono je na czerwono!|\u26A0\uFE0F Znaleziono {count} niesparowanych nawias\xF3w i zaznaczono je na czerwono!",
-          btn_zws_remove: "Usu\u0144 ZWS",
-          btn_zws_remove_tooltip: "Usuwa niewidoczne znaki (Zero Width Space)",
           global_check_tooltip: "Sprawd\u017A brakuj\u0105ce lub b\u0142\u0119dnie zamkni\u0119te nawiasy",
           global_fix_tooltip: "Zastosuj wszystkie poprawki tekstu naraz",
-          btn_fix_all_label: "Popraw wszystko (Tekst)",
-          btn_fix_all_short: "\u2728 Popraw wszystko"
+          custom_manager_title: "\u2728 Mened\u017Cer w\u0142asnych przycisk\xF3w",
+          custom_manager_tab_create: "Utw\xF3rz",
+          custom_manager_tab_library: "Biblioteka",
+          custom_mgr_action_type: "Typ akcji",
+          custom_mgr_type_structure: "Tag struktury (Wstawianie)",
+          custom_mgr_type_cleanup: "Narz\u0119dzie czyszczenia (Znajd\u017A/Zamie\u0144)",
+          custom_mgr_button_label: "Etykieta przycisku",
+          custom_mgr_btn_label_placeholder: "Np: [Zwrotka], Usu\u0144 Emoji...",
+          custom_mgr_text_to_insert: "Tekst do wstawienia",
+          custom_mgr_advanced_regex: "Zaawansowany tryb Regex",
+          custom_mgr_find_pattern: "Szukany wzorzec",
+          custom_mgr_replace_with: "Zamie\u0144 na",
+          custom_mgr_save_button: "Zapisz w\u0142asny przycisk",
+          custom_mgr_empty_library: "Nie znaleziono w\u0142asnych przycisk\xF3w.",
+          custom_mgr_share_presets: "Udost\u0119pnianie ustawie\u0144",
+          custom_mgr_import_placeholder: "Wklej kod tutaj, aby zaimportowa\u0107, lub kliknij Eksportuj...",
+          custom_mgr_export_code: "Kopiuj kod eksportu",
+          custom_mgr_import_button: "Importuj kod",
+          custom_mgr_error_no_label: "Prosz\u0119 poda\u0107 nazw\u0119 przycisku.",
+          custom_mgr_error_no_content: "Tre\u015B\u0107 jest wymagana.",
+          custom_mgr_success_created: "Przycisk utworzony! Od\u015Bwie\u017Canie...",
+          custom_mgr_success_imported: "Import zako\u0144czony sukcesem! Od\u015Bwie\u017Canie...",
+          custom_mgr_find_placeholder_exact: "Tekst do usuni\u0119cia",
+          custom_mgr_find_placeholder_regex: "Wzorzec Regex (np. d+s*$)",
+          custom_mgr_replace_placeholder: "(Pozostaw puste, aby usun\u0105\u0107)",
+          custom_mgr_case_sensitive: "Uwzgl\u0119dniaj wielko\u015B\u0107 liter",
+          settings_custom_library: "\u{1F4DA} Biblioteka przycisk\xF3w"
         }
       };
-      function formatListWithConjunction(items, lang) {
-        if (items.length === 0) return "";
-        if (items.length === 1) return items[0];
-        if (typeof Intl !== "undefined" && Intl.ListFormat) {
-          try {
-            const formatter = new Intl.ListFormat(lang, { style: "long", type: "conjunction" });
-            return formatter.format(items);
-          } catch (e) {
-            console.warn("[GFT] Intl.ListFormat failed, falling back to manual join.", e);
-          }
-        }
-        const lastItem = items.pop();
-        const conjunctions = {
-          "fr": " et ",
-          "en": " and ",
-          "pl": " i "
-        };
-        const conj = conjunctions[lang] || conjunctions["fr"];
-        return items.join(", ") + conj + lastItem;
+    }
+  });
+
+  // src/modules/utils.js
+  function formatListWithConjunction(items, lang) {
+    if (items.length === 0) return "";
+    if (items.length === 1) return items[0];
+    if (typeof Intl !== "undefined" && Intl.ListFormat) {
+      try {
+        const formatter = new Intl.ListFormat(lang, { style: "long", type: "conjunction" });
+        return formatter.format(items);
+      } catch (e) {
+        console.warn("[GFT] Intl.ListFormat failed, falling back to manual join.", e);
       }
-      function getPluralForm(count, lang) {
-        const c = Math.abs(count);
-        if (lang === "pl") {
-          if (c === 1) return 0;
-          if (c % 10 >= 2 && c % 10 <= 4 && (c % 100 < 12 || c % 100 > 14)) return 1;
-          return 2;
-        }
-        if (lang === "fr") return c > 1 ? 1 : 0;
-        return c === 1 ? 0 : 1;
+    }
+    const lastItem = items.pop();
+    const conjunctions = {
+      "fr": " et ",
+      "en": " and ",
+      "pl": " i "
+    };
+    const conj = conjunctions[lang] || conjunctions["fr"];
+    return items.join(", ") + conj + lastItem;
+  }
+  function getPluralForm(count, lang) {
+    const c = Math.abs(count);
+    if (lang === "pl") {
+      if (c === 1) return 0;
+      if (c % 10 >= 2 && c % 10 <= 4 && (c % 100 < 12 || c % 100 > 14)) return 1;
+      return 2;
+    }
+    if (lang === "fr") return c > 1 ? 1 : 0;
+    return c === 1 ? 0 : 1;
+  }
+  function getTranslation(key, count = null) {
+    const lang = localStorage.getItem("gftLanguage") || "fr";
+    let val = TRANSLATIONS[lang] && TRANSLATIONS[lang][key] || TRANSLATIONS["fr"][key] || key;
+    if (count !== null && typeof val === "string" && val.includes("|")) {
+      const parts = val.split("|").map((s) => s.trim());
+      const formIndex = getPluralForm(count, lang);
+      return parts[formIndex] || parts[parts.length - 1];
+    }
+    return val;
+  }
+  function decodeHtmlEntities(text) {
+    if (!text) return "";
+    const textarea = document.createElement("textarea");
+    textarea.innerHTML = text;
+    return textarea.value;
+  }
+  function cleanArtistName(name) {
+    if (!name) return "";
+    let cleaned = name.trim();
+    cleaned = decodeHtmlEntities(cleaned);
+    const commonSuffixRegex = /\s*\((?:FRA|FR|UK|US|Feat\.|Featuring|Trad\.|Producer|Mix|Remix|Edit|Version|Live|Demo)[^)]*?\)\s*$/i;
+    if (commonSuffixRegex.test(cleaned)) {
+      cleaned = cleaned.replace(commonSuffixRegex, "").trim();
+    }
+    const trailingParenthesisRegex = /\s*\([^)]*\)\s*$/;
+    if (trailingParenthesisRegex.test(cleaned)) {
+      cleaned = cleaned.replace(trailingParenthesisRegex, "").trim();
+    } else {
+      const isolatedTrailingParenthesisRegex = /\)\s*$/;
+      if (isolatedTrailingParenthesisRegex.test(cleaned)) {
+        cleaned = cleaned.replace(isolatedTrailingParenthesisRegex, "").trim();
       }
-      function getTranslation(key, count = null) {
-        const lang = localStorage.getItem("gftLanguage") || "fr";
-        let val = TRANSLATIONS[lang] && TRANSLATIONS[lang][key] || TRANSLATIONS["fr"][key] || key;
-        if (count !== null && typeof val === "string" && val.includes("|")) {
-          const parts = val.split("|").map((s) => s.trim());
-          const formIndex = getPluralForm(count, lang);
-          return parts[formIndex] || parts[parts.length - 1];
-        }
-        return val;
+    }
+    const lastOpenParenIndex = cleaned.lastIndexOf("(");
+    if (lastOpenParenIndex > -1 && cleaned.indexOf(")", lastOpenParenIndex) === -1) {
+      if (cleaned.length - lastOpenParenIndex < 10) {
+        cleaned = cleaned.substring(0, lastOpenParenIndex).trim();
       }
-      function decodeHtmlEntities(text) {
-        if (!text) return "";
-        const textarea = document.createElement("textarea");
-        textarea.innerHTML = text;
-        return textarea.value;
+    }
+    cleaned = cleaned.replace(/\s+/g, " ").trim();
+    return cleaned;
+  }
+  function escapeRegExp(string) {
+    if (!string) return "";
+    return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  }
+  function formatArtistList(artists) {
+    if (!artists || artists.length === 0) return "";
+    if (artists.length === 1) return artists[0];
+    if (artists.length === 2) return artists.join(" & ");
+    return `${artists.slice(0, -1).join(", ")} & ${artists[artists.length - 1]}`;
+  }
+  function numberToFrenchWords(num) {
+    if (num === 0) return "z\xE9ro";
+    const ones = ["", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"];
+    const teens = ["dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf"];
+    const tens = ["", "", "vingt", "trente", "quarante", "cinquante", "soixante", "soixante", "quatre-vingt", "quatre-vingt"];
+    function convertUpTo99(n) {
+      if (n < 10) return ones[n];
+      if (n < 20) return teens[n - 10];
+      const ten = Math.floor(n / 10);
+      const one = n % 10;
+      if (ten === 7) {
+        if (one === 0) return "soixante-dix";
+        if (one === 1) return "soixante et onze";
+        return "soixante-" + teens[one];
       }
-      function cleanArtistName(name) {
-        if (!name) return "";
-        let cleaned = name.trim();
-        cleaned = decodeHtmlEntities(cleaned);
-        const commonSuffixRegex = /\s*\((?:FRA|FR|UK|US|Feat\.|Featuring|Trad\.|Producer|Mix|Remix|Edit|Version|Live|Demo)[^)]*?\)\s*$/i;
-        if (commonSuffixRegex.test(cleaned)) {
-          cleaned = cleaned.replace(commonSuffixRegex, "").trim();
-        }
-        const trailingParenthesisRegex = /\s*\([^)]*\)\s*$/;
-        if (trailingParenthesisRegex.test(cleaned)) {
-          cleaned = cleaned.replace(trailingParenthesisRegex, "").trim();
-        } else {
-          const isolatedTrailingParenthesisRegex = /\)\s*$/;
-          if (isolatedTrailingParenthesisRegex.test(cleaned)) {
-            cleaned = cleaned.replace(isolatedTrailingParenthesisRegex, "").trim();
-          }
-        }
-        const lastOpenParenIndex = cleaned.lastIndexOf("(");
-        if (lastOpenParenIndex > -1 && cleaned.indexOf(")", lastOpenParenIndex) === -1) {
-          if (cleaned.length - lastOpenParenIndex < 10) {
-            cleaned = cleaned.substring(0, lastOpenParenIndex).trim();
-          }
-        }
-        cleaned = cleaned.replace(/\s+/g, " ").trim();
-        return cleaned;
+      if (ten === 9) {
+        if (one === 0) return "quatre-vingt-dix";
+        return "quatre-vingt-" + teens[one];
       }
-      function escapeRegExp(string) {
-        if (!string) return "";
-        return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      if (one === 0) {
+        if (ten === 8) return "quatre-vingts";
+        return tens[ten];
       }
-      function formatArtistList(artists) {
-        if (!artists || artists.length === 0) return "";
-        if (artists.length === 1) return artists[0];
-        if (artists.length === 2) return artists.join(" & ");
-        return `${artists.slice(0, -1).join(", ")} & ${artists[artists.length - 1]}`;
+      if (one === 1 && (ten === 2 || ten === 3 || ten === 4 || ten === 5 || ten === 6)) {
+        return tens[ten] + " et un";
       }
-      function numberToFrenchWords(num) {
-        if (num === 0) return "z\xE9ro";
-        const ones = ["", "un", "deux", "trois", "quatre", "cinq", "six", "sept", "huit", "neuf"];
-        const teens = ["dix", "onze", "douze", "treize", "quatorze", "quinze", "seize", "dix-sept", "dix-huit", "dix-neuf"];
-        const tens = ["", "", "vingt", "trente", "quarante", "cinquante", "soixante", "soixante", "quatre-vingt", "quatre-vingt"];
-        function convertUpTo99(n) {
-          if (n < 10) return ones[n];
-          if (n < 20) return teens[n - 10];
-          const ten = Math.floor(n / 10);
-          const one = n % 10;
-          if (ten === 7) {
-            if (one === 0) return "soixante-dix";
-            if (one === 1) return "soixante et onze";
-            return "soixante-" + teens[one];
-          }
-          if (ten === 9) {
-            if (one === 0) return "quatre-vingt-dix";
-            return "quatre-vingt-" + teens[one];
-          }
-          if (one === 0) {
-            if (ten === 8) return "quatre-vingts";
-            return tens[ten];
-          }
-          if (one === 1 && (ten === 2 || ten === 3 || ten === 4 || ten === 5 || ten === 6)) {
-            return tens[ten] + " et un";
-          }
-          if (ten === 8) return "quatre-vingt-" + ones[one];
-          return tens[ten] + "-" + ones[one];
-        }
-        function convertUpTo999(n) {
-          if (n < 100) return convertUpTo99(n);
-          const hundred = Math.floor(n / 100);
-          const rest2 = n % 100;
-          let result2 = "";
-          if (hundred === 1) {
-            result2 = "cent";
-          } else {
-            result2 = ones[hundred] + " cent";
-          }
-          if (rest2 === 0 && hundred > 1) {
-            result2 += "s";
-          } else if (rest2 > 0) {
-            result2 += " " + convertUpTo99(rest2);
-          }
-          return result2;
-        }
-        if (num < 0 || num > 999999999999) return num.toString();
-        if (num < 1e3) return convertUpTo999(num);
-        if (num >= 1e9) {
-          const billions = Math.floor(num / 1e9);
-          const rest2 = num % 1e9;
-          let result2 = "";
-          if (billions === 1) {
-            result2 = "un milliard";
-          } else {
-            result2 = convertUpTo999(billions) + " milliards";
-          }
-          if (rest2 > 0) {
-            result2 += " " + numberToFrenchWords(rest2);
-          }
-          return result2;
-        }
-        if (num >= 1e6) {
-          const millions = Math.floor(num / 1e6);
-          const rest2 = num % 1e6;
-          let result2 = "";
-          if (millions === 1) {
-            result2 = "un million";
-          } else {
-            result2 = convertUpTo999(millions) + " millions";
-          }
-          if (rest2 > 0) {
-            result2 += " " + numberToFrenchWords(rest2);
-          }
-          return result2;
-        }
-        const thousand = Math.floor(num / 1e3);
-        const rest = num % 1e3;
-        let result = "";
-        if (thousand === 1) {
-          result = "mille";
-        } else {
-          result = convertUpTo999(thousand) + " mille";
-        }
-        if (rest > 0) {
-          result += " " + convertUpTo999(rest);
-        }
-        return result;
+      if (ten === 8) return "quatre-vingt-" + ones[one];
+      return tens[ten] + "-" + ones[one];
+    }
+    function convertUpTo999(n) {
+      if (n < 100) return convertUpTo99(n);
+      const hundred = Math.floor(n / 100);
+      const rest2 = n % 100;
+      let result2 = "";
+      if (hundred === 1) {
+        result2 = "cent";
+      } else {
+        result2 = ones[hundred] + " cent";
       }
-      function numberToEnglishWords(num) {
-        if (num === 0) return "zero";
-        const ones = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
-        const teens = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
-        const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
-        function convertUpTo99(n) {
-          if (n < 10) return ones[n];
-          if (n < 20) return teens[n - 10];
-          const ten = Math.floor(n / 10);
-          const one = n % 10;
-          if (one === 0) return tens[ten];
-          return tens[ten] + "-" + ones[one];
+      if (rest2 === 0 && hundred > 1) {
+        result2 += "s";
+      } else if (rest2 > 0) {
+        result2 += " " + convertUpTo99(rest2);
+      }
+      return result2;
+    }
+    if (num < 0 || num > 999999999999) return num.toString();
+    if (num < 1e3) return convertUpTo999(num);
+    if (num >= 1e9) {
+      const billions = Math.floor(num / 1e9);
+      const rest2 = num % 1e9;
+      let result2 = "";
+      if (billions === 1) {
+        result2 = "un milliard";
+      } else {
+        result2 = convertUpTo999(billions) + " milliards";
+      }
+      if (rest2 > 0) {
+        result2 += " " + numberToFrenchWords(rest2);
+      }
+      return result2;
+    }
+    if (num >= 1e6) {
+      const millions = Math.floor(num / 1e6);
+      const rest2 = num % 1e6;
+      let result2 = "";
+      if (millions === 1) {
+        result2 = "un million";
+      } else {
+        result2 = convertUpTo999(millions) + " millions";
+      }
+      if (rest2 > 0) {
+        result2 += " " + numberToFrenchWords(rest2);
+      }
+      return result2;
+    }
+    const thousand = Math.floor(num / 1e3);
+    const rest = num % 1e3;
+    let result = "";
+    if (thousand === 1) {
+      result = "mille";
+    } else {
+      result = convertUpTo999(thousand) + " mille";
+    }
+    if (rest > 0) {
+      result += " " + convertUpTo999(rest);
+    }
+    return result;
+  }
+  function numberToEnglishWords(num) {
+    if (num === 0) return "zero";
+    const ones = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+    const teens = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+    const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+    function convertUpTo99(n) {
+      if (n < 10) return ones[n];
+      if (n < 20) return teens[n - 10];
+      const ten = Math.floor(n / 10);
+      const one = n % 10;
+      if (one === 0) return tens[ten];
+      return tens[ten] + "-" + ones[one];
+    }
+    function convertUpTo999(n) {
+      if (n < 100) return convertUpTo99(n);
+      const hundred = Math.floor(n / 100);
+      const rest2 = n % 100;
+      let result2 = ones[hundred] + " hundred";
+      if (rest2 > 0) {
+        result2 += " " + convertUpTo99(rest2);
+      }
+      return result2;
+    }
+    if (num < 0 || num > 999999999999) return num.toString();
+    if (num < 1e3) return convertUpTo999(num);
+    if (num >= 1e9) {
+      const billions = Math.floor(num / 1e9);
+      const rest2 = num % 1e9;
+      let result2 = convertUpTo999(billions) + " billion";
+      if (rest2 > 0) result2 += " " + numberToEnglishWords(rest2);
+      return result2;
+    }
+    if (num >= 1e6) {
+      const millions = Math.floor(num / 1e6);
+      const rest2 = num % 1e6;
+      let result2 = convertUpTo999(millions) + " million";
+      if (rest2 > 0) result2 += " " + numberToEnglishWords(rest2);
+      return result2;
+    }
+    const thousand = Math.floor(num / 1e3);
+    const rest = num % 1e3;
+    let result = convertUpTo999(thousand) + " thousand";
+    if (rest > 0) result += " " + convertUpTo999(rest);
+    return result;
+  }
+  function numberToPolishWords(num) {
+    if (num === 0) return "zero";
+    const ones = ["", "jeden", "dwa", "trzy", "cztery", "pi\u0119\u0107", "sze\u015B\u0107", "siedem", "osiem", "dziewi\u0119\u0107"];
+    const teens = ["dziesi\u0119\u0107", "jedena\u015Bcie", "dwana\u015Bcie", "trzyna\u015Bcie", "czterna\u015Bcie", "pi\u0119tna\u015Bcie", "szesna\u015Bcie", "siedemna\u015Bcie", "osiemna\u015Bcie", "dziewi\u0119tna\u015Bcie"];
+    const tens = ["", "", "dwadzie\u015Bcia", "trzydzie\u015Bci", "czterdzie\u015Bci", "pi\u0119\u0107dziesi\u0105t", "sze\u015B\u0107dziesi\u0105t", "siedemdziesi\u0105t", "osiemdziesi\u0105t", "dziewi\u0119\u0107dziesi\u0105t"];
+    const hundreds = ["", "sto", "dwie\u015Bcie", "trzysta", "czterysta", "pi\u0119\u0107set", "sze\u015B\u0107set", "siedemset", "osiemset", "dziewi\u0119\u0107set"];
+    function convertUpTo99(n) {
+      if (n < 10) return ones[n];
+      if (n < 20) return teens[n - 10];
+      const ten = Math.floor(n / 10);
+      const one = n % 10;
+      if (one === 0) return tens[ten];
+      return tens[ten] + " " + ones[one];
+    }
+    function convertUpTo999(n) {
+      if (n < 100) return convertUpTo99(n);
+      const hundred = Math.floor(n / 100);
+      const rest2 = n % 100;
+      let result2 = hundreds[hundred];
+      if (rest2 > 0) {
+        result2 += " " + convertUpTo99(rest2);
+      }
+      return result2;
+    }
+    function getThousandForm(n) {
+      if (n === 1) return "tysi\u0105c";
+      const lastDigit = n % 10;
+      const lastTwoDigits = n % 100;
+      if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return "tysi\u0119cy";
+      if (lastDigit >= 2 && lastDigit <= 4) return "tysi\u0105ce";
+      return "tysi\u0119cy";
+    }
+    function getMillionForm(n) {
+      if (n === 1) return "milion";
+      const lastDigit = n % 10;
+      const lastTwoDigits = n % 100;
+      if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return "milion\xF3w";
+      if (lastDigit >= 2 && lastDigit <= 4) return "miliony";
+      return "milion\xF3w";
+    }
+    function getBillionForm(n) {
+      if (n === 1) return "miliard";
+      const lastDigit = n % 10;
+      const lastTwoDigits = n % 100;
+      if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return "miliard\xF3w";
+      if (lastDigit >= 2 && lastDigit <= 4) return "miliardy";
+      return "miliard\xF3w";
+    }
+    if (num < 0 || num > 999999999999) return num.toString();
+    if (num < 1e3) return convertUpTo999(num);
+    if (num >= 1e9) {
+      const billions = Math.floor(num / 1e9);
+      const rest2 = num % 1e9;
+      let result2 = (billions === 1 ? "" : convertUpTo999(billions) + " ") + getBillionForm(billions);
+      if (rest2 > 0) result2 += " " + numberToPolishWords(rest2);
+      return result2.trim();
+    }
+    if (num >= 1e6) {
+      const millions = Math.floor(num / 1e6);
+      const rest2 = num % 1e6;
+      let result2 = (millions === 1 ? "" : convertUpTo999(millions) + " ") + getMillionForm(millions);
+      if (rest2 > 0) result2 += " " + numberToPolishWords(rest2);
+      return result2.trim();
+    }
+    const thousand = Math.floor(num / 1e3);
+    const rest = num % 1e3;
+    let result = (thousand === 1 ? "" : convertUpTo999(thousand) + " ") + getThousandForm(thousand);
+    if (rest > 0) result += " " + convertUpTo999(rest);
+    return result.trim();
+  }
+  function isValidNumber(str) {
+    if (!str || str.trim() === "") return false;
+    const trimmed = str.trim();
+    return /^\d+$/.test(trimmed);
+  }
+  function extractArtistsFromMetaContent(metaContent) {
+    const result = { main: [], ft: [] };
+    if (!metaContent) return result;
+    let contentForArtists = decodeHtmlEntities(metaContent);
+    const songTitleSeparatorMatch = contentForArtists.match(/\s[–-]\s/);
+    if (songTitleSeparatorMatch) {
+      contentForArtists = contentForArtists.substring(0, songTitleSeparatorMatch.index).trim();
+    }
+    let ftContent = null;
+    let mainPart = contentForArtists;
+    const ftOuterMatch = contentForArtists.match(/\((Ft\.|Featuring)\s+(.*)\)\s*$/i);
+    if (ftOuterMatch && ftOuterMatch[2]) {
+      ftContent = ftOuterMatch[2].trim();
+      mainPart = contentForArtists.replace(ftOuterMatch[0], "").trim();
+    }
+    if (ftContent) {
+      ftContent.split(/[,&]\s*/).forEach((name) => {
+        const cleaned = name.trim();
+        if (cleaned) result.ft.push(cleaned);
+      });
+    }
+    mainPart.split(/[,&]\s*/).forEach((name) => {
+      const cleanedName = name.trim();
+      if (cleanedName) {
+        if (!result.ft.some((ftArt) => ftArt.toLowerCase() === cleanedName.toLowerCase())) {
+          result.main.push(cleanedName);
         }
-        function convertUpTo999(n) {
-          if (n < 100) return convertUpTo99(n);
-          const hundred = Math.floor(n / 100);
-          const rest2 = n % 100;
-          let result2 = ones[hundred] + " hundred";
-          if (rest2 > 0) {
-            result2 += " " + convertUpTo99(rest2);
+      }
+    });
+    return result;
+  }
+  var init_utils = __esm({
+    "src/modules/utils.js"() {
+      init_translations();
+    }
+  });
+
+  // src/modules/songData.js
+  function extractSongData() {
+    const songData = {
+      title: null,
+      mainArtists: [],
+      featuringArtists: [],
+      _rawMainArtists: [],
+      _rawFeaturingArtistsFromSection: [],
+      _rawFeaturingArtistsFromTitleExtract: []
+    };
+    let rawTitleText = null;
+    let artistsFromMeta = { main: [], ft: [] };
+    const ogTitleMeta = document.querySelector(SELECTORS.OG_TITLE_META);
+    if (ogTitleMeta && ogTitleMeta.content) {
+      artistsFromMeta = extractArtistsFromMetaContent(ogTitleMeta.content);
+      songData._rawMainArtists = [...artistsFromMeta.main];
+      songData._rawFeaturingArtistsFromTitleExtract = [...artistsFromMeta.ft];
+      const titleParts = decodeHtmlEntities(ogTitleMeta.content).split(/\s[–-]\s/);
+      if (titleParts.length > 1) {
+        rawTitleText = titleParts.slice(1).join(" \u2013 ").trim();
+        if (artistsFromMeta.main.length > 0) {
+          const mainArtistString = formatArtistList(artistsFromMeta.main);
+          if (rawTitleText.toLowerCase().endsWith(mainArtistString.toLowerCase())) {
+            rawTitleText = rawTitleText.substring(0, rawTitleText.length - mainArtistString.length).replace(/\s*-\s*$/, "").trim();
           }
-          return result2;
         }
-        if (num < 0 || num > 999999999999) return num.toString();
-        if (num < 1e3) return convertUpTo999(num);
-        if (num >= 1e9) {
-          const billions = Math.floor(num / 1e9);
-          const rest2 = num % 1e9;
-          let result2 = convertUpTo999(billions) + " billion";
-          if (rest2 > 0) result2 += " " + numberToEnglishWords(rest2);
-          return result2;
-        }
-        if (num >= 1e6) {
-          const millions = Math.floor(num / 1e6);
-          const rest2 = num % 1e6;
-          let result2 = convertUpTo999(millions) + " million";
-          if (rest2 > 0) result2 += " " + numberToEnglishWords(rest2);
-          return result2;
-        }
-        const thousand = Math.floor(num / 1e3);
-        const rest = num % 1e3;
-        let result = convertUpTo999(thousand) + " thousand";
-        if (rest > 0) result += " " + convertUpTo999(rest);
-        return result;
       }
-      function numberToPolishWords(num) {
-        if (num === 0) return "zero";
-        const ones = ["", "jeden", "dwa", "trzy", "cztery", "pi\u0119\u0107", "sze\u015B\u0107", "siedem", "osiem", "dziewi\u0119\u0107"];
-        const teens = ["dziesi\u0119\u0107", "jedena\u015Bcie", "dwana\u015Bcie", "trzyna\u015Bcie", "czterna\u015Bcie", "pi\u0119tna\u015Bcie", "szesna\u015Bcie", "siedemna\u015Bcie", "osiemna\u015Bcie", "dziewi\u0119tna\u015Bcie"];
-        const tens = ["", "", "dwadzie\u015Bcia", "trzydzie\u015Bci", "czterdzie\u015Bci", "pi\u0119\u0107dziesi\u0105t", "sze\u015B\u0107dziesi\u0105t", "siedemdziesi\u0105t", "osiemdziesi\u0105t", "dziewi\u0119\u0107dziesi\u0105t"];
-        const hundreds = ["", "sto", "dwie\u015Bcie", "trzysta", "czterysta", "pi\u0119\u0107set", "sze\u015B\u0107set", "siedemset", "osiemset", "dziewi\u0119\u0107set"];
-        function convertUpTo99(n) {
-          if (n < 10) return ones[n];
-          if (n < 20) return teens[n - 10];
-          const ten = Math.floor(n / 10);
-          const one = n % 10;
-          if (one === 0) return tens[ten];
-          return tens[ten] + " " + ones[one];
-        }
-        function convertUpTo999(n) {
-          if (n < 100) return convertUpTo99(n);
-          const hundred = Math.floor(n / 100);
-          const rest2 = n % 100;
-          let result2 = hundreds[hundred];
-          if (rest2 > 0) {
-            result2 += " " + convertUpTo99(rest2);
-          }
-          return result2;
-        }
-        function getThousandForm(n) {
-          if (n === 1) return "tysi\u0105c";
-          const lastDigit = n % 10;
-          const lastTwoDigits = n % 100;
-          if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return "tysi\u0119cy";
-          if (lastDigit >= 2 && lastDigit <= 4) return "tysi\u0105ce";
-          return "tysi\u0119cy";
-        }
-        function getMillionForm(n) {
-          if (n === 1) return "milion";
-          const lastDigit = n % 10;
-          const lastTwoDigits = n % 100;
-          if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return "milion\xF3w";
-          if (lastDigit >= 2 && lastDigit <= 4) return "miliony";
-          return "milion\xF3w";
-        }
-        function getBillionForm(n) {
-          if (n === 1) return "miliard";
-          const lastDigit = n % 10;
-          const lastTwoDigits = n % 100;
-          if (lastTwoDigits >= 12 && lastTwoDigits <= 14) return "miliard\xF3w";
-          if (lastDigit >= 2 && lastDigit <= 4) return "miliardy";
-          return "miliard\xF3w";
-        }
-        if (num < 0 || num > 999999999999) return num.toString();
-        if (num < 1e3) return convertUpTo999(num);
-        if (num >= 1e9) {
-          const billions = Math.floor(num / 1e9);
-          const rest2 = num % 1e9;
-          let result2 = (billions === 1 ? "" : convertUpTo999(billions) + " ") + getBillionForm(billions);
-          if (rest2 > 0) result2 += " " + numberToPolishWords(rest2);
-          return result2.trim();
-        }
-        if (num >= 1e6) {
-          const millions = Math.floor(num / 1e6);
-          const rest2 = num % 1e6;
-          let result2 = (millions === 1 ? "" : convertUpTo999(millions) + " ") + getMillionForm(millions);
-          if (rest2 > 0) result2 += " " + numberToPolishWords(rest2);
-          return result2.trim();
-        }
-        const thousand = Math.floor(num / 1e3);
-        const rest = num % 1e3;
-        let result = (thousand === 1 ? "" : convertUpTo999(thousand) + " ") + getThousandForm(thousand);
-        if (rest > 0) result += " " + convertUpTo999(rest);
-        return result.trim();
+    } else {
+      const twitterTitleMeta = document.querySelector(SELECTORS.TWITTER_TITLE_META);
+      if (twitterTitleMeta && twitterTitleMeta.content) {
+        artistsFromMeta = extractArtistsFromMetaContent(twitterTitleMeta.content);
+        songData._rawMainArtists = [...artistsFromMeta.main];
+        songData._rawFeaturingArtistsFromTitleExtract = [...artistsFromMeta.ft];
+        const titleParts = decodeHtmlEntities(twitterTitleMeta.content).split(/\s[–-]\s/);
+        if (titleParts.length > 1) rawTitleText = titleParts.slice(1).join(" \u2013 ").trim();
       }
-      function isValidNumber(str) {
-        if (!str || str.trim() === "") return false;
-        const trimmed = str.trim();
-        return /^\d+$/.test(trimmed);
+    }
+    if (songData._rawMainArtists.length === 0) {
+      const mainArtistsContainer = document.querySelector(SELECTORS.MAIN_ARTISTS_CONTAINER_FALLBACK);
+      if (mainArtistsContainer) {
+        mainArtistsContainer.querySelectorAll(SELECTORS.MAIN_ARTIST_LINK_IN_CONTAINER_FALLBACK).forEach((link) => {
+          const n = link.textContent.trim();
+          if (n && !songData._rawMainArtists.includes(n)) songData._rawMainArtists.push(n);
+        });
+      } else {
+        document.querySelectorAll(SELECTORS.FALLBACK_MAIN_ARTIST_LINKS_FALLBACK).forEach((link) => {
+          const n = link.textContent.trim();
+          if (n && !songData._rawMainArtists.includes(n)) songData._rawMainArtists.push(n);
+        });
       }
-      function extractArtistsFromMetaContent(metaContent) {
-        const result = { main: [], ft: [] };
-        if (!metaContent) return result;
-        let contentForArtists = decodeHtmlEntities(metaContent);
-        const songTitleSeparatorMatch = contentForArtists.match(/\s[–-]\s/);
-        if (songTitleSeparatorMatch) {
-          contentForArtists = contentForArtists.substring(0, songTitleSeparatorMatch.index).trim();
+    }
+    document.querySelectorAll(SELECTORS.CREDITS_PAGE_ARTIST_LIST_CONTAINER).forEach((listContainer) => {
+      const lt = listContainer.previousElementSibling;
+      let isFt = false;
+      if (lt) {
+        const txt = lt.textContent.trim().toLowerCase();
+        if (txt.includes("featuring") || txt.includes("feat") || txt.includes("avec")) {
+          isFt = true;
         }
-        let ftContent = null;
-        let mainPart = contentForArtists;
-        const ftOuterMatch = contentForArtists.match(/\((Ft\.|Featuring)\s+(.*)\)\s*$/i);
-        if (ftOuterMatch && ftOuterMatch[2]) {
-          ftContent = ftOuterMatch[2].trim();
-          mainPart = contentForArtists.replace(ftOuterMatch[0], "").trim();
-        }
-        if (ftContent) {
-          ftContent.split(/[,&]\s*/).forEach((name) => {
-            const cleaned = name.trim();
-            if (cleaned) result.ft.push(cleaned);
-          });
-        }
-        mainPart.split(/[,&]\s*/).forEach((name) => {
-          const cleanedName = name.trim();
-          if (cleanedName) {
-            if (!result.ft.some((ftArt) => ftArt.toLowerCase() === cleanedName.toLowerCase())) {
-              result.main.push(cleanedName);
-            }
+      }
+      if (isFt) {
+        listContainer.querySelectorAll(SELECTORS.CREDITS_PAGE_ARTIST_NAME_IN_LINK).forEach((s) => {
+          const n = s.textContent.trim();
+          if (n && !songData._rawFeaturingArtistsFromSection.includes(n) && !songData._rawMainArtists.includes(n)) {
+            songData._rawFeaturingArtistsFromSection.push(n);
           }
         });
-        return result;
       }
-      function extractSongData() {
-        const songData = { title: null, mainArtists: [], featuringArtists: [], _rawMainArtists: [], _rawFeaturingArtistsFromSection: [], _rawFeaturingArtistsFromTitleExtract: [] };
-        let rawTitleText = null;
-        let artistsFromMeta = { main: [], ft: [] };
-        const ogTitleMeta = document.querySelector(SELECTORS.OG_TITLE_META);
-        if (ogTitleMeta && ogTitleMeta.content) {
-          artistsFromMeta = extractArtistsFromMetaContent(ogTitleMeta.content);
-          songData._rawMainArtists = [...artistsFromMeta.main];
-          songData._rawFeaturingArtistsFromTitleExtract = [...artistsFromMeta.ft];
-          const titleParts = decodeHtmlEntities(ogTitleMeta.content).split(/\s[–-]\s/);
-          if (titleParts.length > 1) {
-            rawTitleText = titleParts.slice(1).join(" \u2013 ").trim();
-            if (artistsFromMeta.main.length > 0) {
-              const mainArtistString = formatArtistList(artistsFromMeta.main);
-              if (rawTitleText.toLowerCase().endsWith(mainArtistString.toLowerCase())) {
-                rawTitleText = rawTitleText.substring(0, rawTitleText.length - mainArtistString.length).replace(/\s*-\s*$/, "").trim();
-              }
-            }
-          }
-        } else {
-          const twitterTitleMeta = document.querySelector(SELECTORS.TWITTER_TITLE_META);
-          if (twitterTitleMeta && twitterTitleMeta.content) {
-            artistsFromMeta = extractArtistsFromMetaContent(twitterTitleMeta.content);
-            songData._rawMainArtists = [...artistsFromMeta.main];
-            songData._rawFeaturingArtistsFromTitleExtract = [...artistsFromMeta.ft];
-            const titleParts = decodeHtmlEntities(twitterTitleMeta.content).split(/\s[–-]\s/);
-            if (titleParts.length > 1) rawTitleText = titleParts.slice(1).join(" \u2013 ").trim();
+    });
+    if (!rawTitleText) {
+      for (const sel of SELECTORS.TITLE) {
+        const el = document.querySelector(sel);
+        if (el) {
+          rawTitleText = el.textContent;
+          if (rawTitleText) break;
+        }
+      }
+    }
+    if (rawTitleText) {
+      let ttc = decodeHtmlEntities(rawTitleText.trim()).replace(/\s+Lyrics$/i, "").trim();
+      if (artistsFromMeta.main.length === 0 && songData._rawMainArtists.length > 0) {
+        const blk = formatArtistList(songData._rawMainArtists.map((a) => cleanArtistName(a)));
+        if (blk) {
+          const esc = escapeRegExp(blk);
+          let m = ttc.match(new RegExp(`^${esc}\\s*-\\s*(.+)$`, "i"));
+          if (m && m[1]) ttc = m[1].trim();
+          else {
+            m = ttc.match(new RegExp(`^(.+?)\\s*-\\s*${esc}$`, "i"));
+            if (m && m[1]) ttc = m[1].trim();
           }
         }
-        if (songData._rawMainArtists.length === 0) {
-          const mainArtistsContainer = document.querySelector(SELECTORS.MAIN_ARTISTS_CONTAINER_FALLBACK);
-          if (mainArtistsContainer) {
-            mainArtistsContainer.querySelectorAll(SELECTORS.MAIN_ARTIST_LINK_IN_CONTAINER_FALLBACK).forEach((link) => {
-              const n = link.textContent.trim();
-              if (n && !songData._rawMainArtists.includes(n)) songData._rawMainArtists.push(n);
-            });
-          } else {
-            document.querySelectorAll(SELECTORS.FALLBACK_MAIN_ARTIST_LINKS_FALLBACK).forEach((link) => {
-              const n = link.textContent.trim();
-              if (n && !songData._rawMainArtists.includes(n)) songData._rawMainArtists.push(n);
-            });
-          }
+      }
+      ttc = ttc.replace(/\s*\((?:Ft\.|Featuring)[^)]+\)\s*/gi, " ").trim().replace(/^[\s,-]+|[\s,-]+$/g, "").replace(/\s\s+/g, " ");
+      songData.title = ttc;
+    }
+    if (!songData.title || songData.title.length === 0) songData.title = "TITRE INCONNU";
+    songData.mainArtists = [...new Set(songData._rawMainArtists.map((name) => cleanArtistName(name)))].filter(Boolean);
+    let finalFeaturingArtists = [];
+    const seenCleanedFtNamesForDeduplication = /* @__PURE__ */ new Set();
+    if (songData._rawFeaturingArtistsFromTitleExtract.length > 0) {
+      songData._rawFeaturingArtistsFromTitleExtract.forEach((rawName) => {
+        const cleanedName = cleanArtistName(rawName);
+        if (cleanedName && !seenCleanedFtNamesForDeduplication.has(cleanedName.toLowerCase()) && !songData.mainArtists.some((mainArt) => mainArt.toLowerCase() === cleanedName.toLowerCase())) {
+          finalFeaturingArtists.push(cleanedName);
+          seenCleanedFtNamesForDeduplication.add(cleanedName.toLowerCase());
         }
-        document.querySelectorAll(SELECTORS.CREDITS_PAGE_ARTIST_LIST_CONTAINER).forEach((listContainer) => {
-          const lt = listContainer.previousElementSibling;
-          let isFt = false;
-          if (lt) {
-            const txt = lt.textContent.trim().toLowerCase();
-            if (txt.includes("featuring") || txt.includes("feat") || txt.includes("avec")) {
-              isFt = true;
-            }
-          }
-          if (isFt) {
-            listContainer.querySelectorAll(SELECTORS.CREDITS_PAGE_ARTIST_NAME_IN_LINK).forEach((s) => {
-              const n = s.textContent.trim();
-              if (n && !songData._rawFeaturingArtistsFromSection.includes(n) && !songData._rawMainArtists.includes(n)) {
-                songData._rawFeaturingArtistsFromSection.push(n);
-              }
-            });
-          }
+      });
+    } else {
+      songData._rawFeaturingArtistsFromSection.forEach((rawName) => {
+        const cleanedName = cleanArtistName(rawName);
+        if (cleanedName && !seenCleanedFtNamesForDeduplication.has(cleanedName.toLowerCase()) && !songData.mainArtists.some((mainArt) => mainArt.toLowerCase() === cleanedName.toLowerCase())) {
+          finalFeaturingArtists.push(cleanedName);
+          seenCleanedFtNamesForDeduplication.add(cleanedName.toLowerCase());
+        }
+      });
+    }
+    songData.featuringArtists = finalFeaturingArtists;
+    GFT_STATE.currentSongTitle = songData.title;
+    GFT_STATE.currentMainArtists = [...songData.mainArtists];
+    GFT_STATE.currentFeaturingArtists = [...songData.featuringArtists];
+    GFT_STATE.detectedArtists = [.../* @__PURE__ */ new Set([...GFT_STATE.currentMainArtists, ...GFT_STATE.currentFeaturingArtists])].filter(Boolean);
+    return songData;
+  }
+  var init_songData = __esm({
+    "src/modules/songData.js"() {
+      init_constants();
+      init_utils();
+    }
+  });
+
+  // src/modules/config.js
+  function isTagNewlinesDisabled() {
+    return localStorage.getItem(DISABLE_TAG_NEWLINES_STORAGE_KEY) === "true";
+  }
+  function setTagNewlinesDisabled(disabled) {
+    localStorage.setItem(DISABLE_TAG_NEWLINES_STORAGE_KEY, disabled.toString());
+  }
+  function isLyricCardOnlyMode() {
+    return localStorage.getItem(LYRIC_CARD_ONLY_STORAGE_KEY) === "true";
+  }
+  function setLyricCardOnlyMode(enabled) {
+    localStorage.setItem(LYRIC_CARD_ONLY_STORAGE_KEY, enabled.toString());
+  }
+  function getTranscriptionMode() {
+    return localStorage.getItem(TRANSCRIPTION_MODE_STORAGE_KEY) || "fr";
+  }
+  function setTranscriptionMode(mode) {
+    localStorage.setItem(TRANSCRIPTION_MODE_STORAGE_KEY, mode);
+  }
+  function isEnglishTranscriptionMode() {
+    return getTranscriptionMode() === "en";
+  }
+  function isPolishTranscriptionMode2() {
+    return getTranscriptionMode() === "pl";
+  }
+  var init_config = __esm({
+    "src/modules/config.js"() {
+      init_constants();
+    }
+  });
+
+  // src/modules/ui-artists.js
+  function createArtistSelectors(container) {
+    if (!container) {
+      console.error("[createArtistSelectors] Erreur: Conteneur non fourni.");
+      return;
+    }
+    const existingSelectorContainer = document.getElementById(ARTIST_SELECTOR_CONTAINER_ID);
+    if (existingSelectorContainer) {
+      existingSelectorContainer.remove();
+    }
+    const artistSelectorContainer = document.createElement("div");
+    artistSelectorContainer.id = ARTIST_SELECTOR_CONTAINER_ID;
+    artistSelectorContainer.style.display = "flex";
+    artistSelectorContainer.style.flexWrap = "wrap";
+    artistSelectorContainer.style.gap = "2px 10px";
+    artistSelectorContainer.style.alignItems = "center";
+    const title = document.createElement("p");
+    title.textContent = getTranslation("artist_selection");
+    title.style.width = "100%";
+    title.style.margin = "0 0 1px 0";
+    artistSelectorContainer.appendChild(title);
+    if (!GFT_STATE.detectedArtists || GFT_STATE.detectedArtists.length === 0) {
+      const noArtistsMsg = document.createElement("span");
+      noArtistsMsg.textContent = getTranslation("no_artist");
+      noArtistsMsg.style.fontStyle = "italic";
+      artistSelectorContainer.appendChild(noArtistsMsg);
+    } else {
+      GFT_STATE.detectedArtists.forEach((artistName, index) => {
+        const artistId = `artist_checkbox_${index}_${artistName.replace(/[^a-zA-Z0-9]/g, "")}_GFT`;
+        const wrapper = document.createElement("span");
+        const checkbox = document.createElement("input");
+        Object.assign(checkbox, {
+          type: "checkbox",
+          name: "selectedGeniusArtist_checkbox_GFT",
+          value: artistName,
+          id: artistId
         });
-        if (!rawTitleText) {
-          for (const sel of SELECTORS.TITLE) {
-            const el = document.querySelector(sel);
-            if (el) {
-              rawTitleText = el.textContent;
-              if (rawTitleText) break;
-            }
-          }
-        }
-        if (rawTitleText) {
-          let ttc = decodeHtmlEntities(rawTitleText.trim()).replace(/\s+Lyrics$/i, "").trim();
-          if (artistsFromMeta.main.length === 0 && songData._rawMainArtists.length > 0) {
-            const blk = formatArtistList(songData._rawMainArtists.map((a) => cleanArtistName(a)));
-            if (blk) {
-              const esc = escapeRegExp(blk);
-              let m = ttc.match(new RegExp(`^${esc}\\s*-\\s*(.+)$`, "i"));
-              if (m && m[1]) ttc = m[1].trim();
-              else {
-                m = ttc.match(new RegExp(`^(.+?)\\s*-\\s*${esc}$`, "i"));
-                if (m && m[1]) ttc = m[1].trim();
-              }
-            }
-          }
-          ttc = ttc.replace(/\s*\((?:Ft\.|Featuring)[^)]+\)\s*/gi, " ").trim().replace(/^[\s,-]+|[\s,-]+$/g, "").replace(/\s\s+/g, " ");
-          songData.title = ttc;
-        }
-        if (!songData.title || songData.title.length === 0) songData.title = "TITRE INCONNU";
-        songData.mainArtists = [...new Set(songData._rawMainArtists.map((name) => cleanArtistName(name)))].filter(Boolean);
-        let finalFeaturingArtists = [];
-        const seenCleanedFtNamesForDeduplication = /* @__PURE__ */ new Set();
-        if (songData._rawFeaturingArtistsFromTitleExtract.length > 0) {
-          songData._rawFeaturingArtistsFromTitleExtract.forEach((rawName) => {
-            const cleanedName = cleanArtistName(rawName);
-            if (cleanedName && !seenCleanedFtNamesForDeduplication.has(cleanedName.toLowerCase()) && !songData.mainArtists.some((mainArt) => mainArt.toLowerCase() === cleanedName.toLowerCase())) {
-              finalFeaturingArtists.push(cleanedName);
-              seenCleanedFtNamesForDeduplication.add(cleanedName.toLowerCase());
-            }
-          });
-        } else {
-          songData._rawFeaturingArtistsFromSection.forEach((rawName) => {
-            const cleanedName = cleanArtistName(rawName);
-            if (cleanedName && !seenCleanedFtNamesForDeduplication.has(cleanedName.toLowerCase()) && !songData.mainArtists.some((mainArt) => mainArt.toLowerCase() === cleanedName.toLowerCase())) {
-              finalFeaturingArtists.push(cleanedName);
-              seenCleanedFtNamesForDeduplication.add(cleanedName.toLowerCase());
-            }
-          });
-        }
-        songData.featuringArtists = finalFeaturingArtists;
-        currentSongTitle = songData.title;
-        currentMainArtists = [...songData.mainArtists];
-        currentFeaturingArtists = [...songData.featuringArtists];
-        detectedArtists = [.../* @__PURE__ */ new Set([...currentMainArtists, ...currentFeaturingArtists])].filter(Boolean);
-        return songData;
-      }
-      function createArtistSelectors(container) {
-        if (!container) {
-          console.error("[createArtistSelectors] Erreur: Conteneur non fourni.");
-          return;
-        }
-        const existingSelectorContainer = document.getElementById(ARTIST_SELECTOR_CONTAINER_ID);
-        if (existingSelectorContainer) {
-          existingSelectorContainer.remove();
-        }
-        const artistSelectorContainer = document.createElement("div");
-        artistSelectorContainer.id = ARTIST_SELECTOR_CONTAINER_ID;
-        artistSelectorContainer.style.display = "flex";
-        artistSelectorContainer.style.flexWrap = "wrap";
-        artistSelectorContainer.style.gap = "2px 10px";
-        artistSelectorContainer.style.alignItems = "center";
-        const title = document.createElement("p");
-        title.textContent = getTranslation("artist_selection");
-        title.style.width = "100%";
-        title.style.margin = "0 0 1px 0";
-        artistSelectorContainer.appendChild(title);
-        if (!detectedArtists || detectedArtists.length === 0) {
-          const noArtistsMsg = document.createElement("span");
-          noArtistsMsg.textContent = getTranslation("no_artist");
-          noArtistsMsg.style.fontStyle = "italic";
-          artistSelectorContainer.appendChild(noArtistsMsg);
-        } else {
-          detectedArtists.forEach((artistName, index) => {
-            const artistId = `artist_checkbox_${index}_${artistName.replace(/[^a-zA-Z0-9]/g, "")}_GFT`;
-            const wrapper = document.createElement("span");
-            const checkbox = document.createElement("input");
-            Object.assign(checkbox, { type: "checkbox", name: "selectedGeniusArtist_checkbox_GFT", value: artistName, id: artistId });
-            wrapper.appendChild(checkbox);
-            const label = document.createElement("label");
-            label.htmlFor = artistId;
-            label.textContent = artistName;
-            label.style.marginLeft = "3px";
-            wrapper.appendChild(label);
-            artistSelectorContainer.appendChild(wrapper);
-          });
-        }
-        container.appendChild(artistSelectorContainer);
-      }
-      function isHeaderFeatEnabled() {
-        return localStorage.getItem(HEADER_FEAT_STORAGE_KEY) !== "false";
-      }
-      function setHeaderFeatEnabled(enabled) {
-        localStorage.setItem(HEADER_FEAT_STORAGE_KEY, enabled.toString());
-      }
-      function isTagNewlinesDisabled() {
-        return localStorage.getItem(DISABLE_TAG_NEWLINES_STORAGE_KEY) === "true";
-      }
-      function setTagNewlinesDisabled(disabled) {
-        localStorage.setItem(DISABLE_TAG_NEWLINES_STORAGE_KEY, disabled.toString());
-      }
-      function isLyricCardOnlyMode() {
-        return localStorage.getItem(LYRIC_CARD_ONLY_STORAGE_KEY) === "true";
-      }
-      function setLyricCardOnlyMode(enabled) {
-        localStorage.setItem(LYRIC_CARD_ONLY_STORAGE_KEY, enabled.toString());
-      }
-      function getTranscriptionMode() {
-        return localStorage.getItem(TRANSCRIPTION_MODE_STORAGE_KEY) || "fr";
-      }
-      function setTranscriptionMode(mode) {
-        localStorage.setItem(TRANSCRIPTION_MODE_STORAGE_KEY, mode);
-      }
-      function isEnglishTranscriptionMode() {
-        return getTranscriptionMode() === "en";
-      }
-      function isPolishTranscriptionMode() {
-        return getTranscriptionMode() === "pl";
-      }
-      function formatSimpleTag(tag, forceNoNewline = false) {
-        if (forceNoNewline) return tag;
-        return isTagNewlinesDisabled() ? tag : `${tag}
+        wrapper.appendChild(checkbox);
+        const label = document.createElement("label");
+        label.htmlFor = artistId;
+        label.textContent = artistName;
+        label.style.marginLeft = "3px";
+        wrapper.appendChild(label);
+        artistSelectorContainer.appendChild(wrapper);
+      });
+    }
+    container.appendChild(artistSelectorContainer);
+  }
+  function formatSimpleTag(tag, forceNoNewline = false) {
+    if (forceNoNewline) return tag;
+    return isTagNewlinesDisabled() ? tag : `${tag}
 `;
+  }
+  function addArtistToText(baseTextWithBrackets) {
+    const checkedArtistsCheckboxes = document.querySelectorAll('input[name="selectedGeniusArtist_checkbox_GFT"]:checked');
+    const selectedArtistNames = Array.from(checkedArtistsCheckboxes).map((cb) => cb.value.trim()).filter(Boolean);
+    let resultText;
+    if (selectedArtistNames.length > 0) {
+      const tagPart = baseTextWithBrackets.slice(0, -1);
+      const artistsString = formatArtistList(selectedArtistNames);
+      const separator = isEnglishTranscriptionMode() || isPolishTranscriptionMode2() ? ": " : " : ";
+      resultText = `${tagPart}${separator}${artistsString}]`;
+    } else {
+      resultText = baseTextWithBrackets;
+    }
+    if (!isTagNewlinesDisabled()) {
+      resultText += "\n";
+    }
+    return resultText;
+  }
+  var init_ui_artists = __esm({
+    "src/modules/ui-artists.js"() {
+      init_constants();
+      init_utils();
+      init_config();
+    }
+  });
+
+  // src/modules/corrections.js
+  function isSectionTag(line) {
+    const trimmed = line.trim();
+    if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+      if (/^\[\?+\]$/.test(trimmed)) return false;
+      return true;
+    }
+    if (/^\[\[.*\]\]\(.*\)$/.test(trimmed)) {
+      return true;
+    }
+    return false;
+  }
+  function correctLineSpacing(text) {
+    const originalLines = text.split("\n");
+    let correctionsCount = 0;
+    if (originalLines.length === 0) {
+      return { newText: "", correctionsCount: 0 };
+    }
+    const linesWithAddedSpacing = [];
+    for (let i = 0; i < originalLines.length; i++) {
+      const currentLine = originalLines[i];
+      linesWithAddedSpacing.push(currentLine);
+      if (currentLine.trim() !== "" && !isSectionTag(currentLine)) {
+        if (i + 1 < originalLines.length) {
+          const nextLine = originalLines[i + 1];
+          if (nextLine.trim() !== "" && isSectionTag(nextLine)) {
+            linesWithAddedSpacing.push("");
+            correctionsCount++;
+          }
+        }
       }
-      function addArtistToText(baseTextWithBrackets) {
-        const checkedArtistsCheckboxes = document.querySelectorAll('input[name="selectedGeniusArtist_checkbox_GFT"]:checked');
-        const selectedArtistNames = Array.from(checkedArtistsCheckboxes).map((cb) => cb.value.trim()).filter(Boolean);
-        let resultText;
-        if (selectedArtistNames.length > 0) {
-          const tagPart = baseTextWithBrackets.slice(0, -1);
-          const artistsString = formatArtistList(selectedArtistNames);
-          const separator = isEnglishTranscriptionMode() || isPolishTranscriptionMode() ? ": " : " : ";
-          resultText = `${tagPart}${separator}${artistsString}]`;
+    }
+    const cleanedLines = [];
+    for (let i = 0; i < linesWithAddedSpacing.length; i++) {
+      const currentLine = linesWithAddedSpacing[i];
+      const trimmedLine = currentLine.trim();
+      if (trimmedLine !== "") {
+        cleanedLines.push(currentLine);
+      } else {
+        if (cleanedLines.length === 0) {
+          correctionsCount++;
+          continue;
+        }
+        const prevLine = cleanedLines[cleanedLines.length - 1];
+        let nextLineIsTag = false;
+        let hasNextContent = false;
+        for (let k = i + 1; k < linesWithAddedSpacing.length; k++) {
+          if (linesWithAddedSpacing[k].trim() !== "") {
+            hasNextContent = true;
+            if (isSectionTag(linesWithAddedSpacing[k])) {
+              nextLineIsTag = true;
+            }
+            break;
+          }
+        }
+        if (!hasNextContent) {
+          correctionsCount++;
+          continue;
+        }
+        if (nextLineIsTag) {
+          if (prevLine.trim() === "") {
+            correctionsCount++;
+          } else {
+            cleanedLines.push(currentLine);
+          }
         } else {
-          resultText = baseTextWithBrackets;
+          correctionsCount++;
         }
-        if (!isTagNewlinesDisabled()) {
-          resultText += "\n";
-        }
-        return resultText;
       }
+    }
+    const newText = cleanedLines.join("\n");
+    if (text === newText) return { newText, correctionsCount: 0 };
+    if (correctionsCount === 0 && text !== newText) correctionsCount = 1;
+    return { newText, correctionsCount };
+  }
+  function applyTextTransformToDivEditor(editorNode, transformFunction) {
+    const selection = window.getSelection();
+    const range = selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
+    let currentTextContent = "";
+    const lineElements = [];
+    let nodeBuffer = "";
+    editorNode.childNodes.forEach((child) => {
+      if (child.nodeName === "BR") {
+        if (nodeBuffer) lineElements.push(document.createTextNode(nodeBuffer));
+        nodeBuffer = "";
+        lineElements.push(document.createElement("br"));
+      } else if (child.nodeType === Node.TEXT_NODE) {
+        nodeBuffer += child.textContent;
+      } else if (child.nodeType === Node.ELEMENT_NODE) {
+        if (nodeBuffer) lineElements.push(document.createTextNode(nodeBuffer));
+        nodeBuffer = "";
+        if (child.nodeName === "DIV" || child.nodeName === "P") {
+          if (child.textContent.trim() !== "") {
+            lineElements.push(child.cloneNode(true));
+          } else if (child.querySelector("br")) {
+            lineElements.push(document.createElement("br"));
+          }
+        } else {
+          nodeBuffer += child.textContent;
+        }
+      }
+    });
+    if (nodeBuffer) lineElements.push(document.createTextNode(nodeBuffer));
+    currentTextContent = "";
+    lineElements.forEach((el) => {
+      if (el.nodeName === "BR") {
+        currentTextContent += "\n";
+      } else if (el.nodeType === Node.TEXT_NODE) {
+        currentTextContent += el.textContent;
+      } else if (el.nodeName === "DIV" || el.nodeName === "P") {
+        currentTextContent += el.textContent + "\n";
+      }
+    });
+    currentTextContent = currentTextContent.replace(/\n+$/, "");
+    const { newText, correctionsCount } = transformFunction(currentTextContent);
+    if (currentTextContent !== newText || correctionsCount > 0) {
+      editorNode.innerHTML = "";
+      newText.split("\n").forEach((lineText, index, arr) => {
+        const lineDiv = document.createElement("div");
+        if (lineText === "") {
+          if (index === arr.length - 1 && arr.length > 1 && !newText.endsWith("\n\n")) {
+          } else {
+            lineDiv.appendChild(document.createElement("br"));
+          }
+        } else {
+          lineDiv.textContent = lineText;
+        }
+        editorNode.appendChild(lineDiv);
+      });
+      if (editorNode.childNodes.length === 0) {
+        const emptyDiv = document.createElement("div");
+        emptyDiv.appendChild(document.createElement("br"));
+        editorNode.appendChild(emptyDiv);
+      }
+      if (range) {
+        try {
+          const lastDiv = editorNode.lastChild;
+          if (lastDiv) {
+            const newRange = document.createRange();
+            if (lastDiv.nodeName === "DIV") {
+              if (lastDiv.firstChild && lastDiv.firstChild.nodeName === "BR") {
+                newRange.setStartBefore(lastDiv.firstChild);
+              } else if (lastDiv.firstChild && lastDiv.firstChild.nodeType === Node.TEXT_NODE) {
+                newRange.setStart(lastDiv.firstChild, lastDiv.firstChild.textContent.length);
+              } else {
+                newRange.selectNodeContents(lastDiv);
+                newRange.collapse(false);
+              }
+            } else {
+              newRange.setStart(lastDiv, lastDiv.textContent ? lastDiv.textContent.length : 0);
+            }
+            newRange.collapse(true);
+            selection.removeAllRanges();
+            selection.addRange(newRange);
+          }
+        } catch (e) {
+          console.warn("Erreur restauration s\xE9lection apr\xE8s transformDiv:", e);
+        }
+      }
+      editorNode.focus();
+      const inputEvent = new Event("input", { bubbles: true, cancelable: true });
+      editorNode.dispatchEvent(inputEvent);
+    }
+    return correctionsCount;
+  }
+  function applyAllTextCorrectionsToString(text, options = {}) {
+    const opts = {
+      yPrime: options.yPrime !== false,
+      apostrophes: options.apostrophes !== false,
+      oeuLigature: options.oeuLigature !== false,
+      frenchQuotes: options.frenchQuotes !== false,
+      longDash: options.longDash !== false,
+      doubleSpaces: options.doubleSpaces !== false,
+      capitalization: options.capitalization !== false,
+      punctuation: options.punctuation !== false,
+      spacing: options.spacing !== false
+    };
+    let currentText = text;
+    let result;
+    const corrections = {
+      yPrime: 0,
+      apostrophes: 0,
+      oeuLigature: 0,
+      frenchQuotes: 0,
+      longDash: 0,
+      doubleSpaces: 0,
+      spacing: 0
+    };
+    if (opts.yPrime) {
+      const yPrimePattern = /\b(Y|y)['']/g;
+      const yPrimeReplacement = (match, firstLetter) => firstLetter === "Y" ? "Y " : "y ";
+      const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
+      if (textAfterYPrime !== currentText) {
+        corrections.yPrime = (currentText.match(yPrimePattern) || []).length;
+        currentText = textAfterYPrime;
+      }
+    }
+    if (opts.apostrophes) {
+      const apostrophePattern = /['']/g;
+      const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
+      if (textAfterApostrophe !== currentText) {
+        corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
+        currentText = textAfterApostrophe;
+      }
+    }
+    if (opts.oeuLigature) {
+      const oeuPattern = /([Oo])eu/g;
+      const oeuReplacement = (match, firstLetter) => firstLetter === "O" ? "\u0152u" : "\u0153u";
+      const textAfterOeu = currentText.replace(oeuPattern, oeuReplacement);
+      if (textAfterOeu !== currentText) {
+        corrections.oeuLigature = (currentText.match(oeuPattern) || []).length;
+        currentText = textAfterOeu;
+      }
+    }
+    if (opts.frenchQuotes) {
+      const frenchQuotesPattern = /[«»]/g;
+      const textAfterFrenchQuotes = currentText.replace(frenchQuotesPattern, '"');
+      if (textAfterFrenchQuotes !== currentText) {
+        corrections.frenchQuotes = (currentText.match(frenchQuotesPattern) || []).length;
+        currentText = textAfterFrenchQuotes;
+      }
+    }
+    if (opts.longDash) {
+      if (typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) {
+        const polishDashPattern = / - /g;
+        const textAfterPolishDash = currentText.replace(polishDashPattern, " \u2014 ");
+        if (textAfterPolishDash !== currentText) {
+          corrections.longDash = (currentText.match(polishDashPattern) || []).length;
+          currentText = textAfterPolishDash;
+        }
+      } else {
+        const longDashPattern = /[—–]/g;
+        const textAfterLongDash = currentText.replace(longDashPattern, "-");
+        if (textAfterLongDash !== currentText) {
+          corrections.longDash = (currentText.match(longDashPattern) || []).length;
+          currentText = textAfterLongDash;
+        }
+      }
+    }
+    if (opts.doubleSpaces) {
+      const doubleSpacesPattern = /  +/g;
+      const textAfterDoubleSpaces = currentText.replace(doubleSpacesPattern, " ");
+      if (textAfterDoubleSpaces !== currentText) {
+        corrections.doubleSpaces = (currentText.match(doubleSpacesPattern) || []).length;
+        currentText = textAfterDoubleSpaces;
+      }
+    }
+    if (opts.spacing) {
+      result = correctLineSpacing(currentText);
+      if (result.correctionsCount > 0) {
+        corrections.spacing = result.correctionsCount;
+        currentText = result.newText;
+      }
+    }
+    const totalCorrections = corrections.yPrime + corrections.apostrophes + corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash + corrections.doubleSpaces + corrections.spacing;
+    return { newText: currentText, correctionsCount: totalCorrections, corrections };
+  }
+  async function applyAllTextCorrectionsAsync(text, showProgressFn) {
+    const showProgress = showProgressFn || (() => {
+    });
+    let currentText = text;
+    let result;
+    const totalSteps = 7;
+    const corrections = {
+      yPrime: 0,
+      apostrophes: 0,
+      oeuLigature: 0,
+      frenchQuotes: 0,
+      longDash: 0,
+      doubleSpaces: 0,
+      spacing: 0
+    };
+    showProgress(1, totalSteps, getTranslation("progress_step_yprime"));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const yPrimePattern = /\b(Y|y)['']/g;
+    const yPrimeReplacement = (match, firstLetter) => firstLetter === "Y" ? "Y " : "y ";
+    const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
+    if (textAfterYPrime !== currentText) {
+      corrections.yPrime = (currentText.match(yPrimePattern) || []).length;
+      currentText = textAfterYPrime;
+    }
+    showProgress(2, totalSteps, getTranslation("progress_step_apostrophes"));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const apostrophePattern = /['']/g;
+    const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
+    if (textAfterApostrophe !== currentText) {
+      corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
+      currentText = textAfterApostrophe;
+    }
+    showProgress(3, totalSteps, getTranslation("progress_step_oeu"));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const oeuPattern = /([Oo])eu/g;
+    const oeuReplacement = (match, firstLetter) => firstLetter === "O" ? "\u0152u" : "\u0153u";
+    const textAfterOeu = currentText.replace(oeuPattern, oeuReplacement);
+    if (textAfterOeu !== currentText) {
+      corrections.oeuLigature = (currentText.match(oeuPattern) || []).length;
+      currentText = textAfterOeu;
+    }
+    showProgress(4, totalSteps, getTranslation("progress_step_quotes"));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const frenchQuotesPattern = /[«»]/g;
+    const textAfterFrenchQuotes = currentText.replace(frenchQuotesPattern, '"');
+    if (textAfterFrenchQuotes !== currentText) {
+      corrections.frenchQuotes = (currentText.match(frenchQuotesPattern) || []).length;
+      currentText = textAfterFrenchQuotes;
+    }
+    showProgress(5, totalSteps, getTranslation("progress_step_dash"));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    if (typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) {
+      const polishDashPattern = / - /g;
+      const textAfterPolishDash = currentText.replace(polishDashPattern, " \u2014 ");
+      if (textAfterPolishDash !== currentText) {
+        corrections.longDash = (currentText.match(polishDashPattern) || []).length;
+        currentText = textAfterPolishDash;
+      }
+    } else {
+      const longDashPattern = /[—–]/g;
+      const textAfterLongDash = currentText.replace(longDashPattern, "-");
+      if (textAfterLongDash !== currentText) {
+        corrections.longDash = (currentText.match(longDashPattern) || []).length;
+        currentText = textAfterLongDash;
+      }
+    }
+    showProgress(6, totalSteps, getTranslation("progress_step_spaces"));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const doubleSpacesPattern = /  +/g;
+    const textAfterDoubleSpaces = currentText.replace(doubleSpacesPattern, " ");
+    if (textAfterDoubleSpaces !== currentText) {
+      corrections.doubleSpaces = (currentText.match(doubleSpacesPattern) || []).length;
+      currentText = textAfterDoubleSpaces;
+    }
+    showProgress(7, totalSteps, getTranslation("progress_step_spacing"));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    result = correctLineSpacing(currentText);
+    if (result.correctionsCount > 0) {
+      corrections.spacing = result.correctionsCount;
+      currentText = result.newText;
+    }
+    const totalCorrections = corrections.yPrime + corrections.apostrophes + corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash + corrections.doubleSpaces + corrections.spacing;
+    return { newText: currentText, correctionsCount: totalCorrections, corrections };
+  }
+  var init_corrections = __esm({
+    "src/modules/corrections.js"() {
+      init_utils();
+    }
+  });
+
+  // src/content.js
+  var require_content = __commonJS({
+    "src/content.js"() {
+      init_songData();
+      init_config();
+      init_ui_artists();
+      init_translations();
+      init_constants();
+      init_utils();
+      init_corrections();
+      console.log("Genius Fast Transcriber v4.0.0 \u{1F3B5}");
+      (function injectCriticalStyles() {
+        if (!document.getElementById("gft-critical-animations")) {
+          const style = document.createElement("style");
+          style.id = "gft-critical-animations";
+          style.textContent = `
+            @keyframes lyrics-helper-fadeout {
+                0% { background-color: #f9ff55; opacity: 0.8; }
+                70% { background-color: #f9ff55; opacity: 0.5; }
+                100% { background-color: transparent; opacity: 1; }
+            }
+            .gft-shortcut-feedback {
+                animation: gft-button-glow 0.3s ease-out;
+            }
+            @keyframes gft-button-glow {
+                0% { box-shadow: 0 0 0 0 rgba(249, 255, 85, 0.7); transform: scale(1); }
+                50% { box-shadow: 0 0 20px 10px rgba(249, 255, 85, 0); transform: scale(1.05); }
+                100% { box-shadow: 0 0 0 0 rgba(249, 255, 85, 0); transform: scale(1); }
+            }
+            .gft-autosave-indicator {
+                font-size: 16px; margin-left: 10px;
+                opacity: 0.2; transition: opacity 0.3s ease;
+                cursor: default;
+            }
+            .gft-autosave-flash {
+                animation: gft-save-flash 1s ease-out;
+            }
+            @keyframes gft-save-flash {
+                0% { opacity: 1; transform: scale(1.3); }
+                100% { opacity: 0.2; transform: scale(1); }
+            }
+            /* Custom Button Manager Styles */
+            .gft-custom-manager-modal {
+                width: 420px; max-width: 90vw;
+                font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                border: 1px solid rgba(255,255,255,0.1);
+            }
+            .gft-tabs {
+                display: flex; background: rgba(0,0,0,0.05);
+                padding: 3px; border-radius: 8px; margin: 15px 0;
+            }
+            .gft-tab-btn {
+                flex: 1; background: none; border: none; padding: 8px;
+                color: inherit; cursor: pointer; border-radius: 6px;
+                font-size: 13px; transition: all 0.2s; opacity: 0.7;
+            }
+            .gft-tab-btn.active {
+                background: white; color: black; opacity: 1;
+                font-weight: bold; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            }
+            .gft-dark-mode .gft-tab-btn.active { background: #444; color: white; }
+            .gft-form-group { margin-bottom: 15px; }
+            .gft-form-label {
+                display: block; font-size: 11px; margin-bottom: 6px;
+                opacity: 0.9; font-weight: 600; text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+            .gft-form-input, .gft-form-textarea, .gft-form-select {
+                width: 100%; padding: 10px 14px; border-radius: 6px;
+                border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.8);
+                color: #222; font-size: 14px; box-sizing: border-box;
+                transition: border-color 0.2s;
+            }
+            .gft-form-input:focus, .gft-form-textarea:focus { border-color: #f9ff55; outline: none; }
+            .gft-dark-mode .gft-form-input, .gft-dark-mode .gft-form-textarea, .gft-dark-mode .gft-form-select {
+                border-color: rgba(255,255,255,0.1); background: #2a2a2a; color: #eee;
+            }
+            .gft-custom-list { max-height: 280px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; }
+            .gft-custom-list::-webkit-scrollbar { width: 4px; }
+            .gft-custom-list::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+            .gft-dark-mode .gft-custom-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); }
+            .gft-custom-item {
+                display: flex; justify-content: space-between; align-items: center;
+                padding: 10px; border-bottom: 1px solid rgba(0,0,0,0.05); transition: background 0.2s;
+            }
+            .gft-custom-item:hover { background: rgba(0,0,0,0.02); }
+            .gft-dark-mode .gft-custom-item:hover { background: rgba(255,255,255,0.02); }
+            .gft-dark-mode .gft-custom-item { border-bottom-color: rgba(255,255,255,0.05); }
+            .gft-code-area {
+                width: 100%; height: 70px; font-family: monospace; font-size: 11px;
+                margin-top: 8px; border-radius: 6px; background: rgba(0,0,0,0.05);
+                border: 1px solid rgba(0,0,0,0.1); padding: 8px; resize: none;
+            }
+            .gft-dark-mode .gft-code-area { background: #111; color: #888; border-color: #333; }
+            .gft-io-zone { margin-top: 20px; padding-top: 15px; border-top: 1px dashed rgba(0,0,0,0.1); }
+            .gft-dark-mode .gft-io-zone { border-top-color: rgba(255,255,255,0.1); }
+            .gft-preview-zone { 
+                padding: 15px; background: rgba(0,0,0,0.03); border-radius: 8px; 
+                margin-bottom: 15px; text-align: center; border: 1px dashed rgba(0,0,0,0.1);
+            }
+            .gft-dark-mode .gft-preview-zone { background: #151515; border-color: rgba(255,255,255,0.1); }
+            .gft-dark-mode .gft-shortcut-button { color: #eee !important; background: #333; border-color: #444; }
+            .gft-dark-mode .gft-shortcut-button.gft-btn-struct { color: #222 !important; background: #f9ff55; border-color: #f9ff55; }
+        `;
+          document.head.appendChild(style);
+        }
+      })();
       function replaceAndHighlightInDiv(editorNode, searchRegex, replacementTextOrFn, highlightClass) {
         let replacementsMadeCount = 0;
         const treeWalker = document.createTreeWalker(editorNode, NodeFilter.SHOW_TEXT, null, false);
@@ -1747,26 +2211,33 @@
         }
         const overlay = document.createElement("div");
         overlay.id = "gft-textarea-overlay";
+        const computedStyle = window.getComputedStyle(textarea);
         overlay.style.cssText = `
         position: absolute;
         pointer-events: none;
-        z-index: 1;
+        z-index: 10000;
         white-space: pre-wrap;
         word-wrap: break-word;
         overflow: hidden;
-        font-family: ${window.getComputedStyle(textarea).fontFamily};
-        font-size: ${window.getComputedStyle(textarea).fontSize};
-        line-height: ${window.getComputedStyle(textarea).lineHeight};
-        padding: ${window.getComputedStyle(textarea).padding};
-        border: ${window.getComputedStyle(textarea).border};
+        background-color: transparent;
+        color: transparent;
+        font-family: ${computedStyle.fontFamily};
+        font-size: ${computedStyle.fontSize};
+        line-height: ${computedStyle.lineHeight};
+        padding: ${computedStyle.padding};
+        margin: ${computedStyle.margin};
+        border: ${computedStyle.border};
+        border-color: transparent;
         box-sizing: border-box;
     `;
         const rect = textarea.getBoundingClientRect();
-        const parentRect = textarea.offsetParent.getBoundingClientRect();
-        overlay.style.top = rect.top - parentRect.top + textarea.offsetParent.scrollTop + "px";
-        overlay.style.left = rect.left - parentRect.left + textarea.offsetParent.scrollLeft + "px";
-        overlay.style.width = textarea.offsetWidth + "px";
-        overlay.style.height = textarea.offsetHeight + "px";
+        const parentRect = textarea.offsetParent ? textarea.offsetParent.getBoundingClientRect() : { top: 0, left: 0 };
+        const scrollTop = textarea.offsetParent ? textarea.offsetParent.scrollTop : 0;
+        const scrollLeft = textarea.offsetParent ? textarea.offsetParent.scrollLeft : 0;
+        overlay.style.top = rect.top - parentRect.top + scrollTop + "px";
+        overlay.style.left = rect.left - parentRect.left + scrollLeft + "px";
+        overlay.style.width = rect.width + "px";
+        overlay.style.height = rect.height + "px";
         const text = textarea.value;
         const unmatchedPositions = new Set(unmatched.map((u) => u.position));
         let htmlContent = "";
@@ -1782,34 +2253,46 @@
             } else if (unmatchedItem.type === "wrong-pair") {
               title = `${unmatchedItem.char} ne correspond pas au caract\xE8re ouvrant`;
             }
-            htmlContent += `<span class="gft-bracket-error-overlay" title="${title}" style="background-color: rgba(255, 68, 68, 0.5); color: transparent; font-weight: bold; position: relative; z-index: 2;">${char === "<" ? "&lt;" : char === ">" ? "&gt;" : char === "&" ? "&amp;" : char}</span>`;
+            htmlContent += `<span class="gft-bracket-error-overlay" title="${title}" style="background-color: #ff0000 !important; color: white !important; font-weight: bold; border-radius: 2px;">${char === "<" ? "&lt;" : char === ">" ? "&gt;" : char === "&" ? "&amp;" : char}</span>`;
           } else {
-            htmlContent += `<span style="color: transparent;">${char === "<" ? "&lt;" : char === ">" ? "&gt;" : char === "&" ? "&amp;" : char === "\n" ? "<br>" : char}</span>`;
+            if (char === "\n") {
+              htmlContent += "<br>";
+            } else {
+              htmlContent += `<span>${char === "<" ? "&lt;" : char === ">" ? "&gt;" : char === "&" ? "&amp;" : char === " " ? "&nbsp;" : char}</span>`;
+            }
           }
         }
         overlay.innerHTML = htmlContent;
-        textarea.parentNode.insertBefore(overlay, textarea);
+        if (textarea.nextSibling) {
+          textarea.parentNode.insertBefore(overlay, textarea.nextSibling);
+        } else {
+          textarea.parentNode.appendChild(overlay);
+        }
         const syncScroll = () => {
           overlay.scrollTop = textarea.scrollTop;
           overlay.scrollLeft = textarea.scrollLeft;
         };
         textarea.addEventListener("scroll", syncScroll);
-        textarea.addEventListener("input", () => {
+        const cleanup = () => {
           overlay.remove();
           textarea.removeEventListener("scroll", syncScroll);
-        });
-        const style = document.createElement("style");
-        style.textContent = `
-        @keyframes gft-overlay-pulse {
-            0%, 100% { background-color: rgba(255, 68, 68, 0.5); }
-            50% { background-color: rgba(255, 34, 34, 0.7); }
-        }
-        .gft-bracket-error-overlay {
-            animation: gft-overlay-pulse 1.5s ease-in-out infinite;
-        }
-    `;
+          textarea.removeEventListener("input", cleanup);
+        };
+        textarea.addEventListener("input", cleanup);
         if (!document.getElementById("gft-overlay-style")) {
+          const style = document.createElement("style");
           style.id = "gft-overlay-style";
+          style.textContent = `
+            @keyframes gft-overlay-pulse {
+                0%, 100% { background-color: #ff0000; box-shadow: 0 0 5px #ff0000; }
+                50% { background-color: #aa0000; box-shadow: 0 0 2px #550000; }
+            }
+            .gft-bracket-error-overlay {
+                animation: gft-overlay-pulse 1s ease-in-out infinite;
+                display: inline-block;
+                line-height: 1;
+            }
+        `;
           document.head.appendChild(style);
         }
       }
@@ -1902,20 +2385,20 @@
         if (helperElement) helperElement.style.display = "none";
       }
       function applyDarkMode(isDark) {
-        if (shortcutsContainerElement) {
+        if (GFT_STATE.shortcutsContainerElement) {
           if (isDark) {
-            shortcutsContainerElement.classList.add(DARK_MODE_CLASS);
-            if (darkModeButton) darkModeButton.textContent = "\u2600\uFE0F";
+            GFT_STATE.shortcutsContainerElement.classList.add(DARK_MODE_CLASS);
+            if (GFT_STATE.darkModeButton) GFT_STATE.darkModeButton.textContent = "\u2600\uFE0F";
           } else {
-            shortcutsContainerElement.classList.remove(DARK_MODE_CLASS);
-            if (darkModeButton) darkModeButton.textContent = "\u{1F319}";
+            GFT_STATE.shortcutsContainerElement.classList.remove(DARK_MODE_CLASS);
+            if (GFT_STATE.darkModeButton) GFT_STATE.darkModeButton.textContent = "\u{1F319}";
           }
         }
-        if (floatingFormattingToolbar) {
+        if (GFT_STATE.floatingFormattingToolbar) {
           if (isDark) {
-            floatingFormattingToolbar.classList.add(DARK_MODE_CLASS);
+            GFT_STATE.floatingFormattingToolbar.classList.add(DARK_MODE_CLASS);
           } else {
-            floatingFormattingToolbar.classList.remove(DARK_MODE_CLASS);
+            GFT_STATE.floatingFormattingToolbar.classList.remove(DARK_MODE_CLASS);
           }
         }
         localStorage.setItem(DARK_MODE_STORAGE_KEY, isDark.toString());
@@ -1926,8 +2409,8 @@
         applyDarkMode(shouldBeDark);
       }
       function createFloatingFormattingToolbar() {
-        if (floatingFormattingToolbar && document.body.contains(floatingFormattingToolbar)) {
-          return floatingFormattingToolbar;
+        if (GFT_STATE.floatingFormattingToolbar && document.body.contains(GFT_STATE.floatingFormattingToolbar)) {
+          return GFT_STATE.floatingFormattingToolbar;
         }
         const toolbar = document.createElement("div");
         toolbar.id = FLOATING_TOOLBAR_ID;
@@ -2002,7 +2485,7 @@
           toolbar.appendChild(adlibButton);
         }
         document.body.appendChild(toolbar);
-        floatingFormattingToolbar = toolbar;
+        GFT_STATE.floatingFormattingToolbar = toolbar;
         const isDarkMode = localStorage.getItem(DARK_MODE_STORAGE_KEY) === "true";
         if (isDarkMode) {
           toolbar.classList.add(DARK_MODE_CLASS);
@@ -2010,28 +2493,28 @@
         return toolbar;
       }
       function applyFormattingToSelection(formatType) {
-        if (!currentActiveEditor) return;
+        if (!GFT_STATE.currentActiveEditor) return;
         isButtonActionInProgress = true;
-        if (autoSaveTimeout) {
-          clearTimeout(autoSaveTimeout);
-          autoSaveTimeout = null;
+        if (GFT_STATE.autoSaveTimeout) {
+          clearTimeout(GFT_STATE.autoSaveTimeout);
+          GFT_STATE.autoSaveTimeout = null;
         }
         saveToHistory();
-        currentActiveEditor.focus();
+        GFT_STATE.currentActiveEditor.focus();
         const prefix = formatType === "bold" ? "<b>" : "<i>";
         const suffix = formatType === "bold" ? "</b>" : "</i>";
-        if (currentEditorType === "textarea") {
-          const start = currentActiveEditor.selectionStart;
-          const end = currentActiveEditor.selectionEnd;
-          const selectedText = currentActiveEditor.value.substring(start, end);
+        if (GFT_STATE.currentEditorType === "textarea") {
+          const start = GFT_STATE.currentActiveEditor.selectionStart;
+          const end = GFT_STATE.currentActiveEditor.selectionEnd;
+          const selectedText = GFT_STATE.currentActiveEditor.value.substring(start, end);
           let textToInsert = start !== end ? `${prefix}${selectedText}${suffix}` : `${prefix} ${suffix}`;
           document.execCommand("insertText", false, textToInsert);
           if (start === end) {
-            currentActiveEditor.setSelectionRange(start + prefix.length + 1, start + prefix.length + 1);
+            GFT_STATE.currentActiveEditor.setSelectionRange(start + prefix.length + 1, start + prefix.length + 1);
           } else {
-            currentActiveEditor.setSelectionRange(start + prefix.length, start + prefix.length + selectedText.length);
+            GFT_STATE.currentActiveEditor.setSelectionRange(start + prefix.length, start + prefix.length + selectedText.length);
           }
-        } else if (currentEditorType === "div") {
+        } else if (GFT_STATE.currentEditorType === "div") {
           document.execCommand(formatType, false, null);
           const selection = window.getSelection();
           if (selection.isCollapsed) {
@@ -2050,29 +2533,29 @@
         }
         setTimeout(() => {
           isButtonActionInProgress = false;
-          if (currentActiveEditor) {
-            lastSavedContent = getCurrentEditorContent();
-            hasUnsavedChanges = false;
+          if (GFT_STATE.currentActiveEditor) {
+            GFT_STATE.lastSavedContent = getCurrentEditorContent();
+            GFT_STATE.hasUnsavedChanges = false;
           }
         }, 100);
         hideFloatingToolbar();
       }
       function convertNumberToWords() {
-        if (!currentActiveEditor) return;
+        if (!GFT_STATE.currentActiveEditor) return;
         isButtonActionInProgress = true;
-        if (autoSaveTimeout) {
-          clearTimeout(autoSaveTimeout);
-          autoSaveTimeout = null;
+        if (GFT_STATE.autoSaveTimeout) {
+          clearTimeout(GFT_STATE.autoSaveTimeout);
+          GFT_STATE.autoSaveTimeout = null;
         }
         saveToHistory();
-        currentActiveEditor.focus();
+        GFT_STATE.currentActiveEditor.focus();
         let selectedText = "";
         let start, end;
-        if (currentEditorType === "textarea") {
-          start = currentActiveEditor.selectionStart;
-          end = currentActiveEditor.selectionEnd;
-          selectedText = currentActiveEditor.value.substring(start, end).trim();
-        } else if (currentEditorType === "div") {
+        if (GFT_STATE.currentEditorType === "textarea") {
+          start = GFT_STATE.currentActiveEditor.selectionStart;
+          end = GFT_STATE.currentActiveEditor.selectionEnd;
+          selectedText = GFT_STATE.currentActiveEditor.value.substring(start, end).trim();
+        } else if (GFT_STATE.currentEditorType === "div") {
           const selection = window.getSelection();
           if (selection.rangeCount > 0) {
             selectedText = selection.toString().trim();
@@ -2084,69 +2567,69 @@
         }
         const num = parseInt(selectedText, 10);
         let wordsText;
-        if (isPolishTranscriptionMode()) {
+        if (isPolishTranscriptionMode2()) {
           wordsText = numberToPolishWords(num);
         } else if (isEnglishTranscriptionMode()) {
           wordsText = numberToEnglishWords(num);
         } else {
           wordsText = numberToFrenchWords(num);
         }
-        if (currentEditorType === "textarea") {
+        if (GFT_STATE.currentEditorType === "textarea") {
           document.execCommand("insertText", false, wordsText);
           const newEnd = start + wordsText.length;
-          currentActiveEditor.setSelectionRange(newEnd, newEnd);
-        } else if (currentEditorType === "div") {
+          GFT_STATE.currentActiveEditor.setSelectionRange(newEnd, newEnd);
+        } else if (GFT_STATE.currentEditorType === "div") {
           document.execCommand("insertText", false, wordsText);
         }
         setTimeout(() => {
           isButtonActionInProgress = false;
-          if (currentActiveEditor) {
-            lastSavedContent = getCurrentEditorContent();
-            hasUnsavedChanges = false;
+          if (GFT_STATE.currentActiveEditor) {
+            GFT_STATE.lastSavedContent = getCurrentEditorContent();
+            GFT_STATE.hasUnsavedChanges = false;
           }
         }, 100);
         hideFloatingToolbar();
       }
       function wrapSelectionWithAdlib() {
-        if (!currentActiveEditor) return;
+        if (!GFT_STATE.currentActiveEditor) return;
         isButtonActionInProgress = true;
-        if (autoSaveTimeout) {
-          clearTimeout(autoSaveTimeout);
-          autoSaveTimeout = null;
+        if (GFT_STATE.autoSaveTimeout) {
+          clearTimeout(GFT_STATE.autoSaveTimeout);
+          GFT_STATE.autoSaveTimeout = null;
         }
         saveToHistory();
         let selectedText = "";
         let replaced = false;
-        if (currentEditorType === "textarea") {
-          const start = currentActiveEditor.selectionStart;
-          const end = currentActiveEditor.selectionEnd;
+        if (GFT_STATE.currentEditorType === "textarea") {
+          const start = GFT_STATE.currentActiveEditor.selectionStart;
+          const end = GFT_STATE.currentActiveEditor.selectionEnd;
           if (start !== end) {
-            selectedText = currentActiveEditor.value.substring(start, end);
+            selectedText = GFT_STATE.currentActiveEditor.value.substring(start, end);
             const wrappedText = "(" + selectedText + ")";
-            currentActiveEditor.setSelectionRange(start, end);
+            GFT_STATE.currentActiveEditor.setSelectionRange(start, end);
             document.execCommand("insertText", false, wrappedText);
             replaced = true;
           }
-        } else if (currentEditorType === "div") {
+        } else if (GFT_STATE.currentEditorType === "div") {
           const selection = window.getSelection();
           if (selection.rangeCount > 0 && !selection.isCollapsed) {
             selectedText = selection.toString();
             const wrappedText = "(" + selectedText + ")";
             document.execCommand("insertText", false, wrappedText);
-            currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
+            GFT_STATE.currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
             replaced = true;
           }
         }
         if (replaced) {
-          showFeedbackMessage(getTranslation("feedback_adlib_added"), 2e3, shortcutsContainerElement);
+          showFeedbackMessage(getTranslation("feedback_adlib_added"), 2e3, GFT_STATE.shortcutsContainerElement);
         } else {
-          showFeedbackMessage(getTranslation("feedback_select_text_first"), 2e3, shortcutsContainerElement);
+          showFeedbackMessage(getTranslation("feedback_select_text_first"), 2e3, GFT_STATE.shortcutsContainerElement);
         }
         setTimeout(() => {
           isButtonActionInProgress = false;
-          if (currentActiveEditor) {
-            lastSavedContent = getCurrentEditorContent();
-            hasUnsavedChanges = false;
+          if (GFT_STATE.currentActiveEditor) {
+            GFT_STATE.lastSavedContent = getCurrentEditorContent();
+            GFT_STATE.hasUnsavedChanges = false;
           }
         }, 100);
         hideFloatingToolbar();
@@ -2165,10 +2648,10 @@
         };
       }
       function updateStatsDisplay() {
-        if (!currentActiveEditor) return;
+        if (!GFT_STATE.currentActiveEditor) return;
         const statsElement = document.getElementById("gft-stats-display");
         if (!statsElement || !statsElement.classList.contains("gft-stats-visible")) return;
-        const text = currentEditorType === "textarea" ? currentActiveEditor.value : currentActiveEditor.textContent || "";
+        const text = GFT_STATE.currentEditorType === "textarea" ? GFT_STATE.currentActiveEditor.value : GFT_STATE.currentActiveEditor.textContent || "";
         const stats = calculateStats(text);
         statsElement.innerHTML = `\u{1F4CA} <strong>${stats.lines}</strong> ${getTranslation("stats_lines", stats.lines)} \u2022 <strong>${stats.words}</strong> ${getTranslation("stats_words", stats.words)} \u2022 <strong>${stats.sections}</strong> ${getTranslation("stats_sections", stats.sections)} \u2022 <strong>${stats.characters}</strong> ${getTranslation("stats_characters", stats.characters)}`;
       }
@@ -2203,21 +2686,21 @@
         return statsElement;
       }
       function getCurrentEditorContent() {
-        if (!currentActiveEditor) return "";
-        if (currentEditorType === "textarea") {
-          return currentActiveEditor.value;
-        } else if (currentEditorType === "div") {
-          return currentActiveEditor.textContent || "";
+        if (!GFT_STATE.currentActiveEditor) return "";
+        if (GFT_STATE.currentEditorType === "textarea") {
+          return GFT_STATE.currentActiveEditor.value;
+        } else if (GFT_STATE.currentEditorType === "div") {
+          return GFT_STATE.currentActiveEditor.textContent || "";
         }
         return "";
       }
       function setEditorContent(content) {
-        if (!currentActiveEditor) return;
-        if (currentEditorType === "textarea") {
-          currentActiveEditor.value = content;
-          currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
-        } else if (currentEditorType === "div") {
-          currentActiveEditor.innerHTML = "";
+        if (!GFT_STATE.currentActiveEditor) return;
+        if (GFT_STATE.currentEditorType === "textarea") {
+          GFT_STATE.currentActiveEditor.value = content;
+          GFT_STATE.currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
+        } else if (GFT_STATE.currentEditorType === "div") {
+          GFT_STATE.currentActiveEditor.innerHTML = "";
           content.split("\n").forEach((lineText, index, arr) => {
             const lineDiv = document.createElement("div");
             if (lineText === "") {
@@ -2227,60 +2710,57 @@
             } else {
               lineDiv.textContent = lineText;
             }
-            currentActiveEditor.appendChild(lineDiv);
+            GFT_STATE.currentActiveEditor.appendChild(lineDiv);
           });
-          if (currentActiveEditor.childNodes.length === 0) {
+          if (GFT_STATE.currentActiveEditor.childNodes.length === 0) {
             const emptyDiv = document.createElement("div");
             emptyDiv.appendChild(document.createElement("br"));
-            currentActiveEditor.appendChild(emptyDiv);
+            GFT_STATE.currentActiveEditor.appendChild(emptyDiv);
           }
-          currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
+          GFT_STATE.currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
         }
         debouncedStatsUpdate();
       }
-      var autoSaveTimeout = null;
-      var lastSavedContent = "";
       var isUndoRedoInProgress = false;
       var isButtonActionInProgress = false;
-      var hasUnsavedChanges = false;
       var draftNotificationShown = false;
       function saveToHistory() {
-        if (!currentActiveEditor || isUndoRedoInProgress) return;
+        if (!GFT_STATE.currentActiveEditor || isUndoRedoInProgress) return;
         const currentContent = getCurrentEditorContent();
-        if (undoStack.length > 0 && undoStack[undoStack.length - 1] === currentContent) {
+        if (GFT_STATE.undoStack.length > 0 && GFT_STATE.undoStack[GFT_STATE.undoStack.length - 1] === currentContent) {
           return;
         }
-        undoStack.push(currentContent);
-        lastSavedContent = currentContent;
-        hasUnsavedChanges = false;
-        if (undoStack.length > MAX_HISTORY_SIZE) {
-          undoStack.shift();
+        GFT_STATE.undoStack.push(currentContent);
+        GFT_STATE.lastSavedContent = currentContent;
+        GFT_STATE.hasUnsavedChanges = false;
+        if (GFT_STATE.undoStack.length > MAX_HISTORY_SIZE) {
+          GFT_STATE.undoStack.shift();
         }
-        redoStack = [];
+        GFT_STATE.redoStack = [];
         updateHistoryButtons();
       }
       function autoSaveToHistory() {
-        if (!currentActiveEditor || isUndoRedoInProgress || isButtonActionInProgress) return;
+        if (!GFT_STATE.currentActiveEditor || isUndoRedoInProgress || isButtonActionInProgress) return;
         const currentContent = getCurrentEditorContent();
-        if (!hasUnsavedChanges && currentContent !== lastSavedContent) {
-          if (lastSavedContent && lastSavedContent !== (undoStack[undoStack.length - 1] || "")) {
-            undoStack.push(lastSavedContent);
-            if (undoStack.length > MAX_HISTORY_SIZE) {
-              undoStack.shift();
+        if (!GFT_STATE.hasUnsavedChanges && currentContent !== GFT_STATE.lastSavedContent) {
+          if (GFT_STATE.lastSavedContent && GFT_STATE.lastSavedContent !== (GFT_STATE.undoStack[GFT_STATE.undoStack.length - 1] || "")) {
+            GFT_STATE.undoStack.push(GFT_STATE.lastSavedContent);
+            if (GFT_STATE.undoStack.length > MAX_HISTORY_SIZE) {
+              GFT_STATE.undoStack.shift();
             }
-            redoStack = [];
+            GFT_STATE.redoStack = [];
             updateHistoryButtons();
           }
-          hasUnsavedChanges = true;
+          GFT_STATE.hasUnsavedChanges = true;
         }
-        if (autoSaveTimeout) {
-          clearTimeout(autoSaveTimeout);
+        if (GFT_STATE.autoSaveTimeout) {
+          clearTimeout(GFT_STATE.autoSaveTimeout);
         }
-        autoSaveTimeout = setTimeout(() => {
+        GFT_STATE.autoSaveTimeout = setTimeout(() => {
           if (isUndoRedoInProgress || isButtonActionInProgress) return;
           const finalContent = getCurrentEditorContent();
-          lastSavedContent = finalContent;
-          hasUnsavedChanges = false;
+          GFT_STATE.lastSavedContent = finalContent;
+          GFT_STATE.hasUnsavedChanges = false;
           saveDraft(finalContent);
         }, 2e3);
       }
@@ -2293,7 +2773,7 @@
         const draftData = {
           content,
           timestamp: Date.now(),
-          title: currentSongTitle
+          title: GFT_STATE.currentSongTitle
         };
         try {
           localStorage.setItem(key, JSON.stringify(draftData));
@@ -2399,48 +2879,48 @@
         }, 15e3);
       }
       function undoLastChange() {
-        if (!currentActiveEditor || undoStack.length === 0) {
-          showFeedbackMessage(getTranslation("feedback_no_changes"), 2e3, shortcutsContainerElement);
+        if (!GFT_STATE.currentActiveEditor || GFT_STATE.undoStack.length === 0) {
+          showFeedbackMessage(getTranslation("feedback_no_changes"), 2e3, GFT_STATE.shortcutsContainerElement);
           return;
         }
         isUndoRedoInProgress = true;
-        if (autoSaveTimeout) {
-          clearTimeout(autoSaveTimeout);
-          autoSaveTimeout = null;
+        if (GFT_STATE.autoSaveTimeout) {
+          clearTimeout(GFT_STATE.autoSaveTimeout);
+          GFT_STATE.autoSaveTimeout = null;
         }
         const currentContent = getCurrentEditorContent();
-        redoStack.push(currentContent);
-        const previousContent = undoStack.pop();
+        GFT_STATE.redoStack.push(currentContent);
+        const previousContent = GFT_STATE.undoStack.pop();
         setEditorContent(previousContent);
-        lastSavedContent = previousContent;
-        hasUnsavedChanges = false;
+        GFT_STATE.lastSavedContent = previousContent;
+        GFT_STATE.hasUnsavedChanges = false;
         updateHistoryButtons();
-        showFeedbackMessage(getTranslation("feedback_undo"), 2e3, shortcutsContainerElement);
+        showFeedbackMessage(getTranslation("feedback_undo"), 2e3, GFT_STATE.shortcutsContainerElement);
         setTimeout(() => {
           isUndoRedoInProgress = false;
         }, 100);
       }
       function redoLastChange() {
-        if (!currentActiveEditor || redoStack.length === 0) {
-          showFeedbackMessage(getTranslation("feedback_no_changes"), 2e3, shortcutsContainerElement);
+        if (!GFT_STATE.currentActiveEditor || GFT_STATE.redoStack.length === 0) {
+          showFeedbackMessage(getTranslation("feedback_no_changes"), 2e3, GFT_STATE.shortcutsContainerElement);
           return;
         }
         isUndoRedoInProgress = true;
-        if (autoSaveTimeout) {
-          clearTimeout(autoSaveTimeout);
-          autoSaveTimeout = null;
+        if (GFT_STATE.autoSaveTimeout) {
+          clearTimeout(GFT_STATE.autoSaveTimeout);
+          GFT_STATE.autoSaveTimeout = null;
         }
         const currentContent = getCurrentEditorContent();
-        undoStack.push(currentContent);
-        if (undoStack.length > MAX_HISTORY_SIZE) {
-          undoStack.shift();
+        GFT_STATE.undoStack.push(currentContent);
+        if (GFT_STATE.undoStack.length > MAX_HISTORY_SIZE) {
+          GFT_STATE.undoStack.shift();
         }
-        const nextContent = redoStack.pop();
+        const nextContent = GFT_STATE.redoStack.pop();
         setEditorContent(nextContent);
-        lastSavedContent = nextContent;
-        hasUnsavedChanges = false;
+        GFT_STATE.lastSavedContent = nextContent;
+        GFT_STATE.hasUnsavedChanges = false;
         updateHistoryButtons();
-        showFeedbackMessage(getTranslation("feedback_redo"), 2e3, shortcutsContainerElement);
+        showFeedbackMessage(getTranslation("feedback_redo"), 2e3, GFT_STATE.shortcutsContainerElement);
         setTimeout(() => {
           isUndoRedoInProgress = false;
         }, 100);
@@ -2449,7 +2929,7 @@
         const undoButton = document.getElementById("gft-undo-button");
         const redoButton = document.getElementById("gft-redo-button");
         if (undoButton) {
-          if (undoStack.length === 0) {
+          if (GFT_STATE.undoStack.length === 0) {
             undoButton.disabled = true;
             undoButton.style.opacity = "0.5";
             undoButton.style.cursor = "not-allowed";
@@ -2460,7 +2940,7 @@
           }
         }
         if (redoButton) {
-          if (redoStack.length === 0) {
+          if (GFT_STATE.redoStack.length === 0) {
             redoButton.disabled = true;
             redoButton.style.opacity = "0.5";
             redoButton.style.cursor = "not-allowed";
@@ -2488,17 +2968,17 @@
       }
       function showProgress(step, total, message) {
         let progressContainer = document.getElementById("gft-progress-container");
-        if (!progressContainer && shortcutsContainerElement) {
+        if (!progressContainer && GFT_STATE.shortcutsContainerElement) {
           progressContainer = createProgressBar();
           const feedbackMsg = document.getElementById(FEEDBACK_MESSAGE_ID);
           if (feedbackMsg) {
-            shortcutsContainerElement.insertBefore(progressContainer, feedbackMsg.nextSibling);
+            GFT_STATE.shortcutsContainerElement.insertBefore(progressContainer, feedbackMsg.nextSibling);
           } else {
             const panelTitle = document.getElementById("gftPanelTitle");
             if (panelTitle) {
-              shortcutsContainerElement.insertBefore(progressContainer, panelTitle.nextSibling);
+              GFT_STATE.shortcutsContainerElement.insertBefore(progressContainer, panelTitle.nextSibling);
             } else {
-              shortcutsContainerElement.insertBefore(progressContainer, shortcutsContainerElement.firstChild);
+              GFT_STATE.shortcutsContainerElement.insertBefore(progressContainer, GFT_STATE.shortcutsContainerElement.firstChild);
             }
           }
         }
@@ -3199,21 +3679,21 @@
         // Flèche Droite
       };
       function insertTagViaShortcut(tagType) {
-        if (!currentActiveEditor) return;
+        if (!GFT_STATE.currentActiveEditor) return;
         isButtonActionInProgress = true;
-        if (autoSaveTimeout) {
-          clearTimeout(autoSaveTimeout);
-          autoSaveTimeout = null;
+        if (GFT_STATE.autoSaveTimeout) {
+          clearTimeout(GFT_STATE.autoSaveTimeout);
+          GFT_STATE.autoSaveTimeout = null;
         }
-        currentActiveEditor.focus();
+        GFT_STATE.currentActiveEditor.focus();
         let textToInsert = "";
         switch (tagType) {
           case "couplet":
-            textToInsert = addArtistToText(`[Couplet ${coupletCounter}]`);
-            coupletCounter++;
+            textToInsert = addArtistToText(`[Couplet ${GFT_STATE.coupletCounter}]`);
+            GFT_STATE.coupletCounter++;
             const coupletButton = document.getElementById(COUPLET_BUTTON_ID);
             if (coupletButton) {
-              coupletButton.textContent = `[Couplet ${coupletCounter}]`;
+              coupletButton.textContent = `[Couplet ${GFT_STATE.coupletCounter}]`;
             }
             break;
           case "refrain":
@@ -3238,9 +3718,9 @@
         }
         setTimeout(() => {
           isButtonActionInProgress = false;
-          if (currentActiveEditor) {
-            lastSavedContent = getCurrentEditorContent();
-            hasUnsavedChanges = false;
+          if (GFT_STATE.currentActiveEditor) {
+            GFT_STATE.lastSavedContent = getCurrentEditorContent();
+            GFT_STATE.hasUnsavedChanges = false;
           }
         }, 150);
       }
@@ -3262,12 +3742,12 @@
         const GLOBAL_ACTIONS = ["togglePlay", "rewind", "forward", "toggleStats"];
         const isGlobalAction = GLOBAL_ACTIONS.includes(action);
         if (isGlobalAction) {
-          if (!currentActiveEditor && !document.querySelector(SELECTORS.CONTROLS_STICKY_SECTION)) {
+          if (!GFT_STATE.currentActiveEditor && !document.querySelector(SELECTORS.CONTROLS_STICKY_SECTION)) {
             return;
           }
         } else {
-          if (!currentActiveEditor) return;
-          if (document.activeElement !== currentActiveEditor) return;
+          if (!GFT_STATE.currentActiveEditor) return;
+          if (document.activeElement !== GFT_STATE.currentActiveEditor) return;
         }
         event.preventDefault();
         event.stopPropagation();
@@ -3336,7 +3816,7 @@
           showFeedbackMessage(getTranslation("feedback_select_text_first") || "Enter text to find");
           return;
         }
-        if (!currentActiveEditor) return;
+        if (!GFT_STATE.currentActiveEditor) return;
         saveToHistory();
         const currentText = getCurrentEditorContent();
         let newText = "";
@@ -3432,23 +3912,23 @@
         };
       }
       function showFloatingToolbar() {
-        if (!floatingFormattingToolbar) {
+        if (!GFT_STATE.floatingFormattingToolbar) {
           createFloatingFormattingToolbar();
         }
         let rect;
         let selectedText = "";
-        if (currentActiveEditor) {
-          Array.from(floatingFormattingToolbar.children).forEach((child) => child.style.display = "");
-          if (currentEditorType === "textarea") {
-            const textareaRect = currentActiveEditor.getBoundingClientRect();
-            const start = currentActiveEditor.selectionStart;
-            const end = currentActiveEditor.selectionEnd;
+        if (GFT_STATE.currentActiveEditor) {
+          Array.from(GFT_STATE.floatingFormattingToolbar.children).forEach((child) => child.style.display = "");
+          if (GFT_STATE.currentEditorType === "textarea") {
+            const textareaRect = GFT_STATE.currentActiveEditor.getBoundingClientRect();
+            const start = GFT_STATE.currentActiveEditor.selectionStart;
+            const end = GFT_STATE.currentActiveEditor.selectionEnd;
             if (start === end) {
               hideFloatingToolbar();
               return;
             }
-            selectedText = currentActiveEditor.value.substring(start, end);
-            const startPos = getTextareaCaretPosition(currentActiveEditor, start);
+            selectedText = GFT_STATE.currentActiveEditor.value.substring(start, end);
+            const startPos = getTextareaCaretPosition(GFT_STATE.currentActiveEditor, start);
             rect = {
               left: textareaRect.left + startPos.left,
               top: textareaRect.top + startPos.top,
@@ -3471,7 +3951,7 @@
             }
           }
         } else {
-          Array.from(floatingFormattingToolbar.children).forEach((child) => {
+          Array.from(GFT_STATE.floatingFormattingToolbar.children).forEach((child) => {
             if (child.classList.contains("gft-lyric-card-btn")) {
               child.style.display = "";
             } else {
@@ -3496,37 +3976,37 @@
           return;
         }
         const isNumber = isValidNumber(selectedText);
-        const numberButton = floatingFormattingToolbar.querySelector(".gft-number-button");
+        const numberButton = GFT_STATE.floatingFormattingToolbar.querySelector(".gft-number-button");
         if (numberButton) {
-          if (isNumber && currentActiveEditor) {
+          if (isNumber && GFT_STATE.currentActiveEditor) {
             numberButton.style.display = "inline-block";
           } else {
             numberButton.style.display = "none";
           }
         }
-        floatingFormattingToolbar.style.display = "flex";
-        floatingFormattingToolbar.style.visibility = "visible";
-        floatingFormattingToolbar.style.opacity = "1";
-        floatingFormattingToolbar.style.position = "fixed";
-        const toolbarWidth = floatingFormattingToolbar.offsetWidth || 150;
-        const toolbarHeight = floatingFormattingToolbar.offsetHeight || 40;
+        GFT_STATE.floatingFormattingToolbar.style.display = "flex";
+        GFT_STATE.floatingFormattingToolbar.style.visibility = "visible";
+        GFT_STATE.floatingFormattingToolbar.style.opacity = "1";
+        GFT_STATE.floatingFormattingToolbar.style.position = "fixed";
+        const toolbarWidth = GFT_STATE.floatingFormattingToolbar.offsetWidth || 150;
+        const toolbarHeight = GFT_STATE.floatingFormattingToolbar.offsetHeight || 40;
         const left = rect.left + rect.width / 2 - toolbarWidth / 2;
         const top = rect.top - toolbarHeight - 8;
-        floatingFormattingToolbar.style.left = `${Math.max(10, left)}px`;
-        floatingFormattingToolbar.style.top = `${Math.max(10, top)}px`;
+        GFT_STATE.floatingFormattingToolbar.style.left = `${Math.max(10, left)}px`;
+        GFT_STATE.floatingFormattingToolbar.style.top = `${Math.max(10, top)}px`;
       }
       function hideFloatingToolbar() {
-        if (floatingFormattingToolbar) {
-          floatingFormattingToolbar.style.display = "none";
+        if (GFT_STATE.floatingFormattingToolbar) {
+          GFT_STATE.floatingFormattingToolbar.style.display = "none";
         }
       }
       function handleSelectionChange() {
-        if (currentActiveEditor) {
+        if (GFT_STATE.currentActiveEditor) {
           let hasSelection = false;
-          if (currentEditorType === "textarea") {
-            const start = currentActiveEditor.selectionStart;
-            const end = currentActiveEditor.selectionEnd;
-            hasSelection = start !== end && document.activeElement === currentActiveEditor;
+          if (GFT_STATE.currentEditorType === "textarea") {
+            const start = GFT_STATE.currentActiveEditor.selectionStart;
+            const end = GFT_STATE.currentActiveEditor.selectionEnd;
+            hasSelection = start !== end && document.activeElement === GFT_STATE.currentActiveEditor;
           } else {
             const selection = window.getSelection();
             if (!selection.rangeCount) {
@@ -3536,15 +4016,15 @@
             const range = selection.getRangeAt(0);
             const container = range.commonAncestorContainer;
             let isInEditor = false;
-            if (currentActiveEditor.contains(container) || container.nodeType === Node.ELEMENT_NODE && container === currentActiveEditor) {
+            if (GFT_STATE.currentActiveEditor.contains(container) || container.nodeType === Node.ELEMENT_NODE && container === GFT_STATE.currentActiveEditor) {
               isInEditor = true;
-            } else if (container.parentNode && currentActiveEditor.contains(container.parentNode)) {
+            } else if (container.parentNode && GFT_STATE.currentActiveEditor.contains(container.parentNode)) {
               isInEditor = true;
             }
             hasSelection = isInEditor && !selection.isCollapsed;
           }
           if (hasSelection) {
-            if (floatingFormattingToolbar) {
+            if (GFT_STATE.floatingFormattingToolbar) {
               if (isLyricCardOnlyMode()) {
                 setTimeout(showFloatingToolbar, 50);
               } else {
@@ -3595,350 +4075,12 @@
           }
         }
       }
-      function isSectionTag(line) {
-        const trimmed = line.trim();
-        if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-          if (/^\[\?+\]$/.test(trimmed)) return false;
-          return true;
-        }
-        if (/^\[\[.*\]\]\(.*\)$/.test(trimmed)) {
-          return true;
-        }
-        return false;
-      }
-      function correctLineSpacing(text) {
-        const originalLines = text.split("\n");
-        let correctionsCount = 0;
-        if (originalLines.length === 0) {
-          return { newText: "", correctionsCount: 0 };
-        }
-        const linesWithAddedSpacing = [];
-        for (let i = 0; i < originalLines.length; i++) {
-          const currentLine = originalLines[i];
-          linesWithAddedSpacing.push(currentLine);
-          if (currentLine.trim() !== "" && !isSectionTag(currentLine)) {
-            if (i + 1 < originalLines.length) {
-              const nextLine = originalLines[i + 1];
-              if (nextLine.trim() !== "" && isSectionTag(nextLine)) {
-                linesWithAddedSpacing.push("");
-                correctionsCount++;
-              }
-            }
-          }
-        }
-        const cleanedLines = [];
-        for (let i = 0; i < linesWithAddedSpacing.length; i++) {
-          const currentLine = linesWithAddedSpacing[i];
-          const trimmedLine = currentLine.trim();
-          if (trimmedLine !== "") {
-            cleanedLines.push(currentLine);
-          } else {
-            if (cleanedLines.length === 0) {
-              correctionsCount++;
-              continue;
-            }
-            const prevLine = cleanedLines[cleanedLines.length - 1];
-            let nextLineIsTag = false;
-            let hasNextContent = false;
-            for (let k = i + 1; k < linesWithAddedSpacing.length; k++) {
-              if (linesWithAddedSpacing[k].trim() !== "") {
-                hasNextContent = true;
-                if (isSectionTag(linesWithAddedSpacing[k])) {
-                  nextLineIsTag = true;
-                }
-                break;
-              }
-            }
-            if (!hasNextContent) {
-              correctionsCount++;
-              continue;
-            }
-            if (nextLineIsTag) {
-              if (prevLine.trim() === "") {
-                correctionsCount++;
-              } else {
-                cleanedLines.push(currentLine);
-              }
-            } else {
-              correctionsCount++;
-            }
-          }
-        }
-        const newText = cleanedLines.join("\n");
-        if (text === newText) return { newText, correctionsCount: 0 };
-        if (correctionsCount === 0 && text !== newText) correctionsCount = 1;
-        return { newText, correctionsCount };
-      }
-      function applyTextTransformToDivEditor(editorNode, transformFunction) {
-        const selection = window.getSelection();
-        const range = selection.rangeCount > 0 ? selection.getRangeAt(0).cloneRange() : null;
-        let currentTextContent = "";
-        const lineElements = [];
-        let nodeBuffer = "";
-        editorNode.childNodes.forEach((child) => {
-          if (child.nodeName === "BR") {
-            if (nodeBuffer) lineElements.push(document.createTextNode(nodeBuffer));
-            nodeBuffer = "";
-            lineElements.push(document.createElement("br"));
-          } else if (child.nodeType === Node.TEXT_NODE) {
-            nodeBuffer += child.textContent;
-          } else if (child.nodeType === Node.ELEMENT_NODE) {
-            if (nodeBuffer) lineElements.push(document.createTextNode(nodeBuffer));
-            nodeBuffer = "";
-            if (child.nodeName === "DIV" || child.nodeName === "P") {
-              if (child.textContent.trim() !== "") {
-                lineElements.push(child.cloneNode(true));
-              } else if (child.querySelector("br")) {
-                lineElements.push(document.createElement("br"));
-              }
-            } else {
-              nodeBuffer += child.textContent;
-            }
-          }
-        });
-        if (nodeBuffer) lineElements.push(document.createTextNode(nodeBuffer));
-        currentTextContent = "";
-        lineElements.forEach((el) => {
-          if (el.nodeName === "BR") {
-            currentTextContent += "\n";
-          } else if (el.nodeType === Node.TEXT_NODE) {
-            currentTextContent += el.textContent;
-          } else if (el.nodeName === "DIV" || el.nodeName === "P") {
-            currentTextContent += el.textContent + "\n";
-          }
-        });
-        currentTextContent = currentTextContent.replace(/\n+$/, "");
-        const { newText, correctionsCount } = transformFunction(currentTextContent);
-        if (currentTextContent !== newText || correctionsCount > 0) {
-          editorNode.innerHTML = "";
-          newText.split("\n").forEach((lineText, index, arr) => {
-            const lineDiv = document.createElement("div");
-            if (lineText === "") {
-              if (index === arr.length - 1 && arr.length > 1 && !newText.endsWith("\n\n")) {
-              } else {
-                lineDiv.appendChild(document.createElement("br"));
-              }
-            } else {
-              lineDiv.textContent = lineText;
-            }
-            editorNode.appendChild(lineDiv);
-          });
-          if (editorNode.childNodes.length === 0) {
-            const emptyDiv = document.createElement("div");
-            emptyDiv.appendChild(document.createElement("br"));
-            editorNode.appendChild(emptyDiv);
-          }
-          if (range) {
-            try {
-              const lastDiv = editorNode.lastChild;
-              if (lastDiv) {
-                const newRange = document.createRange();
-                if (lastDiv.nodeName === "DIV") {
-                  if (lastDiv.firstChild && lastDiv.firstChild.nodeName === "BR") {
-                    newRange.setStartBefore(lastDiv.firstChild);
-                  } else if (lastDiv.firstChild && lastDiv.firstChild.nodeType === Node.TEXT_NODE) {
-                    newRange.setStart(lastDiv.firstChild, lastDiv.firstChild.textContent.length);
-                  } else {
-                    newRange.selectNodeContents(lastDiv);
-                    newRange.collapse(false);
-                  }
-                } else {
-                  newRange.setStart(lastDiv, lastDiv.textContent ? lastDiv.textContent.length : 0);
-                }
-                newRange.collapse(true);
-                selection.removeAllRanges();
-                selection.addRange(newRange);
-              }
-            } catch (e) {
-              console.warn("Erreur restauration s\xE9lection apr\xE8s transformDiv:", e);
-            }
-          }
-          editorNode.focus();
-          const inputEvent = new Event("input", { bubbles: true, cancelable: true });
-          editorNode.dispatchEvent(inputEvent);
-        }
-        return correctionsCount;
-      }
-      function applyAllTextCorrectionsToString(text, options = {}) {
-        const opts = {
-          yPrime: options.yPrime !== false,
-          apostrophes: options.apostrophes !== false,
-          oeuLigature: options.oeuLigature !== false,
-          frenchQuotes: options.frenchQuotes !== false,
-          longDash: options.longDash !== false,
-          doubleSpaces: options.doubleSpaces !== false,
-          capitalization: options.capitalization !== false,
-          punctuation: options.punctuation !== false,
-          spacing: options.spacing !== false
-        };
-        let currentText = text;
-        let result;
-        const corrections = {
-          yPrime: 0,
-          apostrophes: 0,
-          oeuLigature: 0,
-          frenchQuotes: 0,
-          longDash: 0,
-          doubleSpaces: 0,
-          spacing: 0
-        };
-        if (opts.yPrime) {
-          const yPrimePattern = /\b(Y|y)['']/g;
-          const yPrimeReplacement = (match, firstLetter) => firstLetter === "Y" ? "Y " : "y ";
-          const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
-          if (textAfterYPrime !== currentText) {
-            corrections.yPrime = (currentText.match(yPrimePattern) || []).length;
-            currentText = textAfterYPrime;
-          }
-        }
-        if (opts.apostrophes) {
-          const apostrophePattern = /['']/g;
-          const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
-          if (textAfterApostrophe !== currentText) {
-            corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
-            currentText = textAfterApostrophe;
-          }
-        }
-        if (opts.oeuLigature) {
-          const oeuPattern = /([Oo])eu/g;
-          const oeuReplacement = (match, firstLetter) => firstLetter === "O" ? "\u0152u" : "\u0153u";
-          const textAfterOeu = currentText.replace(oeuPattern, oeuReplacement);
-          if (textAfterOeu !== currentText) {
-            corrections.oeuLigature = (currentText.match(oeuPattern) || []).length;
-            currentText = textAfterOeu;
-          }
-        }
-        if (opts.frenchQuotes) {
-          const frenchQuotesPattern = /[«»]/g;
-          const textAfterFrenchQuotes = currentText.replace(frenchQuotesPattern, '"');
-          if (textAfterFrenchQuotes !== currentText) {
-            corrections.frenchQuotes = (currentText.match(frenchQuotesPattern) || []).length;
-            currentText = textAfterFrenchQuotes;
-          }
-        }
-        if (opts.longDash) {
-          if (typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) {
-            const polishDashPattern = / - /g;
-            const textAfterPolishDash = currentText.replace(polishDashPattern, " \u2014 ");
-            if (textAfterPolishDash !== currentText) {
-              corrections.longDash = (currentText.match(polishDashPattern) || []).length;
-              currentText = textAfterPolishDash;
-            }
-          } else {
-            const longDashPattern = /[—–]/g;
-            const textAfterLongDash = currentText.replace(longDashPattern, "-");
-            if (textAfterLongDash !== currentText) {
-              corrections.longDash = (currentText.match(longDashPattern) || []).length;
-              currentText = textAfterLongDash;
-            }
-          }
-        }
-        if (opts.doubleSpaces) {
-          const doubleSpacesPattern = /  +/g;
-          const textAfterDoubleSpaces = currentText.replace(doubleSpacesPattern, " ");
-          if (textAfterDoubleSpaces !== currentText) {
-            corrections.doubleSpaces = (currentText.match(doubleSpacesPattern) || []).length;
-            currentText = textAfterDoubleSpaces;
-          }
-        }
-        if (opts.spacing) {
-          result = correctLineSpacing(currentText);
-          if (result.correctionsCount > 0) {
-            corrections.spacing = result.correctionsCount;
-            currentText = result.newText;
-          }
-        }
-        const totalCorrections = corrections.yPrime + corrections.apostrophes + corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash + corrections.doubleSpaces + corrections.spacing;
-        return { newText: currentText, correctionsCount: totalCorrections, corrections };
-      }
-      async function applyAllTextCorrectionsAsync(text) {
-        let currentText = text;
-        let result;
-        const totalSteps = 7;
-        const corrections = {
-          yPrime: 0,
-          apostrophes: 0,
-          oeuLigature: 0,
-          frenchQuotes: 0,
-          longDash: 0,
-          doubleSpaces: 0,
-          spacing: 0
-        };
-        showProgress(1, totalSteps, getTranslation("progress_step_yprime"));
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        const yPrimePattern = /\b(Y|y)['']/g;
-        const yPrimeReplacement = (match, firstLetter) => firstLetter === "Y" ? "Y " : "y ";
-        const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
-        if (textAfterYPrime !== currentText) {
-          corrections.yPrime = (currentText.match(yPrimePattern) || []).length;
-          currentText = textAfterYPrime;
-        }
-        showProgress(2, totalSteps, getTranslation("progress_step_apostrophes"));
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        const apostrophePattern = /['']/g;
-        const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
-        if (textAfterApostrophe !== currentText) {
-          corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
-          currentText = textAfterApostrophe;
-        }
-        showProgress(3, totalSteps, getTranslation("progress_step_oeu"));
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        const oeuPattern = /([Oo])eu/g;
-        const oeuReplacement = (match, firstLetter) => firstLetter === "O" ? "\u0152u" : "\u0153u";
-        const textAfterOeu = currentText.replace(oeuPattern, oeuReplacement);
-        if (textAfterOeu !== currentText) {
-          corrections.oeuLigature = (currentText.match(oeuPattern) || []).length;
-          currentText = textAfterOeu;
-        }
-        showProgress(4, totalSteps, getTranslation("progress_step_quotes"));
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        const frenchQuotesPattern = /[«»]/g;
-        const textAfterFrenchQuotes = currentText.replace(frenchQuotesPattern, '"');
-        if (textAfterFrenchQuotes !== currentText) {
-          corrections.frenchQuotes = (currentText.match(frenchQuotesPattern) || []).length;
-          currentText = textAfterFrenchQuotes;
-        }
-        showProgress(5, totalSteps, getTranslation("progress_step_dash"));
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        if (typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) {
-          const polishDashPattern = / - /g;
-          const textAfterPolishDash = currentText.replace(polishDashPattern, " \u2014 ");
-          if (textAfterPolishDash !== currentText) {
-            corrections.longDash = (currentText.match(polishDashPattern) || []).length;
-            currentText = textAfterPolishDash;
-          }
-        } else {
-          const longDashPattern = /[—–]/g;
-          const textAfterLongDash = currentText.replace(longDashPattern, "-");
-          if (textAfterLongDash !== currentText) {
-            corrections.longDash = (currentText.match(longDashPattern) || []).length;
-            currentText = textAfterLongDash;
-          }
-        }
-        showProgress(6, totalSteps, getTranslation("progress_step_spaces"));
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        const doubleSpacesPattern = /  +/g;
-        const textAfterDoubleSpaces = currentText.replace(doubleSpacesPattern, " ");
-        if (textAfterDoubleSpaces !== currentText) {
-          corrections.doubleSpaces = (currentText.match(doubleSpacesPattern) || []).length;
-          currentText = textAfterDoubleSpaces;
-        }
-        showProgress(7, totalSteps, getTranslation("progress_step_spacing"));
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        result = correctLineSpacing(currentText);
-        if (result.correctionsCount > 0) {
-          corrections.spacing = result.correctionsCount;
-          currentText = result.newText;
-        }
-        const totalCorrections = corrections.yPrime + corrections.apostrophes + corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash + corrections.doubleSpaces + corrections.spacing;
-        return { newText: currentText, correctionsCount: totalCorrections, corrections };
-      }
       function initLyricsEditorEnhancer() {
         let foundEditor = null;
         let foundEditorType = null;
         const getStructuralTags = () => {
           const isEnglish = isEnglishTranscriptionMode();
-          const isPolish = isPolishTranscriptionMode();
+          const isPolish = isPolishTranscriptionMode2();
           const customButtons = getCustomButtons().filter((b) => b.type === "structure").map((b) => ({
             label: b.label,
             getText: () => {
@@ -3961,8 +4103,8 @@
                   prev: { label: "\u2190", title: getTranslation("btn_prev_couplet_title"), tooltip: getTranslation("btn_prev_couplet_tooltip") },
                   main: {
                     id: COUPLET_BUTTON_ID,
-                    getLabel: () => `[Zwrotka ${coupletCounter}]`,
-                    getText: () => addArtistToText(`[Zwrotka ${coupletCounter}]`),
+                    getLabel: () => `[Zwrotka ${GFT_STATE.coupletCounter}]`,
+                    getText: () => addArtistToText(`[Zwrotka ${GFT_STATE.coupletCounter}]`),
                     tooltip: getTranslation("add_couplet"),
                     shortcut: "1"
                   },
@@ -3994,8 +4136,8 @@
                   prev: { label: "\u2190", title: getTranslation("btn_prev_couplet_title"), tooltip: getTranslation("btn_prev_couplet_tooltip") },
                   main: {
                     id: COUPLET_BUTTON_ID,
-                    getLabel: () => `[Verse ${coupletCounter}]`,
-                    getText: () => addArtistToText(`[Verse ${coupletCounter}]`),
+                    getLabel: () => `[Verse ${GFT_STATE.coupletCounter}]`,
+                    getText: () => addArtistToText(`[Verse ${GFT_STATE.coupletCounter}]`),
                     tooltip: getTranslation("add_couplet"),
                     shortcut: "1"
                   },
@@ -4017,8 +4159,8 @@
             return {
               buttons: [
                 { label: getTranslation("btn_header"), getText: () => {
-                  let txt = `[Paroles de "${currentSongTitle}"`;
-                  const fts = formatArtistList(currentFeaturingArtists);
+                  let txt = `[Paroles de "${GFT_STATE.currentSongTitle}"`;
+                  const fts = formatArtistList(GFT_STATE.currentFeaturingArtists);
                   if (fts && isHeaderFeatEnabled()) txt += ` ft. ${fts}`;
                   txt += "]";
                   if (!isTagNewlinesDisabled()) txt += "\n";
@@ -4029,8 +4171,8 @@
                   prev: { label: "\u2190", title: getTranslation("btn_prev_couplet_title"), tooltip: getTranslation("btn_prev_couplet_tooltip") },
                   main: {
                     id: COUPLET_BUTTON_ID,
-                    getLabel: () => `[Couplet ${coupletCounter}]`,
-                    getText: () => addArtistToText(`[Couplet ${coupletCounter}]`),
+                    getLabel: () => `[Couplet ${GFT_STATE.coupletCounter}]`,
+                    getText: () => addArtistToText(`[Couplet ${GFT_STATE.coupletCounter}]`),
                     tooltip: getTranslation("add_couplet"),
                     shortcut: "1"
                   },
@@ -4054,11 +4196,11 @@
         };
         const getTextCleanupTools = () => {
           const isEnglish = isEnglishTranscriptionMode();
-          const isPolish = isPolishTranscriptionMode();
+          const isPolish = isPolishTranscriptionMode2();
           const customButtons = getCustomButtons().filter((b) => b.type === "cleanup").map((b) => ({
             label: b.label,
             action: "replaceText",
-            searchPattern: new RegExp(b.regex, "g"),
+            searchPattern: new RegExp(b.regex, b.isCaseSensitive ? "g" : "gi"),
             replacementText: b.replacement || "",
             highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
             tooltip: "Custom: " + b.label
@@ -4246,72 +4388,72 @@
           foundEditor = null;
           foundEditorType = null;
         }
-        const editorJustAppeared = foundEditor && !currentActiveEditor;
-        const editorJustDisappeared = !foundEditor && currentActiveEditor;
-        const editorInstanceChanged = foundEditor && currentActiveEditor && foundEditor !== currentActiveEditor;
+        const editorJustAppeared = foundEditor && !GFT_STATE.currentActiveEditor;
+        const editorJustDisappeared = !foundEditor && GFT_STATE.currentActiveEditor;
+        const editorInstanceChanged = foundEditor && GFT_STATE.currentActiveEditor && foundEditor !== GFT_STATE.currentActiveEditor;
         if (editorJustAppeared || editorInstanceChanged) {
-          currentActiveEditor = foundEditor;
-          currentEditorType = foundEditorType;
+          GFT_STATE.currentActiveEditor = foundEditor;
+          GFT_STATE.currentEditorType = foundEditorType;
           extractSongData();
           hideGeniusFormattingHelper();
-          if (shortcutsContainerElement) {
-            shortcutsContainerElement.remove();
-            shortcutsContainerElement = null;
+          if (GFT_STATE.shortcutsContainerElement) {
+            GFT_STATE.shortcutsContainerElement.remove();
+            GFT_STATE.shortcutsContainerElement = null;
           }
           setTimeout(checkAndRestoreDraft, 1e3);
-          undoStack = [];
-          redoStack = [];
-          lastSavedContent = "";
-          hasUnsavedChanges = false;
-          if (autoSaveTimeout) {
-            clearTimeout(autoSaveTimeout);
-            autoSaveTimeout = null;
+          GFT_STATE.undoStack = [];
+          GFT_STATE.redoStack = [];
+          GFT_STATE.lastSavedContent = "";
+          GFT_STATE.hasUnsavedChanges = false;
+          if (GFT_STATE.autoSaveTimeout) {
+            clearTimeout(GFT_STATE.autoSaveTimeout);
+            GFT_STATE.autoSaveTimeout = null;
           }
           createFloatingFormattingToolbar();
-          if (currentEditorType === "textarea") {
-            currentActiveEditor.addEventListener("select", handleSelectionChange);
-            currentActiveEditor.addEventListener("mouseup", handleSelectionChange);
-            currentActiveEditor.addEventListener("scroll", hideFloatingToolbar);
+          if (GFT_STATE.currentEditorType === "textarea") {
+            GFT_STATE.currentActiveEditor.addEventListener("select", handleSelectionChange);
+            GFT_STATE.currentActiveEditor.addEventListener("mouseup", handleSelectionChange);
+            GFT_STATE.currentActiveEditor.addEventListener("scroll", hideFloatingToolbar);
           }
-          currentActiveEditor.addEventListener("input", debouncedStatsUpdate);
-          currentActiveEditor.addEventListener("input", autoSaveToHistory);
+          GFT_STATE.currentActiveEditor.addEventListener("input", debouncedStatsUpdate);
+          GFT_STATE.currentActiveEditor.addEventListener("input", autoSaveToHistory);
           setTimeout(() => updateStatsDisplay(), 500);
           setTimeout(() => {
             const initialContent = getCurrentEditorContent();
             if (initialContent && initialContent.trim().length > 0) {
-              lastSavedContent = initialContent;
-              if (undoStack.length === 0 || undoStack[undoStack.length - 1] !== initialContent) {
-                undoStack.push(initialContent);
+              GFT_STATE.lastSavedContent = initialContent;
+              if (GFT_STATE.undoStack.length === 0 || GFT_STATE.undoStack[GFT_STATE.undoStack.length - 1] !== initialContent) {
+                GFT_STATE.undoStack.push(initialContent);
                 updateHistoryButtons();
               }
             }
           }, 500);
         } else if (editorJustDisappeared) {
-          currentActiveEditor = null;
-          currentEditorType = null;
+          GFT_STATE.currentActiveEditor = null;
+          GFT_STATE.currentEditorType = null;
           hideFloatingToolbar();
-          undoStack = [];
-          redoStack = [];
-          lastSavedContent = "";
-          hasUnsavedChanges = false;
-          if (autoSaveTimeout) {
-            clearTimeout(autoSaveTimeout);
-            autoSaveTimeout = null;
+          GFT_STATE.undoStack = [];
+          GFT_STATE.redoStack = [];
+          GFT_STATE.lastSavedContent = "";
+          GFT_STATE.hasUnsavedChanges = false;
+          if (GFT_STATE.autoSaveTimeout) {
+            clearTimeout(GFT_STATE.autoSaveTimeout);
+            GFT_STATE.autoSaveTimeout = null;
           }
         }
-        shortcutsContainerElement = document.getElementById(SHORTCUTS_CONTAINER_ID);
-        if (editorJustDisappeared && shortcutsContainerElement) {
-          shortcutsContainerElement.remove();
-          shortcutsContainerElement = null;
+        GFT_STATE.shortcutsContainerElement = document.getElementById(SHORTCUTS_CONTAINER_ID);
+        if (editorJustDisappeared && GFT_STATE.shortcutsContainerElement) {
+          GFT_STATE.shortcutsContainerElement.remove();
+          GFT_STATE.shortcutsContainerElement = null;
           return;
         }
         if (foundEditor) {
           const targetStickySection = document.querySelector(SELECTORS.CONTROLS_STICKY_SECTION);
           if (targetStickySection) {
             if (isLyricCardOnlyMode()) {
-              if (shortcutsContainerElement) {
-                shortcutsContainerElement.remove();
-                shortcutsContainerElement = null;
+              if (GFT_STATE.shortcutsContainerElement) {
+                GFT_STATE.shortcutsContainerElement.remove();
+                GFT_STATE.shortcutsContainerElement = null;
               }
               if (editorJustAppeared || editorInstanceChanged) {
                 extractSongData();
@@ -4319,10 +4461,10 @@
               }
               return;
             }
-            if (!shortcutsContainerElement || editorInstanceChanged || editorJustAppeared) {
-              if (shortcutsContainerElement) shortcutsContainerElement.remove();
-              shortcutsContainerElement = document.createElement("div");
-              shortcutsContainerElement.id = SHORTCUTS_CONTAINER_ID;
+            if (!GFT_STATE.shortcutsContainerElement || editorInstanceChanged || editorJustAppeared) {
+              if (GFT_STATE.shortcutsContainerElement) GFT_STATE.shortcutsContainerElement.remove();
+              GFT_STATE.shortcutsContainerElement = document.createElement("div");
+              GFT_STATE.shortcutsContainerElement.id = SHORTCUTS_CONTAINER_ID;
               const isDarkMode = localStorage.getItem(DARK_MODE_STORAGE_KEY) === "true";
               const panelTitle = document.createElement("div");
               panelTitle.id = "gftPanelTitle";
@@ -4392,7 +4534,7 @@
               const undoButton = document.createElement("button");
               undoButton.id = "gft-undo-button";
               undoButton.textContent = "\u21A9";
-              undoButton.title = "Annuler (Ctrl+Z)";
+              undoButton.title = getTranslation("undo_tooltip");
               undoButton.classList.add("genius-lyrics-shortcut-button");
               undoButton.disabled = true;
               undoButton.style.opacity = "0.5";
@@ -4405,7 +4547,7 @@
               const redoButton = document.createElement("button");
               redoButton.id = "gft-redo-button";
               redoButton.textContent = "\u21AA";
-              redoButton.title = "Refaire (Ctrl+Y)";
+              redoButton.title = getTranslation("redo_tooltip");
               redoButton.classList.add("genius-lyrics-shortcut-button");
               redoButton.disabled = true;
               redoButton.style.opacity = "0.5";
@@ -4477,6 +4619,16 @@
                   menu.remove();
                 };
                 menu.appendChild(tutorialItem);
+                const libraryItem = document.createElement("button");
+                libraryItem.className = "gft-settings-menu-item";
+                libraryItem.textContent = getTranslation("settings_custom_library");
+                libraryItem.onclick = () => {
+                  if (typeof openCustomButtonManager === "function") {
+                    openCustomButtonManager("structure", "library");
+                  }
+                  menu.remove();
+                };
+                menu.appendChild(libraryItem);
                 document.body.appendChild(menu);
                 const closeMenuHandler = (e) => {
                   if (!menu.contains(e.target) && e.target !== settingsButton) {
@@ -4487,8 +4639,8 @@
                 document.addEventListener("click", closeMenuHandler);
               });
               panelTitle.appendChild(settingsButton);
-              addTooltip(settingsButton, "Param\xE8tres (Mode sombre, Stats, Aide)");
-              shortcutsContainerElement.appendChild(panelTitle);
+              addTooltip(settingsButton, getTranslation("settings_tooltip"));
+              GFT_STATE.shortcutsContainerElement.appendChild(panelTitle);
               loadDarkModePreference();
               const panelContent = document.createElement("div");
               panelContent.id = "gft-panel-content";
@@ -4500,9 +4652,9 @@
               if (statsDisplay.classList.contains("gft-stats-visible")) {
                 updateStatsDisplay();
               }
-              if (detectedArtists.length === 0 && !editorJustAppeared && !editorInstanceChanged) extractSongData();
+              if (GFT_STATE.detectedArtists.length === 0 && !editorJustAppeared && !editorInstanceChanged) extractSongData();
               createArtistSelectors(panelContent);
-              if (currentFeaturingArtists.length > 0 || currentMainArtists.length > 1) {
+              if (GFT_STATE.currentFeaturingArtists.length > 0 || GFT_STATE.currentMainArtists.length > 1) {
                 const hrArtists = document.createElement("hr");
                 panelContent.appendChild(hrArtists);
               }
@@ -4542,21 +4694,21 @@
                 }
                 button.addEventListener("click", (event) => {
                   event.preventDefault();
-                  if (!currentActiveEditor) {
+                  if (!GFT_STATE.currentActiveEditor) {
                     initLyricsEditorEnhancer();
-                    if (!currentActiveEditor) return;
+                    if (!GFT_STATE.currentActiveEditor) return;
                   }
                   let savedCursorStart = null;
                   let savedCursorEnd = null;
-                  if (currentEditorType === "textarea") {
-                    savedCursorStart = currentActiveEditor.selectionStart;
-                    savedCursorEnd = currentActiveEditor.selectionEnd;
+                  if (GFT_STATE.currentEditorType === "textarea") {
+                    savedCursorStart = GFT_STATE.currentActiveEditor.selectionStart;
+                    savedCursorEnd = GFT_STATE.currentActiveEditor.selectionEnd;
                   }
-                  currentActiveEditor.focus();
+                  GFT_STATE.currentActiveEditor.focus();
                   isButtonActionInProgress = true;
-                  if (autoSaveTimeout) {
-                    clearTimeout(autoSaveTimeout);
-                    autoSaveTimeout = null;
+                  if (GFT_STATE.autoSaveTimeout) {
+                    clearTimeout(GFT_STATE.autoSaveTimeout);
+                    GFT_STATE.autoSaveTimeout = null;
                   }
                   let textToInsertForCouplet = null;
                   let insertionPerformed = false;
@@ -4564,8 +4716,8 @@
                     saveToHistory();
                     const replacementValueOrFn = config.replacementFunction || config.replacementText;
                     let replacementsCount = 0;
-                    if (currentEditorType === "textarea") {
-                      const originalValue = currentActiveEditor.value;
+                    if (GFT_STATE.currentEditorType === "textarea") {
+                      const originalValue = GFT_STATE.currentActiveEditor.value;
                       let tempCount = 0;
                       const newValue = originalValue.replace(config.searchPattern, (...matchArgs) => {
                         tempCount++;
@@ -4573,14 +4725,14 @@
                         return replacementValueOrFn;
                       });
                       if (originalValue !== newValue) {
-                        currentActiveEditor.value = newValue;
-                        currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
+                        GFT_STATE.currentActiveEditor.value = newValue;
+                        GFT_STATE.currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
                         replacementsCount = tempCount;
-                        createTextareaReplacementOverlay(currentActiveEditor, originalValue, newValue, config.searchPattern);
+                        createTextareaReplacementOverlay(GFT_STATE.currentActiveEditor, originalValue, newValue, config.searchPattern);
                       }
-                    } else if (currentEditorType === "div") {
-                      replacementsCount = replaceAndHighlightInDiv(currentActiveEditor, config.searchPattern, replacementValueOrFn, config.highlightClass);
-                      if (replacementsCount > 0) currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
+                    } else if (GFT_STATE.currentEditorType === "div") {
+                      replacementsCount = replaceAndHighlightInDiv(GFT_STATE.currentActiveEditor, config.searchPattern, replacementValueOrFn, config.highlightClass);
+                      if (replacementsCount > 0) GFT_STATE.currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
                     }
                     if (replacementsCount > 0) {
                       let itemLabel = "\xE9l\xE9ment(s)";
@@ -4590,13 +4742,13 @@
                         if (config.label.includes("y' \u2192 y ")) itemLabel = "occurrence(s) de 'y''";
                         if (config.label.includes("\u2019 \u2192 '")) itemLabel = "apostrophe(s) \u2019";
                       }
-                      showFeedbackMessage(getTranslation("feedback_replaced", replacementsCount).replace("{count}", replacementsCount).replace("{item}", itemLabel), 3e3, shortcutsContainerElement);
+                      showFeedbackMessage(getTranslation("feedback_replaced", replacementsCount).replace("{count}", replacementsCount).replace("{item}", itemLabel), 3e3, GFT_STATE.shortcutsContainerElement);
                     } else {
                       let noCorrectionLabel = "\xE9l\xE9ment(s)";
                       if (config.feedbackKey) {
                         noCorrectionLabel = getTranslation(config.feedbackKey, 1);
                       }
-                      showFeedbackMessage(getTranslation("feedback_no_correction_needed").replace("{item}", noCorrectionLabel), 2e3, shortcutsContainerElement);
+                      showFeedbackMessage(getTranslation("feedback_no_correction_needed").replace("{item}", noCorrectionLabel), 2e3, GFT_STATE.shortcutsContainerElement);
                     }
                   } else if (config.action === "lineCorrection" && config.correctionType) {
                     saveToHistory();
@@ -4608,38 +4760,38 @@
                       feedbackLabel = "espacement(s) de ligne";
                     }
                     if (correctionFunction) {
-                      if (currentEditorType === "textarea") {
-                        const originalText = currentActiveEditor.value;
+                      if (GFT_STATE.currentEditorType === "textarea") {
+                        const originalText = GFT_STATE.currentActiveEditor.value;
                         const { newText, correctionsCount: count } = correctionFunction(originalText);
                         if (originalText !== newText) {
-                          currentActiveEditor.value = newText;
-                          currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
+                          GFT_STATE.currentActiveEditor.value = newText;
+                          GFT_STATE.currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
                         }
                         correctionsCount = count;
-                      } else if (currentEditorType === "div") {
-                        correctionsCount = applyTextTransformToDivEditor(currentActiveEditor, correctionFunction);
+                      } else if (GFT_STATE.currentEditorType === "div") {
+                        correctionsCount = applyTextTransformToDivEditor(GFT_STATE.currentActiveEditor, correctionFunction);
                       }
                       if (correctionsCount > 0) {
                         let itemLabel = "\xE9l\xE9ment(s)";
                         if (config.feedbackKey) itemLabel = getTranslation(config.feedbackKey, correctionsCount);
                         else itemLabel = feedbackLabel;
-                        showFeedbackMessage(getTranslation("feedback_corrected", correctionsCount).replace("{count}", correctionsCount).replace("{item}", itemLabel), 3e3, shortcutsContainerElement);
+                        showFeedbackMessage(getTranslation("feedback_corrected", correctionsCount).replace("{count}", correctionsCount).replace("{item}", itemLabel), 3e3, GFT_STATE.shortcutsContainerElement);
                       } else {
                         let noCorrectionLabel = "\xE9l\xE9ment(s)";
                         if (config.feedbackKey) noCorrectionLabel = getTranslation(config.feedbackKey, 1);
                         else noCorrectionLabel = feedbackLabel;
-                        showFeedbackMessage(getTranslation("feedback_no_correction_needed").replace("{item}", noCorrectionLabel), 2e3, shortcutsContainerElement);
+                        showFeedbackMessage(getTranslation("feedback_no_correction_needed").replace("{item}", noCorrectionLabel), 2e3, GFT_STATE.shortcutsContainerElement);
                       }
                     }
                   } else if (config.action === "globalTextFix") {
                     (async () => {
                       try {
-                        const originalText = currentEditorType === "textarea" ? currentActiveEditor.value : currentActiveEditor.textContent || "";
-                        const result = await applyAllTextCorrectionsAsync(originalText);
+                        const originalText = GFT_STATE.currentEditorType === "textarea" ? GFT_STATE.currentActiveEditor.value : GFT_STATE.currentActiveEditor.textContent || "";
+                        const result = await applyAllTextCorrectionsAsync(originalText, showProgress);
                         hideProgress();
                         if (result.correctionsCount === 0) {
-                          const editorRef2 = currentActiveEditor;
-                          const editorTypeRef2 = currentEditorType;
+                          const editorRef2 = GFT_STATE.currentActiveEditor;
+                          const editorTypeRef2 = GFT_STATE.currentEditorType;
                           let unmatchedCount = 0;
                           console.log("[GFT] V\xE9rification des brackets (cas sans correction texte)...");
                           if (editorRef2) {
@@ -4650,15 +4802,15 @@
                             showFeedbackMessage(
                               getTranslation("feedback_brackets_issue").replace("{count}", unmatchedCount),
                               5e3,
-                              shortcutsContainerElement
+                              GFT_STATE.shortcutsContainerElement
                             );
                           } else {
-                            showFeedbackMessage(getTranslation("feedback_no_text_corrections"), 3e3, shortcutsContainerElement);
+                            showFeedbackMessage(getTranslation("feedback_no_text_corrections"), 3e3, GFT_STATE.shortcutsContainerElement);
                           }
                           return;
                         }
-                        const editorRef = currentActiveEditor;
-                        const editorTypeRef = currentEditorType;
+                        const editorRef = GFT_STATE.currentActiveEditor;
+                        const editorTypeRef = GFT_STATE.currentEditorType;
                         showCorrectionPreview(
                           originalText,
                           result.newText,
@@ -4683,7 +4835,7 @@
                             const totalCount = Object.values(finalStats).reduce((a, b) => a + b, 0);
                             const lang = localStorage.getItem("gftLanguage") || "fr";
                             const message = detailsArray.length > 0 ? getTranslation("feedback_summary_corrected", totalCount).replace("{details}", formatListWithConjunction(detailsArray, lang)).replace("{count}", totalCount) : getTranslation("feedback_summary_correction", totalCount).replace("{count}", totalCount);
-                            showFeedbackMessage(message, 4500, shortcutsContainerElement);
+                            showFeedbackMessage(message, 4500, GFT_STATE.shortcutsContainerElement);
                             console.log("[GFT] V\xE9rification des brackets apr\xE8s corrections...");
                             console.log("[GFT] editorRef:", editorRef);
                             console.log("[GFT] editorTypeRef:", editorTypeRef);
@@ -4692,11 +4844,10 @@
                               console.log("[GFT] unmatchedCount:", unmatchedCount);
                               setTimeout(() => {
                                 if (unmatchedCount > 0) {
-                                  const pluriel = unmatchedCount > 1 ? "s" : "";
                                   showFeedbackMessage(
-                                    `\u26A0\uFE0F ${unmatchedCount} parenth\xE8se${pluriel}/crochet${pluriel} non appari\xE9${pluriel} d\xE9tect\xE9${pluriel} et surlign\xE9${pluriel} en rouge !`,
+                                    getTranslation("feedback_brackets_issue").replace("{count}", unmatchedCount),
                                     5e3,
-                                    shortcutsContainerElement
+                                    GFT_STATE.shortcutsContainerElement
                                   );
                                 } else {
                                 }
@@ -4707,46 +4858,46 @@
                           },
                           // Callback si l'utilisateur annule
                           () => {
-                            showFeedbackMessage(getTranslation("feedback_corrections_cancelled"), 2e3, shortcutsContainerElement);
+                            showFeedbackMessage(getTranslation("feedback_corrections_cancelled"), 2e3, GFT_STATE.shortcutsContainerElement);
                           }
                         );
                       } catch (error) {
                         hideProgress();
                         console.error("Erreur lors des corrections:", error);
-                        showFeedbackMessage("\u274C Erreur lors des corrections", 3e3, shortcutsContainerElement);
+                        showFeedbackMessage(getTranslation("error_corrections"), 3e3, GFT_STATE.shortcutsContainerElement);
                       }
                     })();
                   } else if (config.action === "checkBrackets") {
-                    const unmatchedCount = highlightUnmatchedBracketsInEditor(currentActiveEditor, currentEditorType);
+                    const unmatchedCount = highlightUnmatchedBracketsInEditor(GFT_STATE.currentActiveEditor, GFT_STATE.currentEditorType);
                     if (unmatchedCount > 0) {
                       showFeedbackMessage(
                         getTranslation("feedback_brackets_issue").replace("{count}", unmatchedCount),
                         5e3,
-                        shortcutsContainerElement
+                        GFT_STATE.shortcutsContainerElement
                       );
                     } else {
                       showFeedbackMessage(
                         getTranslation("feedback_brackets_ok"),
                         3e3,
-                        shortcutsContainerElement
+                        GFT_STATE.shortcutsContainerElement
                       );
                     }
                   } else if (config.action === "duplicateLine") {
                     saveToHistory();
-                    if (currentEditorType === "textarea") {
-                      const text = currentActiveEditor.value;
-                      const cursorPos = currentActiveEditor.selectionStart;
+                    if (GFT_STATE.currentEditorType === "textarea") {
+                      const text = GFT_STATE.currentActiveEditor.value;
+                      const cursorPos = GFT_STATE.currentActiveEditor.selectionStart;
                       let lineStart = text.lastIndexOf("\n", cursorPos - 1) + 1;
                       let lineEnd = text.indexOf("\n", cursorPos);
                       if (lineEnd === -1) lineEnd = text.length;
                       const currentLine = text.substring(lineStart, lineEnd);
                       const newText = text.substring(0, lineEnd) + "\n" + currentLine + text.substring(lineEnd);
-                      currentActiveEditor.value = newText;
-                      currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
+                      GFT_STATE.currentActiveEditor.value = newText;
+                      GFT_STATE.currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
                       const newCursorPos = lineEnd + 1 + currentLine.length;
-                      currentActiveEditor.setSelectionRange(newCursorPos, newCursorPos);
-                      showFeedbackMessage(getTranslation("feedback_duplicate_line"), 2e3, shortcutsContainerElement);
-                    } else if (currentEditorType === "div") {
+                      GFT_STATE.currentActiveEditor.setSelectionRange(newCursorPos, newCursorPos);
+                      showFeedbackMessage(getTranslation("feedback_duplicate_line"), 2e3, GFT_STATE.shortcutsContainerElement);
+                    } else if (GFT_STATE.currentEditorType === "div") {
                       const selection = window.getSelection();
                       if (selection.rangeCount > 0) {
                         const range = selection.getRangeAt(0);
@@ -4759,37 +4910,37 @@
                         }
                         if (lineText) {
                           document.execCommand("insertText", false, "\n" + lineText);
-                          currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
-                          showFeedbackMessage(getTranslation("feedback_duplicate_line"), 2e3, shortcutsContainerElement);
+                          GFT_STATE.currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
+                          showFeedbackMessage(getTranslation("feedback_duplicate_line"), 2e3, GFT_STATE.shortcutsContainerElement);
                         }
                       }
                     }
                   } else if (config.action === "wrapSelection") {
                     let selectedText = "";
-                    if (currentEditorType === "textarea") {
-                      const start = currentActiveEditor.selectionStart;
-                      const end = currentActiveEditor.selectionEnd;
+                    if (GFT_STATE.currentEditorType === "textarea") {
+                      const start = GFT_STATE.currentActiveEditor.selectionStart;
+                      const end = GFT_STATE.currentActiveEditor.selectionEnd;
                       if (start !== end) {
                         saveToHistory();
-                        selectedText = currentActiveEditor.value.substring(start, end);
+                        selectedText = GFT_STATE.currentActiveEditor.value.substring(start, end);
                         const wrappedText = config.wrapStart + selectedText + config.wrapEnd;
-                        currentActiveEditor.setSelectionRange(start, end);
+                        GFT_STATE.currentActiveEditor.setSelectionRange(start, end);
                         document.execCommand("insertText", false, wrappedText);
-                        showFeedbackMessage(getTranslation("feedback_wrapped").replace("{start}", config.wrapStart).replace("{end}", config.wrapEnd), 2e3, shortcutsContainerElement);
+                        showFeedbackMessage(getTranslation("feedback_wrapped").replace("{start}", config.wrapStart).replace("{end}", config.wrapEnd), 2e3, GFT_STATE.shortcutsContainerElement);
                       } else {
-                        showFeedbackMessage(getTranslation("feedback_select_text_first"), 2e3, shortcutsContainerElement);
+                        showFeedbackMessage(getTranslation("feedback_select_text_first"), 2e3, GFT_STATE.shortcutsContainerElement);
                       }
-                    } else if (currentEditorType === "div") {
+                    } else if (GFT_STATE.currentEditorType === "div") {
                       const selection = window.getSelection();
                       if (selection.rangeCount > 0 && !selection.isCollapsed) {
                         saveToHistory();
                         selectedText = selection.toString();
                         const wrappedText = config.wrapStart + selectedText + config.wrapEnd;
                         document.execCommand("insertText", false, wrappedText);
-                        currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
-                        showFeedbackMessage(getTranslation("feedback_wrapped").replace("{start}", config.wrapStart).replace("{end}", config.wrapEnd), 2e3, shortcutsContainerElement);
+                        GFT_STATE.currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
+                        showFeedbackMessage(getTranslation("feedback_wrapped").replace("{start}", config.wrapStart).replace("{end}", config.wrapEnd), 2e3, GFT_STATE.shortcutsContainerElement);
                       } else {
-                        showFeedbackMessage(getTranslation("feedback_select_text_first"), 2e3, shortcutsContainerElement);
+                        showFeedbackMessage(getTranslation("feedback_select_text_first"), 2e3, GFT_STATE.shortcutsContainerElement);
                       }
                     }
                   } else {
@@ -4802,27 +4953,27 @@
                     } else if (typeof config.text !== "undefined") {
                       textToInsert = config.text;
                     }
-                    if (typeof textToInsert !== "undefined" && textToInsert !== null && currentActiveEditor) {
+                    if (typeof textToInsert !== "undefined" && textToInsert !== null && GFT_STATE.currentActiveEditor) {
                       saveToHistory();
                       document.execCommand("insertText", false, textToInsert);
                       insertionPerformed = true;
                     }
                   }
                   if (isCoupletMainButton && textToInsertForCouplet !== null) {
-                    coupletCounter++;
+                    GFT_STATE.coupletCounter++;
                     button.textContent = config.getLabel();
                   } else if (typeof config.getLabel === "function" && !isCoupletMainButton) {
                     button.textContent = config.getLabel();
                   }
-                  if (!insertionPerformed && currentEditorType === "textarea" && savedCursorStart !== null && savedCursorEnd !== null) {
-                    currentActiveEditor.setSelectionRange(savedCursorStart, savedCursorEnd);
+                  if (!insertionPerformed && GFT_STATE.currentEditorType === "textarea" && savedCursorStart !== null && savedCursorEnd !== null) {
+                    GFT_STATE.currentActiveEditor.setSelectionRange(savedCursorStart, savedCursorEnd);
                   }
-                  currentActiveEditor.focus();
+                  GFT_STATE.currentActiveEditor.focus();
                   setTimeout(() => {
                     isButtonActionInProgress = false;
-                    if (currentActiveEditor) {
-                      lastSavedContent = getCurrentEditorContent();
-                      hasUnsavedChanges = false;
+                    if (GFT_STATE.currentActiveEditor) {
+                      GFT_STATE.lastSavedContent = getCurrentEditorContent();
+                      GFT_STATE.hasUnsavedChanges = false;
                     }
                   }, 150);
                 });
@@ -4852,8 +5003,8 @@
                   prevBtn.textContent = "\u2190";
                   prevBtn.onclick = (e) => {
                     e.stopPropagation();
-                    if (coupletCounter > 1) {
-                      coupletCounter--;
+                    if (GFT_STATE.coupletCounter > 1) {
+                      GFT_STATE.coupletCounter--;
                       const mainLabel = document.getElementById(COUPLET_BUTTON_ID);
                       if (mainLabel) mainLabel.textContent = coupletManagerConfig.main.getLabel();
                     }
@@ -4871,7 +5022,7 @@
                   nextBtn.textContent = "\u2192";
                   nextBtn.onclick = (e) => {
                     e.stopPropagation();
-                    coupletCounter++;
+                    GFT_STATE.coupletCounter++;
                     const mainLabel = document.getElementById(COUPLET_BUTTON_ID);
                     if (mainLabel) mainLabel.textContent = coupletManagerConfig.main.getLabel();
                   };
@@ -5092,7 +5243,7 @@
               creditLabel.style.color = "#888";
               creditLabel.style.opacity = "0.6";
               creditLabel.style.userSelect = "none";
-              if (!isEnglishTranscriptionMode() && !isPolishTranscriptionMode()) {
+              if (!isEnglishTranscriptionMode() && !isPolishTranscriptionMode2()) {
                 const iaLink = document.createElement("a");
                 iaLink.textContent = "\u{1F916} Transcription IA \u2197";
                 iaLink.href = "https://aistudio.google.com/apps/drive/1D16MbaGAWjUMTseOvzzvSDnccRbU-z_S?fullscreenApplet=true&showPreview=true&showAssistant=true";
@@ -5122,8 +5273,8 @@
               footerContainer.appendChild(creditLabel);
               footerContainer.appendChild(versionLabel);
               panelContent.appendChild(footerContainer);
-              shortcutsContainerElement.appendChild(panelContent);
-              targetStickySection.prepend(shortcutsContainerElement);
+              GFT_STATE.shortcutsContainerElement.appendChild(panelContent);
+              targetStickySection.prepend(GFT_STATE.shortcutsContainerElement);
               if (isFirstLaunch()) {
                 setTimeout(() => {
                   showTutorial();
@@ -5132,16 +5283,16 @@
             } else {
               if (document.title !== (window._gftLastPageTitle || "")) {
                 extractSongData();
-                const artistSelContainer = shortcutsContainerElement.querySelector(`#${ARTIST_SELECTOR_CONTAINER_ID}`);
+                const artistSelContainer = GFT_STATE.shortcutsContainerElement.querySelector(`#${ARTIST_SELECTOR_CONTAINER_ID}`);
                 if (artistSelContainer && artistSelContainer.parentNode) createArtistSelectors(artistSelContainer.parentNode);
-                else if (shortcutsContainerElement) createArtistSelectors(shortcutsContainerElement);
+                else if (GFT_STATE.shortcutsContainerElement) createArtistSelectors(GFT_STATE.shortcutsContainerElement);
               }
-              if (shortcutsContainerElement) loadDarkModePreference();
+              if (GFT_STATE.shortcutsContainerElement) loadDarkModePreference();
             }
             window._gftLastPageTitle = document.title;
             hideGeniusFormattingHelper();
-            if (shortcutsContainerElement) {
-              const coupletButton = shortcutsContainerElement.querySelector(`#${COUPLET_BUTTON_ID}`);
+            if (GFT_STATE.shortcutsContainerElement) {
+              const coupletButton = GFT_STATE.shortcutsContainerElement.querySelector(`#${COUPLET_BUTTON_ID}`);
               if (coupletButton && SHORTCUTS.TAGS_STRUCTURAUX && SHORTCUTS.TAGS_STRUCTURAUX[0]) {
                 const coupletManagerConfig = SHORTCUTS.TAGS_STRUCTURAUX[0].buttons.find((b) => b.type === "coupletManager");
                 if (coupletManagerConfig) {
@@ -5150,15 +5301,15 @@
               }
             }
           } else {
-            if (shortcutsContainerElement) {
-              shortcutsContainerElement.remove();
-              shortcutsContainerElement = null;
+            if (GFT_STATE.shortcutsContainerElement) {
+              GFT_STATE.shortcutsContainerElement.remove();
+              GFT_STATE.shortcutsContainerElement = null;
             }
           }
         } else {
-          if (shortcutsContainerElement) {
-            shortcutsContainerElement.remove();
-            shortcutsContainerElement = null;
+          if (GFT_STATE.shortcutsContainerElement) {
+            GFT_STATE.shortcutsContainerElement.remove();
+            GFT_STATE.shortcutsContainerElement = null;
           }
         }
       }
@@ -5167,10 +5318,10 @@
           setTimeout(startObserver, 100);
           return;
         }
-        if (observer && typeof observer.disconnect === "function") {
-          observer.disconnect();
+        if (GFT_STATE.observer && typeof GFT_STATE.observer.disconnect === "function") {
+          GFT_STATE.observer.disconnect();
         }
-        observer = new MutationObserver((mutationsList, currentObsInstance) => {
+        GFT_STATE.observer = new MutationObserver((mutationsList, currentObsInstance) => {
           let editorAppeared = false;
           let controlsAppeared = false;
           for (const mutation of mutationsList) {
@@ -5186,8 +5337,8 @@
             }
           }
           const editorNowExistsInDOM = document.querySelector(SELECTORS.TEXTAREA_EDITOR) || document.querySelector(SELECTORS.DIV_EDITOR);
-          const editorVanished = currentActiveEditor && !document.body.contains(currentActiveEditor);
-          if (editorAppeared || controlsAppeared || !currentActiveEditor && editorNowExistsInDOM || editorVanished) {
+          const editorVanished = GFT_STATE.currentActiveEditor && !document.body.contains(GFT_STATE.currentActiveEditor);
+          if (editorAppeared || controlsAppeared || !GFT_STATE.currentActiveEditor && editorNowExistsInDOM || editorVanished) {
             currentObsInstance.disconnect();
             initLyricsEditorEnhancer();
             enableYoutubeJsApi();
@@ -5199,7 +5350,7 @@
           }
         });
         try {
-          observer.observe(document.body, { childList: true, subtree: true });
+          GFT_STATE.observer.observe(document.body, { childList: true, subtree: true });
         } catch (e) {
           console.error("[Observer] Erreur initiale:", e);
         }
@@ -5248,9 +5399,9 @@
         });
       }
       window.addEventListener("beforeunload", () => {
-        if (observer && typeof observer.disconnect === "function") observer.disconnect();
-        if (shortcutsContainerElement) shortcutsContainerElement.remove();
-        if (floatingFormattingToolbar) floatingFormattingToolbar.remove();
+        if (GFT_STATE.observer && typeof GFT_STATE.observer.disconnect === "function") GFT_STATE.observer.disconnect();
+        if (GFT_STATE.shortcutsContainerElement) GFT_STATE.shortcutsContainerElement.remove();
+        if (GFT_STATE.floatingFormattingToolbar) GFT_STATE.floatingFormattingToolbar.remove();
         delete window._gftLastPageTitle;
       });
       function extractArtistImage() {
@@ -5287,8 +5438,8 @@
         if (aboutImg && aboutImg.src) return cleanUrl(aboutImg.src);
         const metaImg = document.querySelector('meta[property="genius:track_artist_image"]');
         if (metaImg && metaImg.content) return cleanUrl(metaImg.content);
-        if (typeof currentMainArtists !== "undefined" && currentMainArtists.length > 0) {
-          const artistName = currentMainArtists[0];
+        if (typeof GFT_STATE.currentMainArtists !== "undefined" && GFT_STATE.currentMainArtists.length > 0) {
+          const artistName = GFT_STATE.currentMainArtists[0];
           const candidate = Array.from(document.querySelectorAll("img")).find((img) => {
             const src = img.src || "";
             const alt = img.alt || "";
@@ -5485,7 +5636,7 @@
         optionAlbum.value = "ALBUM";
         optionAlbum.text = getTranslation("lc_album_default");
         imageSelector.appendChild(optionAlbum);
-        const allArtists = [.../* @__PURE__ */ new Set([...currentMainArtists, ...currentFeaturingArtists])].filter(Boolean);
+        const allArtists = [.../* @__PURE__ */ new Set([...GFT_STATE.currentMainArtists, ...GFT_STATE.currentFeaturingArtists])].filter(Boolean);
         const artistImageCache = {};
         allArtists.forEach((art) => {
           const opt = document.createElement("option");
@@ -5775,8 +5926,8 @@ ${window.location.href}
           return;
         }
         const text = selection.toString().trim();
-        const songTitle = currentSongTitle || "Titre Inconnu";
-        const artistName = currentMainArtists.length > 0 ? currentMainArtists.join(" & ") : "Artiste Inconnu";
+        const songTitle = GFT_STATE.currentSongTitle || "Titre Inconnu";
+        const artistName = GFT_STATE.currentMainArtists.length > 0 ? GFT_STATE.currentMainArtists.join(" & ") : "Artiste Inconnu";
         let candidateUrls = [];
         const ogImage = document.querySelector('meta[property="og:image"]');
         if (ogImage && ogImage.content) candidateUrls.push(ogImage.content);
@@ -5791,7 +5942,7 @@ ${window.location.href}
         }
         const albumUrl = uniqueUrls[0];
         showFeedbackMessage(getTranslation("lc_searching_artist"), 0);
-        const primaryArtistName = currentMainArtists.length > 0 ? currentMainArtists[0] : null;
+        const primaryArtistName = GFT_STATE.currentMainArtists.length > 0 ? GFT_STATE.currentMainArtists[0] : null;
         let artistUrl = await fetchArtistImageFromApi(primaryArtistName);
         if (!artistUrl) {
           console.log("[GFT] API failed, using DOM fallback.");
@@ -5921,31 +6072,6 @@ ${window.location.href}
         }
         return [];
       }
-      async function generateLyricsCard() {
-        const selection = window.getSelection();
-        if (!selection || selection.toString().trim().length === 0) {
-          showFeedbackMessage("Veuillez s\xE9lectionner du texte pour cr\xE9er une Lyric Card.");
-          return;
-        }
-        const text = selection.toString().trim();
-        const songTitle = currentSongTitle || "Titre Inconnu";
-        const artistName = currentMainArtists.length > 0 ? currentMainArtists.join(" & ") : "Artiste Inconnu";
-        let candidateUrls = [];
-        const ogImage = document.querySelector('meta[property="og:image"]');
-        if (ogImage && ogImage.content) candidateUrls.push(ogImage.content);
-        const twitterImage = document.querySelector('meta[name="twitter:image"]');
-        if (twitterImage && twitterImage.content) candidateUrls.push(twitterImage.content);
-        const headerImg = document.querySelector('div[class*="SongHeader"] img') || document.querySelector('img[class*="CoverArt"]');
-        if (headerImg && headerImg.src) candidateUrls.push(headerImg.src);
-        const uniqueUrls = [...new Set(candidateUrls)];
-        if (uniqueUrls.length === 0) {
-          showFeedbackMessage(getTranslation("lc_error_album_not_found"), 1e3);
-          return;
-        }
-        const albumUrl = uniqueUrls[0];
-        showFeedbackMessage(getTranslation("lc_opening"), 500);
-        showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, null);
-      }
       function getDominantColor(img) {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
@@ -5979,7 +6105,7 @@ ${window.location.href}
         if (typeof isHeaderFeatEnabled === "function" && typeof setHeaderFeatEnabled === "function") {
           const newState = !isHeaderFeatEnabled();
           setHeaderFeatEnabled(newState);
-          showFeedbackMessage(newState ? "\u2705 Inclure Feats dans l'en-t\xEAte" : "\u274C Feats masqu\xE9s dans l'en-t\xEAte", 2e3, shortcutsContainerElement || document.body);
+          showFeedbackMessage(newState ? "\u2705 Inclure Feats dans l'en-t\xEAte" : "\u274C Feats masqu\xE9s dans l'en-t\xEAte", 2e3, GFT_STATE.shortcutsContainerElement || document.body);
         }
       }
       function gftToggleTagNewlines() {
@@ -5987,7 +6113,7 @@ ${window.location.href}
           const currentValue = isTagNewlinesDisabled();
           const newState = !currentValue;
           setTagNewlinesDisabled(newState);
-          showFeedbackMessage(!newState ? "\u2705 Saut de ligne apr\xE8s tags ACTIV\xC9" : "\u274C Saut de ligne apr\xE8s tags D\xC9SACTIV\xC9", 2e3, shortcutsContainerElement || document.body);
+          showFeedbackMessage(!newState ? "\u2705 Saut de ligne apr\xE8s tags ACTIV\xC9" : "\u274C Saut de ligne apr\xE8s tags D\xC9SACTIV\xC9", 2e3, GFT_STATE.shortcutsContainerElement || document.body);
         }
       }
       function gftToggleDarkMode() {
@@ -6016,71 +6142,6 @@ ${window.location.href}
           document.body.classList.remove(DARK_MODE_CLASS);
         }
       }
-      function highlightUnmatchedBracketsInEditor(editor, editorType) {
-        if (!editor) return 0;
-        const text = editorType === "textarea" ? editor.value : editor.textContent || "";
-        const unmatchedIndices = [];
-        const stack = [];
-        for (let i = 0; i < text.length; i++) {
-          const char = text[i];
-          if (char === "(" || char === "[") {
-            stack.push({ char, index: i });
-          } else if (char === ")" || char === "]") {
-            if (stack.length === 0) {
-              unmatchedIndices.push(i);
-            } else {
-              const last = stack.pop();
-              if (char === ")" && last.char !== "(" || char === "]" && last.char !== "[") {
-                unmatchedIndices.push(last.index);
-                unmatchedIndices.push(i);
-              }
-            }
-          }
-        }
-        stack.forEach((item) => unmatchedIndices.push(item.index));
-        const count = unmatchedIndices.length;
-        if (count > 0 && editorType === "textarea") {
-          const rect = editor.getBoundingClientRect();
-          const overlay = document.createElement("div");
-          const computedStyle = window.getComputedStyle(editor);
-          overlay.style.position = "absolute";
-          overlay.style.top = `${rect.top + window.scrollY}px`;
-          overlay.style.left = `${rect.left + window.scrollX}px`;
-          overlay.style.width = computedStyle.width;
-          overlay.style.height = computedStyle.height;
-          overlay.style.font = computedStyle.font;
-          overlay.style.lineHeight = computedStyle.lineHeight;
-          overlay.style.padding = computedStyle.padding;
-          overlay.style.border = computedStyle.border;
-          overlay.style.whiteSpace = computedStyle.whiteSpace;
-          overlay.style.overflow = "hidden";
-          overlay.style.pointerEvents = "none";
-          overlay.style.zIndex = "9999";
-          overlay.style.backgroundColor = "transparent";
-          overlay.style.color = "transparent";
-          let html = "";
-          let lastIndex = 0;
-          unmatchedIndices.sort((a, b) => a - b);
-          const safeIndices = unmatchedIndices.filter((v, i, a) => a.indexOf(v) === i);
-          safeIndices.forEach((index) => {
-            const safeText = text.substring(lastIndex, index).replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            html += safeText;
-            const char = text[index].replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            html += `<span style="background-color: rgba(255, 0, 0, 0.3); border-bottom: 2px solid red;">${char}</span>`;
-            lastIndex = index + 1;
-          });
-          html += text.substring(lastIndex).replace(/</g, "&lt;").replace(/>/g, "&gt;");
-          overlay.innerHTML = html.replace(/\n/g, "<br>");
-          overlay.scrollTop = editor.scrollTop;
-          editor.addEventListener("scroll", () => {
-            overlay.scrollTop = editor.scrollTop;
-          });
-          document.body.appendChild(overlay);
-          setTimeout(() => {
-            if (document.body.contains(overlay)) document.body.removeChild(overlay);
-          }, 5e3);
-        }
-      }
       function showFeedbackMessage(message, duration = 3e3, container = null) {
         let feedbackEl = document.getElementById(FEEDBACK_MESSAGE_ID);
         if (!feedbackEl) {
@@ -6100,13 +6161,13 @@ ${window.location.href}
           feedbackEl = toast;
           feedbackEl.style.display = "block";
         }
-        if (feedbackTimeout) {
-          clearTimeout(feedbackTimeout);
-          feedbackTimeout = null;
+        if (GFT_STATE.feedbackTimeout) {
+          clearTimeout(GFT_STATE.feedbackTimeout);
+          GFT_STATE.feedbackTimeout = null;
         }
-        if (feedbackAnimationTimeout) {
-          clearTimeout(feedbackAnimationTimeout);
-          feedbackAnimationTimeout = null;
+        if (GFT_STATE.feedbackAnimationTimeout) {
+          clearTimeout(GFT_STATE.feedbackAnimationTimeout);
+          GFT_STATE.feedbackAnimationTimeout = null;
         }
         feedbackEl.textContent = message;
         feedbackEl.style.display = "block";
@@ -6122,7 +6183,7 @@ ${window.location.href}
           }
         });
         if (duration > 0) {
-          feedbackTimeout = setTimeout(() => {
+          GFT_STATE.feedbackTimeout = setTimeout(() => {
             feedbackEl.style.opacity = "0";
             if (feedbackEl.id === FEEDBACK_MESSAGE_ID) {
               feedbackEl.style.maxHeight = "0";
@@ -6131,15 +6192,15 @@ ${window.location.href}
               feedbackEl.style.paddingTop = "0";
               feedbackEl.style.paddingBottom = "0";
             }
-            feedbackAnimationTimeout = setTimeout(() => {
+            GFT_STATE.feedbackAnimationTimeout = setTimeout(() => {
               feedbackEl.style.visibility = "hidden";
               if (feedbackEl.id === "gft-global-toast") {
               } else {
                 feedbackEl.style.display = "none";
               }
-              feedbackAnimationTimeout = null;
+              GFT_STATE.feedbackAnimationTimeout = null;
             }, 300);
-            feedbackTimeout = null;
+            GFT_STATE.feedbackTimeout = null;
           }, duration);
         }
       }
@@ -6189,7 +6250,7 @@ ${window.location.href}
           return false;
         }
       }
-      function openCustomButtonManager(defaultType = "structure") {
+      function openCustomButtonManager(defaultType = "structure", initialTab = "create") {
         const existing = document.getElementById("gft-custom-manager");
         if (existing) existing.remove();
         const isDarkMode = localStorage.getItem(DARK_MODE_STORAGE_KEY) === "true";
@@ -6199,28 +6260,34 @@ ${window.location.href}
         position: fixed; top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0,0,0,0.8); z-index: 10005;
         display: flex; justify-content: center; align-items: center;
-        backdrop-filter: blur(3px);
+        backdrop-filter: blur(5px);
     `;
+        overlay.onclick = (e) => {
+          if (e.target === overlay) overlay.remove();
+        };
         const modal = document.createElement("div");
         modal.className = `gft-custom-manager-modal ${isDarkMode ? "gft-dark-mode" : ""}`;
         modal.style.background = isDarkMode ? "#222" : "white";
         modal.style.color = isDarkMode ? "#eee" : "#222";
-        modal.style.setProperty("color", isDarkMode ? "#eee" : "#222", "important");
-        modal.style.padding = "20px";
-        modal.style.borderRadius = "8px";
-        modal.style.boxShadow = "0 10px 25px rgba(0,0,0,0.5)";
+        modal.style.padding = "24px";
+        modal.style.borderRadius = "12px";
+        modal.style.boxShadow = "0 20px 50px rgba(0,0,0,0.5)";
+        modal.style.position = "relative";
         const header = document.createElement("div");
         header.style.display = "flex";
         header.style.justifyContent = "space-between";
         header.style.alignItems = "center";
-        header.innerHTML = `<h2 style="margin:0; font-size:18px;">\u2728 Custom Buttons Manager</h2>`;
+        header.innerHTML = `<h2 style="margin:0; font-size:20px; font-weight:700;">${getTranslation("custom_manager_title")}</h2>`;
         const closeBtn = document.createElement("button");
         closeBtn.innerHTML = "&times;";
         closeBtn.style.background = "none";
         closeBtn.style.border = "none";
-        closeBtn.style.fontSize = "24px";
+        closeBtn.style.fontSize = "28px";
         closeBtn.style.cursor = "pointer";
         closeBtn.style.color = "inherit";
+        closeBtn.style.opacity = "0.5";
+        closeBtn.onmouseenter = () => closeBtn.style.opacity = "1";
+        closeBtn.onmouseleave = () => closeBtn.style.opacity = "0.5";
         closeBtn.onclick = () => overlay.remove();
         header.appendChild(closeBtn);
         modal.appendChild(header);
@@ -6228,45 +6295,59 @@ ${window.location.href}
         tabsContainer.className = "gft-tabs";
         const tabCreate = document.createElement("button");
         tabCreate.className = "gft-tab-btn active";
-        tabCreate.textContent = "Create";
+        tabCreate.textContent = getTranslation("custom_manager_tab_create");
         const tabManage = document.createElement("button");
         tabManage.className = "gft-tab-btn";
-        tabManage.textContent = "Library";
+        tabManage.textContent = getTranslation("custom_manager_tab_library");
         tabsContainer.appendChild(tabCreate);
         tabsContainer.appendChild(tabManage);
         modal.appendChild(tabsContainer);
         const contentCreate = document.createElement("div");
         contentCreate.style.display = "flex";
         contentCreate.style.flexDirection = "column";
-        contentCreate.style.gap = "10px";
+        contentCreate.style.gap = "5px";
         const typeGroup = document.createElement("div");
         typeGroup.className = "gft-form-group";
-        typeGroup.innerHTML = `<label class="gft-form-label">Action Type</label>`;
+        typeGroup.innerHTML = `<label class="gft-form-label">${getTranslation("custom_mgr_action_type")}</label>`;
         const typeSelect = document.createElement("select");
         typeSelect.className = "gft-form-select";
         typeSelect.innerHTML = `
-        <option value="structure">Structure Tag (Insertion)</option>
-        <option value="cleanup">Cleanup Tool (Search/Replace)</option>
+        <option value="structure">\u{1F3D7}\uFE0F ${getTranslation("custom_mgr_type_structure")}</option>
+        <option value="cleanup">\u{1F9F9} ${getTranslation("custom_mgr_type_cleanup")}</option>
     `;
         typeSelect.value = defaultType;
         typeGroup.appendChild(typeSelect);
         contentCreate.appendChild(typeGroup);
         const nameGroup = document.createElement("div");
         nameGroup.className = "gft-form-group";
-        nameGroup.innerHTML = `<label class="gft-form-label">Button Label</label>`;
+        nameGroup.innerHTML = `<label class="gft-form-label">${getTranslation("custom_mgr_button_label")}</label>`;
         const nameInput = document.createElement("input");
         nameInput.className = "gft-form-input";
-        nameInput.placeholder = "Ex: Remove Emoji, [Verse]...";
+        nameInput.maxLength = 25;
+        nameInput.placeholder = getTranslation("custom_mgr_btn_label_placeholder");
         nameGroup.appendChild(nameInput);
         contentCreate.appendChild(nameGroup);
+        const previewZone = document.createElement("div");
+        previewZone.className = "gft-preview-zone";
+        previewZone.innerHTML = `<div style="font-size:10px; opacity:0.5; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px;">Preview</div>`;
+        const previewBtn = document.createElement("button");
+        previewBtn.className = "gft-shortcut-button";
+        previewBtn.style.pointerEvents = "none";
+        previewBtn.textContent = "Label";
+        previewZone.appendChild(previewBtn);
+        contentCreate.appendChild(previewZone);
+        nameInput.oninput = () => {
+          previewBtn.textContent = nameInput.value.trim() || "Label";
+        };
         const dynamicFields = document.createElement("div");
         const renderDynamicFields = () => {
           dynamicFields.innerHTML = "";
           const type = typeSelect.value;
+          previewBtn.className = type === "structure" ? "gft-shortcut-button gft-btn-struct" : "gft-shortcut-button gft-btn-cleanup";
           if (type === "structure") {
             const grp = document.createElement("div");
             grp.className = "gft-form-group";
-            grp.innerHTML = `<label class="gft-form-label">Text to Insert</label>`;
+            grp.innerHTML = `<label class="gft-form-label">${getTranslation("custom_mgr_text_to_insert")}</label>`;
             const input = document.createElement("textarea");
             input.id = "gft-custom-content";
             input.className = "gft-form-textarea";
@@ -6275,6 +6356,10 @@ ${window.location.href}
             grp.appendChild(input);
             dynamicFields.appendChild(grp);
           } else {
+            const switchesRow = document.createElement("div");
+            switchesRow.style.display = "flex";
+            switchesRow.style.gap = "15px";
+            switchesRow.style.marginBottom = "12px";
             const modeSwitch = document.createElement("div");
             modeSwitch.style.display = "flex";
             modeSwitch.style.alignItems = "center";
@@ -6283,12 +6368,36 @@ ${window.location.href}
             const chk = document.createElement("input");
             chk.type = "checkbox";
             chk.id = "gft-advanced-regex";
+            chk.style.width = "16px";
+            chk.style.height = "16px";
+            const lbl = document.createElement("label");
+            lbl.htmlFor = "gft-advanced-regex";
+            lbl.textContent = getTranslation("custom_mgr_advanced_regex");
+            lbl.style.cursor = "pointer";
             modeSwitch.appendChild(chk);
-            modeSwitch.appendChild(document.createTextNode("Advanced Regex Mode"));
-            dynamicFields.appendChild(modeSwitch);
+            modeSwitch.appendChild(lbl);
+            switchesRow.appendChild(modeSwitch);
+            const caseSwitch = document.createElement("div");
+            caseSwitch.style.display = "flex";
+            caseSwitch.style.alignItems = "center";
+            caseSwitch.style.gap = "5px";
+            caseSwitch.style.fontSize = "12px";
+            const chkCase = document.createElement("input");
+            chkCase.type = "checkbox";
+            chkCase.id = "gft-case-sensitive";
+            chkCase.style.width = "16px";
+            chkCase.style.height = "16px";
+            const lblCase = document.createElement("label");
+            lblCase.htmlFor = "gft-case-sensitive";
+            lblCase.textContent = getTranslation("custom_mgr_case_sensitive");
+            lblCase.style.cursor = "pointer";
+            caseSwitch.appendChild(chkCase);
+            caseSwitch.appendChild(lblCase);
+            switchesRow.appendChild(caseSwitch);
+            dynamicFields.appendChild(switchesRow);
             const grpFind = document.createElement("div");
             grpFind.className = "gft-form-group";
-            grpFind.innerHTML = `<label class="gft-form-label">Find Pattern</label>`;
+            grpFind.innerHTML = `<label class="gft-form-label">${getTranslation("custom_mgr_find_pattern")}</label>`;
             const inputFind = document.createElement("input");
             inputFind.id = "gft-custom-find";
             inputFind.className = "gft-form-input";
@@ -6296,18 +6405,18 @@ ${window.location.href}
             dynamicFields.appendChild(grpFind);
             const grpRep = document.createElement("div");
             grpRep.className = "gft-form-group";
-            grpRep.innerHTML = `<label class="gft-form-label">Replace With</label>`;
+            grpRep.innerHTML = `<label class="gft-form-label">${getTranslation("custom_mgr_replace_with")}</label>`;
             const inputRep = document.createElement("input");
             inputRep.id = "gft-custom-replace";
             inputRep.className = "gft-form-input";
-            inputRep.placeholder = "(Leave empty to delete)";
+            inputRep.placeholder = getTranslation("custom_mgr_replace_placeholder");
             grpRep.appendChild(inputRep);
             dynamicFields.appendChild(grpRep);
             chk.onchange = () => {
               if (chk.checked) {
-                inputFind.placeholder = "Regex Pattern (e.g. \\d+\\s*$)";
+                inputFind.placeholder = getTranslation("custom_mgr_find_placeholder_regex");
               } else {
-                inputFind.placeholder = "Exact text to remove";
+                inputFind.placeholder = getTranslation("custom_mgr_find_placeholder_exact");
               }
             };
             chk.dispatchEvent(new Event("change"));
@@ -6317,33 +6426,36 @@ ${window.location.href}
         typeSelect.onchange = renderDynamicFields;
         contentCreate.appendChild(dynamicFields);
         const saveBtn = document.createElement("button");
-        saveBtn.textContent = "Save Custom Button";
-        saveBtn.style.cssText = "background: #f9ff55; color: black; border: none; padding: 10px; font-weight: bold; border-radius: 4px; cursor: pointer; margin-top: 10px; width: 100%;";
+        saveBtn.textContent = getTranslation("custom_mgr_save_button");
+        saveBtn.className = "gft-tutorial-button";
+        saveBtn.style.cssText = "background: #f9ff55; color: black; border: none; padding: 12px; font-weight: bold; border-radius: 8px; cursor: pointer; margin-top: 10px; width: 100%; font-size:15px;";
         saveBtn.onclick = () => {
           const type = typeSelect.value;
           const label = nameInput.value.trim();
-          if (!label) return alert("Please specify a button label.");
+          if (!label) return alert(getTranslation("custom_mgr_error_no_label"));
           const btnData = {
             label,
             type
           };
           if (type === "structure") {
             const content = document.getElementById("gft-custom-content").value;
-            if (!content) return alert("Content is required.");
+            if (!content) return alert(getTranslation("custom_mgr_error_no_content"));
             btnData.content = content;
           } else {
             const find = document.getElementById("gft-custom-find").value;
             const rep = document.getElementById("gft-custom-replace").value;
             const isRegex = document.getElementById("gft-advanced-regex").checked;
-            if (!find) return alert("Find pattern is required.");
+            const isCaseSensitive = document.getElementById("gft-case-sensitive").checked;
+            if (!find) return alert(getTranslation("custom_mgr_error_no_content"));
             btnData.regex = isRegex ? find : escapeRegExp(find);
             btnData.replacement = rep;
             btnData.isExplicitRegex = isRegex;
+            btnData.isCaseSensitive = isCaseSensitive;
           }
           saveCustomButton(btnData);
-          showFeedbackMessage("Button created! Reloading...", 3e3);
+          showFeedbackMessage(getTranslation("custom_mgr_success_created"), 3e3);
           overlay.remove();
-          window.location.reload();
+          setTimeout(() => window.location.reload(), 1e3);
         };
         contentCreate.appendChild(saveBtn);
         modal.appendChild(contentCreate);
@@ -6355,21 +6467,32 @@ ${window.location.href}
           list.className = "gft-custom-list";
           const buttons = getCustomButtons();
           if (buttons.length === 0) {
-            list.innerHTML = `<div style="padding:15px; text-align:center; opacity:0.5;">No custom buttons found.</div>`;
+            list.innerHTML = `<div style="padding:30px; text-align:center; opacity:0.5; font-style:italic;">${getTranslation("custom_mgr_empty_library")}</div>`;
           } else {
             buttons.forEach((btn) => {
               const item = document.createElement("div");
               item.className = "gft-custom-item";
+              const icon = btn.type === "structure" ? "\u{1F3D7}\uFE0F" : "\u{1F9F9}";
               const info = document.createElement("div");
-              info.innerHTML = `<strong>${btn.label}</strong> <span style="font-size:10px; opacity:0.7; border:1px solid currentColor; padding:1px 3px; border-radius:3px;">${btn.type}</span>`;
+              info.style.display = "flex";
+              info.style.alignItems = "center";
+              info.style.gap = "8px";
+              info.innerHTML = `
+                    <span style="font-size:18px;">${icon}</span>
+                    <div style="display:flex; flex-direction:column;">
+                        <span style="font-weight:600; font-size:14px;">${btn.label}</span>
+                        <span style="font-size:10px; opacity:0.5; text-transform:uppercase; letter-spacing:0.5px;">${btn.type}</span>
+                    </div>
+                `;
               const actions = document.createElement("div");
-              actions.className = "gft-custom-actions";
+              actions.style.display = "flex";
+              actions.style.gap = "5px";
               const delBtn = document.createElement("button");
-              delBtn.className = "gft-icon-btn gft-btn-delete";
+              delBtn.style.cssText = "background:rgba(255,0,0,0.1); border:none; padding:8px; border-radius:6px; cursor:pointer; color:#ff4444; font-size:14px;";
               delBtn.innerHTML = "\u{1F5D1}\uFE0F";
               delBtn.title = "Delete";
               delBtn.onclick = () => {
-                if (confirm("Delete this button?")) {
+                if (confirm(`Delete "${btn.label}"?`)) {
                   deleteCustomButton(btn.id);
                   renderList();
                 }
@@ -6383,39 +6506,41 @@ ${window.location.href}
           contentManage.appendChild(list);
           const ioZone = document.createElement("div");
           ioZone.className = "gft-io-zone";
-          ioZone.innerHTML = `<strong>Share Presets</strong>`;
+          ioZone.innerHTML = `<div style="font-weight:700; font-size:13px; margin-bottom:10px; display:flex; align-items:center; gap:5px;">\u{1F4E4} ${getTranslation("custom_mgr_share_presets")}</div>`;
           const codeArea = document.createElement("textarea");
           codeArea.className = "gft-code-area";
-          codeArea.placeholder = "Paste a preset code here to import, or click Export...";
+          codeArea.placeholder = getTranslation("custom_mgr_import_placeholder");
           const btnContainer = document.createElement("div");
           btnContainer.style.display = "flex";
           btnContainer.style.gap = "10px";
-          btnContainer.style.marginTop = "5px";
+          btnContainer.style.marginTop = "10px";
           const exportBtn = document.createElement("button");
-          exportBtn.textContent = "Copy Export Code";
+          exportBtn.textContent = getTranslation("custom_mgr_export_code");
           exportBtn.className = "gft-tutorial-button";
-          exportBtn.style.fontSize = "11px";
-          exportBtn.style.padding = "5px 10px";
+          exportBtn.style.flex = "1";
+          exportBtn.style.fontSize = "12px";
+          exportBtn.style.padding = "8px";
           exportBtn.onclick = () => {
             const code = exportCustomButtons();
             codeArea.value = code;
             codeArea.select();
             document.execCommand("copy");
-            showFeedbackMessage("Code copied!", 2e3);
+            showFeedbackMessage(getTranslation("common_copy_success") || "Copied!", 2e3);
           };
           const importBtn = document.createElement("button");
-          importBtn.textContent = "Import Code";
+          importBtn.textContent = getTranslation("custom_mgr_import_button");
           importBtn.className = "gft-tutorial-button";
-          importBtn.style.fontSize = "11px";
-          exportBtn.style.padding = "5px 10px";
+          importBtn.style.flex = "1";
+          importBtn.style.fontSize = "12px";
+          importBtn.style.padding = "8px";
           importBtn.style.background = "#f9ff55";
           importBtn.style.color = "black";
           importBtn.onclick = () => {
             const code = codeArea.value.trim();
-            if (!code) return alert("Please paste a code first.");
+            if (!code) return;
             if (importCustomButtons(code)) {
-              alert("Import successful! Reloading...");
-              window.location.reload();
+              showFeedbackMessage(getTranslation("custom_mgr_success_imported"), 3e3);
+              setTimeout(() => window.location.reload(), 1500);
             } else {
               alert("Import failed. Invalid code.");
             }
@@ -6441,6 +6566,11 @@ ${window.location.href}
           contentCreate.style.display = "none";
           renderList();
         };
+        if (initialTab === "library") {
+          tabManage.onclick();
+        } else {
+          tabCreate.onclick();
+        }
         overlay.appendChild(modal);
         document.body.appendChild(overlay);
       }
