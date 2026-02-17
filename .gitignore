@@ -22,6 +22,12 @@ test-output.js
 *-test.js
 *-old.js
 
+# Security/Internal Checklists (Personal reference)
+SAFE_TO_COMMIT.md
+GITHUB_SECURITY_CHECK.md
+SESSION_SUMMARY.md
+READY_TO_PUBLISH.md
+
 # Logs
 *.log
 npm-debug.log*
