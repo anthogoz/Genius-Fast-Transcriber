@@ -10,33 +10,14 @@ The project has reached a major milestone with **Version 4.0.0**! The infrastruc
 - [x] **Automated Releases**: Packaging script that names the ZIP based on the manifest version.
 - [x] **Dev Documentation**: Creation of comprehensive guides for contributors.
 - [x] **License & Open Source**: Switched to MIT license and project cleanup.
-- [x] **Modularization Phase 2**: Removal of duplicated code in `content.js` and module imports.
-  - [x] Removed ~960 lines of `TRANSLATIONS` (imported from `translations/index.js`).
-  - [x] Removed ~480 lines of utility functions (imported from `modules/utils.js`).
-  - [x] Removed ~510 lines of correction functions (imported from `modules/corrections.js`).
-  - [x] Removed 4 duplicate functions (isHeaderFeatEnabled, setHeaderFeatEnabled, generateLyricsCard, highlightUnmatchedBracketsInEditor).
-  - [x] Decoupled `showProgress` via callback in `applyAllTextCorrectionsAsync`.
-  - [x] `content.js` reduced from **8685 → 6585 lines** (~24% reduction).
+- [ ] **Modularization Phase 2 (HELP WANTED)**: 
+  - [ ] Remove duplicated code in `src/content.js` and replace with module imports.
+  - [ ] Decouple `showProgress` via callback in `applyAllTextCorrectionsAsync` (partially done).
+  - [ ] Finalize `GFT_STATE` shared state management across all modules.
+- [ ] **Modularization Phase 3**: 
+  - [ ] Extract `extractSongData`, configuration helpers, and artist UI logic into separate modules (partially done).
+  - [ ] Extract the massive `initLyricsEditorEnhancer` and `showCorrectionPreview` functions.
 
----
-
-- [x] **Modularization Phase 3**:
-  - [x] Shared state management (`GFT_STATE`) across all modules.
-  - [x] Extracted `extractSongData` (100+ lines), configuration helpers, and artist UI logic into separate modules.
-  - [x] `content.js` reduced from **6585 → 6427 lines**.
-- [x] **Full Internationalization**: All side panel UI labels, tooltips, and feedback messages migrated to the translation system (FR, EN, PL).
-- [x] **Zero Build Warnings**: 91 duplicate translation keys resolved and cleaned up via automated script.
-
----
-
-## 🚨 Current Priorities (Phase 4)
-
-### 🧪 Quality Assurance & Testing
-- [ ] **Unit Testing**: Set up Jest to test critical functions (text corrections, number conversion).
-- [ ] **Integration Tests**: Verify that modularized state (`GFT_STATE`) works correctly under different browser scenarios.
-
-### 🔧 Further Modularization
-- [ ] **Modularization Phase 4**: Extract the massive `initLyricsEditorEnhancer` and `showCorrectionPreview` functions.
 
 
 ---

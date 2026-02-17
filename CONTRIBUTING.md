@@ -60,8 +60,9 @@ Have an idea to improve the extension? Share it!
 ### 3. 📝 Improve documentation
 Documentation can always be improved (README, code comments, etc.)
 
-### 4. 💻 Write code
+### 4. 💻 Write code (Priority: Modularization!)
 Check the [Open Issues](https://github.com/anthogoz/genius-fast-transcriber/issues) or the [TODO.md](TODO.md) file.
+**We are currently looking for help with the modularization project (Phase 2 & 3).** See [MODULARIZATION_STATUS.md](MODULARIZATION_STATUS.md) for details.
 
 ## 🐛 Report a Bug
 
@@ -196,9 +197,30 @@ function myFunction(paramName) {
 
 ## 🏗️ Code Architecture
 
-### Main Files
+The project is currently undergoing a major transition from a monolithic `content.js` to a modular structure using **esbuild**.
 
-#### `content.js` (3792 lines - v2.5)
+### Project Structure (v4.0.0+)
+
+```
+Genius Fast Transcriber/
+├── content.js              # Compiled output (do NOT edit directly)
+├── esbuild.config.js       # Build configuration
+├── src/
+│   ├── content.js          # Entry point (being modularized)
+│   ├── translations/       # All UI strings (FR, EN, PL)
+│   └── modules/            # Reusable components
+│       ├── constants.js    # Global constants & selectors
+│       ├── utils.js        # Helper functions
+│       ├── corrections.js  # Text cleanup logic
+│       ├── songData.js     # Metadata extraction
+│       └── ...
+└── ...
+```
+
+### Key Components
+
+#### `src/content.js`
+The main entry point. We are gradually removing functions from this file and moving them into `src/modules/`. **Contributions to speed up this migration are very welcome!**
 
 **Section 1: Global Variables (lines 26-44)**
 - Extension state (counters, active editor, dark mode, Undo/Redo history)

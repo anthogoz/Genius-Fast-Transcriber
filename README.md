@@ -1,6 +1,6 @@
 # 🎵 Genius Fast Transcriber + Lyric Card Maker
 
-![Version](https://img.shields.io/badge/version-3.1.0-blue.svg?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-4.0.0-blue.svg?style=for-the-badge)
 ![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-green.svg?style=for-the-badge&logo=google-chrome)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg?style=for-the-badge)
 ![Build](https://img.shields.io/badge/build-esbuild-yellow.svg?style=for-the-badge)
@@ -8,8 +8,8 @@
 **The ultimate tool for transcribers on Genius.com.**
 Transform your editing experience with a suite of professional tools, a modern interface, smart automations, and full customization.
 
-> **🔧 Developers:** This extension now uses a modular build system with **esbuild**!  
-> See [MODULARIZATION_COMPLETE.md](./MODULARIZATION_COMPLETE.md) for details.
+> **🚧 Modularization In Progress:** This extension is currently being migrated to a modern modular build system.  
+> We need help integrating the new modules! See [MODULARIZATION_STATUS.md](./MODULARIZATION_STATUS.md) for the roadmap and how to contribute.
 
 ---
 
@@ -145,9 +145,13 @@ Transform your editing experience with a suite of professional tools, a modern i
 ## 🛠️ Contribute
 
 This project is open-source and community-driven!
-We need your ideas for **Code Modularization** and new features.
+We specifically need help with **Phase 2 & 3 of Code Modularization** (extracting logic from `content.js` into separate modules).
 
-👉 **See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidelines.**
+> [!TIP]
+> **Help Wanted!** 🚀  
+> If you're a developer looking to contribute to a popular browser extension, check out our [MODULARIZATION_STATUS.md](./MODULARIZATION_STATUS.md) guide.
+
+👉 **See [CONTRIBUTING.md](CONTRIBUTING.md) for general contribution guidelines.**
 
 ---
 

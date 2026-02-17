@@ -13,18 +13,18 @@
 
 ### 1. 🔧 Technique / Architecture
 
-#### Phase 2 : Modularisation Complète
-- [ ] Intégrer complètement les imports dans `src/content.js`
-- [ ] Supprimer le code dupliqué (actuellement en double)
-- [ ] Créer plus de modules :
-  - `modules/ui.js` — Gestion UI et DOM
-  - `modules/editor.js` — Logique éditeur Genius
-  - `modules/youtube.js` — Intégration YouTube
-  - `modules/lyric-card.js` — Génération Lyric Cards
-  - `modules/storage.js` — LocalStorage management
-  - `modules/shortcuts.js` — Gestion raccourcis clavier
+#### Phase 2 : Modularisation Complète (EN: Help Needed 🏗️)
+- [ ] **Integration:** Integrate imports fully in `src/content.js`.
+- [ ] **Cleanup:** Remove duplicated code (currently both in `src/content.js` and modules).
+- [ ] **Extraction:** Create more modules:
+  - `modules/ui.js` — UI and DOM management.
+  - `modules/editor.js` — Genius editor logic.
+  - `modules/youtube.js` — YouTube integration.
+  - `modules/lyric-card.js` — Lyric Cards generation.
+  - `modules/storage.js` — LocalStorage management.
+  - `modules/shortcuts.js` — Keyboard shortcuts.
 
-**Impact :** Code plus maintenable, bugs plus faciles à trouver
+**Impact :** Cleaner code, easier debugging. Help is welcome on these tasks!
 
 #### Tests Automatisés
 - [ ] Ajouter tests unitaires (Jest)
@@ -265,11 +265,11 @@ Ces features peuvent être ajoutées rapidement :
 - Tests unitaires
 - Nouveaux modules (Phase 2)
 
-### 🔴 Avancé
-- Custom Commands System
-- Genius API integration
-- Optimisation performance
-- Architecture complète
+### 🔴 Avancé (High Priority: Help Needed!)
+- **Phase 2 Modularization:** Help integrate imports and clean up `src/content.js`.
+- **Custom Commands System:** Design and implement a user-facing command manager.
+- **Genius API integration:** Better metadata and validation.
+- **Performance Optimization:** Code splitting and lazy loading.
 
 ---
 
