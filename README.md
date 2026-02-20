@@ -127,6 +127,7 @@ Transform your editing experience with a suite of professional tools, a modern i
     - **Fast Build**: esbuild integration for near-instant development.
 - **🛠️ Refined UI**:
     - Native Genius styling for seamless integration.
+    - **Custom Buttons Manager**: UI/UX overhaul for more intuitive command creation.
     - Smoother dropdown menus and improved button alignment.
 
 ## 🆕 What's New in v3.1.0

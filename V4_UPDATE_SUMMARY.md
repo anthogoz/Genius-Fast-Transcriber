@@ -37,6 +37,7 @@ Le code a été entièrement restructuré pour la pérennité du projet.
 ## 🛠️ 4. Améliorations UI/UX
 - **Design 100% Natif** : Les nouveaux boutons utilisent exactement les mêmes classes CSS que Genius pour une intégration invisible.
 - **Menu Dropdown** : Nouveau menu fluide pour choisir le format d'export.
+- **Gestionnaire de boutons personnalisés** : Amélioration de l'UX/UI pour une création et une gestion plus intuitive des commandes persos.
 - **Corrections de bugs** : Nombreux correctifs sur la gestion du Dark Mode et le placement des éléments.
 
 ---
