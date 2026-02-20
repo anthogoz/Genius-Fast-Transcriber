@@ -13,6 +13,9 @@ The project has reached a major milestone with **Version 4.0.0**! The infrastruc
 - [x] **License & Open Source**: Switched to MIT license and project cleanup.
 - [x] **Disable Tooltips**: New setting to toggle button tooltips in the interface.
 - [x] **Stability Fix**: Resolved "Extension context invalidated" errors during updates.
+  ### 🛠️ Personalization (Custom Commands System)
+- [x] Create an interface allowing users to define their own buttons and regex macros without       touching the code.
+- [x] Import/Export system for "Button Packs" for the community.
 - [ ] **Modularization Phase 2 (HELP WANTED)**: 
   - [ ] Remove duplicated code in `src/content.js` and replace with module imports.
   - [ ] Decouple `showProgress` via callback in `applyAllTextCorrectionsAsync` (partially done).
@@ -27,14 +30,10 @@ The project has reached a major milestone with **Version 4.0.0**! The infrastruc
 
 ## 💡 Ideas & Future Roadmap
 
-### 🛠️ Personalization (Custom Commands System)
-- [ ] Create an interface allowing users to define their own buttons and regex macros without touching the code.
-- [ ] Import/Export system for "Button Packs" for the community.
+
 
 ### 🎨 User Experience (UX)
 - [ ] **Keyboard Shortcuts**: Add hotkeys for frequent actions (e.g., `Ctrl+Shift+F` for Fix All).
-- [ ] **Live Preview**: Highlight changes that corrections are about to make before applying them.
-- [ ] **Themes**: Compact mode and customizable color themes.
 
 ### 🔌 Advanced Integrations
 - [ ] **GFT + YouTube**: Better synchronization with the built-in Genius YouTube player.
