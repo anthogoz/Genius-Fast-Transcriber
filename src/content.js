@@ -10,7 +10,9 @@ import { extractSongData } from './modules/songData.js';
 import {
     isTagNewlinesDisabled, setTagNewlinesDisabled, isLyricCardOnlyMode,
     setLyricCardOnlyMode, getTranscriptionMode, setTranscriptionMode,
-    isEnglishTranscriptionMode, isPolishTranscriptionMode
+    isEnglishTranscriptionMode, isPolishTranscriptionMode,
+    areTooltipsEnabled,
+    setTooltipsEnabled
 } from './modules/config.js';
 import {
     createArtistSelectors, addArtistToText, formatSimpleTag
@@ -53,6 +55,15 @@ import { exportToTxt } from './modules/export.js';
 // ===========================
 
 console.log('Genius Fast Transcriber v4.0.0 🎵');
+
+/**
+ * Vérifie si le contexte de l'extension est toujours valide.
+ * Empêche les erreurs "Extension context invalidated" après une mise à jour.
+ * @returns {boolean} True si le contexte est valide.
+ */
+function isContextValid() {
+    return typeof chrome !== 'undefined' && !!chrome.runtime && !!chrome.runtime.id;
+}
 
 // ----- Injection des animations CSS essentielles -----
 // Injecte l'animation de surlignage pour s'assurer qu'elle fonctionne même si les styles CSS de Genius l'écrasent
@@ -1997,22 +2008,6 @@ function markTutorialCompleted() {
     localStorage.setItem('gft-tutorial-completed', 'true');
 }
 
-/**
- * Vérifie si les tooltips sont activés.
- * @returns {boolean} True si les tooltips sont activés.
- */
-function areTooltipsEnabled() {
-    const setting = localStorage.getItem('gft-tooltips-enabled');
-    return setting === null || setting === 'true'; // Activé par défaut
-}
-
-/**
- * Active ou désactive les tooltips.
- * @param {boolean} enabled - True pour activer, false pour désactiver.
- */
-function setTooltipsEnabled(enabled) {
-    localStorage.setItem('gft-tooltips-enabled', enabled.toString());
-}
 
 /**
  * Vérifie si l'inclusion des feat dans l'en-tête est activée.
@@ -2158,6 +2153,7 @@ function getTutorialSteps() {
  * Affiche le tutoriel guidé.
  */
 function showTutorial() {
+    if (!isContextValid()) return;
     currentTutorialStep = 0;
 
     // Crée l'overlay
@@ -2444,91 +2440,90 @@ function addTooltip(element, text) {
  * Affiche le menu de paramètres.
  */
 function showSettingsMenu() {
+    // Si le menu existe déjà, on le ferme
+    const existingMenu = document.getElementById('gft-settings-menu');
+    if (existingMenu) {
+        closeSettingsMenu();
+        return;
+    }
+
     // Crée un simple menu avec les options
     const menu = document.createElement('div');
     menu.className = 'gft-settings-menu';
     menu.id = 'gft-settings-menu';
 
     // Applique le mode sombre si nécessaire
-    const isDarkMode = localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true';
+    const isDarkMode = document.body.classList.contains(DARK_MODE_CLASS);
     if (isDarkMode) {
         menu.classList.add(DARK_MODE_CLASS);
     }
 
-    // Option 1: Relancer le tutoriel
-    const tutorialOption = document.createElement('button');
-    tutorialOption.className = 'gft-settings-menu-item';
-    tutorialOption.textContent = '🎓 Relancer le tutoriel';
-    tutorialOption.addEventListener('click', () => {
-        closeSettingsMenu();
-        showTutorial();
-    });
-    menu.appendChild(tutorialOption);
+    const addItem = (label, onClick) => {
+        const item = document.createElement('button');
+        item.className = 'gft-settings-menu-item';
+        item.textContent = label;
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            onClick();
+            closeSettingsMenu();
+        });
+        menu.appendChild(item);
+    };
 
-    // Option 2: Toggle tooltips
-    const tooltipsOption = document.createElement('button');
-    tooltipsOption.className = 'gft-settings-menu-item';
+    // 1. Mode Sombre
+    addItem(
+        isDarkMode ? getTranslation('dark_mode_toggle_light') : getTranslation('dark_mode_toggle_dark'),
+        gftToggleDarkMode
+    );
+
+    // 2. Statistiques
+    const areStatsVisible = document.getElementById('gft-stats-display')?.classList.contains('gft-stats-visible');
+    addItem(
+        areStatsVisible ? getTranslation('stats_hide') : getTranslation('stats_show'),
+        toggleStatsDisplay
+    );
+
+    // 3. Tooltips
     const tooltipsEnabled = areTooltipsEnabled();
-    tooltipsOption.textContent = tooltipsEnabled ? '💬 Désactiver les tooltips' : '💬 Activer les tooltips';
-    tooltipsOption.addEventListener('click', () => {
-        // Réévalue l'état actuel au moment du clic
-        const currentState = areTooltipsEnabled();
-        setTooltipsEnabled(!currentState);
-        closeSettingsMenu();
-        showFeedbackMessage(
-            currentState ? 'Tooltips désactivés' : 'Tooltips activés',
-            2000,
-            GFT_STATE.shortcutsContainerElement
-        );
-    });
-    menu.appendChild(tooltipsOption);
-
-    // Option 3: Toggle feat dans l'en-tête
-    const headerFeatOption = document.createElement('button');
-    headerFeatOption.className = 'gft-settings-menu-item';
-    const headerFeatEnabled = isHeaderFeatEnabled();
-    headerFeatOption.textContent = headerFeatEnabled ? '🎤 Masquer feat dans l\'en-tête' : '🎤 Afficher feat dans l\'en-tête';
-    headerFeatOption.addEventListener('click', () => {
-        // Réévalue l'état actuel au moment du clic
-        const currentState = isHeaderFeatEnabled();
-        setHeaderFeatEnabled(!currentState);
-        closeSettingsMenu();
-        showFeedbackMessage(
-            currentState ? 'Feat masqués dans l\'en-tête' : 'Feat affichés dans l\'en-tête',
-            2000,
-            GFT_STATE.shortcutsContainerElement
-        );
-    });
-    menu.appendChild(headerFeatOption);
-
-    // Option 4: Toggle saut de ligne après tags
-    const tagNewlinesOption = document.createElement('button');
-    tagNewlinesOption.className = 'gft-settings-menu-item';
-    const tagNewlinesDisabled = isTagNewlinesDisabled();
-    tagNewlinesOption.textContent = tagNewlinesDisabled ? '↵ Activer saut de ligne après tags' : '↵ Désactiver saut de ligne après tags';
-    tagNewlinesOption.addEventListener('click', () => {
-        const currentState = isTagNewlinesDisabled();
-        setTagNewlinesDisabled(!currentState);
-        closeSettingsMenu();
-        showFeedbackMessage(
-            !currentState ? 'Saut de ligne après tags DÉSACTIVÉ' : 'Saut de ligne après tags ACTIVÉ',
-            2000,
-            GFT_STATE.shortcutsContainerElement
-        );
-    });
-    menu.appendChild(tagNewlinesOption);
-
-    // Option 5: Accéder à la bibliothèque de boutons
-    const libraryOption = document.createElement('button');
-    libraryOption.className = 'gft-settings-menu-item';
-    libraryOption.textContent = getTranslation('settings_custom_library');
-    libraryOption.addEventListener('click', () => {
-        closeSettingsMenu();
-        if (typeof openCustomButtonManager === 'function') {
-            openCustomButtonManager('structure', 'library');
+    addItem(
+        tooltipsEnabled ? getTranslation('tooltips_disable') : getTranslation('tooltips_enable'),
+        () => {
+            setTooltipsEnabled(!tooltipsEnabled);
+            showFeedbackMessage(
+                !tooltipsEnabled ? getTranslation('feedback_tooltips_enabled') : getTranslation('feedback_tooltips_disabled')
+            );
         }
-    });
-    menu.appendChild(libraryOption);
+    );
+
+    // 4. Masquer les Feats dans l'en-tête (Seulement en FR)
+    if (!isEnglishTranscriptionMode() && !isPolishTranscriptionMode()) {
+        addItem(
+            isHeaderFeatEnabled() ? getTranslation('header_feat_hide') : getTranslation('header_feat_show'),
+            gftToggleHeaderFeat
+        );
+    }
+
+    // 5. Saut de ligne après tag
+    addItem(
+        isTagNewlinesDisabled() ? getTranslation('newline_enable') : getTranslation('newline_disable'),
+        gftToggleTagNewlines
+    );
+
+    // 6. Tutoriel
+    addItem(
+        getTranslation('tutorial_link'),
+        showTutorial
+    );
+
+    // 7. Bibliothèque de boutons
+    addItem(
+        getTranslation('settings_custom_library'),
+        () => {
+            if (typeof openCustomButtonManager === 'function') {
+                openCustomButtonManager('structure', 'library');
+            }
+        }
+    );
 
     // Positionne le menu
     const settingsButton = document.getElementById('gft-settings-button');
@@ -3350,6 +3345,7 @@ function handleSelectionChange() {
  * C'est le cœur de l'extension. Elle est appelée lorsque l'éditeur de paroles est détecté.
  */
 function initLyricsEditorEnhancer() {
+    if (!isContextValid()) return;
     let foundEditor = null; let foundEditorType = null;
 
     // Configuration de tous les boutons et actions du panneau.
@@ -3803,6 +3799,7 @@ function initLyricsEditorEnhancer() {
                 clickableTitleArea.style.alignItems = 'center';
                 clickableTitleArea.style.userSelect = 'none';
 
+                if (!isContextValid()) return;
                 const logoURL = chrome.runtime.getURL('images/icon16.png');
 
                 // Flèche (créée ici pour être manipulée)
@@ -3929,94 +3926,7 @@ function initLyricsEditorEnhancer() {
                 settingsButton.addEventListener('click', (event) => {
                     event.preventDefault();
                     event.stopPropagation();
-
-                    const existingMenu = document.getElementById('gft-settings-menu');
-                    if (existingMenu) {
-                        existingMenu.remove(); // Ferme le menu s'il est ouvert
-                        return;
-                    }
-
-                    // Création du Menu Popover
-                    const menu = document.createElement('div');
-                    menu.id = 'gft-settings-menu';
-                    menu.className = 'gft-settings-menu';
-
-                    // Positionnement
-                    const rect = settingsButton.getBoundingClientRect();
-                    menu.style.top = `${rect.bottom + 5}px`;
-                    menu.style.left = `${rect.left}px`;
-
-
-                    // Item 1: Mode Sombre
-                    const darkModeItem = document.createElement('button');
-                    darkModeItem.className = 'gft-settings-menu-item';
-                    darkModeItem.textContent = document.body.classList.contains('gft-dark-mode') ? getTranslation('dark_mode_toggle_light') : getTranslation('dark_mode_toggle_dark');
-                    darkModeItem.onclick = () => {
-                        gftToggleDarkMode();
-                        // On ferme le menu pour voir l'effet global, et au prochain appel le texte sera mis à jour.
-                        menu.remove();
-                    };
-                    menu.appendChild(darkModeItem);
-
-                    // Item 2: Statistiques
-                    const statsItem = document.createElement('button');
-                    statsItem.className = 'gft-settings-menu-item';
-                    const areStatsVisible = document.getElementById('gft-stats-display')?.classList.contains('gft-stats-visible');
-                    statsItem.textContent = areStatsVisible ? getTranslation('stats_hide') : getTranslation('stats_show');
-                    statsItem.onclick = () => { toggleStatsDisplay(); menu.remove(); };
-                    menu.appendChild(statsItem);
-
-                    // Item 3: Masquer les Feats dans l'en-tête (Seulement en FR)
-                    if (!isEnglishTranscriptionMode()) {
-                        const featItem = document.createElement('button');
-                        featItem.className = 'gft-settings-menu-item';
-                        featItem.textContent = isHeaderFeatEnabled() ? getTranslation('header_feat_hide') : getTranslation('header_feat_show');
-                        featItem.onclick = () => {
-                            gftToggleHeaderFeat();
-                            menu.remove();
-                        };
-                        menu.appendChild(featItem);
-                    }
-
-                    // Item 4: Saut de ligne après tag
-                    const newlineItem = document.createElement('button');
-                    newlineItem.className = 'gft-settings-menu-item';
-                    newlineItem.textContent = !isTagNewlinesDisabled() ? getTranslation('newline_enable') : getTranslation('newline_disable');
-                    newlineItem.onclick = () => {
-                        gftToggleTagNewlines();
-                        menu.remove();
-                    };
-                    menu.appendChild(newlineItem);
-
-                    // Item 5: Tutoriel
-                    const tutorialItem = document.createElement('button');
-                    tutorialItem.className = 'gft-settings-menu-item';
-                    tutorialItem.textContent = getTranslation('tutorial_link');
-                    tutorialItem.onclick = () => { showTutorial(); menu.remove(); };
-                    menu.appendChild(tutorialItem);
-
-                    // Item 6: Bibliothèque de boutons
-                    const libraryItem = document.createElement('button');
-                    libraryItem.className = 'gft-settings-menu-item';
-                    libraryItem.textContent = getTranslation('settings_custom_library');
-                    libraryItem.onclick = () => {
-                        if (typeof openCustomButtonManager === 'function') {
-                            openCustomButtonManager('structure', 'library');
-                        }
-                        menu.remove();
-                    };
-                    menu.appendChild(libraryItem);
-
-                    document.body.appendChild(menu);
-
-                    // Fermeture au clic dehors
-                    const closeMenuHandler = (e) => {
-                        if (!menu.contains(e.target) && e.target !== settingsButton) {
-                            menu.remove();
-                            document.removeEventListener('click', closeMenuHandler);
-                        }
-                    };
-                    document.addEventListener('click', closeMenuHandler);
+                    showSettingsMenu();
                 });
 
 
@@ -4932,6 +4842,7 @@ function extractLyricsFromPage() {
  * Initialise l'outil d'exportation dans la toolbar Genius (StickyToolbar).
  */
 function initSongPageToolbarEnhancer() {
+    if (!isContextValid()) return;
     const isSongPage = document.querySelector('meta[property=\"og:type\"][content=\"music.song\"]') !== null || window.location.pathname.includes('-lyrics');
     if (!isSongPage) return;
 
@@ -5041,6 +4952,10 @@ function startObserver() {
     if (!document.body) { setTimeout(startObserver, 100); return; } // Attend que le body soit prêt.
     if (GFT_STATE.observer && typeof GFT_STATE.observer.disconnect === 'function') { GFT_STATE.observer.disconnect(); } // Déconnecte l'ancien observateur.
     GFT_STATE.observer = new MutationObserver((mutationsList, currentObsInstance) => {
+        if (!isContextValid()) {
+            currentObsInstance.disconnect();
+            return;
+        }
         // La fonction de rappel est exécutée à chaque changement détecté dans le DOM.
         let editorAppeared = false; let controlsAppeared = false;
         for (const mutation of mutationsList) { if (mutation.type === 'childList') { if (mutation.addedNodes.length > 0) { mutation.addedNodes.forEach(node => { if (node.nodeType === Node.ELEMENT_NODE && typeof node.matches === 'function') { if (node.matches(SELECTORS.TEXTAREA_EDITOR) || node.matches(SELECTORS.DIV_EDITOR)) editorAppeared = true; if (node.matches(SELECTORS.CONTROLS_STICKY_SECTION)) controlsAppeared = true; } }); } } }
@@ -5756,6 +5671,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
 
             // Charge le logo de manière asynchrone aussi
             const logoImg = new Image();
+            if (!isContextValid()) return;
             const logoUrl = chrome.runtime.getURL(contrastColor === 'white' ? 'images/geniuslogowhite.png' : 'images/geniuslogoblack.png');
             logoImg.src = logoUrl;
 
@@ -5871,6 +5787,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
  * Génère une "Lyric Card" à partir du texte sélectionné.
  */
 async function generateLyricsCard() {
+    if (!isContextValid()) return;
     const selection = window.getSelection();
     if (!selection || selection.toString().trim().length === 0) {
         showFeedbackMessage(getTranslation('lc_select_text_error'));
@@ -6132,7 +6049,8 @@ function gftToggleHeaderFeat() {
     if (typeof isHeaderFeatEnabled === 'function' && typeof setHeaderFeatEnabled === 'function') {
         const newState = !isHeaderFeatEnabled();
         setHeaderFeatEnabled(newState);
-        showFeedbackMessage(newState ? '✅ Inclure Feats dans l\'en-tête' : '❌ Feats masqués dans l\'en-tête', 2000, GFT_STATE.shortcutsContainerElement || document.body);
+        const msg = newState ? getTranslation('header_feat_show') : getTranslation('header_feat_hide');
+        showFeedbackMessage(msg, 2000, GFT_STATE.shortcutsContainerElement || document.body);
     }
 }
 
@@ -6141,7 +6059,8 @@ function gftToggleTagNewlines() {
         const currentValue = isTagNewlinesDisabled();
         const newState = !currentValue;
         setTagNewlinesDisabled(newState);
-        showFeedbackMessage(!newState ? '✅ Saut de ligne après tags ACTIVÉ' : '❌ Saut de ligne après tags DÉSACTIVÉ', 2000, GFT_STATE.shortcutsContainerElement || document.body);
+        const msg = !newState ? getTranslation('newline_enable') : getTranslation('newline_disable');
+        showFeedbackMessage(msg, 2000, GFT_STATE.shortcutsContainerElement || document.body);
     }
 }
 

@@ -1,7 +1,8 @@
 import {
     DISABLE_TAG_NEWLINES_STORAGE_KEY,
     LYRIC_CARD_ONLY_STORAGE_KEY,
-    TRANSCRIPTION_MODE_STORAGE_KEY
+    TRANSCRIPTION_MODE_STORAGE_KEY,
+    TOOLTIPS_ENABLED_STORAGE_KEY
 } from './constants.js';
 
 /**
@@ -34,6 +35,23 @@ export function isLyricCardOnlyMode() {
  */
 export function setLyricCardOnlyMode(enabled) {
     localStorage.setItem(LYRIC_CARD_ONLY_STORAGE_KEY, enabled.toString());
+}
+
+/**
+ * Checks if tooltips are enabled.
+ * @returns {boolean} True if tooltips are enabled.
+ */
+export function areTooltipsEnabled() {
+    const setting = localStorage.getItem(TOOLTIPS_ENABLED_STORAGE_KEY);
+    return setting === null || setting === 'true'; // Enabled by default
+}
+
+/**
+ * Enables or disables tooltips.
+ * @param {boolean} enabled - True to enable, false to disable.
+ */
+export function setTooltipsEnabled(enabled) {
+    localStorage.setItem(TOOLTIPS_ENABLED_STORAGE_KEY, enabled.toString());
 }
 
 /**

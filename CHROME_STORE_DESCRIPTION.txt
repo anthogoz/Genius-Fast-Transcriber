@@ -8,6 +8,8 @@ Elevate your transcription game with Genius Fast Transcriber. Whether you are a 
 • Native UI: Seamless integration with the Genius desktop interface for a premium feel.
 • Modular Architecture: Optimized performance and stability with our new modular codebase.
 • Custom Buttons: Improved UI/UX for the custom buttons and commands manager.
+• Tooltip Settings: New option to disable tooltips for a cleaner interface.
+• Stability Fix: Resolved background crashes during extension reloads.
 • Multi-language: Full Export support for French, English, and Polish.
 
 ✨ KEY FEATURES

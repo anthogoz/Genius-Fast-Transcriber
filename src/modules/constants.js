@@ -32,6 +32,7 @@ export const LYRIC_CARD_ONLY_STORAGE_KEY = 'gftLyricCardOnly';
 export const PANEL_COLLAPSED_STORAGE_KEY = 'gftPanelCollapsed';
 export const TRANSCRIPTION_MODE_STORAGE_KEY = 'gftTranscriptionMode';
 export const CUSTOM_BUTTONS_STORAGE_KEY = 'gftCustomButtons';
+export const TOOLTIPS_ENABLED_STORAGE_KEY = 'gftTooltipsEnabled';
 export const MAX_HISTORY_SIZE = 10;
 
 export const LYRICS_HELPER_HIGHLIGHT_CLASS = 'lyrics-helper-highlight';

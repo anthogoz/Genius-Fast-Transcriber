@@ -8,8 +8,7 @@
 **The ultimate tool for transcribers on Genius.com.**
 Transform your editing experience with a suite of professional tools, a modern interface, smart automations, and full customization.
 
-> **🚧 Modularization In Progress:** This extension is currently being migrated to a modern modular build system.  
-> We need help integrating the new modules! See [MODULARIZATION_STATUS.md](./MODULARIZATION_STATUS.md) for the roadmap and how to contribute.
+---
 
 ---
 

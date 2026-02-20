@@ -8,7 +8,7 @@
   };
 
   // src/modules/constants.js
-  var GFT_STATE, DARK_MODE_CLASS, DARK_MODE_STORAGE_KEY, HEADER_FEAT_STORAGE_KEY, DISABLE_TAG_NEWLINES_STORAGE_KEY, LYRIC_CARD_ONLY_STORAGE_KEY, PANEL_COLLAPSED_STORAGE_KEY, TRANSCRIPTION_MODE_STORAGE_KEY, CUSTOM_BUTTONS_STORAGE_KEY, MAX_HISTORY_SIZE, LYRICS_HELPER_HIGHLIGHT_CLASS, SHORTCUTS_CONTAINER_ID, ARTIST_SELECTOR_CONTAINER_ID, COUPLET_BUTTON_ID, FEEDBACK_MESSAGE_ID, FLOATING_TOOLBAR_ID, SELECTORS;
+  var GFT_STATE, DARK_MODE_CLASS, DARK_MODE_STORAGE_KEY, HEADER_FEAT_STORAGE_KEY, DISABLE_TAG_NEWLINES_STORAGE_KEY, LYRIC_CARD_ONLY_STORAGE_KEY, PANEL_COLLAPSED_STORAGE_KEY, TRANSCRIPTION_MODE_STORAGE_KEY, CUSTOM_BUTTONS_STORAGE_KEY, TOOLTIPS_ENABLED_STORAGE_KEY, MAX_HISTORY_SIZE, LYRICS_HELPER_HIGHLIGHT_CLASS, SHORTCUTS_CONTAINER_ID, ARTIST_SELECTOR_CONTAINER_ID, COUPLET_BUTTON_ID, FEEDBACK_MESSAGE_ID, FLOATING_TOOLBAR_ID, SELECTORS;
   var init_constants = __esm({
     "src/modules/constants.js"() {
       GFT_STATE = {
@@ -39,6 +39,7 @@
       PANEL_COLLAPSED_STORAGE_KEY = "gftPanelCollapsed";
       TRANSCRIPTION_MODE_STORAGE_KEY = "gftTranscriptionMode";
       CUSTOM_BUTTONS_STORAGE_KEY = "gftCustomButtons";
+      TOOLTIPS_ENABLED_STORAGE_KEY = "gftTooltipsEnabled";
       MAX_HISTORY_SIZE = 10;
       LYRICS_HELPER_HIGHLIGHT_CLASS = "lyrics-helper-highlight";
       SHORTCUTS_CONTAINER_ID = "genius-lyrics-shortcuts-container";
@@ -118,6 +119,10 @@
           newline_enable: "\u21B5 Activer saut de ligne apr\xE8s tags",
           newline_disable: "\u21B5 D\xE9sactiver saut de ligne apr\xE8s tags",
           tutorial_link: "\u2753 Tutoriel / Aide",
+          tooltips_enable: "\u{1F4AC} Activer les tooltips",
+          tooltips_disable: "\u{1F4AC} D\xE9sactiver les tooltips",
+          feedback_tooltips_enabled: "Tooltips activ\xE9s",
+          feedback_tooltips_disabled: "Tooltips d\xE9sactiv\xE9s",
           undo_tooltip: "Annuler la derni\xE8re modification (Ctrl+Z)",
           redo_tooltip: "Refaire la derni\xE8re modification annul\xE9e (Ctrl+Y)",
           panel_title_img_alt: "GFT Logo",
@@ -440,6 +445,10 @@
           newline_enable: "\u21B5 Enable newline after tags",
           newline_disable: "\u21B5 Disable newline after tags",
           tutorial_link: "\u2753 Tutorial / Help",
+          tooltips_enable: "\u{1F4AC} Enable tooltips",
+          tooltips_disable: "\u{1F4AC} Disable tooltips",
+          feedback_tooltips_enabled: "Tooltips enabled",
+          feedback_tooltips_disabled: "Tooltips disabled",
           undo_tooltip: "Undo last change (Ctrl+Z)",
           redo_tooltip: "Redo last undone change (Ctrl+Y)",
           panel_title_img_alt: "GFT Logo",
@@ -769,6 +778,10 @@
           newline_enable: "\u21B5 Dodawaj now\u0105 lini\u0119 po tagach",
           newline_disable: "\u21B5 Nie dodawaj nowej linii po tagach",
           tutorial_link: "\u2753 Samouczek / Pomoc",
+          tooltips_enable: "\u{1F4AC} W\u0142\u0105cz podpowiedzi",
+          tooltips_disable: "\u{1F4AC} Wy\u0142\u0105cz podpowiedzi",
+          feedback_tooltips_enabled: "Podpowiedzi w\u0142\u0105czone",
+          feedback_tooltips_disabled: "Podpowiedzi wy\u0142\u0105czone",
           undo_tooltip: "Cofnij ostatni\u0105 zmian\u0119 (Ctrl+Z)",
           redo_tooltip: "Pon\xF3w ostatni\u0105 cofni\u0119t\u0105 zmian\u0119 (Ctrl+Y)",
           panel_title_img_alt: "Logo GFT",
@@ -1518,6 +1531,13 @@
   function setLyricCardOnlyMode(enabled) {
     localStorage.setItem(LYRIC_CARD_ONLY_STORAGE_KEY, enabled.toString());
   }
+  function areTooltipsEnabled() {
+    const setting = localStorage.getItem(TOOLTIPS_ENABLED_STORAGE_KEY);
+    return setting === null || setting === "true";
+  }
+  function setTooltipsEnabled(enabled) {
+    localStorage.setItem(TOOLTIPS_ENABLED_STORAGE_KEY, enabled.toString());
+  }
   function getTranscriptionMode() {
     return localStorage.getItem(TRANSCRIPTION_MODE_STORAGE_KEY) || "fr";
   }
@@ -2009,6 +2029,9 @@
       init_corrections();
       init_export();
       console.log("Genius Fast Transcriber v4.0.0 \u{1F3B5}");
+      function isContextValid() {
+        return typeof chrome !== "undefined" && !!chrome.runtime && !!chrome.runtime.id;
+      }
       (function injectCriticalStyles() {
         if (!document.getElementById("gft-critical-animations")) {
           const style = document.createElement("style");
@@ -3269,10 +3292,6 @@
       function markTutorialCompleted() {
         localStorage.setItem("gft-tutorial-completed", "true");
       }
-      function areTooltipsEnabled() {
-        const setting = localStorage.getItem("gft-tooltips-enabled");
-        return setting === null || setting === "true";
-      }
       function isHeaderFeatEnabled() {
         const setting = localStorage.getItem(HEADER_FEAT_STORAGE_KEY);
         return setting === null ? true : setting === "true";
@@ -3394,6 +3413,7 @@
         ];
       }
       function showTutorial() {
+        if (!isContextValid()) return;
         currentTutorialStep = 0;
         tutorialOverlay = document.createElement("div");
         tutorialOverlay.id = "gft-tutorial-overlay";
@@ -3579,6 +3599,97 @@
           }
           tooltip = null;
         });
+      }
+      function showSettingsMenu() {
+        const existingMenu = document.getElementById("gft-settings-menu");
+        if (existingMenu) {
+          closeSettingsMenu();
+          return;
+        }
+        const menu = document.createElement("div");
+        menu.className = "gft-settings-menu";
+        menu.id = "gft-settings-menu";
+        const isDarkMode = document.body.classList.contains(DARK_MODE_CLASS);
+        if (isDarkMode) {
+          menu.classList.add(DARK_MODE_CLASS);
+        }
+        const addItem = (label, onClick) => {
+          const item = document.createElement("button");
+          item.className = "gft-settings-menu-item";
+          item.textContent = label;
+          item.addEventListener("click", (e) => {
+            e.stopPropagation();
+            onClick();
+            closeSettingsMenu();
+          });
+          menu.appendChild(item);
+        };
+        addItem(
+          isDarkMode ? getTranslation("dark_mode_toggle_light") : getTranslation("dark_mode_toggle_dark"),
+          gftToggleDarkMode
+        );
+        const areStatsVisible = document.getElementById("gft-stats-display")?.classList.contains("gft-stats-visible");
+        addItem(
+          areStatsVisible ? getTranslation("stats_hide") : getTranslation("stats_show"),
+          toggleStatsDisplay
+        );
+        const tooltipsEnabled = areTooltipsEnabled();
+        addItem(
+          tooltipsEnabled ? getTranslation("tooltips_disable") : getTranslation("tooltips_enable"),
+          () => {
+            setTooltipsEnabled(!tooltipsEnabled);
+            showFeedbackMessage(
+              !tooltipsEnabled ? getTranslation("feedback_tooltips_enabled") : getTranslation("feedback_tooltips_disabled")
+            );
+          }
+        );
+        if (!isEnglishTranscriptionMode() && !isPolishTranscriptionMode2()) {
+          addItem(
+            isHeaderFeatEnabled() ? getTranslation("header_feat_hide") : getTranslation("header_feat_show"),
+            gftToggleHeaderFeat
+          );
+        }
+        addItem(
+          isTagNewlinesDisabled() ? getTranslation("newline_enable") : getTranslation("newline_disable"),
+          gftToggleTagNewlines
+        );
+        addItem(
+          getTranslation("tutorial_link"),
+          showTutorial
+        );
+        addItem(
+          getTranslation("settings_custom_library"),
+          () => {
+            if (typeof openCustomButtonManager === "function") {
+              openCustomButtonManager("structure", "library");
+            }
+          }
+        );
+        const settingsButton = document.getElementById("gft-settings-button");
+        if (settingsButton) {
+          const rect = settingsButton.getBoundingClientRect();
+          menu.style.position = "fixed";
+          menu.style.top = `${rect.bottom + 5}px`;
+          menu.style.right = `${window.innerWidth - rect.right}px`;
+        }
+        document.body.appendChild(menu);
+        setTimeout(() => {
+          document.addEventListener("click", closeSettingsMenuOnClickOutside);
+        }, 10);
+      }
+      function closeSettingsMenu() {
+        const menu = document.getElementById("gft-settings-menu");
+        if (menu && document.body.contains(menu)) {
+          document.body.removeChild(menu);
+        }
+        document.removeEventListener("click", closeSettingsMenuOnClickOutside);
+      }
+      function closeSettingsMenuOnClickOutside(event) {
+        const menu = document.getElementById("gft-settings-menu");
+        const settingsButton = document.getElementById("gft-settings-button");
+        if (menu && !menu.contains(event.target) && event.target !== settingsButton) {
+          closeSettingsMenu();
+        }
       }
       var gftYoutubePlayerState = {
         isPlaying: null,
@@ -4134,6 +4245,7 @@
         }
       }
       function initLyricsEditorEnhancer() {
+        if (!isContextValid()) return;
         let foundEditor = null;
         let foundEditorType = null;
         const getStructuralTags = () => {
@@ -4532,6 +4644,7 @@
               clickableTitleArea.style.display = "inline-flex";
               clickableTitleArea.style.alignItems = "center";
               clickableTitleArea.style.userSelect = "none";
+              if (!isContextValid()) return;
               const logoURL = chrome.runtime.getURL("images/icon16.png");
               const collapseArrow = document.createElement("span");
               collapseArrow.id = "gft-collapse-arrow";
@@ -4623,78 +4736,7 @@
               settingsButton.addEventListener("click", (event) => {
                 event.preventDefault();
                 event.stopPropagation();
-                const existingMenu = document.getElementById("gft-settings-menu");
-                if (existingMenu) {
-                  existingMenu.remove();
-                  return;
-                }
-                const menu = document.createElement("div");
-                menu.id = "gft-settings-menu";
-                menu.className = "gft-settings-menu";
-                const rect = settingsButton.getBoundingClientRect();
-                menu.style.top = `${rect.bottom + 5}px`;
-                menu.style.left = `${rect.left}px`;
-                const darkModeItem = document.createElement("button");
-                darkModeItem.className = "gft-settings-menu-item";
-                darkModeItem.textContent = document.body.classList.contains("gft-dark-mode") ? getTranslation("dark_mode_toggle_light") : getTranslation("dark_mode_toggle_dark");
-                darkModeItem.onclick = () => {
-                  gftToggleDarkMode();
-                  menu.remove();
-                };
-                menu.appendChild(darkModeItem);
-                const statsItem = document.createElement("button");
-                statsItem.className = "gft-settings-menu-item";
-                const areStatsVisible = document.getElementById("gft-stats-display")?.classList.contains("gft-stats-visible");
-                statsItem.textContent = areStatsVisible ? getTranslation("stats_hide") : getTranslation("stats_show");
-                statsItem.onclick = () => {
-                  toggleStatsDisplay();
-                  menu.remove();
-                };
-                menu.appendChild(statsItem);
-                if (!isEnglishTranscriptionMode()) {
-                  const featItem = document.createElement("button");
-                  featItem.className = "gft-settings-menu-item";
-                  featItem.textContent = isHeaderFeatEnabled() ? getTranslation("header_feat_hide") : getTranslation("header_feat_show");
-                  featItem.onclick = () => {
-                    gftToggleHeaderFeat();
-                    menu.remove();
-                  };
-                  menu.appendChild(featItem);
-                }
-                const newlineItem = document.createElement("button");
-                newlineItem.className = "gft-settings-menu-item";
-                newlineItem.textContent = !isTagNewlinesDisabled() ? getTranslation("newline_enable") : getTranslation("newline_disable");
-                newlineItem.onclick = () => {
-                  gftToggleTagNewlines();
-                  menu.remove();
-                };
-                menu.appendChild(newlineItem);
-                const tutorialItem = document.createElement("button");
-                tutorialItem.className = "gft-settings-menu-item";
-                tutorialItem.textContent = getTranslation("tutorial_link");
-                tutorialItem.onclick = () => {
-                  showTutorial();
-                  menu.remove();
-                };
-                menu.appendChild(tutorialItem);
-                const libraryItem = document.createElement("button");
-                libraryItem.className = "gft-settings-menu-item";
-                libraryItem.textContent = getTranslation("settings_custom_library");
-                libraryItem.onclick = () => {
-                  if (typeof openCustomButtonManager === "function") {
-                    openCustomButtonManager("structure", "library");
-                  }
-                  menu.remove();
-                };
-                menu.appendChild(libraryItem);
-                document.body.appendChild(menu);
-                const closeMenuHandler = (e) => {
-                  if (!menu.contains(e.target) && e.target !== settingsButton) {
-                    menu.remove();
-                    document.removeEventListener("click", closeMenuHandler);
-                  }
-                };
-                document.addEventListener("click", closeMenuHandler);
+                showSettingsMenu();
               });
               panelTitle.appendChild(settingsButton);
               addTooltip(settingsButton, getTranslation("settings_tooltip"));
@@ -5396,6 +5438,7 @@
         return allText.trim();
       }
       function initSongPageToolbarEnhancer() {
+        if (!isContextValid()) return;
         const isSongPage = document.querySelector('meta[property="og:type"][content="music.song"]') !== null || window.location.pathname.includes("-lyrics");
         if (!isSongPage) return;
         const toolbarLeft = document.querySelector('[data-testid="sticky-contributor-toolbar"] .StickyToolbar__Left-sc-335d47e5-1') || document.querySelector(".StickyToolbar__Left-sc-335d47e5-1");
@@ -5486,6 +5529,10 @@
           GFT_STATE.observer.disconnect();
         }
         GFT_STATE.observer = new MutationObserver((mutationsList, currentObsInstance) => {
+          if (!isContextValid()) {
+            currentObsInstance.disconnect();
+            return;
+          }
           let editorAppeared = false;
           let controlsAppeared = false;
           for (const mutation of mutationsList) {
@@ -6028,6 +6075,7 @@ ${window.location.href}
             const dominantColor = getDominantColor(img);
             const contrastColor = getContrastColor(dominantColor);
             const logoImg = new Image();
+            if (!isContextValid()) return;
             const logoUrl = chrome.runtime.getURL(contrastColor === "white" ? "images/geniuslogowhite.png" : "images/geniuslogoblack.png");
             logoImg.src = logoUrl;
             logoImg.onload = () => {
@@ -6120,6 +6168,7 @@ ${window.location.href}
         };
       }
       async function generateLyricsCard() {
+        if (!isContextValid()) return;
         const selection = window.getSelection();
         if (!selection || selection.toString().trim().length === 0) {
           showFeedbackMessage(getTranslation("lc_select_text_error"));
@@ -6310,7 +6359,8 @@ ${window.location.href}
         if (typeof isHeaderFeatEnabled === "function" && typeof setHeaderFeatEnabled === "function") {
           const newState = !isHeaderFeatEnabled();
           setHeaderFeatEnabled(newState);
-          showFeedbackMessage(newState ? "\u2705 Inclure Feats dans l'en-t\xEAte" : "\u274C Feats masqu\xE9s dans l'en-t\xEAte", 2e3, GFT_STATE.shortcutsContainerElement || document.body);
+          const msg = newState ? getTranslation("header_feat_show") : getTranslation("header_feat_hide");
+          showFeedbackMessage(msg, 2e3, GFT_STATE.shortcutsContainerElement || document.body);
         }
       }
       function gftToggleTagNewlines() {
@@ -6318,7 +6368,8 @@ ${window.location.href}
           const currentValue = isTagNewlinesDisabled();
           const newState = !currentValue;
           setTagNewlinesDisabled(newState);
-          showFeedbackMessage(!newState ? "\u2705 Saut de ligne apr\xE8s tags ACTIV\xC9" : "\u274C Saut de ligne apr\xE8s tags D\xC9SACTIV\xC9", 2e3, GFT_STATE.shortcutsContainerElement || document.body);
+          const msg = !newState ? getTranslation("newline_enable") : getTranslation("newline_disable");
+          showFeedbackMessage(msg, 2e3, GFT_STATE.shortcutsContainerElement || document.body);
         }
       }
       function gftToggleDarkMode() {

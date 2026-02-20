@@ -11,6 +11,8 @@ The project has reached a major milestone with **Version 4.0.0**! The infrastruc
 - [x] **Dev Documentation**: Creation of comprehensive guides for contributors.
 - [x] **Export to .txt**: New toolbar feature for instant, cleaned lyrics downloads.
 - [x] **License & Open Source**: Switched to MIT license and project cleanup.
+- [x] **Disable Tooltips**: New setting to toggle button tooltips in the interface.
+- [x] **Stability Fix**: Resolved "Extension context invalidated" errors during updates.
 - [ ] **Modularization Phase 2 (HELP WANTED)**: 
   - [ ] Remove duplicated code in `src/content.js` and replace with module imports.
   - [ ] Decouple `showProgress` via callback in `applyAllTextCorrectionsAsync` (partially done).
