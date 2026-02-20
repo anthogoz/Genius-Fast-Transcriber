@@ -9,6 +9,7 @@ The project has reached a major milestone with **Version 4.0.0**! The infrastruc
 - [x] **Build System**: esbuild integration for ultra-fast builds (<100ms).
 - [x] **Automated Releases**: Packaging script that names the ZIP based on the manifest version.
 - [x] **Dev Documentation**: Creation of comprehensive guides for contributors.
+- [x] **Export to .txt**: New toolbar feature for instant, cleaned lyrics downloads.
 - [x] **License & Open Source**: Switched to MIT license and project cleanup.
 - [ ] **Modularization Phase 2 (HELP WANTED)**: 
   - [ ] Remove duplicated code in `src/content.js` and replace with module imports.

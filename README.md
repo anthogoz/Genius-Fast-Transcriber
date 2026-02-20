@@ -58,6 +58,16 @@ Transform your editing experience with a suite of professional tools, a modern i
     *   Preview before download.
 *   **Lyric Card Only Mode**: Hide the transcription tools to keep only Lyric Card functionality.
 
+### 📤 Export & Sharing
+*   **Export as .txt**: Download the song lyrics as a clean text file directly from the Genius toolbar.
+*   **Smart Cleaning**: Automatically removes "Contributors" headers, Genius annotations (hyperlinks), and HTML tags.
+*   **Multiple Formats**:
+    *   **Standard**: Keeps tags and spacing.
+    *   **No Tags**: Removes [Verse], [Chorus], etc.
+    *   **No Spacing**: Removes empty lines.
+    *   **Raw**: Pure text without tags or spacing.
+*   **Intelligent Scraper**: If the editor is closed, GFT automatically scrapes the lyrics from the page.
+
 ### 🤖 AI Transcription
 *   **Quick access** to external AI transcription tool directly from the panel footer.
 
@@ -104,6 +114,20 @@ Transform your editing experience with a suite of professional tools, a modern i
     *   "Load unpacked" and select the folder.
 
 ---
+
+## 🆕 What's New in v4.0.0 🚀
+
+- **📤 Export to .txt Tool**:
+    - A new professional button in the Genius "Sticky Toolbar" to export lyrics instantly.
+    - **Smart Extraction**: Cleanly filters out Genius headers, contributors, and hyperlinks.
+    - **Custom Formats**: Choose between Standard, No Tags, No Spacing, or Raw text.
+    - **Multi-language**: Fully translated in French, English, and Polish.
+- **🏗️ Modern Architecture**:
+    - **Modular System**: Complete migration to a modular structure for better performance and easier contributions.
+    - **Fast Build**: esbuild integration for near-instant development.
+- **🛠️ Refined UI**:
+    - Native Genius styling for seamless integration.
+    - Smoother dropdown menus and improved button alignment.
 
 ## 🆕 What's New in v3.1.0
 

@@ -2,13 +2,12 @@
 
 Elevate your transcription game with Genius Fast Transcriber. Whether you are a casual contributor or a top editor, this extension transforms the Genius editor into a powerful, professional workspace.
 
-🔥 NEW IN VERSION 3.0.1
-• Polish Language Support: Full support for Genius Polska guidelines!
-• Custom Buttons Manager: Create your own buttons! Add custom tags or powerful Regex cleanup tools.
-• Share Presets: Export your custom buttons code and share it with the community.
-• Full English Support: The extension now fully adapts to English typography rules and tags (Verse, Chorus...).
-• Number to Words Converter: Instantly convert digits like "42" into "forty-two" (or "quarante-deux" in French mode).
-• Lyric Card Only Mode: Just want to create images? Hide the transcription tools for a cleaner experience.
+🔥 NEW IN VERSION 4.0.0
+• Export to .txt: A powerful new tool in the Genius toolbar to download cleaned lyrics instantly.
+• Smart Cleaning: Automatically removes Genius annotations, HTML tags, and metadata headers.
+• Native UI: Seamless integration with the Genius desktop interface for a premium feel.
+• Modular Architecture: Optimized performance and stability with our new modular codebase.
+• Multi-language: Full Export support for French, English, and Polish.
 
 ✨ KEY FEATURES
 

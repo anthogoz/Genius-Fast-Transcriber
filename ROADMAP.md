@@ -5,6 +5,7 @@
 - ✅ **Modularisation Phase 1** — Infrastructure prête avec esbuild
 - ✅ **Build System** — Scripts npm pour build/watch/package
 - ✅ **Documentation** — Guides complets pour dev et publication
+- ✅ **Export .txt** — Extraction propre des paroles depuis la barre d'outils
 - ✅ **Open Source** — LICENSE MIT, .gitignore configuré
 
 ---
@@ -147,7 +148,7 @@
 **Impact :** Qualité améliorée
 
 #### Export Options
-- [ ] Export lyrics en .txt, .lrc, .json
+- [ ] Export lyrics en .lrc, .json
 - [ ] Copie formatée pour Discord/Markdown
 - [ ] Generate shareable link
 

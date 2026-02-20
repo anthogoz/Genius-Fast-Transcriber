@@ -126,6 +126,7 @@
           // Sections
           section_structure: "Structure & Artistes",
           section_cleanup: "Outils de nettoyage",
+          section_export: "Exportation",
           // Buttons & Tooltips
           btn_header: "En-t\xEAte",
           btn_header_tooltip: "Ins\xE9rer l'en-t\xEAte de la chanson avec les artistes",
@@ -387,7 +388,13 @@
           custom_mgr_find_placeholder_regex: "Motif Regex (ex: d+s*$)",
           custom_mgr_replace_placeholder: "(Laisser vide pour supprimer)",
           custom_mgr_case_sensitive: "Respecter la casse",
-          settings_custom_library: "\u{1F4DA} Biblioth\xE8que de boutons"
+          settings_custom_library: "\u{1F4DA} Biblioth\xE8que de boutons",
+          export_btn: "Exporter en .txt",
+          export_opt_standard: "\u{1F4C4} Paroles standards",
+          export_opt_no_tags: "\u{1F4C4} Sans tags [Couplet...]",
+          export_opt_no_spacing: "\u{1F4C4} Sans espacement",
+          export_opt_raw: "\u{1F4C4} Texte brut",
+          export_filename_suffix: " (GFT Export)"
         },
         en: {
           panel_title: "Genius Fast Transcriber",
@@ -441,6 +448,7 @@
           // Sections
           section_structure: "Structure & Artists",
           section_cleanup: "Cleanup Tools",
+          section_export: "Export",
           // Buttons & Tooltips - REVERT TO FRENCH for Transcription tags
           btn_header: "Header",
           btn_header_tooltip: "Insert song header with artists",
@@ -707,7 +715,13 @@
           custom_mgr_find_placeholder_regex: "Regex Pattern (e.g. d+s*$)",
           custom_mgr_replace_placeholder: "(Leave empty to delete)",
           custom_mgr_case_sensitive: "Case Sensitive",
-          settings_custom_library: "\u{1F4DA} Buttons Library"
+          settings_custom_library: "\u{1F4DA} Buttons Library",
+          export_btn: "Export as .txt",
+          export_opt_standard: "\u{1F4C4} Standard Lyrics",
+          export_opt_no_tags: "\u{1F4C4} No tags [Verse...]",
+          export_opt_no_spacing: "\u{1F4C4} No extra spacing",
+          export_opt_raw: "\u{1F4C4} Raw text",
+          export_filename_suffix: " (GFT Export)"
         },
         // Polish translations - UI strings are placeholders for contributor PR
         // Structure tags and cleanup tools are Polish-specific per Genius Polska guidelines
@@ -761,6 +775,7 @@
           // Sections
           section_structure: "Struktura i wykonawcy",
           section_cleanup: "Szybkie poprawki",
+          section_export: "Eksport",
           // Buttons & Tooltips - Polish structure tags
           btn_header: "Nag\u0142\xF3wek SEO",
           btn_header_tooltip: "Wstaw nag\u0142\xF3wek z tytu\u0142em i wykonawcami utworu",
@@ -1019,7 +1034,13 @@
           custom_mgr_find_placeholder_regex: "Wzorzec Regex (np. d+s*$)",
           custom_mgr_replace_placeholder: "(Pozostaw puste, aby usun\u0105\u0107)",
           custom_mgr_case_sensitive: "Uwzgl\u0119dniaj wielko\u015B\u0107 liter",
-          settings_custom_library: "\u{1F4DA} Biblioteka przycisk\xF3w"
+          settings_custom_library: "\u{1F4DA} Biblioteka przycisk\xF3w",
+          export_btn: "Eksportuj do .txt",
+          export_opt_standard: "\u{1F4C4} Standardowy tekst",
+          export_opt_no_tags: "\u{1F4C4} Bez tag\xF3w sekcji",
+          export_opt_no_spacing: "\u{1F4C4} Bez pustych linii",
+          export_opt_raw: "\u{1F4C4} Czysty tekst",
+          export_filename_suffix: " (GFT Eksport)"
         }
       };
     }
@@ -1940,6 +1961,42 @@
     }
   });
 
+  // src/modules/export.js
+  function cleanLyricsText(text) {
+    if (!text) return "";
+    let cleaned = text;
+    cleaned = cleaned.replace(/<[^>]*>/g, "");
+    cleaned = cleaned.replace(/\[\[(.*?)\]\]\(.*?\)/g, "$1");
+    cleaned = cleaned.replace(/\[((?!.*?\bVerse\b|.*?Chorus\b|.*?Intro\b|.*?Bridge\b).*?)\]\(.*?\)/g, "$1");
+    return cleaned;
+  }
+  function exportToTxt(text, filename, options = {}) {
+    let processedText = cleanLyricsText(text);
+    let lines = processedText.split(/\r?\n/);
+    let filteredLines = lines;
+    if (options.removeTags) {
+      filteredLines = filteredLines.filter((line) => !isSectionTag(line));
+    }
+    if (options.removeSpacing) {
+      filteredLines = filteredLines.filter((line) => line.trim() !== "");
+    }
+    processedText = filteredLines.join("\n").trim();
+    const blob = new Blob([processedText], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename || "lyrics.txt";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setTimeout(() => URL.revokeObjectURL(url), 100);
+  }
+  var init_export = __esm({
+    "src/modules/export.js"() {
+      init_corrections();
+    }
+  });
+
   // src/content.js
   var require_content = __commonJS({
     "src/content.js"() {
@@ -1950,6 +2007,7 @@
       init_constants();
       init_utils();
       init_corrections();
+      init_export();
       console.log("Genius Fast Transcriber v4.0.0 \u{1F3B5}");
       (function injectCriticalStyles() {
         if (!document.getElementById("gft-critical-animations")) {
@@ -5270,6 +5328,9 @@
               versionLabel.id = "gft-version-label";
               versionLabel.textContent = "v4.0.0";
               versionLabel.title = "Genius Fast Transcriber v4.0.0 - Nouvelle Interface Premium";
+              versionLabel.style.fontSize = "10px";
+              versionLabel.style.color = "#888";
+              versionLabel.style.opacity = "0.6";
               footerContainer.appendChild(creditLabel);
               footerContainer.appendChild(versionLabel);
               panelContent.appendChild(footerContainer);
@@ -5313,6 +5374,109 @@
           }
         }
       }
+      function extractLyricsFromPage() {
+        const containers = document.querySelectorAll(SELECTORS.LYRICS_CONTAINER);
+        if (!containers || containers.length === 0) return "";
+        let allText = "";
+        containers.forEach((container) => {
+          const clone = container.cloneNode(true);
+          clone.querySelectorAll('div[class*="Lyrics__Footer"], a[class*="Lyrics__Footer"], div[class*="LyricsHeader"], span[class*="LyricsHeader"]').forEach((el) => el.remove());
+          clone.querySelectorAll("*").forEach((el) => {
+            if (el.innerText && (el.innerText.includes("Contributor") || el.innerText.includes("Lyrics"))) {
+              if (el.innerText.length < 50) el.remove();
+            }
+          });
+          clone.querySelectorAll("br").forEach((br) => br.replaceWith("\n"));
+          clone.querySelectorAll("div, p").forEach((el) => {
+            el.innerHTML += "\n";
+          });
+          allText += clone.innerText || clone.textContent;
+          allText += "\n\n";
+        });
+        return allText.trim();
+      }
+      function initSongPageToolbarEnhancer() {
+        const isSongPage = document.querySelector('meta[property="og:type"][content="music.song"]') !== null || window.location.pathname.includes("-lyrics");
+        if (!isSongPage) return;
+        const toolbarLeft = document.querySelector('[data-testid="sticky-contributor-toolbar"] .StickyToolbar__Left-sc-335d47e5-1') || document.querySelector(".StickyToolbar__Left-sc-335d47e5-1");
+        if (!toolbarLeft) return;
+        if (document.getElementById("gft-toolbar-export-btn")) return;
+        const lang = getTranscriptionMode();
+        const exportBtn = document.createElement("button");
+        exportBtn.id = "gft-toolbar-export-btn";
+        exportBtn.className = "SmallButton__Container-sc-f92f54a0-0 cmagge StickyToolbar__SmallButton-sc-335d47e5-5 aIzQu";
+        exportBtn.innerHTML = `<span>${TRANSLATIONS[lang].export_btn}</span>`;
+        exportBtn.style.marginLeft = "0px";
+        exportBtn.style.position = "relative";
+        const dropdown = document.createElement("div");
+        dropdown.id = "gft-export-dropdown";
+        dropdown.style.cssText = `
+        position: absolute;
+        top: calc(100% + 5px);
+        left: 0;
+        background: white;
+        border: 1px solid rgba(0,0,0,0.15);
+        border-radius: 6px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: none;
+        z-index: 10000;
+        min-width: 170px;
+        padding: 5px 0;
+    `;
+        const formats = [
+          { label: TRANSLATIONS[lang].export_opt_standard, id: "standard" },
+          { label: TRANSLATIONS[lang].export_opt_no_tags, id: "no-tags" },
+          { label: TRANSLATIONS[lang].export_opt_no_spacing, id: "no-spacing" },
+          { label: TRANSLATIONS[lang].export_opt_raw, id: "raw" }
+        ];
+        formats.forEach((format) => {
+          const item = document.createElement("div");
+          item.innerText = format.label;
+          item.style.cssText = `
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #111;
+            text-align: left;
+            transition: background 0.15s;
+        `;
+          item.onmouseenter = () => item.style.background = "#f2f2f2";
+          item.onmouseleave = () => item.style.background = "transparent";
+          item.onclick = (e) => {
+            e.stopPropagation();
+            dropdown.style.display = "none";
+            let text = "";
+            const editor = document.querySelector('.lyrics_edit-text_area, textarea[name="song[lyrics]"]');
+            if (editor && editor.value) {
+              text = editor.value;
+            } else {
+              text = extractLyricsFromPage();
+            }
+            if (!text) {
+              showFeedbackMessage(TRANSLATIONS[lang].export_error_no_lyrics, 3e3);
+              return;
+            }
+            const title = document.querySelector('h1[class*="Title"]')?.innerText || "Lyrics";
+            const filename = `${title}.txt`;
+            exportToTxt(text, filename, {
+              removeTags: format.id === "no-tags" || format.id === "raw",
+              removeSpacing: format.id === "no-spacing" || format.id === "raw"
+            });
+            showFeedbackMessage(TRANSLATIONS[lang].export_success);
+          };
+          dropdown.appendChild(item);
+        });
+        exportBtn.onclick = (e) => {
+          e.stopPropagation();
+          const isShown = dropdown.style.display === "block";
+          dropdown.style.display = isShown ? "none" : "block";
+        };
+        document.addEventListener("click", () => {
+          dropdown.style.display = "none";
+        });
+        exportBtn.appendChild(dropdown);
+        toolbarLeft.appendChild(exportBtn);
+      }
       function startObserver() {
         if (!document.body) {
           setTimeout(startObserver, 100);
@@ -5338,9 +5502,11 @@
           }
           const editorNowExistsInDOM = document.querySelector(SELECTORS.TEXTAREA_EDITOR) || document.querySelector(SELECTORS.DIV_EDITOR);
           const editorVanished = GFT_STATE.currentActiveEditor && !document.body.contains(GFT_STATE.currentActiveEditor);
-          if (editorAppeared || controlsAppeared || !GFT_STATE.currentActiveEditor && editorNowExistsInDOM || editorVanished) {
+          const toolbarExists = document.querySelector('[data-testid="sticky-contributor-toolbar"]') !== null;
+          if (editorAppeared || controlsAppeared || !GFT_STATE.currentActiveEditor && editorNowExistsInDOM || editorVanished || toolbarExists) {
             currentObsInstance.disconnect();
             initLyricsEditorEnhancer();
+            initSongPageToolbarEnhancer();
             enableYoutubeJsApi();
             setTimeout(() => {
               startObserver();
@@ -5359,6 +5525,7 @@
         if (isSongPage) {
           extractSongData();
           createFloatingFormattingToolbar();
+          initSongPageToolbarEnhancer();
         }
       }
       if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => {
@@ -5372,14 +5539,17 @@
       window.addEventListener("load", () => {
         applyStoredPreferences();
         initLyricsEditorEnhancer();
+        initSongPageToolbarEnhancer();
       });
       window.addEventListener("popstate", () => {
         applyStoredPreferences();
         initLyricsEditorEnhancer();
+        initSongPageToolbarEnhancer();
       });
       window.addEventListener("hashchange", () => {
         applyStoredPreferences();
         initLyricsEditorEnhancer();
+        initSongPageToolbarEnhancer();
       });
       document.addEventListener("selectionchange", handleSelectionChange);
       document.addEventListener("mouseup", () => {

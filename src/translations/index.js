@@ -53,6 +53,7 @@ export const TRANSLATIONS = {
         // Sections
         section_structure: "Structure & Artistes",
         section_cleanup: "Outils de nettoyage",
+        section_export: "Exportation",
         // Buttons & Tooltips
         btn_header: "En-tête",
         btn_header_tooltip: "Insérer l'en-tête de la chanson avec les artistes",
@@ -314,7 +315,13 @@ export const TRANSLATIONS = {
         custom_mgr_find_placeholder_regex: "Motif Regex (ex: \d+\s*$)",
         custom_mgr_replace_placeholder: "(Laisser vide pour supprimer)",
         custom_mgr_case_sensitive: "Respecter la casse",
-        settings_custom_library: "📚 Bibliothèque de boutons"
+        settings_custom_library: "📚 Bibliothèque de boutons",
+        export_btn: "Exporter en .txt",
+        export_opt_standard: "📄 Paroles standards",
+        export_opt_no_tags: "📄 Sans tags [Couplet...]",
+        export_opt_no_spacing: "📄 Sans espacement",
+        export_opt_raw: "📄 Texte brut",
+        export_filename_suffix: " (GFT Export)"
     },
     en: {
         panel_title: "Genius Fast Transcriber",
@@ -368,6 +375,7 @@ export const TRANSLATIONS = {
         // Sections
         section_structure: "Structure & Artists",
         section_cleanup: "Cleanup Tools",
+        section_export: "Export",
         // Buttons & Tooltips - REVERT TO FRENCH for Transcription tags
         btn_header: "Header",
         btn_header_tooltip: "Insert song header with artists",
@@ -634,7 +642,13 @@ export const TRANSLATIONS = {
         custom_mgr_find_placeholder_regex: "Regex Pattern (e.g. \d+\s*$)",
         custom_mgr_replace_placeholder: "(Leave empty to delete)",
         custom_mgr_case_sensitive: "Case Sensitive",
-        settings_custom_library: "📚 Buttons Library"
+        settings_custom_library: "📚 Buttons Library",
+        export_btn: "Export as .txt",
+        export_opt_standard: "📄 Standard Lyrics",
+        export_opt_no_tags: "📄 No tags [Verse...]",
+        export_opt_no_spacing: "📄 No extra spacing",
+        export_opt_raw: "📄 Raw text",
+        export_filename_suffix: " (GFT Export)"
     },
     // Polish translations - UI strings are placeholders for contributor PR
     // Structure tags and cleanup tools are Polish-specific per Genius Polska guidelines
@@ -688,6 +702,7 @@ export const TRANSLATIONS = {
         // Sections
         section_structure: "Struktura i wykonawcy",
         section_cleanup: "Szybkie poprawki",
+        section_export: "Eksport",
         // Buttons & Tooltips - Polish structure tags
         btn_header: "Nagłówek SEO",
         btn_header_tooltip: "Wstaw nagłówek z tytułem i wykonawcami utworu",
@@ -946,6 +961,12 @@ export const TRANSLATIONS = {
         custom_mgr_find_placeholder_regex: "Wzorzec Regex (np. \d+\s*$)",
         custom_mgr_replace_placeholder: "(Pozostaw puste, aby usunąć)",
         custom_mgr_case_sensitive: "Uwzględniaj wielkość liter",
-        settings_custom_library: "📚 Biblioteka przycisków"
+        settings_custom_library: "📚 Biblioteka przycisków",
+        export_btn: "Eksportuj do .txt",
+        export_opt_standard: "📄 Standardowy tekst",
+        export_opt_no_tags: "📄 Bez tagów sekcji",
+        export_opt_no_spacing: "📄 Bez pustych linii",
+        export_opt_raw: "📄 Czysty tekst",
+        export_filename_suffix: " (GFT Eksport)"
     }
 };

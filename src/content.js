@@ -49,6 +49,7 @@ import {
     isSectionTag, correctLineSpacing, applyTextTransformToDivEditor,
     applyAllTextCorrectionsToString, applyAllTextCorrectionsAsync,
 } from './modules/corrections.js';
+import { exportToTxt } from './modules/export.js';
 // ===========================
 
 console.log('Genius Fast Transcriber v4.0.0 🎵');
@@ -4846,6 +4847,9 @@ function initLyricsEditorEnhancer() {
                 versionLabel.id = 'gft-version-label';
                 versionLabel.textContent = 'v4.0.0'; // Bump version visuelle pour le user
                 versionLabel.title = 'Genius Fast Transcriber v4.0.0 - Nouvelle Interface Premium';
+                versionLabel.style.fontSize = '10px';
+                versionLabel.style.color = '#888';
+                versionLabel.style.opacity = '0.6';
 
                 footerContainer.appendChild(creditLabel);
                 footerContainer.appendChild(versionLabel);
@@ -4893,6 +4897,143 @@ function initLyricsEditorEnhancer() {
 }
 
 /**
+ * Extrait les paroles directement de la page (hors éditeur).
+ */
+function extractLyricsFromPage() {
+    const containers = document.querySelectorAll(SELECTORS.LYRICS_CONTAINER);
+    if (!containers || containers.length === 0) return "";
+
+    let allText = "";
+    containers.forEach(container => {
+        const clone = container.cloneNode(true);
+        // Nettoyage des éléments parasites (Embed, Footer, Contributors, etc.)
+        clone.querySelectorAll('div[class*="Lyrics__Footer"], a[class*="Lyrics__Footer"], div[class*="LyricsHeader"], span[class*="LyricsHeader"]').forEach(el => el.remove());
+
+        // Suppression spécifique des textes de contributeurs s'ils sont capturés
+        clone.querySelectorAll('*').forEach(el => {
+            if (el.innerText && (el.innerText.includes('Contributor') || el.innerText.includes('Lyrics'))) {
+                // Si c'est un petit header de métadonnées, on le vire
+                if (el.innerText.length < 50) el.remove();
+            }
+        });
+
+        clone.querySelectorAll('br').forEach(br => br.replaceWith('\n'));
+        clone.querySelectorAll('div, p').forEach(el => {
+            el.innerHTML += '\n';
+        });
+        allText += clone.innerText || clone.textContent;
+        allText += '\n\n';
+    });
+
+    return allText.trim();
+}
+
+/**
+ * Initialise l'outil d'exportation dans la toolbar Genius (StickyToolbar).
+ */
+function initSongPageToolbarEnhancer() {
+    const isSongPage = document.querySelector('meta[property=\"og:type\"][content=\"music.song\"]') !== null || window.location.pathname.includes('-lyrics');
+    if (!isSongPage) return;
+
+    const toolbarLeft = document.querySelector('[data-testid=\"sticky-contributor-toolbar\"] .StickyToolbar__Left-sc-335d47e5-1')
+        || document.querySelector('.StickyToolbar__Left-sc-335d47e5-1');
+    if (!toolbarLeft) return;
+
+    if (document.getElementById('gft-toolbar-export-btn')) return;
+
+    const lang = getTranscriptionMode();
+
+    // Création du bouton principal (exactement comme "Edit Lyrics")
+    const exportBtn = document.createElement('button');
+    exportBtn.id = 'gft-toolbar-export-btn';
+    // Les classes exactes de Genius pour un look 100% natif
+    exportBtn.className = 'SmallButton__Container-sc-f92f54a0-0 cmagge StickyToolbar__SmallButton-sc-335d47e5-5 aIzQu';
+    exportBtn.innerHTML = `<span>${TRANSLATIONS[lang].export_btn}</span>`;
+    exportBtn.style.marginLeft = '0px'; // Réduit l'espace car les boutons Genius ont déjà leurs marges/paddings
+    exportBtn.style.position = 'relative';
+
+    // Menu dropdown
+    const dropdown = document.createElement('div');
+    dropdown.id = 'gft-export-dropdown';
+    dropdown.style.cssText = `
+        position: absolute;
+        top: calc(100% + 5px);
+        left: 0;
+        background: white;
+        border: 1px solid rgba(0,0,0,0.15);
+        border-radius: 6px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: none;
+        z-index: 10000;
+        min-width: 170px;
+        padding: 5px 0;
+    `;
+
+    const formats = [
+        { label: TRANSLATIONS[lang].export_opt_standard, id: 'standard' },
+        { label: TRANSLATIONS[lang].export_opt_no_tags, id: 'no-tags' },
+        { label: TRANSLATIONS[lang].export_opt_no_spacing, id: 'no-spacing' },
+        { label: TRANSLATIONS[lang].export_opt_raw, id: 'raw' }
+    ];
+
+    formats.forEach(format => {
+        const item = document.createElement('div');
+        item.innerText = format.label;
+        item.style.cssText = `
+            padding: 8px 16px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #111;
+            text-align: left;
+            transition: background 0.15s;
+        `;
+        item.onmouseenter = () => item.style.background = '#f2f2f2';
+        item.onmouseleave = () => item.style.background = 'transparent';
+
+        item.onclick = (e) => {
+            e.stopPropagation();
+            dropdown.style.display = 'none';
+
+            let text = "";
+            const editor = document.querySelector('.lyrics_edit-text_area, textarea[name=\"song[lyrics]\"]');
+            if (editor && editor.value) {
+                text = editor.value;
+            } else {
+                text = extractLyricsFromPage();
+            }
+
+            if (!text) {
+                showFeedbackMessage(TRANSLATIONS[lang].export_error_no_lyrics, 3000);
+                return;
+            }
+
+            const title = document.querySelector('h1[class*=\"Title\"]')?.innerText || 'Lyrics';
+            const filename = `${title}.txt`;
+
+            exportToTxt(text, filename, {
+                removeTags: format.id === 'no-tags' || format.id === 'raw',
+                removeSpacing: format.id === 'no-spacing' || format.id === 'raw'
+            });
+
+            showFeedbackMessage(TRANSLATIONS[lang].export_success);
+        };
+        dropdown.appendChild(item);
+    });
+
+    exportBtn.onclick = (e) => {
+        e.stopPropagation();
+        const isShown = dropdown.style.display === 'block';
+        dropdown.style.display = isShown ? 'none' : 'block';
+    };
+
+    // Fermeture propre au clic ailleurs
+    document.addEventListener('click', () => { dropdown.style.display = 'none'; });
+
+    exportBtn.appendChild(dropdown);
+    toolbarLeft.appendChild(exportBtn);
+}
+
+/**
  * Démarre le MutationObserver pour surveiller les changements dynamiques dans le DOM.
  * C'est essentiel pour les sites de type SPA (Single Page Application) comme Genius.
  */
@@ -4905,11 +5046,17 @@ function startObserver() {
         for (const mutation of mutationsList) { if (mutation.type === 'childList') { if (mutation.addedNodes.length > 0) { mutation.addedNodes.forEach(node => { if (node.nodeType === Node.ELEMENT_NODE && typeof node.matches === 'function') { if (node.matches(SELECTORS.TEXTAREA_EDITOR) || node.matches(SELECTORS.DIV_EDITOR)) editorAppeared = true; if (node.matches(SELECTORS.CONTROLS_STICKY_SECTION)) controlsAppeared = true; } }); } } }
         const editorNowExistsInDOM = document.querySelector(SELECTORS.TEXTAREA_EDITOR) || document.querySelector(SELECTORS.DIV_EDITOR);
         const editorVanished = GFT_STATE.currentActiveEditor && !document.body.contains(GFT_STATE.currentActiveEditor);
+
+        // On vérifie aussi l'apparition de la barre d'outils Genius sur la page
+        const toolbarExists = document.querySelector('[data-testid="sticky-contributor-toolbar"]') !== null;
+
         // Si l'éditeur apparaît ou disparaît, on relance l'initialisation.
-        if (editorAppeared || controlsAppeared || (!GFT_STATE.currentActiveEditor && editorNowExistsInDOM) || editorVanished) {
+        if (editorAppeared || controlsAppeared || (!GFT_STATE.currentActiveEditor && editorNowExistsInDOM) || editorVanished || toolbarExists) {
             // On se déconnecte temporairement pour éviter les boucles infinies.
             currentObsInstance.disconnect();
+
             initLyricsEditorEnhancer();
+            initSongPageToolbarEnhancer();
 
             // On vérifie aussi les iframes YouTube pour injecter l'API
             enableYoutubeJsApi();
@@ -4931,6 +5078,7 @@ function startObserver() {
     if (isSongPage) {
         extractSongData();
         createFloatingFormattingToolbar();
+        initSongPageToolbarEnhancer();
     }
 }
 
@@ -4941,9 +5089,9 @@ if (document.readyState === 'loading') document.addEventListener('DOMContentLoad
 else { applyStoredPreferences(); startObserver(); }
 
 // Ajoute des écouteurs d'événements pour gérer la navigation SPA.
-window.addEventListener('load', () => { applyStoredPreferences(); initLyricsEditorEnhancer(); });
-window.addEventListener('popstate', () => { applyStoredPreferences(); initLyricsEditorEnhancer(); });
-window.addEventListener('hashchange', () => { applyStoredPreferences(); initLyricsEditorEnhancer(); });
+window.addEventListener('load', () => { applyStoredPreferences(); initLyricsEditorEnhancer(); initSongPageToolbarEnhancer(); });
+window.addEventListener('popstate', () => { applyStoredPreferences(); initLyricsEditorEnhancer(); initSongPageToolbarEnhancer(); });
+window.addEventListener('hashchange', () => { applyStoredPreferences(); initLyricsEditorEnhancer(); initSongPageToolbarEnhancer(); });
 
 // Écoute les changements de sélection pour afficher la barre d'outils flottante
 document.addEventListener('selectionchange', handleSelectionChange);
