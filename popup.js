@@ -1,9 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Mode Elements
     const fullOption = document.getElementById('mode-full');
     const lyricOnlyOption = document.getElementById('mode-lyriconly');
-    const langFrOption = document.getElementById('lang-fr');
-    const langEnOption = document.getElementById('lang-en');
-    const langPlOption = document.getElementById('lang-pl');
+
+    // Theme Elements
+    const themeLightBtn = document.getElementById('theme-light');
+    const themeDarkBtn = document.getElementById('theme-dark');
+
+    // Language Elements
+    const langFrBtn = document.getElementById('lang-fr');
+    const langEnBtn = document.getElementById('lang-en');
+    const langPlBtn = document.getElementById('lang-pl');
+
     const status = document.getElementById('status');
     let currentTabId = null;
 
@@ -17,79 +25,76 @@ document.addEventListener('DOMContentLoaded', () => {
             lyricOnlyOption.classList.remove('active');
         }
 
-        // Language
-        langFrOption.classList.remove('active');
-        langEnOption.classList.remove('active');
-        langPlOption.classList.remove('active');
-
-        if (state.language === 'en') {
-            langEnOption.classList.add('active');
-        } else if (state.language === 'pl') {
-            langPlOption.classList.add('active');
+        // Theme
+        document.body.classList.toggle('light-mode', !state.isDarkMode);
+        if (state.isDarkMode) {
+            themeDarkBtn.classList.add('active');
+            themeLightBtn.classList.remove('active');
         } else {
-            // Default FR
-            langFrOption.classList.add('active');
+            themeLightBtn.classList.add('active');
+            themeDarkBtn.classList.remove('active');
         }
+
+        // Language
+        [langFrBtn, langEnBtn, langPlBtn].forEach(btn => btn.classList.remove('active'));
+        if (state.language === 'en') langEnBtn.classList.add('active');
+        else if (state.language === 'pl') langPlBtn.classList.add('active');
+        else langFrBtn.classList.add('active');
     }
 
-    // Get current setting
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        if (!tabs[0] || !tabs[0].url.includes('genius.com')) {
-            status.textContent = "Available only on Genius.com";
-            fullOption.style.opacity = '0.5';
-            lyricOnlyOption.style.opacity = '0.5';
-            fullOption.style.pointerEvents = 'none';
-            lyricOnlyOption.style.pointerEvents = 'none';
-            return;
-        }
-        currentTabId = tabs[0].id;
-
-        // On demande le statut complet (Mode + Langue)
-        chrome.tabs.sendMessage(currentTabId, { action: "GET_STATUS" }, (response) => {
-            if (chrome.runtime.lastError) {
-                status.textContent = "Please reload the Genius page";
+    // Get current status from content script
+    try {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (!tabs || !tabs[0] || !tabs[0].url || !tabs[0].url.includes('genius.com')) {
+                status.textContent = "Available only on Genius.com";
+                document.querySelectorAll('.card, .btn-pill').forEach(el => {
+                    el.style.opacity = '0.5';
+                    el.style.pointerEvents = 'none';
+                });
                 return;
             }
-            if (response) {
-                updateUI(response);
-                status.textContent = "Ready";
-            }
-        });
-    });
+            currentTabId = tabs[0].id;
 
-    // Set Mode
-    function setMode(lyricCardOnly) {
+            chrome.tabs.sendMessage(currentTabId, { action: "GET_STATUS" }, (response) => {
+                if (chrome.runtime.lastError) {
+                    status.textContent = "Please reload the Genius page";
+                    return;
+                }
+                if (response) {
+                    updateUI(response);
+                    status.textContent = "Ready";
+                }
+            });
+        });
+    } catch (err) {
+        console.error("Popup init error:", err);
+        status.textContent = "Initialization error";
+    }
+
+    // Actions
+    function sendMessage(action, data) {
         if (!currentTabId) return;
-        status.textContent = "Saving Mode...";
-        chrome.tabs.sendMessage(currentTabId, { action: "SET_MODE", lyricCardOnly: lyricCardOnly }, (response) => {
-            status.textContent = "Mode saved! Reloading...";
-            setTimeout(() => window.close(), 1000);
+        status.textContent = "Updating...";
+        chrome.tabs.sendMessage(currentTabId, { action, ...data }, (response) => {
+            status.textContent = "Saved! Reloading...";
+            setTimeout(() => window.close(), 800);
         });
     }
 
-    // Set Language
-    function setLanguage(lang) {
-        if (!currentTabId) return;
-        status.textContent = "Saving Language...";
-        chrome.tabs.sendMessage(currentTabId, { action: "SET_LANGUAGE", language: lang }, (response) => {
-            status.textContent = "Language saved! Reloading...";
-            setTimeout(() => window.close(), 1000);
-        });
-    }
+    // Event Listeners
+    fullOption.addEventListener('click', () => sendMessage("SET_MODE", { lyricCardOnly: false }));
+    lyricOnlyOption.addEventListener('click', () => sendMessage("SET_MODE", { lyricCardOnly: true }));
 
-    fullOption.addEventListener('click', () => setMode(false));
-    lyricOnlyOption.addEventListener('click', () => setMode(true));
+    themeLightBtn.addEventListener('click', () => sendMessage("SET_THEME", { isDarkMode: false }));
+    themeDarkBtn.addEventListener('click', () => sendMessage("SET_THEME", { isDarkMode: true }));
 
-    document.getElementById('lang-fr').addEventListener('click', () => setLanguage('fr'));
-    document.getElementById('lang-en').addEventListener('click', () => setLanguage('en'));
-    document.getElementById('lang-pl').addEventListener('click', () => setLanguage('pl'));
+    langFrBtn.addEventListener('click', () => sendMessage("SET_LANGUAGE", { language: 'fr' }));
+    langEnBtn.addEventListener('click', () => sendMessage("SET_LANGUAGE", { language: 'en' }));
+    langPlBtn.addEventListener('click', () => sendMessage("SET_LANGUAGE", { language: 'pl' }));
 
     document.getElementById('restart-tutorial').addEventListener('click', () => {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs[0] && tabs[0].id) {
-                chrome.tabs.sendMessage(tabs[0].id, { action: "RESET_TUTORIAL" });
-                window.close(); // Close popup
-            }
-        });
+        if (!currentTabId) return;
+        chrome.tabs.sendMessage(currentTabId, { action: "RESET_TUTORIAL" });
+        window.close();
     });
 });

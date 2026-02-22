@@ -159,6 +159,111 @@ function isContextValid() {
             .gft-dark-mode .gft-preview-zone { background: #151515; border-color: rgba(255,255,255,0.1); }
             .gft-dark-mode .gft-shortcut-button { color: #eee !important; background: #333; border-color: #444; }
             .gft-dark-mode .gft-shortcut-button.gft-btn-struct { color: #222 !important; background: #f9ff55; border-color: #f9ff55; }
+
+            /* Lyric Card Modern UI */
+            .gft-lc-btn, .gft-lc-select {
+                padding: 10px 18px;
+                border-radius: 999px;
+                font-family: 'Inter', system-ui, -apple-system, sans-serif;
+                font-size: 14px;
+                font-weight: 600;
+                border: 1px solid rgba(128, 128, 128, 0.2);
+                cursor: pointer;
+                transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+                outline: none;
+                height: 42px;
+                box-sizing: border-box;
+            }
+            .gft-lc-btn:hover, .gft-lc-select:hover {
+                transform: scale(1.03);
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            }
+            .gft-lc-btn:active { transform: scale(0.98); }
+            
+            .gft-lc-btn-primary {
+                background: #f9ff55;
+                color: #000;
+                border: none;
+            }
+            .gft-lc-btn-secondary {
+                background: rgba(128, 128, 128, 0.1);
+                color: inherit;
+                backdrop-filter: blur(8px);
+            }
+            .gft-dark-mode .gft-lc-btn-secondary {
+                background: rgba(255, 255, 255, 0.05);
+                color: #fff;
+            }
+            .gft-lc-select {
+                appearance: none;
+                padding-right: 30px;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='currentColor' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+                background-repeat: no-repeat;
+                background-position: calc(100% - 12px) center;
+                background-color: rgba(128, 128, 128, 0.1);
+                color: inherit;
+            }
+            .gft-dark-mode .gft-lc-select {
+                background-color: rgba(255, 255, 255, 0.05);
+                color: #fff;
+            }
+
+            /* Custom Slider */
+            .gft-lc-slider-container {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                background: rgba(128, 128, 128, 0.08);
+                padding: 4px 16px;
+                border-radius: 999px;
+                height: 42px;
+                box-sizing: border-box;
+            }
+            .gft-lc-slider {
+                -webkit-appearance: none;
+                width: 120px;
+                height: 4px;
+                border-radius: 2px;
+                background: rgba(128, 128, 128, 0.2);
+                outline: none;
+            }
+            .gft-lc-slider::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                appearance: none;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #f9ff55;
+                cursor: pointer;
+                box-shadow: 0 0 8px rgba(249, 255, 85, 0.4);
+                transition: all 0.2s;
+            }
+            .gft-lc-slider::-webkit-slider-thumb:hover {
+                transform: scale(1.2);
+                box-shadow: 0 0 12px rgba(249, 255, 85, 0.6);
+            }
+            .gft-lc-group-label {
+                font-size: 11px;
+                font-weight: 700;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                opacity: 0.5;
+                margin-bottom: 4px;
+                width: 100%;
+                text-align: center;
+            }
+            .gft-lc-select option {
+                background-color: #fff;
+                color: #000;
+            }
+            .gft-dark-mode .gft-lc-select option {
+                background-color: #333;
+                color: #fff;
+            }
         `;
         document.head.appendChild(style);
     }
@@ -5122,7 +5227,7 @@ function extractArtistImage() {
 /**
  * Dessine la Lyric Card sur un canvas cible.
  */
-function renderLyricCardToCanvas(canvas, text, artistName, songTitle, imageObj, footerColor, textColor, logoObj, format = '16:9') {
+function renderLyricCardToCanvas(canvas, text, artistName, songTitle, imageObj, footerColor, textColor, logoObj, format = '16:9', zoom = 1) {
     const ctx = canvas.getContext('2d');
 
     // Définition des dimensions selon le format
@@ -5131,17 +5236,24 @@ function renderLyricCardToCanvas(canvas, text, artistName, songTitle, imageObj, 
     if (format === '1:1') {
         WIDTH = 1080;
         HEIGHT = 1080;
-        FOOTER_HEIGHT = 160; // Footer ajusté
-        FONT_SIZE_TEXT = 54;
-        LINE_HEIGHT_TEXT = 90;
+        FOOTER_HEIGHT = 160;
+        FONT_SIZE_TEXT = 54 * zoom;
+        LINE_HEIGHT_TEXT = 90 * zoom;
         FONT_SIZE_FOOTER = 32;
+    } else if (format === '9:16') {
+        WIDTH = 1080;
+        HEIGHT = 1920;
+        FOOTER_HEIGHT = 200;
+        FONT_SIZE_TEXT = 60 * zoom;
+        LINE_HEIGHT_TEXT = 100 * zoom;
+        FONT_SIZE_FOOTER = 36;
     } else {
         // Défaut 16:9
         WIDTH = 1280;
         HEIGHT = 720;
         FOOTER_HEIGHT = 140;
-        FONT_SIZE_TEXT = 48;
-        LINE_HEIGHT_TEXT = 80;
+        FONT_SIZE_TEXT = 48 * zoom;
+        LINE_HEIGHT_TEXT = 80 * zoom;
         FONT_SIZE_FOOTER = 28;
     }
 
@@ -5299,18 +5411,19 @@ function renderLyricCardToCanvas(canvas, text, artistName, songTitle, imageObj, 
     const lyricsBackgroundColor = textColor === 'white' ? 'white' : 'black';
     const lyricsTextColor = textColor === 'white' ? 'black' : 'white';
 
+    ctx.textBaseline = 'middle';
     lines.forEach((line, index) => {
-        const y = startY + (index * lineHeight);
+        const yCenter = startY + (index * lineHeight) + (lineHeight / 2);
         const lineWidth = ctx.measureText(line).width;
-        const padding = 10;
-        const rectTop = y - fontSize + 12;
-        const rectHeight = fontSize + 24;
+        const padding = 12 * (fontSize / 48); // Padding proportionnel à la taille de base
+        const rectHeight = fontSize * 1.35; // Hauteur proportionnelle
+        const rectTop = yCenter - (rectHeight / 2);
 
         ctx.fillStyle = lyricsBackgroundColor;
         ctx.fillRect(60 - padding, rectTop, lineWidth + (padding * 2), rectHeight);
 
         ctx.fillStyle = lyricsTextColor;
-        ctx.fillText(line, 60, y);
+        ctx.fillText(line, 60, yCenter);
     });
 }
 
@@ -5393,15 +5506,16 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
     modal.appendChild(canvasContainer);
 
     const controls = document.createElement('div');
-    controls.style.cssText = 'display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;';
+    controls.style.cssText = 'display: flex; flex-direction: column; gap: 20px; align-items: center; margin-top: 10px;';
+
+    // --- Groupe Réglages (Config) ---
+    const configGroup = document.createElement('div');
+    configGroup.style.cssText = 'display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; width: 100%; align-items: center;';
 
     // Sélecteur d'image / Artiste
     const imageSelector = document.createElement('select');
-    imageSelector.className = 'gft-tutorial-button';
-    imageSelector.style.background = isDarkMode ? '#444' : '#eee';
-    imageSelector.style.color = isDarkMode ? 'white' : 'black';
-    imageSelector.style.maxWidth = '200px';
-    imageSelector.style.cursor = 'pointer';
+    imageSelector.className = 'gft-lc-select';
+    imageSelector.style.maxWidth = '220px';
 
     // Option par défaut : Album
     const optionAlbum = document.createElement('option');
@@ -5411,8 +5525,6 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
 
     // Ajout des artistes détectés
     const allArtists = [...new Set([...GFT_STATE.currentMainArtists, ...GFT_STATE.currentFeaturingArtists])].filter(Boolean);
-
-    // Cache pour stocker les images déjà chargées : { 'ArtistName': 'url' }
     const artistImageCache = {};
 
     allArtists.forEach(art => {
@@ -5422,28 +5534,63 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
         imageSelector.appendChild(opt);
     });
 
-    // Option Recherche Manuelle
     const optionSearch = document.createElement('option');
     optionSearch.value = 'MANUAL_SEARCH';
     optionSearch.text = getTranslation('lc_manual_search');
     imageSelector.appendChild(optionSearch);
 
-    // Bouton Toggle Format (16:9 vs 1:1)
+    // Sélecteur de Format
     let currentFormat = '16:9';
-    const toggleFormatBtn = document.createElement('button');
-    toggleFormatBtn.textContent = getTranslation('lc_format_btn') + '16:9';
-    toggleFormatBtn.className = 'gft-tutorial-button';
-    toggleFormatBtn.style.background = isDarkMode ? '#444' : '#eee';
-    toggleFormatBtn.style.color = isDarkMode ? 'white' : 'black';
-    toggleFormatBtn.onclick = () => {
-        currentFormat = currentFormat === '16:9' ? '1:1' : '16:9';
-        toggleFormatBtn.textContent = getTranslation('lc_format_btn') + currentFormat;
-        // Re-trigger update with current selection
+    const formatSelector = document.createElement('select');
+    formatSelector.className = 'gft-lc-select';
+
+    const formats = ['16:9', '1:1', '9:16'];
+    formats.forEach(f => {
+        const opt = document.createElement('option');
+        opt.value = f;
+        opt.text = f;
+        formatSelector.appendChild(opt);
+    });
+
+    formatSelector.onchange = () => {
+        currentFormat = formatSelector.value;
         imageSelector.dispatchEvent(new Event('change'));
     };
 
-    controls.appendChild(imageSelector);
-    controls.appendChild(toggleFormatBtn);
+    // Slider Zoom
+    const zoomContainer = document.createElement('div');
+    zoomContainer.className = 'gft-lc-slider-container';
+
+    const zoomLabel = document.createElement('span');
+    zoomLabel.innerHTML = `<strong>1.0x</strong>`;
+    zoomLabel.style.fontSize = '12px';
+    zoomLabel.style.minWidth = '40px';
+
+    const zoomSlider = document.createElement('input');
+    zoomSlider.type = 'range';
+    zoomSlider.className = 'gft-lc-slider';
+    zoomSlider.min = '0.5';
+    zoomSlider.max = '2.0';
+    zoomSlider.step = '0.1';
+    zoomSlider.value = '1.0';
+
+    zoomSlider.oninput = () => {
+        const val = parseFloat(zoomSlider.value).toFixed(1);
+        zoomLabel.innerHTML = `<strong>${val}x</strong>`;
+        imageSelector.dispatchEvent(new Event('change'));
+    };
+
+    zoomContainer.appendChild(zoomLabel);
+    zoomContainer.appendChild(zoomSlider);
+
+    configGroup.appendChild(imageSelector);
+    configGroup.appendChild(formatSelector);
+    configGroup.appendChild(zoomContainer);
+    controls.appendChild(configGroup);
+
+    // --- Groupe Actions ---
+    const actionGroup = document.createElement('div');
+    actionGroup.style.cssText = 'display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; width: 100%;';
 
     // --- Search UI (Live Search) ---
     const searchWrapper = document.createElement('div');
@@ -5558,67 +5705,35 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
     let currentUploadedImage = null;
 
     const uploadBtn = document.createElement('button');
-    uploadBtn.textContent = getTranslation('lc_upload_btn');
-    uploadBtn.className = 'gft-tutorial-button';
-    uploadBtn.style.background = isDarkMode ? '#444' : '#eee';
-    uploadBtn.style.color = isDarkMode ? 'white' : 'black';
+    uploadBtn.innerHTML = getTranslation('lc_upload_btn');
+    uploadBtn.className = 'gft-lc-btn gft-lc-btn-secondary';
     uploadBtn.onclick = () => fileInput.click();
 
-    fileInput.onchange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                currentUploadedImage = event.target.result;
-                // Force "Custom" state in selector if possible or just override
-                // Pour simplifier, on applique l'image et on met le selecteur sur un état spécial ou on le laisse tel quel
-                // On pourrait ajouter une option "Custom" temporaire
-
-                let customOpt = imageSelector.querySelector('option[value="CUSTOM"]');
-                if (!customOpt) {
-                    customOpt = document.createElement('option');
-                    customOpt.value = 'CUSTOM';
-                    customOpt.text = '📂 Image importée';
-                    imageSelector.appendChild(customOpt);
-                }
-                customOpt.selected = true;
-
-                updateCard(currentUploadedImage, artistName); // Garde le nom actuel pour l'upload (ou full artists)
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        }
-    };
-
     const downloadBtn = document.createElement('button');
-    downloadBtn.textContent = getTranslation('lc_download_btn');
-    downloadBtn.className = 'gft-tutorial-button';
-    downloadBtn.style.background = '#f9ff55';
-    downloadBtn.style.color = 'black';
-    downloadBtn.style.fontWeight = 'bold';
+    downloadBtn.innerHTML = getTranslation('lc_download_btn');
+    downloadBtn.className = 'gft-lc-btn gft-lc-btn-primary';
 
     const shareXBtn = document.createElement('button');
-    shareXBtn.textContent = getTranslation('lc_share_btn');
-    shareXBtn.className = 'gft-tutorial-button';
-    shareXBtn.style.background = 'black';
-    shareXBtn.style.color = 'white';
-    shareXBtn.style.fontWeight = 'bold';
-    shareXBtn.style.marginLeft = '5px';
+    shareXBtn.innerHTML = getTranslation('lc_share_btn');
+    shareXBtn.className = 'gft-lc-btn gft-lc-btn-secondary';
+    shareXBtn.style.background = '#000';
+    shareXBtn.style.color = '#fff';
+    shareXBtn.style.borderColor = 'rgba(255,255,255,0.2)';
 
     shareXBtn.onclick = async () => {
         try {
-            shareXBtn.textContent = getTranslation('lc_share_copying');
+            shareXBtn.innerHTML = '⏳ ' + getTranslation('lc_share_copying');
 
             // 1. Copy Image to Clipboard
-            // We need to wait for blob generation
             canvas.toBlob(async (blob) => {
                 try {
                     if (!blob) throw new Error("Canvas blob failed");
                     const item = new ClipboardItem({ 'image/png': blob });
                     await navigator.clipboard.write([item]);
 
-                    shareXBtn.textContent = getTranslation('lc_share_copied');
+                    shareXBtn.innerHTML = '✅ ' + getTranslation('lc_share_copied');
 
                     // 2. Open X Intent
-                    // Use specific artist name from selection if available or general one
                     const tweetText = `${songTitle} by ${artistName}\n\n${window.location.href}\n\n#Genius #Lyrics`;
                     const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
                     const width = 600;
@@ -5629,31 +5744,35 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
 
                     showFeedbackMessage(getTranslation('lc_img_copied_tweet'), 6000);
 
-                    setTimeout(() => shareXBtn.textContent = getTranslation('lc_share_btn'), 3000);
+                    setTimeout(() => shareXBtn.innerHTML = getTranslation('lc_share_btn'), 3000);
                 } catch (innerErr) {
                     console.error("Clipboard write failed", innerErr);
                     showFeedbackMessage(getTranslation('lc_error_copy'));
-                    shareXBtn.textContent = getTranslation('lc_share_error');
+                    shareXBtn.innerHTML = '❌ ' + getTranslation('lc_share_error');
                 }
             }, 'image/png');
 
         } catch (err) {
             console.error("Share failed", err);
-            shareXBtn.textContent = getTranslation('lc_share_error');
+            shareXBtn.innerHTML = '❌ ' + getTranslation('lc_share_error');
         }
     };
 
-    controls.appendChild(uploadBtn);
-    controls.appendChild(downloadBtn);
-    controls.appendChild(shareXBtn);
+    actionGroup.appendChild(uploadBtn);
+    actionGroup.appendChild(downloadBtn);
+    actionGroup.appendChild(shareXBtn);
+    controls.appendChild(actionGroup);
+
     modal.appendChild(controls);
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
 
     const updateCard = (imageUrl, displayArtistName) => {
+        const zoomValue = zoomSlider ? parseFloat(zoomSlider.value) : 1;
+
         // Force un premier rendu "vide" (fond noir) pour éviter l'écran blanc si c'est le premier chargement
         if (!canvas.renderedOnce) {
-            renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, null, '#111', 'white', null, currentFormat);
+            renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, null, '#111', 'white', null, currentFormat, zoomValue);
             canvas.renderedOnce = true;
         }
 
@@ -5664,7 +5783,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
         const timeout = setTimeout(() => {
             isTimedOut = true;
             console.warn("[GFT] Image load timeout. Rendering with fallback color.");
-            renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, null, '#111', 'white', null, currentFormat);
+            renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, null, '#111', 'white', null, currentFormat, zoomValue);
         }, 4000);
 
         if (imageUrl.startsWith('data:')) {
@@ -5690,10 +5809,10 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
             logoImg.src = logoUrl;
 
             logoImg.onload = () => {
-                renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, img, dominantColor, contrastColor, logoImg, currentFormat);
+                renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, img, dominantColor, contrastColor, logoImg, currentFormat, zoomValue);
             };
             logoImg.onerror = () => {
-                renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, img, dominantColor, contrastColor, null, currentFormat);
+                renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, img, dominantColor, contrastColor, null, currentFormat, zoomValue);
             };
         };
 
@@ -5702,7 +5821,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
             clearTimeout(timeout);
             console.error("[GFT] Main image load error:", imageUrl, e);
             // On fait quand même le rendu avec un fond par défaut
-            renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, null, '#111', 'white', null, currentFormat);
+            renderLyricCardToCanvas(canvas, text, displayArtistName, songTitle, null, '#111', 'white', null, currentFormat, zoomValue);
             showFeedbackMessage(getTranslation('lc_feedback_load_error'), 3000);
         };
     };
@@ -6641,38 +6760,33 @@ function openCustomButtonManager(defaultType = 'structure', initialTab = 'create
 
 // ----- Communication avec le Popup -----
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "GET_MODE") {
-        sendResponse({ lyricCardOnly: isLyricCardOnlyMode() });
-    }
-    else if (request.action === "GET_STATUS") {
-        // Renvoie l'état complet (Mode + Langue)
+    if (request.action === "GET_STATUS") {
         sendResponse({
             lyricCardOnly: isLyricCardOnlyMode(),
-            language: localStorage.getItem('gftLanguage') || 'fr'
+            language: localStorage.getItem('gftLanguage') || 'fr',
+            isDarkMode: localStorage.getItem(DARK_MODE_STORAGE_KEY) === 'true'
         });
     }
     else if (request.action === "SET_MODE") {
         setLyricCardOnlyMode(request.lyricCardOnly);
         sendResponse({ success: true });
-        // Recharge la page pour appliquer le changement
         window.location.reload();
     }
     else if (request.action === "SET_LANGUAGE") {
         localStorage.setItem('gftLanguage', request.language);
-        // Synchroniser le mode de transcription avec la langue choisie
         if (typeof setTranscriptionMode === 'function') {
             setTranscriptionMode(request.language);
         }
         sendResponse({ success: true });
         window.location.reload();
     }
+    else if (request.action === "SET_THEME") {
+        localStorage.setItem(DARK_MODE_STORAGE_KEY, request.isDarkMode.toString());
+        sendResponse({ success: true });
+        window.location.reload();
+    }
     else if (request.action === "RESET_TUTORIAL") {
-        // Réinitialise les flags
         localStorage.removeItem('gft-tutorial-completed');
-        // On pourrait aussi reset la langue si on veut un full onboarding
-        // localStorage.removeItem('gftLanguage'); 
-
-        // Lance le tutoriel
         showTutorial();
         sendResponse({ success: true });
     }

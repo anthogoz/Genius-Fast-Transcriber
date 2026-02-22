@@ -13,6 +13,12 @@ The project has reached a major milestone with **Version 4.0.0**! The infrastruc
 - [x] **License & Open Source**: Switched to MIT license and project cleanup.
 - [x] **Disable Tooltips**: New setting to toggle button tooltips in the interface.
 - [x] **Stability Fix**: Resolved "Extension context invalidated" errors during updates.
+- [x] **Lyric Card Update (v4.0.2)**:
+  - [x] Support for **9:16 (Portrait/Stories)** format.
+  - [x] Replaced format cycle button with a **dropdown selector**.
+  - [x] Added a **Zoom Slider** (0.5x to 2.0x) for precise lyric sizing.
+  - [x] **Bug Fix**: Vertical text centering corrected for all zoom levels.
+  - [x] **Modern UI Overhaul**: New professional design with glassmorphism and icons.
   ### 🛠️ Personalization (Custom Commands System)
 - [x] Create an interface allowing users to define their own buttons and regex macros without       touching the code.
 - [x] Import/Export system for "Button Packs" for the community.
