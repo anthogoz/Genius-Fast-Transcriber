@@ -55,6 +55,12 @@ if (fs.existsSync(imagesDir)) {
     filesToInclude.push('images');
 }
 
+// Add _locales directory if exists
+const localesDir = path.join(ROOT, '_locales');
+if (fs.existsSync(localesDir)) {
+    filesToInclude.push('_locales');
+}
+
 // Add styles.css if exists
 if (fs.existsSync(path.join(ROOT, 'styles.css'))) {
     filesToInclude.push('styles.css');

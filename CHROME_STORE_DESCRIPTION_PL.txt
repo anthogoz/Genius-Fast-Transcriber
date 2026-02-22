@@ -1,0 +1,65 @@
+🚀 NAJLEPSZE NARZĘDZIE DLA WSPÓŁPRACOWNIKÓW GENIUS.COM
+
+Zwiększ swoją wydajność dzięki Genius Fast Transcriber. Niezależnie od tego, czy jesteś okazjonalnym współpracownikiem, czy głównym edytorem, to rozszerzenie zmienia edytor Genius w potężne, profesjonalne miejsce pracy.
+
+🔥 NOWOŚCI W WERSJI 4.0.0
+• Eksport do .txt: Nowe potężne narzędzie w pasku Genius do błyskawicznego pobierania oczyszczonego tekstu.
+• Inteligentne Oczyszczanie: Automatycznie usuwa adnotacje Genius, tagi HTML i nagłówki metadanych.
+• Natywny Interfejs: Płynna integracja z pulpitem Genius dla lepszego doświadczenia użytkownika.
+• Architektura Modułowa: Zoptymalizowana wydajność i stabilność dzięki nowej bazie kodu.
+• Własne Przyciski: Ulepszony interfejs zarządzania komendami i własnymi przyciskami.
+• Ustawienia Tooltipów: Nowa opcja wyłączenia podpowiedzi dla czystszego interfejsu.
+• Poprawa Stabilności: Rozwiązano problem awarii podczas odświeżania rozszerzenia.
+• Wielojęzyczność: Pełne wsparcie eksportu dla języka polskiego, francuskiego i angielskiego.
+
+✨ KLUCZOWE FUNKCJE
+
+1️⃣ Inteligentna Struktura i Tagi
+• Wykrywanie Artystów: Automatycznie wykrywa głównych artystów i gości, aby poprawnie oznaczyć sekcje.
+• Ujednolicony Menedżer Zwrotek: Jeden dynamiczny przycisk dla [Zwrotka 1], [Zwrotka 2]... z nawigacją strzałkami.
+• Tagi Jednym Kliknięciem: Błyskawiczne wstawianie [Refren], [Intro], [Mostek] z poprawnym formatowaniem.
+
+2️⃣ Magiczny Przycisk "Napraw wszystko" 🪄
+Zaoszczędź godziny edycji. Jedno kliknięcie wykonuje ponad 10 standardowych poprawek Genius:
+• Zamiana prostych apostrofów (') na typograficzne (’).
+• Wielka litera na początku każdego wersu.
+• Usuwanie niepotrzebnej interpunkcji na końcu linii.
+• Poprawa odstępów wokół znaków interpunkcyjnych.
+• Zamiana "x" na "×" w mnożnikach.
+• Tryb polski: Specyficzne zasady interpunkcji i formatowania.
+
+3️⃣ 🎨 Wbudowany Kreator Lyric Cards
+Twórz piękne obrazy ze swoimi ulubionymi tekstami bezpośrednio na stronie.
+• Zaznacz dowolny tekst i kliknij przycisk "Lyric Card".
+• Tła: Użyj oficjalnej okładki albumu lub zdjęcia artysty.
+• Formaty: 16:9 (YouTube), 9:16 (Story/TikTok), 1:1 (Instagram).
+• Błyskawiczne pobieranie lub kopiowanie do schowka.
+
+4️⃣ Profesjonalne Narzędzia
+• Tryb Ciemny: Elegancki interfejs idealnie zintegrowany z Genius.
+• Pływający Pasek Narzędzi: Szybkie formatowanie (Pogrubienie, Kursywa, Liczby).
+• Moduł Sprawdzania Nawiasów: Podświetla brakujące lub nieotwarte nawiasy na CZERWONO.
+• Znajdź i Zamień: Potężne narzędzia do oczyszczania (usuwanie podwójnych spacji itp.).
+
+⌨️ SKRÓTY KLAWIATUROWE
+• Ctrl + 1-5 : Wstawianie tagów struktury (Zwrotka, Refren...)
+• Ctrl + Shift + C : "Napraw wszystko" (Otwiera podgląd)
+• Ctrl + D : Powielenie bieżącej linii
+• Ctrl + Z / Y : Cofnij / Ponów z wizualną historią
+• Ctrl + Alt + Space : Odtwarzanie/Pauza wideo YouTube
+
+🌍 WSPARCIE WIELOJĘZYCZNE
+• Polski (Zasady typograficzne i interpunkcyjne)
+• Français (Règles typographiques, espaces insécables...)
+• English (International rules)
+
+🔒 PRYWATNOŚĆ I BEZPIECZEŃSTWO
+• Brak zbierania danych: Twoje teksty i wersje robocze zostają na Twoim komputerze.
+• Lokalny Autozapis: Nigdy nie trać pracy w przypadku awarii przeglądarki.
+
+---
+Aktualizacje i pomoc:
+Ten projekt jest open-source i tworzony przez społeczność. Jeśli masz sugestie lub znajdziesz błędy, zachęcamy do współtworzenia!
+
+Stworzone z ❤️ przez Lnkhey.
+(Nieoficjalne rozszerzenie, niezwiązane z Genius Media Group Inc.)

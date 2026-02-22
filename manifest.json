@@ -1,8 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Genius Fast Transcriber + Lyric Card Maker",
+  "name": "__MSG_extName__",
   "version": "4.0.1",
-  "description": "The ultimate tool for Genius contributors. Custom buttons, smart tags, auto-corrections, and Lyric Card creation (FR/EN/PL).",
+  "description": "__MSG_extDescription__",
+  "default_locale": "fr",
   "permissions": [],
   "host_permissions": [
     "*://*.genius.com/*"

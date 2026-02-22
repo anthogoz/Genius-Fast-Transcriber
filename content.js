@@ -5731,18 +5731,32 @@
         ctx.fillStyle = textColor;
         ctx.textBaseline = "middle";
         ctx.letterSpacing = "2px";
-        const footerText = `${artistName.toUpperCase()}, "${songTitle.toUpperCase()}"`;
+        const firstPart = artistName.toUpperCase() + ",";
+        const secondPart = ` "${songTitle.toUpperCase()}"`;
+        const fullText = firstPart + secondPart;
         const maxFooterTextWidth = logoX - 40 - 60;
-        let displayText = footerText;
-        let textWidth = ctx.measureText(displayText).width;
-        if (textWidth > maxFooterTextWidth) {
-          while (textWidth > maxFooterTextWidth && displayText.length > 0) {
-            displayText = displayText.slice(0, -1);
-            textWidth = ctx.measureText(displayText + "...").width;
-          }
-          displayText += "...";
+        let textWidth = ctx.measureText(fullText).width;
+        if (textWidth <= maxFooterTextWidth) {
+          ctx.fillText(fullText, 60, HEIGHT - FOOTER_HEIGHT / 2);
+        } else {
+          let line1 = firstPart;
+          let line2 = secondPart.trim();
+          const truncate = (text2, maxWidth) => {
+            let t = text2;
+            if (ctx.measureText(t).width <= maxWidth) return t;
+            while (ctx.measureText(t + "...").width > maxWidth && t.length > 0) {
+              t = t.slice(0, -1);
+            }
+            return t + "...";
+          };
+          line1 = truncate(line1, maxFooterTextWidth);
+          line2 = truncate(line2, maxFooterTextWidth);
+          const spacing = 4;
+          const line1Y = HEIGHT - FOOTER_HEIGHT / 2 - FONT_SIZE_FOOTER / 2 - spacing;
+          const line2Y = HEIGHT - FOOTER_HEIGHT / 2 + FONT_SIZE_FOOTER / 2 + spacing;
+          ctx.fillText(line1, 60, line1Y);
+          ctx.fillText(line2, 60, line2Y);
         }
-        ctx.fillText(displayText, 60, HEIGHT - FOOTER_HEIGHT / 2);
         ctx.letterSpacing = "0px";
         if (logoObj) {
           ctx.drawImage(logoObj, logoX, HEIGHT - FOOTER_HEIGHT / 2 - logoHeight / 2, logoWidth, logoHeight);

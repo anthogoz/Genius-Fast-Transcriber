@@ -5211,29 +5211,47 @@ function renderLyricCardToCanvas(canvas, text, artistName, songTitle, imageObj, 
     ctx.textBaseline = 'middle';
     ctx.letterSpacing = "2px";
 
-    // Construction du texte complet
-    const footerText = `${artistName.toUpperCase()}, "${songTitle.toUpperCase()}"`;
+    // Construction du texte
+    const firstPart = artistName.toUpperCase() + ",";
+    const secondPart = ` "${songTitle.toUpperCase()}"`;
+    const fullText = firstPart + secondPart;
 
     // Calcul de l'espace disponible
-    // Marge gauche (60) + Texte + Marge (environ 40) + Logo + Marge droite (60)
-    // Espace max pour le texte = LogoX - Marge - 60 (début texte)
     const maxFooterTextWidth = logoX - 40 - 60;
 
-    // Mesure et troncature si nécessaire
-    let displayText = footerText;
-    let textWidth = ctx.measureText(displayText).width;
+    // Mesure
+    let textWidth = ctx.measureText(fullText).width;
 
-    if (textWidth > maxFooterTextWidth) {
-        // Algorithme de troncature
-        // On enlève des caractères tant que ça dépasse, puis on ajoute "..."
-        while (textWidth > maxFooterTextWidth && displayText.length > 0) {
-            displayText = displayText.slice(0, -1);
-            textWidth = ctx.measureText(displayText + "...").width;
-        }
-        displayText += "...";
+    if (textWidth <= maxFooterTextWidth) {
+        // Rendu sur une seule ligne (cas standard)
+        ctx.fillText(fullText, 60, HEIGHT - (FOOTER_HEIGHT / 2));
+    } else {
+        // Rendu sur deux lignes
+        let line1 = firstPart;
+        let line2 = secondPart.trim();
+
+        // Fonction utilitaire de troncature interne
+        const truncate = (text, maxWidth) => {
+            let t = text;
+            if (ctx.measureText(t).width <= maxWidth) return t;
+            while (ctx.measureText(t + "...").width > maxWidth && t.length > 0) {
+                t = t.slice(0, -1);
+            }
+            return t + "...";
+        };
+
+        // On tronque chaque ligne si elle dépasse individuellement le max
+        line1 = truncate(line1, maxFooterTextWidth);
+        line2 = truncate(line2, maxFooterTextWidth);
+
+        // Positionnement vertical pour deux lignes centrées
+        const spacing = 4;
+        const line1Y = HEIGHT - (FOOTER_HEIGHT / 2) - (FONT_SIZE_FOOTER / 2) - spacing;
+        const line2Y = HEIGHT - (FOOTER_HEIGHT / 2) + (FONT_SIZE_FOOTER / 2) + spacing;
+
+        ctx.fillText(line1, 60, line1Y);
+        ctx.fillText(line2, 60, line2Y);
     }
-
-    ctx.fillText(displayText, 60, HEIGHT - (FOOTER_HEIGHT / 2));
     ctx.letterSpacing = "0px";
 
     // Dessin du Logo après le texte

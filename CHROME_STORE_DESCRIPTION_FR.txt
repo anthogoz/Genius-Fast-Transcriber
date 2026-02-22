@@ -1,0 +1,64 @@
+🚀 L'OUTIL ULTIME POUR LES CONTRIBUTEURS GENIUS.COM
+
+Améliorez votre productivité avec Genius Fast Transcriber. Que vous soyez un contributeur occasionnel ou un éditeur confirmé, cette extension transforme l'éditeur Genius en un espace de travail puissant et professionnel.
+
+🔥 NOUVEAUTÉS DE LA VERSION 4.0.0
+• Export .txt : Un nouvel outil puissant pour télécharger instantanément vos paroles nettoyées.
+• Nettoyage Intelligent : Supprime automatiquement les annotations, les balises HTML et les en-têtes de métadonnées.
+• Interface Native : Intégration fluide à l'interface Genius desktop pour une expérience premium.
+• Architecture Modulaire : Performance et stabilité optimisées avec notre nouvelle base de code.
+• Boutons Personnalisés : Interface améliorée pour la gestion des commandes et boutons perso.
+• Paramètres de Tooltips : Nouvelle option pour désactiver les info-bulles.
+• Correction de Stabilité : Résolution des plantages lors du rechargement de l'extension.
+• Multilingue : Support complet de l'export pour le Français, l'Anglais et le Polonais.
+
+✨ FONCTIONNALITÉS CLÉS
+
+1️⃣ Structure & Tags Intelligents
+• Détection d'Artistes : Détecte automatiquement les artistes principaux et featurings pour créditer les sections.
+• Gestionnaire de Couplets Unifié : Un seul bouton dynamique pour [Couplet 1], [Couplet 2]... avec navigation.
+• Tags en Un Clic : Insérez [Refrain], [Intro], [Pont] avec le bon formatage instantanément.
+
+2️⃣ Bouton Magique "Tout Corriger" 🪄
+Gagnez des heures d'édition. Un clic effectue plus de 10 corrections standard Genius :
+• Remplace les apostrophes droites (') par des apostrophes typographiques (’).
+• Ajoute une majuscule au début de chaque ligne.
+• Supprime la ponctuation inutile en fin de ligne.
+• Corrige l'espacement autour de la ponctuation.
+• Convertit "x" en "×" pour les multiplicateurs.
+• Spécifique au mode Français : Gestion des « guillemets », espaces fines, etc.
+
+3️⃣ 🎨 Créateur de Lyric Cards Intégré
+Créez de superbes images de vos paroles préférées directement depuis la page.
+• Sélectionnez du texte et cliquez sur le bouton "Lyric Card".
+• Fonds : Utilisez la pochette d'album officielle ou l'image de l'artiste.
+• Formats : 16:9 (YouTube), 9:16 (Story/TikTok), 1:1 (Instagram).
+• Téléchargement ou copie dans le presse-papier instantanés.
+
+4️⃣ Outils Professionnels
+• Mode Sombre : Une interface élégante parfaitement intégrée à Genius.
+• Barre d'Outils Flottante : Formatage rapide (Gras, Italique, Nombres).
+• Vérificateur de Parenthèses : Surligne en ROUGE les crochets manquants ou non fermés.
+• Rechercher & Remplacer : Outils de nettoyage puissants (espaces doubles, tirets...).
+
+⌨️ RACCOURCIS CLAVIERS
+• Ctrl + 1-5 : Insérer les tags de structure (Couplet, Refrain...)
+• Ctrl + Shift + C : "Tout Corriger" (Ouvre la prévisualisation)
+• Ctrl + D : Dupliquer la ligne actuelle
+• Ctrl + Z / Y : Annuler / Rétablir avec historique visuel
+• Ctrl + Alt + Espace : Lecture/Pause de la vidéo YouTube
+
+🌍 SUPPORT MULTILINGUE
+• Français (Règles typographiques, gestion des "œ", espaces insécables...)
+• English (Règles internationales)
+
+🔒 CONFIDENTIALITÉ & SÉCURITÉ
+• Aucune collecte de données : Vos paroles et brouillons restent sur votre ordinateur.
+• Sauvegarde Automatique Locale : Ne perdez jamais votre travail en cas de plantage.
+
+---
+Mises à jour & Support :
+Ce projet est open-source et communautaire. Si vous avez des suggestions ou trouvez des bugs, n'hésitez pas à contribuer !
+
+Développé avec ❤️ par Lnkhey.
+(Extension non officielle, non affiliée à Genius Media Group Inc.)
