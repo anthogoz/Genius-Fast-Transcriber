@@ -1638,3 +1638,21 @@
   resize: vertical;
   box-sizing: border-box;
 }
+
+/* ----- Footer Links (Buy Me a Coffee & GitHub) ----- */
+.gft-footer-link {
+  color: #888;
+  text-decoration: none;
+  font-size: 10px;
+  opacity: 0.6;
+  transition: opacity 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.gft-footer-link:hover {
+  opacity: 1;
+  color: #f9ff55 !important;
+  text-decoration: underline !important;
+}

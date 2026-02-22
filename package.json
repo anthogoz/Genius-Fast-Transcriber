@@ -1,6 +1,6 @@
 {
   "name": "genius-fast-transcriber",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "description": "The ultimate tool for Genius.com contributors — smart tags, auto-corrections, and Lyric Card creation.",
   "scripts": {
     "build": "node esbuild.config.js",

@@ -325,7 +325,9 @@ export const TRANSLATIONS = {
         export_opt_no_tags: "📄 Sans tags [Couplet...]",
         export_opt_no_spacing: "📄 Sans espacement",
         export_opt_raw: "📄 Texte brut",
-        export_filename_suffix: " (GFT Export)"
+        export_filename_suffix: " (GFT Export)",
+        footer_buy_me_a_coffee: "M'offrir une pinte",
+        footer_github: "GitHub"
     },
     en: {
         panel_title: "Genius Fast Transcriber",
@@ -656,7 +658,9 @@ export const TRANSLATIONS = {
         export_opt_no_tags: "📄 No tags [Verse...]",
         export_opt_no_spacing: "📄 No extra spacing",
         export_opt_raw: "📄 Raw text",
-        export_filename_suffix: " (GFT Export)"
+        export_filename_suffix: " (GFT Export)",
+        footer_buy_me_a_coffee: "Buy Me a Coffee",
+        footer_github: "GitHub"
     },
     // Polish translations - UI strings are placeholders for contributor PR
     // Structure tags and cleanup tools are Polish-specific per Genius Polska guidelines
@@ -979,6 +983,8 @@ export const TRANSLATIONS = {
         export_opt_no_tags: "📄 Bez tagów sekcji",
         export_opt_no_spacing: "📄 Bez pustych linii",
         export_opt_raw: "📄 Czysty tekst",
-        export_filename_suffix: " (GFT Eksport)"
+        export_filename_suffix: " (GFT Eksport)",
+        footer_buy_me_a_coffee: "Kup mi kawę",
+        footer_github: "GitHub"
     }
 };
