@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
   "name": "__MSG_extName__",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "__MSG_extDescription__",
-  "default_locale": "fr",
+  "default_locale": "en",
   "permissions": [],
   "host_permissions": [
     "*://*.genius.com/*"

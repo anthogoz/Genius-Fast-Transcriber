@@ -1,8 +1,8 @@
-// content.js (Version 4.0.1 - Modular)
+// content.js (Version 4.0.2 - Modular)
 /**
- * @file Main entry point for "Genius Fast Transcriber" extension v4.0.1.
+ * @file Main entry point for "Genius Fast Transcriber" extension v4.0.2.
  * @author Lnkhey  
- * @version 4.0.1
+ * @version 4.0.2
  */
 
 // =====
@@ -54,7 +54,7 @@ import {
 import { exportToTxt } from './modules/export.js';
 // ===========================
 
-console.log('Genius Fast Transcriber v4.0.1 🎵');
+console.log('Genius Fast Transcriber v4.0.2 🎵');
 
 /**
  * Vérifie si le contexte de l'extension est toujours valide.
@@ -4729,8 +4729,8 @@ function initLyricsEditorEnhancer() {
 
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v4.0.1'; // Bump version visuelle pour le user
-                versionLabel.title = 'Genius Fast Transcriber v4.0.1 - Nouvelle Interface Premium';
+                versionLabel.textContent = 'v4.0.2'; // Bump version visuelle pour le user
+                versionLabel.title = 'Genius Fast Transcriber v4.0.2 - Nouvelle Interface Premium';
                 versionLabel.style.fontSize = '10px';
                 versionLabel.style.color = '#888';
                 versionLabel.style.opacity = '0.6';
@@ -5375,7 +5375,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
 
     // Indicateur de version
     const versionSpan = document.createElement('span');
-    versionSpan.textContent = 'v4.0.1';
+    versionSpan.textContent = 'v4.0.2';
     versionSpan.style.fontSize = '11px';
     versionSpan.style.color = isDarkMode ? '#888' : '#aaa';
     versionSpan.style.fontWeight = 'normal';

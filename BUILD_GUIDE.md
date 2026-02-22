@@ -102,7 +102,7 @@ La version est **toujours synchronisée** avec le manifest.json !
 
 ## 🎯 Prochaine Version Suggérée
 
-**v4.0.1** — Bug fixes  
+**v4.0.2** — Bug fixes  
 **v4.1.0** — New features  
 **v5.0.0** — Major changes
 

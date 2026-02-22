@@ -2034,7 +2034,7 @@
       init_utils();
       init_corrections();
       init_export();
-      console.log("Genius Fast Transcriber v4.0.1 \u{1F3B5}");
+      console.log("Genius Fast Transcriber v4.0.2 \u{1F3B5}");
       function isContextValid() {
         return typeof chrome !== "undefined" && !!chrome.runtime && !!chrome.runtime.id;
       }
@@ -5351,8 +5351,8 @@
               creditLabel.style.userSelect = "none";
               const versionLabel = document.createElement("div");
               versionLabel.id = "gft-version-label";
-              versionLabel.textContent = "v4.0.1";
-              versionLabel.title = "Genius Fast Transcriber v4.0.1 - Nouvelle Interface Premium";
+              versionLabel.textContent = "v4.0.2";
+              versionLabel.title = "Genius Fast Transcriber v4.0.2 - Nouvelle Interface Premium";
               versionLabel.style.fontSize = "10px";
               versionLabel.style.color = "#888";
               versionLabel.style.opacity = "0.6";
@@ -5852,7 +5852,7 @@
         const titleText = document.createTextNode(getTranslation("lc_modal_title"));
         title.appendChild(titleText);
         const versionSpan = document.createElement("span");
-        versionSpan.textContent = "v4.0.1";
+        versionSpan.textContent = "v4.0.2";
         versionSpan.style.fontSize = "11px";
         versionSpan.style.color = isDarkMode ? "#888" : "#aaa";
         versionSpan.style.fontWeight = "normal";
