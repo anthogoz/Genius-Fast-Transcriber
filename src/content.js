@@ -1,8 +1,8 @@
-// content.js (Version 4.0.2 - Modular)
+// content.js (Version 4.0.3 - Modular)
 /**
- * @file Main entry point for "Genius Fast Transcriber" extension v4.0.2.
+ * @file Main entry point for "Genius Fast Transcriber" extension v4.0.3.
  * @author Lnkhey  
- * @version 4.0.2
+ * @version 4.0.3
  */
 
 // =====
@@ -54,7 +54,7 @@ import {
 import { exportToTxt } from './modules/export.js';
 // ===========================
 
-console.log('Genius Fast Transcriber v4.0.2 🎵');
+console.log('Genius Fast Transcriber v4.0.3 🎵');
 
 /**
  * Vérifie si le contexte de l'extension est toujours valide.
@@ -393,7 +393,7 @@ function replaceAndHighlightInDiv(editorNode, searchRegex, replacementTextOrFn, 
             localSearchRegex.lastIndex = 0;
             while ((match = localSearchRegex.exec(textNode.nodeValue)) !== null) {
                 if (match.index > lastIndex) fragment.appendChild(document.createTextNode(textNode.nodeValue.substring(lastIndex, match.index)));
-                const actualReplacement = typeof replacementTextOrFn === 'function' ? replacementTextOrFn(match[0], ...match.slice(1)) : replacementTextOrFn;
+                const actualReplacement = typeof replacementTextOrFn === 'function' ? replacementTextOrFn(match[0], ...match.slice(1)) : match[0].replace(new RegExp(searchRegex.source, searchRegex.flags.replace('g', '')), replacementTextOrFn);
                 const span = document.createElement('span');
                 span.className = highlightClass;
                 // Applique des styles inline avec !important pour éviter qu'ils soient écrasés par les styles de Genius
@@ -1942,6 +1942,7 @@ function showCorrectionPreview(originalText, correctedText, initialCorrections, 
         oeuLigature: true,
         frenchQuotes: true,
         longDash: true,
+        punctuation: true,
         doubleSpaces: true,
         spacing: true
     };
@@ -2006,6 +2007,13 @@ function showCorrectionPreview(originalText, correctedText, initialCorrections, 
     optionsContainer.appendChild(createOption('oeuLigature', getTranslation('preview_opt_oeu')));
     optionsContainer.appendChild(createOption('frenchQuotes', getTranslation('preview_opt_quotes')));
     optionsContainer.appendChild(createOption('longDash', getTranslation('preview_opt_dash')));
+
+    // N'afficher l'option de ponctuation que si on est en français
+    if (!(typeof isPolishTranscriptionMode === 'function' && isPolishTranscriptionMode()) &&
+        !(typeof isEnglishTranscriptionMode === 'function' && isEnglishTranscriptionMode())) {
+        optionsContainer.appendChild(createOption('punctuation', getTranslation('preview_opt_punctuation')));
+    }
+
     optionsContainer.appendChild(createOption('doubleSpaces', getTranslation('preview_opt_spaces')));
     optionsContainer.appendChild(createOption('spacing', getTranslation('preview_opt_spacing')));
 
@@ -2079,6 +2087,7 @@ function showCorrectionPreview(originalText, correctedText, initialCorrections, 
         if (options.oeuLigature && currentStats.oeuLigature > 0) detailsArray.push(`${currentStats.oeuLigature} "oeu"`);
         if (options.frenchQuotes && currentStats.frenchQuotes > 0) detailsArray.push(`${currentStats.frenchQuotes} ${getTranslation('preview_stat_quotes', currentStats.frenchQuotes)}`);
         if (options.longDash && currentStats.longDash > 0) detailsArray.push(`${currentStats.longDash} ${getTranslation('preview_stat_dash', currentStats.longDash)}`);
+        if (options.punctuation && currentStats.punctuation > 0) detailsArray.push(`${currentStats.punctuation} ${getTranslation('preview_stat_punctuation', currentStats.punctuation)}`);
         if (options.doubleSpaces && currentStats.doubleSpaces > 0) detailsArray.push(`${currentStats.doubleSpaces} ${getTranslation('preview_stat_spaces', currentStats.doubleSpaces)}`);
         if (options.spacing && currentStats.spacing > 0) detailsArray.push(`${currentStats.spacing} ${getTranslation('preview_stat_spacing', currentStats.spacing)}`);
 
@@ -3599,7 +3608,7 @@ function initLyricsEditorEnhancer() {
             {
                 label: getTranslation('btn_apostrophe_label'),
                 action: 'replaceText',
-                searchPattern: /['']/g,
+                searchPattern: /[‘’´`ʻ]/g,
                 replacementText: "'",
                 highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
                 tooltip: getTranslation('cleanup_apostrophe_tooltip'),
@@ -3705,9 +3714,10 @@ function initLyricsEditorEnhancer() {
             // Mode français : tous les outils spécifiques
             const frenchSpecificTools = [
                 {
-                    label: getTranslation('btn_y_label'),
+                    id: 'btn_y_prime',
+                    label: "y' → y ",
                     action: 'replaceText',
-                    searchPattern: /\b(Y|y)['']/g,
+                    searchPattern: /\b(Y|y)['‘’´`ʻ]/g,
                     replacementFunction: (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y '),
                     highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
                     tooltip: getTranslation('cleanup_y_tooltip'),
@@ -3730,6 +3740,15 @@ function initLyricsEditorEnhancer() {
                     highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
                     tooltip: getTranslation('cleanup_long_dash_tooltip'),
                     feedbackKey: 'preview_stat_dash'
+                },
+                {
+                    label: getTranslation('btn_punctuation_spacing_label'),
+                    action: 'replaceText',
+                    searchPattern: /([^ \n\[(<])([?!])/g,
+                    replacementText: '$1 $2',
+                    highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+                    tooltip: getTranslation('cleanup_punctuation_spacing_tooltip'),
+                    feedbackKey: 'preview_stat_punctuation'
                 }
             ];
 
@@ -4147,11 +4166,16 @@ function initLyricsEditorEnhancer() {
                             let replacementsCount = 0;
                             if (GFT_STATE.currentEditorType === 'textarea') {
                                 const originalValue = GFT_STATE.currentActiveEditor.value; let tempCount = 0;
-                                const newValue = originalValue.replace(config.searchPattern, (...matchArgs) => {
-                                    tempCount++;
-                                    if (typeof replacementValueOrFn === 'function') return replacementValueOrFn(...matchArgs);
-                                    return replacementValueOrFn;
-                                });
+                                let newValue;
+                                if (typeof replacementValueOrFn === 'function') {
+                                    newValue = originalValue.replace(config.searchPattern, (...matchArgs) => {
+                                        tempCount++;
+                                        return replacementValueOrFn(...matchArgs);
+                                    });
+                                } else {
+                                    tempCount = (originalValue.match(config.searchPattern) || []).length;
+                                    newValue = originalValue.replace(config.searchPattern, replacementValueOrFn);
+                                }
                                 if (originalValue !== newValue) {
                                     GFT_STATE.currentActiveEditor.value = newValue;
                                     GFT_STATE.currentActiveEditor.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
@@ -4834,8 +4858,8 @@ function initLyricsEditorEnhancer() {
 
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v4.0.2'; // Bump version visuelle pour le user
-                versionLabel.title = 'Genius Fast Transcriber v4.0.2 - Nouvelle Interface Premium';
+                versionLabel.textContent = 'v4.0.3'; // Bump version visuelle pour le user
+                versionLabel.title = 'Genius Fast Transcriber v4.0.3 - Nouvelle Interface Premium';
                 versionLabel.style.fontSize = '10px';
                 versionLabel.style.color = '#888';
                 versionLabel.style.opacity = '0.6';
@@ -5488,7 +5512,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
 
     // Indicateur de version
     const versionSpan = document.createElement('span');
-    versionSpan.textContent = 'v4.0.2';
+    versionSpan.textContent = 'v4.0.3';
     versionSpan.style.fontSize = '11px';
     versionSpan.style.color = isDarkMode ? '#888' : '#aaa';
     versionSpan.style.fontWeight = 'normal';

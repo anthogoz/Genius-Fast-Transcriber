@@ -204,6 +204,8 @@
           cleanup_adlib_tooltip: "Entoure le texte s\xE9lectionn\xE9 de parenth\xE8ses pour les ad-libs",
           btn_capitalize_label: "Maj. d\xE9but ligne",
           btn_punctuation_label: "Suppr. ., fin ligne",
+          btn_punctuation_spacing_label: "Espace ?!",
+          cleanup_punctuation_spacing_tooltip: "Ajoute un espace avant les points d'interrogation et d'exclamation (mot ?)",
           btn_spacing_label: "Corriger Espacement",
           btn_check_label: "\u{1F50D} V\xE9rifier ( ) [ ]",
           btn_fix_all_label: "Tout Corriger (Texte)",
@@ -304,11 +306,13 @@
           preview_opt_oeu: "oeu \u2192 \u0153u",
           preview_opt_quotes: 'Guillemets \xAB\xBB \u2192 "',
           preview_opt_dash: "Tirets longs \u2014 \u2013 \u2192 -",
+          preview_opt_punctuation: "Espace avant ? et !",
           preview_opt_spaces: "Doubles espaces",
           preview_opt_spacing: "Espacement (lignes)",
           preview_stat_apostrophes: "apostrophe(s) \u2019",
           preview_stat_quotes: "guillemet(s) fran\xE7ais",
           preview_stat_dash: "tiret(s) long(s)",
+          preview_stat_punctuation: "espace(s) ponctuation",
           preview_stat_spaces: "double(s) espace(s)",
           preview_stat_spacing: "espacement(s) de ligne",
           preview_stat_orphans: "orphelins",
@@ -535,6 +539,8 @@
           cleanup_adlib_tooltip: "Entoure le texte s\xE9lectionn\xE9 de parenth\xE8ses pour les ad-libs",
           btn_capitalize_label: "Maj. d\xE9but ligne",
           btn_punctuation_label: "Suppr. ., fin ligne",
+          btn_punctuation_spacing_label: "Space ?!",
+          cleanup_punctuation_spacing_tooltip: "Adds a space before question and exclamation marks (word ?)",
           btn_spacing_label: "Fix Spacing",
           btn_check_label: "\u{1F50D} Check ( ) [ ]",
           btn_fix_all_label: "Fix All (Text)",
@@ -621,11 +627,13 @@
           preview_opt_oeu: "oeu \u2192 \u0153u",
           preview_opt_quotes: 'Quotes \xAB\xBB \u2192 "',
           preview_opt_dash: "Long dashes \u2014 \u2013 \u2192 -",
+          preview_opt_punctuation: "Space before ? and !",
           preview_opt_spaces: "Double spaces",
           preview_opt_spacing: "Spacing (lines)",
           preview_stat_apostrophes: "apostrophe(s)",
           preview_stat_quotes: "french quote(s)",
           preview_stat_dash: "long dash(es)",
+          preview_stat_punctuation: "punctuation space(s)",
           preview_stat_spaces: "double space(s)",
           preview_stat_spacing: "line spacing",
           preview_stat_orphans: "orphans",
@@ -1556,7 +1564,7 @@
   function isEnglishTranscriptionMode() {
     return getTranscriptionMode() === "en";
   }
-  function isPolishTranscriptionMode2() {
+  function isPolishTranscriptionMode() {
     return getTranscriptionMode() === "pl";
   }
   var init_config = __esm({
@@ -1625,7 +1633,7 @@
     if (selectedArtistNames.length > 0) {
       const tagPart = baseTextWithBrackets.slice(0, -1);
       const artistsString = formatArtistList(selectedArtistNames);
-      const separator = isEnglishTranscriptionMode() || isPolishTranscriptionMode2() ? ": " : " : ";
+      const separator = isEnglishTranscriptionMode() || isPolishTranscriptionMode() ? ": " : " : ";
       resultText = `${tagPart}${separator}${artistsString}]`;
     } else {
       resultText = baseTextWithBrackets;
@@ -1828,11 +1836,12 @@
       oeuLigature: 0,
       frenchQuotes: 0,
       longDash: 0,
+      punctuation: 0,
       doubleSpaces: 0,
       spacing: 0
     };
     if (opts.yPrime) {
-      const yPrimePattern = /\b(Y|y)['']/g;
+      const yPrimePattern = /\b(Y|y)['‘’´`ʻ]/g;
       const yPrimeReplacement = (match, firstLetter) => firstLetter === "Y" ? "Y " : "y ";
       const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
       if (textAfterYPrime !== currentText) {
@@ -1841,7 +1850,7 @@
       }
     }
     if (opts.apostrophes) {
-      const apostrophePattern = /['']/g;
+      const apostrophePattern = /[‘’´`ʻ]/g;
       const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
       if (textAfterApostrophe !== currentText) {
         corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
@@ -1882,6 +1891,16 @@
         }
       }
     }
+    if (opts.punctuation) {
+      if (!(typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) && !(typeof isEnglishTranscriptionMode === "function" && isEnglishTranscriptionMode())) {
+        const punctuationPattern = /([^ \n\[(<])([?!])/g;
+        const textAfterPunctuation = currentText.replace(punctuationPattern, "$1 $2");
+        if (textAfterPunctuation !== currentText) {
+          corrections.punctuation = (currentText.match(punctuationPattern) || []).length;
+          currentText = textAfterPunctuation;
+        }
+      }
+    }
     if (opts.doubleSpaces) {
       const doubleSpacesPattern = /  +/g;
       const textAfterDoubleSpaces = currentText.replace(doubleSpacesPattern, " ");
@@ -1897,7 +1916,7 @@
         currentText = result.newText;
       }
     }
-    const totalCorrections = corrections.yPrime + corrections.apostrophes + corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash + corrections.doubleSpaces + corrections.spacing;
+    const totalCorrections = corrections.yPrime + corrections.apostrophes + corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash + corrections.doubleSpaces + corrections.spacing + (corrections.punctuation || 0);
     return { newText: currentText, correctionsCount: totalCorrections, corrections };
   }
   async function applyAllTextCorrectionsAsync(text, showProgressFn) {
@@ -1905,19 +1924,20 @@
     });
     let currentText = text;
     let result;
-    const totalSteps = 7;
+    const totalSteps = 8;
     const corrections = {
       yPrime: 0,
       apostrophes: 0,
       oeuLigature: 0,
       frenchQuotes: 0,
       longDash: 0,
+      punctuation: 0,
       doubleSpaces: 0,
       spacing: 0
     };
     showProgress(1, totalSteps, getTranslation("progress_step_yprime"));
     await new Promise((resolve) => setTimeout(resolve, 50));
-    const yPrimePattern = /\b(Y|y)['']/g;
+    const yPrimePattern = /\b(Y|y)['‘’´`ʻ]/g;
     const yPrimeReplacement = (match, firstLetter) => firstLetter === "Y" ? "Y " : "y ";
     const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
     if (textAfterYPrime !== currentText) {
@@ -1926,7 +1946,7 @@
     }
     showProgress(2, totalSteps, getTranslation("progress_step_apostrophes"));
     await new Promise((resolve) => setTimeout(resolve, 50));
-    const apostrophePattern = /['']/g;
+    const apostrophePattern = /[‘’´`ʻ]/g;
     const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
     if (textAfterApostrophe !== currentText) {
       corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
@@ -1966,7 +1986,17 @@
         currentText = textAfterLongDash;
       }
     }
-    showProgress(6, totalSteps, getTranslation("progress_step_spaces"));
+    showProgress(6, totalSteps, getTranslation("progress_step_punctuation"));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    if (!(typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) && !(typeof isEnglishTranscriptionMode === "function" && isEnglishTranscriptionMode())) {
+      const punctuationPattern = /([^ \n\[(<])([?!])/g;
+      const textAfterPunctuation = currentText.replace(punctuationPattern, "$1 $2");
+      if (textAfterPunctuation !== currentText) {
+        corrections.punctuation = (currentText.match(punctuationPattern) || []).length;
+        currentText = textAfterPunctuation;
+      }
+    }
+    showProgress(7, totalSteps, getTranslation("progress_step_spaces"));
     await new Promise((resolve) => setTimeout(resolve, 50));
     const doubleSpacesPattern = /  +/g;
     const textAfterDoubleSpaces = currentText.replace(doubleSpacesPattern, " ");
@@ -1974,19 +2004,20 @@
       corrections.doubleSpaces = (currentText.match(doubleSpacesPattern) || []).length;
       currentText = textAfterDoubleSpaces;
     }
-    showProgress(7, totalSteps, getTranslation("progress_step_spacing"));
+    showProgress(8, totalSteps, getTranslation("progress_step_spacing"));
     await new Promise((resolve) => setTimeout(resolve, 50));
     result = correctLineSpacing(currentText);
     if (result.correctionsCount > 0) {
       corrections.spacing = result.correctionsCount;
       currentText = result.newText;
     }
-    const totalCorrections = corrections.yPrime + corrections.apostrophes + corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash + corrections.doubleSpaces + corrections.spacing;
+    const totalCorrections = corrections.yPrime + corrections.apostrophes + corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash + corrections.punctuation + corrections.doubleSpaces + corrections.spacing;
     return { newText: currentText, correctionsCount: totalCorrections, corrections };
   }
   var init_corrections = __esm({
     "src/modules/corrections.js"() {
       init_utils();
+      init_config();
     }
   });
 
@@ -2037,7 +2068,7 @@
       init_utils();
       init_corrections();
       init_export();
-      console.log("Genius Fast Transcriber v4.0.2 \u{1F3B5}");
+      console.log("Genius Fast Transcriber v4.0.3 \u{1F3B5}");
       function isContextValid() {
         return typeof chrome !== "undefined" && !!chrome.runtime && !!chrome.runtime.id;
       }
@@ -2259,7 +2290,7 @@
             localSearchRegex.lastIndex = 0;
             while ((match = localSearchRegex.exec(textNode.nodeValue)) !== null) {
               if (match.index > lastIndex) fragment.appendChild(document.createTextNode(textNode.nodeValue.substring(lastIndex, match.index)));
-              const actualReplacement = typeof replacementTextOrFn === "function" ? replacementTextOrFn(match[0], ...match.slice(1)) : replacementTextOrFn;
+              const actualReplacement = typeof replacementTextOrFn === "function" ? replacementTextOrFn(match[0], ...match.slice(1)) : match[0].replace(new RegExp(searchRegex.source, searchRegex.flags.replace("g", "")), replacementTextOrFn);
               const span = document.createElement("span");
               span.className = highlightClass;
               span.style.cssText = "background-color: #f9ff55 !important; border-radius: 2px !important; padding: 0 1px !important; animation: lyrics-helper-fadeout 2s ease-out forwards !important;";
@@ -2762,7 +2793,7 @@
         }
         const num = parseInt(selectedText, 10);
         let wordsText;
-        if (isPolishTranscriptionMode2()) {
+        if (isPolishTranscriptionMode()) {
           wordsText = numberToPolishWords(num);
         } else if (isEnglishTranscriptionMode()) {
           wordsText = numberToEnglishWords(num);
@@ -3285,6 +3316,7 @@
           oeuLigature: true,
           frenchQuotes: true,
           longDash: true,
+          punctuation: true,
           doubleSpaces: true,
           spacing: true
         };
@@ -3334,6 +3366,9 @@
         optionsContainer.appendChild(createOption("oeuLigature", getTranslation("preview_opt_oeu")));
         optionsContainer.appendChild(createOption("frenchQuotes", getTranslation("preview_opt_quotes")));
         optionsContainer.appendChild(createOption("longDash", getTranslation("preview_opt_dash")));
+        if (!(typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) && !(typeof isEnglishTranscriptionMode === "function" && isEnglishTranscriptionMode())) {
+          optionsContainer.appendChild(createOption("punctuation", getTranslation("preview_opt_punctuation")));
+        }
         optionsContainer.appendChild(createOption("doubleSpaces", getTranslation("preview_opt_spaces")));
         optionsContainer.appendChild(createOption("spacing", getTranslation("preview_opt_spacing")));
         header.appendChild(optionsContainer);
@@ -3390,6 +3425,7 @@
           if (options.oeuLigature && currentStats.oeuLigature > 0) detailsArray.push(`${currentStats.oeuLigature} "oeu"`);
           if (options.frenchQuotes && currentStats.frenchQuotes > 0) detailsArray.push(`${currentStats.frenchQuotes} ${getTranslation("preview_stat_quotes", currentStats.frenchQuotes)}`);
           if (options.longDash && currentStats.longDash > 0) detailsArray.push(`${currentStats.longDash} ${getTranslation("preview_stat_dash", currentStats.longDash)}`);
+          if (options.punctuation && currentStats.punctuation > 0) detailsArray.push(`${currentStats.punctuation} ${getTranslation("preview_stat_punctuation", currentStats.punctuation)}`);
           if (options.doubleSpaces && currentStats.doubleSpaces > 0) detailsArray.push(`${currentStats.doubleSpaces} ${getTranslation("preview_stat_spaces", currentStats.doubleSpaces)}`);
           if (options.spacing && currentStats.spacing > 0) detailsArray.push(`${currentStats.spacing} ${getTranslation("preview_stat_spacing", currentStats.spacing)}`);
           const total = result.correctionsCount;
@@ -3757,7 +3793,7 @@
             );
           }
         );
-        if (!isEnglishTranscriptionMode() && !isPolishTranscriptionMode2()) {
+        if (!isEnglishTranscriptionMode() && !isPolishTranscriptionMode()) {
           addItem(
             isHeaderFeatEnabled() ? getTranslation("header_feat_hide") : getTranslation("header_feat_show"),
             gftToggleHeaderFeat
@@ -4364,7 +4400,7 @@
         let foundEditorType = null;
         const getStructuralTags = () => {
           const isEnglish = isEnglishTranscriptionMode();
-          const isPolish = isPolishTranscriptionMode2();
+          const isPolish = isPolishTranscriptionMode();
           const customButtons = getCustomButtons().filter((b) => b.type === "structure").map((b) => ({
             label: b.label,
             getText: () => {
@@ -4480,7 +4516,7 @@
         };
         const getTextCleanupTools = () => {
           const isEnglish = isEnglishTranscriptionMode();
-          const isPolish = isPolishTranscriptionMode2();
+          const isPolish = isPolishTranscriptionMode();
           const customButtons = getCustomButtons().filter((b) => b.type === "cleanup").map((b) => ({
             label: b.label,
             action: "replaceText",
@@ -4499,7 +4535,7 @@
             {
               label: getTranslation("btn_apostrophe_label"),
               action: "replaceText",
-              searchPattern: /['']/g,
+              searchPattern: /[‘’´`ʻ]/g,
               replacementText: "'",
               highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
               tooltip: getTranslation("cleanup_apostrophe_tooltip"),
@@ -4602,9 +4638,10 @@
           } else {
             const frenchSpecificTools = [
               {
-                label: getTranslation("btn_y_label"),
+                id: "btn_y_prime",
+                label: "y' \u2192 y ",
                 action: "replaceText",
-                searchPattern: /\b(Y|y)['']/g,
+                searchPattern: /\b(Y|y)['‘’´`ʻ]/g,
                 replacementFunction: (match, firstLetter) => firstLetter === "Y" ? "Y " : "y ",
                 highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
                 tooltip: getTranslation("cleanup_y_tooltip"),
@@ -4627,6 +4664,15 @@
                 highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
                 tooltip: getTranslation("cleanup_long_dash_tooltip"),
                 feedbackKey: "preview_stat_dash"
+              },
+              {
+                label: getTranslation("btn_punctuation_spacing_label"),
+                action: "replaceText",
+                searchPattern: /([^ \n\[(<])([?!])/g,
+                replacementText: "$1 $2",
+                highlightClass: LYRICS_HELPER_HIGHLIGHT_CLASS,
+                tooltip: getTranslation("cleanup_punctuation_spacing_tooltip"),
+                feedbackKey: "preview_stat_punctuation"
               }
             ];
             return [...frenchSpecificTools, ...commonTools, ...customButtons, plusButton];
@@ -4933,11 +4979,16 @@
                     if (GFT_STATE.currentEditorType === "textarea") {
                       const originalValue = GFT_STATE.currentActiveEditor.value;
                       let tempCount = 0;
-                      const newValue = originalValue.replace(config.searchPattern, (...matchArgs) => {
-                        tempCount++;
-                        if (typeof replacementValueOrFn === "function") return replacementValueOrFn(...matchArgs);
-                        return replacementValueOrFn;
-                      });
+                      let newValue;
+                      if (typeof replacementValueOrFn === "function") {
+                        newValue = originalValue.replace(config.searchPattern, (...matchArgs) => {
+                          tempCount++;
+                          return replacementValueOrFn(...matchArgs);
+                        });
+                      } else {
+                        tempCount = (originalValue.match(config.searchPattern) || []).length;
+                        newValue = originalValue.replace(config.searchPattern, replacementValueOrFn);
+                      }
                       if (originalValue !== newValue) {
                         GFT_STATE.currentActiveEditor.value = newValue;
                         GFT_STATE.currentActiveEditor.dispatchEvent(new Event("input", { bubbles: true, cancelable: true }));
@@ -5459,8 +5510,8 @@
               creditLabel.style.userSelect = "none";
               const versionLabel = document.createElement("div");
               versionLabel.id = "gft-version-label";
-              versionLabel.textContent = "v4.0.2";
-              versionLabel.title = "Genius Fast Transcriber v4.0.2 - Nouvelle Interface Premium";
+              versionLabel.textContent = "v4.0.3";
+              versionLabel.title = "Genius Fast Transcriber v4.0.3 - Nouvelle Interface Premium";
               versionLabel.style.fontSize = "10px";
               versionLabel.style.color = "#888";
               versionLabel.style.opacity = "0.6";
@@ -5968,7 +6019,7 @@
         const titleText = document.createTextNode(getTranslation("lc_modal_title"));
         title.appendChild(titleText);
         const versionSpan = document.createElement("span");
-        versionSpan.textContent = "v4.0.2";
+        versionSpan.textContent = "v4.0.3";
         versionSpan.style.fontSize = "11px";
         versionSpan.style.color = isDarkMode ? "#888" : "#aaa";
         versionSpan.style.fontWeight = "normal";

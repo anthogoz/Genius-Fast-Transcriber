@@ -19,6 +19,9 @@ The project has reached a major milestone with **Version 4.0.0**! The infrastruc
   - [x] Added a **Zoom Slider** (0.5x to 2.0x) for precise lyric sizing.
   - [x] **Bug Fix**: Vertical text centering corrected for all zoom levels.
   - [x] **Modern UI Overhaul**: New professional design with glassmorphism and icons.
+- [x] **Fixes & Improvements (v4.0.3)**:
+  - [x] **Bug Fix**: Incorrect apostrophe counts and regex patterns fixed.
+  - [x] **Feature**: Auto-spacing before punctuation (`?` and `!`) in French transcription mode.
   ### 🛠️ Personalization (Custom Commands System)
 - [x] Create an interface allowing users to define their own buttons and regex macros without       touching the code.
 - [x] Import/Export system for "Button Packs" for the community.

@@ -3,6 +3,7 @@
 // applyAllTextCorrectionsToString, applyAllTextCorrectionsAsync
 
 import { getTranslation } from './utils.js';
+import { isEnglishTranscriptionMode, isPolishTranscriptionMode } from './config.js';
 
 function isSectionTag(line) {
     const trimmed = line.trim();
@@ -298,13 +299,14 @@ function applyAllTextCorrectionsToString(text, options = {}) {
         oeuLigature: 0,
         frenchQuotes: 0,
         longDash: 0,
+        punctuation: 0,
         doubleSpaces: 0,
         spacing: 0
     };
 
     // Correction de "y'" -> "y "
     if (opts.yPrime) {
-        const yPrimePattern = /\b(Y|y)['']/g;
+        const yPrimePattern = /\b(Y|y)['‘’´`ʻ]/g;
         const yPrimeReplacement = (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y ');
         const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
         if (textAfterYPrime !== currentText) {
@@ -315,7 +317,7 @@ function applyAllTextCorrectionsToString(text, options = {}) {
 
     // Correction de l'apostrophe typographique ' -> '
     if (opts.apostrophes) {
-        const apostrophePattern = /['']/g;
+        const apostrophePattern = /[‘’´`ʻ]/g;
         const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
         if (textAfterApostrophe !== currentText) {
             corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
@@ -366,6 +368,25 @@ function applyAllTextCorrectionsToString(text, options = {}) {
         }
     }
 
+    // Correction de la ponctuation (espaces avant ! et ?) - Uniquement en Français
+    if (opts.punctuation) {
+        if (!(typeof isPolishTranscriptionMode === 'function' && isPolishTranscriptionMode()) &&
+            !(typeof isEnglishTranscriptionMode === 'function' && isEnglishTranscriptionMode())) {
+
+            // Regex cible: une lettre/chiffre collée directement à ? ou !
+            // Ex: "Où es tu?" -> "Où es tu ?"
+            // Ex excluant les balises, et autres: On vise simplement \w suivi de [?!] (ou gérant les ponctuations multiples)
+
+            const punctuationPattern = /([^ \n\[(<])([?!])/g;
+            const textAfterPunctuation = currentText.replace(punctuationPattern, '$1 $2');
+
+            if (textAfterPunctuation !== currentText) {
+                corrections.punctuation = (currentText.match(punctuationPattern) || []).length;
+                currentText = textAfterPunctuation;
+            }
+        }
+    }
+
     // Correction des doubles espaces
     if (opts.doubleSpaces) {
         const doubleSpacesPattern = /  +/g;
@@ -388,7 +409,7 @@ function applyAllTextCorrectionsToString(text, options = {}) {
     // Calcul du total
     const totalCorrections = corrections.yPrime + corrections.apostrophes +
         corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash +
-        corrections.doubleSpaces + corrections.spacing;
+        corrections.doubleSpaces + corrections.spacing + (corrections.punctuation || 0);
 
     return { newText: currentText, correctionsCount: totalCorrections, corrections: corrections };
 }
@@ -403,7 +424,7 @@ async function applyAllTextCorrectionsAsync(text, showProgressFn) {
     const showProgress = showProgressFn || (() => { });
     let currentText = text;
     let result;
-    const totalSteps = 7;
+    const totalSteps = 8;
 
     // Objet pour tracker les corrections par type
     const corrections = {
@@ -412,6 +433,7 @@ async function applyAllTextCorrectionsAsync(text, showProgressFn) {
         oeuLigature: 0,
         frenchQuotes: 0,
         longDash: 0,
+        punctuation: 0,
         doubleSpaces: 0,
         spacing: 0
     };
@@ -420,7 +442,7 @@ async function applyAllTextCorrectionsAsync(text, showProgressFn) {
     showProgress(1, totalSteps, getTranslation('progress_step_yprime'));
     await new Promise(resolve => setTimeout(resolve, 50));
 
-    const yPrimePattern = /\b(Y|y)['']/g;
+    const yPrimePattern = /\b(Y|y)['‘’´`ʻ]/g;
     const yPrimeReplacement = (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y ');
     const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
     if (textAfterYPrime !== currentText) {
@@ -432,7 +454,7 @@ async function applyAllTextCorrectionsAsync(text, showProgressFn) {
     showProgress(2, totalSteps, getTranslation('progress_step_apostrophes'));
     await new Promise(resolve => setTimeout(resolve, 50));
 
-    const apostrophePattern = /['']/g;
+    const apostrophePattern = /[‘’´`ʻ]/g;
     const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
     if (textAfterApostrophe !== currentText) {
         corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
@@ -482,8 +504,24 @@ async function applyAllTextCorrectionsAsync(text, showProgressFn) {
         }
     }
 
-    // Étape 6: Correction des doubles espaces
-    showProgress(6, totalSteps, getTranslation('progress_step_spaces'));
+    // Étape 6: Ponctuation (espace avant ? et !) en Français
+    showProgress(6, totalSteps, getTranslation('progress_step_punctuation')); // Note: Needs trans key later if applicable
+    await new Promise(resolve => setTimeout(resolve, 50));
+
+    if (!(typeof isPolishTranscriptionMode === 'function' && isPolishTranscriptionMode()) &&
+        !(typeof isEnglishTranscriptionMode === 'function' && isEnglishTranscriptionMode())) {
+
+        const punctuationPattern = /([^ \n\[(<])([?!])/g;
+        const textAfterPunctuation = currentText.replace(punctuationPattern, '$1 $2');
+
+        if (textAfterPunctuation !== currentText) {
+            corrections.punctuation = (currentText.match(punctuationPattern) || []).length;
+            currentText = textAfterPunctuation;
+        }
+    }
+
+    // Étape 7: Correction des doubles espaces
+    showProgress(7, totalSteps, getTranslation('progress_step_spaces'));
     await new Promise(resolve => setTimeout(resolve, 50));
 
     const doubleSpacesPattern = /  +/g;
@@ -493,8 +531,8 @@ async function applyAllTextCorrectionsAsync(text, showProgressFn) {
         currentText = textAfterDoubleSpaces;
     }
 
-    // Étape 7: Espacement
-    showProgress(7, totalSteps, getTranslation('progress_step_spacing'));
+    // Étape 8: Espacement
+    showProgress(8, totalSteps, getTranslation('progress_step_spacing'));
     await new Promise(resolve => setTimeout(resolve, 50));
 
     result = correctLineSpacing(currentText);
@@ -506,7 +544,7 @@ async function applyAllTextCorrectionsAsync(text, showProgressFn) {
     // Calcul du total
     const totalCorrections = corrections.yPrime + corrections.apostrophes +
         corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash +
-        corrections.doubleSpaces + corrections.spacing;
+        corrections.punctuation + corrections.doubleSpaces + corrections.spacing;
 
     return { newText: currentText, correctionsCount: totalCorrections, corrections: corrections };
 }
