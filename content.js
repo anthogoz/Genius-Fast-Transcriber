@@ -411,7 +411,13 @@
           yt_pause_sync: "\u23F8\uFE0F Pause (Sync)",
           panel_toggle_tooltip: "Cliquer pour replier/d\xE9plier",
           confirm_delete_button: 'Supprimer "{label}" ?',
-          import_failed_invalid: "\xC9chec de l'import. Code invalide."
+          import_failed_invalid: "\xC9chec de l'import. Code invalide.",
+          bracket_opening_no_close: "{char} ouvrant sans fermeture correspondante",
+          bracket_closing_no_open: "{char} fermant sans ouverture correspondante",
+          bracket_wrong_pair: "{char} ne correspond pas au caract\xE8re ouvrant",
+          lc_unknown_title: "Titre Inconnu",
+          lc_unknown_artist: "Artiste Inconnu",
+          unsaved_changes_warning: "Vous avez des modifications non sauvegard\xE9es. Voulez-vous vraiment quitter ?"
         },
         en: {
           panel_title: "Genius Fast Transcriber",
@@ -754,7 +760,13 @@
           yt_pause_sync: "\u23F8\uFE0F Pause (Sync)",
           panel_toggle_tooltip: "Click to collapse/expand",
           confirm_delete_button: 'Delete "{label}"?',
-          import_failed_invalid: "Import failed. Invalid code."
+          import_failed_invalid: "Import failed. Invalid code.",
+          bracket_opening_no_close: "Opening {char} without matching closing",
+          bracket_closing_no_open: "Closing {char} without matching opening",
+          bracket_wrong_pair: "{char} does not match the opening character",
+          lc_unknown_title: "Unknown Title",
+          lc_unknown_artist: "Unknown Artist",
+          unsaved_changes_warning: "You have unsaved changes. Are you sure you want to leave?"
         },
         // Polish translations - UI strings are placeholders for contributor PR
         // Structure tags and cleanup tools are Polish-specific per Genius Polska guidelines
@@ -1087,7 +1099,13 @@
           yt_pause_sync: "\u23F8\uFE0F Pauza (Sync)",
           panel_toggle_tooltip: "Kliknij, aby zwin\u0105\u0107/rozwin\u0105\u0107",
           confirm_delete_button: 'Usun\u0105\u0107 "{label}"?',
-          import_failed_invalid: "Import nie powi\xF3d\u0142 si\u0119. Nieprawid\u0142owy kod."
+          import_failed_invalid: "Import nie powi\xF3d\u0142 si\u0119. Nieprawid\u0142owy kod.",
+          bracket_opening_no_close: "Otwieraj\u0105cy {char} bez odpowiadaj\u0105cego zamkni\u0119cia",
+          bracket_closing_no_open: "Zamykaj\u0105cy {char} bez odpowiadaj\u0105cego otwarcia",
+          bracket_wrong_pair: "{char} nie pasuje do znaku otwieraj\u0105cego",
+          lc_unknown_title: "Nieznany tytu\u0142",
+          lc_unknown_artist: "Nieznany wykonawca",
+          unsaved_changes_warning: "Masz niezapisane zmiany. Czy na pewno chcesz wyj\u015B\u0107?"
         }
       };
     }
@@ -2043,7 +2061,12 @@
   // src/modules/ui.js
   function showFeedbackMessage(message, duration = 3e3, container = null) {
     let feedbackEl = document.getElementById(FEEDBACK_MESSAGE_ID);
-    if (!feedbackEl) {
+    const isModalOpen = !!(document.getElementById("gft-lyric-card-modal") || document.getElementById("gft-custom-manager") || document.querySelector(".gft-preview-overlay"));
+    const isPanelFeedbackVisible = feedbackEl && !isModalOpen && (() => {
+      const parent = feedbackEl.closest("#genius-lyrics-shortcuts-container");
+      return parent && parent.offsetParent !== null;
+    })();
+    if (!feedbackEl || !isPanelFeedbackVisible) {
       let toast = document.getElementById("gft-global-toast");
       if (!toast) {
         toast = document.createElement("div");
@@ -2457,7 +2480,8 @@
       init_corrections();
       init_export();
       init_ui();
-      console.log("Genius Fast Transcriber v4.1.0 \u{1F3B5}");
+      var GFT_VERSION = typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.getManifest ? chrome.runtime.getManifest().version : "4.1.0";
+      console.log(`Genius Fast Transcriber v${GFT_VERSION} \u{1F3B5}`);
       function isContextValid() {
         return typeof chrome !== "undefined" && !!chrome.runtime && !!chrome.runtime.id;
       }
@@ -2972,11 +2996,11 @@
                 span.textContent = nodeText[localPos];
                 span.style.cssText = "background-color: #ff4444 !important; color: white !important; padding: 0 2px; border-radius: 2px; font-weight: bold;";
                 if (unmatchedItem.type === "opening-without-closing") {
-                  span.title = `${unmatchedItem.char} ouvrant sans fermeture correspondante`;
+                  span.title = getTranslation("bracket_opening_no_close").replace("{char}", unmatchedItem.char);
                 } else if (unmatchedItem.type === "closing-without-opening") {
-                  span.title = `${unmatchedItem.char} fermant sans ouverture correspondante`;
+                  span.title = getTranslation("bracket_closing_no_open").replace("{char}", unmatchedItem.char);
                 } else if (unmatchedItem.type === "wrong-pair") {
-                  span.title = `${unmatchedItem.char} ne correspond pas au caract\xE8re ouvrant`;
+                  span.title = getTranslation("bracket_wrong_pair").replace("{char}", unmatchedItem.char);
                 }
                 fragment.appendChild(span);
                 lastIndex = localPos + 1;
@@ -6084,7 +6108,7 @@
         const titleText = document.createTextNode(getTranslation("lc_modal_title"));
         title.appendChild(titleText);
         const versionSpan = document.createElement("span");
-        versionSpan.textContent = "v4.1.0";
+        versionSpan.textContent = `v${GFT_VERSION}`;
         versionSpan.style.fontSize = "11px";
         versionSpan.style.color = isDarkMode ? "#888" : "#aaa";
         versionSpan.style.fontWeight = "normal";
@@ -6424,8 +6448,8 @@ ${window.location.href}
           return;
         }
         const text = selection.toString().trim();
-        const songTitle = GFT_STATE.currentSongTitle || "Titre Inconnu";
-        const artistName = GFT_STATE.currentMainArtists.length > 0 ? GFT_STATE.currentMainArtists.join(" & ") : "Artiste Inconnu";
+        const songTitle = GFT_STATE.currentSongTitle || getTranslation("lc_unknown_title");
+        const artistName = GFT_STATE.currentMainArtists.length > 0 ? GFT_STATE.currentMainArtists.join(" & ") : getTranslation("lc_unknown_artist");
         let candidateUrls = [];
         const ogImage = document.querySelector('meta[property="og:image"]');
         if (ogImage && ogImage.content) candidateUrls.push(ogImage.content);
@@ -6447,12 +6471,7 @@ ${window.location.href}
           artistUrl = extractArtistImage(albumUrl);
         }
         showFeedbackMessage(getTranslation("lc_generating"), 2e3);
-        if (typeof showLyricCardPreviewModal === "function") {
-          showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artistUrl);
-        } else {
-          console.error("[GFT] CRITICAL: showLyricCardPreviewModal is undefined!");
-          showFeedbackMessage(getTranslation("lc_error_internal"));
-        }
+        showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artistUrl);
       }
       async function fetchArtistImageFromApi(artistName, forceSearch = false) {
         let songId = null;
@@ -6471,9 +6490,14 @@ ${window.location.href}
               }
             }
             if (!songId) {
-              const htmlHead = document.body.innerHTML.substring(0, 5e4);
-              const match = htmlHead.match(/"id":(\d+),"_type":"song"/);
-              if (match && match[1]) songId = match[1];
+              const scripts = document.querySelectorAll('script[type="application/ld+json"], script:not([src])');
+              for (const script of scripts) {
+                const match = script.textContent.match(/"id":(\d+),"_type":"song"/);
+                if (match && match[1]) {
+                  songId = match[1];
+                  break;
+                }
+              }
             }
             if (songId) {
               console.log("[GFT] Fetching artist image via Song ID:", songId);
@@ -7034,9 +7058,7 @@ ${window.location.href}
           window.location.reload();
         } else if (request.action === "SET_LANGUAGE") {
           localStorage.setItem("gftLanguage", request.language);
-          if (typeof setTranscriptionMode === "function") {
-            setTranscriptionMode(request.language);
-          }
+          setTranscriptionMode(request.language);
           sendResponse({ success: true });
           window.location.reload();
         } else if (request.action === "SET_THEME") {
@@ -7047,6 +7069,32 @@ ${window.location.href}
           localStorage.removeItem("gft-tutorial-completed");
           showTutorial();
           sendResponse({ success: true });
+        }
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+          const modalSelectors = [
+            "#gft-lyric-card-modal",
+            "#gft-custom-manager",
+            "#gft-preview-modal",
+            "#gft-preview-overlay",
+            "#gft-settings-menu",
+            "#gft-tutorial-overlay"
+          ];
+          for (const selector of modalSelectors) {
+            const modal = document.querySelector(selector);
+            if (modal) {
+              modal.remove();
+              e.preventDefault();
+            }
+          }
+        }
+      });
+      window.addEventListener("beforeunload", (e) => {
+        if (GFT_STATE.hasUnsavedChanges && GFT_STATE.currentActiveEditor) {
+          const message = getTranslation("unsaved_changes_warning");
+          e.returnValue = message;
+          return message;
         }
       });
       (function init() {

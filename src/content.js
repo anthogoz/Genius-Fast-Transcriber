@@ -1,8 +1,7 @@
 // content.js (Version 4.1.0 - Modular)
 /**
- * @file Main entry point for "Genius Fast Transcriber" extension v4.1.0.
+ * @file Main entry point for "Genius Fast Transcriber" extension.
  * @author Lnkhey  
- * @version 4.1.0
  */
 
 // =====
@@ -59,7 +58,8 @@ import {
 
 // ===========================
 
-console.log('Genius Fast Transcriber v4.1.0 🎵');
+const GFT_VERSION = (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest) ? chrome.runtime.getManifest().version : '4.1.0';
+console.log(`Genius Fast Transcriber v${GFT_VERSION} 🎵`);
 
 /**
  * Vérifie si le contexte de l'extension est toujours valide.
@@ -814,11 +814,11 @@ function highlightUnmatchedBracketsInEditor(editorNode, editorType) {
 
                     // Ajoute un titre pour expliquer le problème
                     if (unmatchedItem.type === 'opening-without-closing') {
-                        span.title = `${unmatchedItem.char} ouvrant sans fermeture correspondante`;
+                        span.title = getTranslation('bracket_opening_no_close').replace('{char}', unmatchedItem.char);
                     } else if (unmatchedItem.type === 'closing-without-opening') {
-                        span.title = `${unmatchedItem.char} fermant sans ouverture correspondante`;
+                        span.title = getTranslation('bracket_closing_no_open').replace('{char}', unmatchedItem.char);
                     } else if (unmatchedItem.type === 'wrong-pair') {
-                        span.title = `${unmatchedItem.char} ne correspond pas au caractère ouvrant`;
+                        span.title = getTranslation('bracket_wrong_pair').replace('{char}', unmatchedItem.char);
                     }
 
                     fragment.appendChild(span);
@@ -5074,7 +5074,7 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
 
     // Indicateur de version
     const versionSpan = document.createElement('span');
-    versionSpan.textContent = 'v4.1.0';
+    versionSpan.textContent = `v${GFT_VERSION}`;
     versionSpan.style.fontSize = '11px';
     versionSpan.style.color = isDarkMode ? '#888' : '#aaa';
     versionSpan.style.fontWeight = 'normal';
@@ -5514,8 +5514,8 @@ async function generateLyricsCard() {
     }
 
     const text = selection.toString().trim();
-    const songTitle = GFT_STATE.currentSongTitle || "Titre Inconnu";
-    const artistName = GFT_STATE.currentMainArtists.length > 0 ? GFT_STATE.currentMainArtists.join(' & ') : "Artiste Inconnu";
+    const songTitle = GFT_STATE.currentSongTitle || getTranslation('lc_unknown_title');
+    const artistName = GFT_STATE.currentMainArtists.length > 0 ? GFT_STATE.currentMainArtists.join(' & ') : getTranslation('lc_unknown_artist');
 
     // 1. Trouver l'image de l'album (Cover Art)
     let candidateUrls = [];
@@ -5549,12 +5549,7 @@ async function generateLyricsCard() {
 
     showFeedbackMessage(getTranslation('lc_generating'), 2000);
 
-    if (typeof showLyricCardPreviewModal === 'function') {
-        showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artistUrl);
-    } else {
-        console.error("[GFT] CRITICAL: showLyricCardPreviewModal is undefined!");
-        showFeedbackMessage(getTranslation('lc_error_internal'));
-    }
+    showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artistUrl);
 }
 /**
  * Récupère l'image de l'artiste via l'API Genius.
@@ -5586,11 +5581,16 @@ async function fetchArtistImageFromApi(artistName, forceSearch = false) {
                 }
             }
 
-            // Stratégie 3: Regex Body
+            // Stratégie 3: Chercher dans les scripts du DOM
             if (!songId) {
-                const htmlHead = document.body.innerHTML.substring(0, 50000);
-                const match = htmlHead.match(/"id":(\d+),"_type":"song"/);
-                if (match && match[1]) songId = match[1];
+                const scripts = document.querySelectorAll('script[type="application/ld+json"], script:not([src])');
+                for (const script of scripts) {
+                    const match = script.textContent.match(/"id":(\d+),"_type":"song"/);
+                    if (match && match[1]) {
+                        songId = match[1];
+                        break;
+                    }
+                }
             }
 
             if (songId) {
@@ -6283,9 +6283,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     else if (request.action === "SET_LANGUAGE") {
         localStorage.setItem('gftLanguage', request.language);
-        if (typeof setTranscriptionMode === 'function') {
-            setTranscriptionMode(request.language);
-        }
+        setTranscriptionMode(request.language);
         sendResponse({ success: true });
         window.location.reload();
     }
@@ -6298,6 +6296,38 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         localStorage.removeItem('gft-tutorial-completed');
         showTutorial();
         sendResponse({ success: true });
+    }
+});
+
+// ----- Fermeture des modals par Echap -----
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        // Ferme le modal le plus en avant (Lyric Card, Custom Button Manager, Correction Preview, Settings, Tutoriel)
+        const modalSelectors = [
+            '#gft-lyric-card-modal',
+            '#gft-custom-manager',
+            '#gft-preview-modal',
+            '#gft-preview-overlay',
+            '#gft-settings-menu',
+            '#gft-tutorial-overlay'
+        ];
+        for (const selector of modalSelectors) {
+            const modal = document.querySelector(selector);
+            if (modal) {
+                modal.remove();
+                e.preventDefault();
+                // Don't return immediately - remove paired elements (overlay + modal)
+            }
+        }
+    }
+});
+
+// ----- Avertissement si modifications non sauvegardées -----
+window.addEventListener('beforeunload', (e) => {
+    if (GFT_STATE.hasUnsavedChanges && GFT_STATE.currentActiveEditor) {
+        const message = getTranslation('unsaved_changes_warning');
+        e.returnValue = message;
+        return message;
     }
 });
 

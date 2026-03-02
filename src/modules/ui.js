@@ -18,8 +18,20 @@ import {
 export function showFeedbackMessage(message, duration = 3000, container = null) {
     let feedbackEl = document.getElementById(FEEDBACK_MESSAGE_ID);
 
-    // Fallback: Si l'élément n'existe pas (panneau fermé), on utilise un toast global
-    if (!feedbackEl) {
+    // Vérifie si l'élément du panneau est visible dans le viewport
+    // ET qu'aucun modal (Lyric Card, Custom Manager, etc.) ne le recouvre
+    const isModalOpen = !!(
+        document.getElementById('gft-lyric-card-modal') ||
+        document.getElementById('gft-custom-manager') ||
+        document.querySelector('.gft-preview-overlay')
+    );
+
+    const isPanelFeedbackVisible = feedbackEl && !isModalOpen && (() => {
+        const parent = feedbackEl.closest('#genius-lyrics-shortcuts-container');
+        return parent && parent.offsetParent !== null;
+    })();
+
+    if (!feedbackEl || !isPanelFeedbackVisible) {
         let toast = document.getElementById('gft-global-toast');
         if (!toast) {
             toast = document.createElement('div');

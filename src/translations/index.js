@@ -337,7 +337,13 @@ export const TRANSLATIONS = {
         yt_pause_sync: "⏸️ Pause (Sync)",
         panel_toggle_tooltip: "Cliquer pour replier/déplier",
         confirm_delete_button: "Supprimer \"{label}\" ?",
-        import_failed_invalid: "Échec de l'import. Code invalide."
+        import_failed_invalid: "Échec de l'import. Code invalide.",
+        bracket_opening_no_close: "{char} ouvrant sans fermeture correspondante",
+        bracket_closing_no_open: "{char} fermant sans ouverture correspondante",
+        bracket_wrong_pair: "{char} ne correspond pas au caractère ouvrant",
+        lc_unknown_title: "Titre Inconnu",
+        lc_unknown_artist: "Artiste Inconnu",
+        unsaved_changes_warning: "Vous avez des modifications non sauvegardées. Voulez-vous vraiment quitter ?"
     },
     en: {
         panel_title: "Genius Fast Transcriber",
@@ -680,7 +686,13 @@ export const TRANSLATIONS = {
         yt_pause_sync: "⏸️ Pause (Sync)",
         panel_toggle_tooltip: "Click to collapse/expand",
         confirm_delete_button: "Delete \"{label}\"?",
-        import_failed_invalid: "Import failed. Invalid code."
+        import_failed_invalid: "Import failed. Invalid code.",
+        bracket_opening_no_close: "Opening {char} without matching closing",
+        bracket_closing_no_open: "Closing {char} without matching opening",
+        bracket_wrong_pair: "{char} does not match the opening character",
+        lc_unknown_title: "Unknown Title",
+        lc_unknown_artist: "Unknown Artist",
+        unsaved_changes_warning: "You have unsaved changes. Are you sure you want to leave?"
     },
     // Polish translations - UI strings are placeholders for contributor PR
     // Structure tags and cleanup tools are Polish-specific per Genius Polska guidelines
@@ -1013,6 +1025,12 @@ export const TRANSLATIONS = {
         yt_pause_sync: "⏸️ Pauza (Sync)",
         panel_toggle_tooltip: "Kliknij, aby zwinąć/rozwinąć",
         confirm_delete_button: "Usunąć \"{label}\"?",
-        import_failed_invalid: "Import nie powiódł się. Nieprawidłowy kod."
+        import_failed_invalid: "Import nie powiódł się. Nieprawidłowy kod.",
+        bracket_opening_no_close: "Otwierający {char} bez odpowiadającego zamknięcia",
+        bracket_closing_no_open: "Zamykający {char} bez odpowiadającego otwarcia",
+        bracket_wrong_pair: "{char} nie pasuje do znaku otwierającego",
+        lc_unknown_title: "Nieznany tytuł",
+        lc_unknown_artist: "Nieznany wykonawca",
+        unsaved_changes_warning: "Masz niezapisane zmiany. Czy na pewno chcesz wyjść?"
     }
 };
