@@ -1816,21 +1816,20 @@
     }
     return correctionsCount;
   }
-  function applyAllTextCorrectionsToString(text, options = {}) {
-    const opts = {
+  function getDefaultOptions(options = {}) {
+    return {
       yPrime: options.yPrime !== false,
       apostrophes: options.apostrophes !== false,
       oeuLigature: options.oeuLigature !== false,
       frenchQuotes: options.frenchQuotes !== false,
       longDash: options.longDash !== false,
       doubleSpaces: options.doubleSpaces !== false,
-      capitalization: options.capitalization !== false,
       punctuation: options.punctuation !== false,
       spacing: options.spacing !== false
     };
-    let currentText = text;
-    let result;
-    const corrections = {
+  }
+  function initCorrectionsObject() {
+    return {
       yPrime: 0,
       apostrophes: 0,
       oeuLigature: 0,
@@ -1840,184 +1839,151 @@
       doubleSpaces: 0,
       spacing: 0
     };
-    if (opts.yPrime) {
-      const yPrimePattern = /\b(Y|y)['‘’´`ʻ]/g;
-      const yPrimeReplacement = (match, firstLetter) => firstLetter === "Y" ? "Y " : "y ";
-      const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
-      if (textAfterYPrime !== currentText) {
-        corrections.yPrime = (currentText.match(yPrimePattern) || []).length;
-        currentText = textAfterYPrime;
-      }
-    }
-    if (opts.apostrophes) {
-      const apostrophePattern = /[‘’´`ʻ]/g;
-      const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
-      if (textAfterApostrophe !== currentText) {
-        corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
-        currentText = textAfterApostrophe;
-      }
-    }
-    if (opts.oeuLigature) {
-      const oeuPattern = /([Oo])eu/g;
-      const oeuReplacement = (match, firstLetter) => firstLetter === "O" ? "\u0152u" : "\u0153u";
-      const textAfterOeu = currentText.replace(oeuPattern, oeuReplacement);
-      if (textAfterOeu !== currentText) {
-        corrections.oeuLigature = (currentText.match(oeuPattern) || []).length;
-        currentText = textAfterOeu;
-      }
-    }
-    if (opts.frenchQuotes) {
-      const frenchQuotesPattern = /[«»]/g;
-      const textAfterFrenchQuotes = currentText.replace(frenchQuotesPattern, '"');
-      if (textAfterFrenchQuotes !== currentText) {
-        corrections.frenchQuotes = (currentText.match(frenchQuotesPattern) || []).length;
-        currentText = textAfterFrenchQuotes;
-      }
-    }
-    if (opts.longDash) {
-      if (typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) {
-        const polishDashPattern = / - /g;
-        const textAfterPolishDash = currentText.replace(polishDashPattern, " \u2014 ");
-        if (textAfterPolishDash !== currentText) {
-          corrections.longDash = (currentText.match(polishDashPattern) || []).length;
-          currentText = textAfterPolishDash;
-        }
-      } else {
-        const longDashPattern = /[—–]/g;
-        const textAfterLongDash = currentText.replace(longDashPattern, "-");
-        if (textAfterLongDash !== currentText) {
-          corrections.longDash = (currentText.match(longDashPattern) || []).length;
-          currentText = textAfterLongDash;
-        }
-      }
-    }
-    if (opts.punctuation) {
-      if (!(typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) && !(typeof isEnglishTranscriptionMode === "function" && isEnglishTranscriptionMode())) {
-        const punctuationPattern = /([^ \n\[(<])([?!])/g;
-        const textAfterPunctuation = currentText.replace(punctuationPattern, "$1 $2");
-        if (textAfterPunctuation !== currentText) {
-          corrections.punctuation = (currentText.match(punctuationPattern) || []).length;
-          currentText = textAfterPunctuation;
-        }
-      }
-    }
-    if (opts.doubleSpaces) {
-      const doubleSpacesPattern = /  +/g;
-      const textAfterDoubleSpaces = currentText.replace(doubleSpacesPattern, " ");
-      if (textAfterDoubleSpaces !== currentText) {
-        corrections.doubleSpaces = (currentText.match(doubleSpacesPattern) || []).length;
-        currentText = textAfterDoubleSpaces;
-      }
-    }
-    if (opts.spacing) {
-      result = correctLineSpacing(currentText);
-      if (result.correctionsCount > 0) {
-        corrections.spacing = result.correctionsCount;
-        currentText = result.newText;
-      }
-    }
-    const totalCorrections = corrections.yPrime + corrections.apostrophes + corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash + corrections.doubleSpaces + corrections.spacing + (corrections.punctuation || 0);
-    return { newText: currentText, correctionsCount: totalCorrections, corrections };
+  }
+  function calculateTotalCorrections(corrections) {
+    return Object.values(corrections).reduce((sum, val) => sum + (val || 0), 0);
+  }
+  function applyAllTextCorrectionsToString(text, options = {}) {
+    const opts = getDefaultOptions(options);
+    let currentText = text;
+    const corrections = initCorrectionsObject();
+    CORRECTION_RULES.forEach((rule) => {
+      currentText = rule.execute(currentText, corrections, opts);
+    });
+    return {
+      newText: currentText,
+      correctionsCount: calculateTotalCorrections(corrections),
+      corrections
+    };
   }
   async function applyAllTextCorrectionsAsync(text, showProgressFn) {
-    const showProgress = showProgressFn || (() => {
+    const showProgress2 = showProgressFn || (() => {
     });
+    const opts = getDefaultOptions({});
     let currentText = text;
-    let result;
-    const totalSteps = 8;
-    const corrections = {
-      yPrime: 0,
-      apostrophes: 0,
-      oeuLigature: 0,
-      frenchQuotes: 0,
-      longDash: 0,
-      punctuation: 0,
-      doubleSpaces: 0,
-      spacing: 0
+    const corrections = initCorrectionsObject();
+    const totalSteps = CORRECTION_RULES.length;
+    for (let i = 0; i < CORRECTION_RULES.length; i++) {
+      const rule = CORRECTION_RULES[i];
+      if (rule.progressKey) {
+        showProgress2(i + 1, totalSteps, getTranslation(rule.progressKey));
+      }
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      currentText = rule.execute(currentText, corrections, opts);
+    }
+    return {
+      newText: currentText,
+      correctionsCount: calculateTotalCorrections(corrections),
+      corrections
     };
-    showProgress(1, totalSteps, getTranslation("progress_step_yprime"));
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    const yPrimePattern = /\b(Y|y)['‘’´`ʻ]/g;
-    const yPrimeReplacement = (match, firstLetter) => firstLetter === "Y" ? "Y " : "y ";
-    const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
-    if (textAfterYPrime !== currentText) {
-      corrections.yPrime = (currentText.match(yPrimePattern) || []).length;
-      currentText = textAfterYPrime;
-    }
-    showProgress(2, totalSteps, getTranslation("progress_step_apostrophes"));
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    const apostrophePattern = /[‘’´`ʻ]/g;
-    const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
-    if (textAfterApostrophe !== currentText) {
-      corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
-      currentText = textAfterApostrophe;
-    }
-    showProgress(3, totalSteps, getTranslation("progress_step_oeu"));
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    const oeuPattern = /([Oo])eu/g;
-    const oeuReplacement = (match, firstLetter) => firstLetter === "O" ? "\u0152u" : "\u0153u";
-    const textAfterOeu = currentText.replace(oeuPattern, oeuReplacement);
-    if (textAfterOeu !== currentText) {
-      corrections.oeuLigature = (currentText.match(oeuPattern) || []).length;
-      currentText = textAfterOeu;
-    }
-    showProgress(4, totalSteps, getTranslation("progress_step_quotes"));
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    const frenchQuotesPattern = /[«»]/g;
-    const textAfterFrenchQuotes = currentText.replace(frenchQuotesPattern, '"');
-    if (textAfterFrenchQuotes !== currentText) {
-      corrections.frenchQuotes = (currentText.match(frenchQuotesPattern) || []).length;
-      currentText = textAfterFrenchQuotes;
-    }
-    showProgress(5, totalSteps, getTranslation("progress_step_dash"));
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    if (typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) {
-      const polishDashPattern = / - /g;
-      const textAfterPolishDash = currentText.replace(polishDashPattern, " \u2014 ");
-      if (textAfterPolishDash !== currentText) {
-        corrections.longDash = (currentText.match(polishDashPattern) || []).length;
-        currentText = textAfterPolishDash;
-      }
-    } else {
-      const longDashPattern = /[—–]/g;
-      const textAfterLongDash = currentText.replace(longDashPattern, "-");
-      if (textAfterLongDash !== currentText) {
-        corrections.longDash = (currentText.match(longDashPattern) || []).length;
-        currentText = textAfterLongDash;
-      }
-    }
-    showProgress(6, totalSteps, getTranslation("progress_step_punctuation"));
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    if (!(typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) && !(typeof isEnglishTranscriptionMode === "function" && isEnglishTranscriptionMode())) {
-      const punctuationPattern = /([^ \n\[(<])([?!])/g;
-      const textAfterPunctuation = currentText.replace(punctuationPattern, "$1 $2");
-      if (textAfterPunctuation !== currentText) {
-        corrections.punctuation = (currentText.match(punctuationPattern) || []).length;
-        currentText = textAfterPunctuation;
-      }
-    }
-    showProgress(7, totalSteps, getTranslation("progress_step_spaces"));
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    const doubleSpacesPattern = /  +/g;
-    const textAfterDoubleSpaces = currentText.replace(doubleSpacesPattern, " ");
-    if (textAfterDoubleSpaces !== currentText) {
-      corrections.doubleSpaces = (currentText.match(doubleSpacesPattern) || []).length;
-      currentText = textAfterDoubleSpaces;
-    }
-    showProgress(8, totalSteps, getTranslation("progress_step_spacing"));
-    await new Promise((resolve) => setTimeout(resolve, 50));
-    result = correctLineSpacing(currentText);
-    if (result.correctionsCount > 0) {
-      corrections.spacing = result.correctionsCount;
-      currentText = result.newText;
-    }
-    const totalCorrections = corrections.yPrime + corrections.apostrophes + corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash + corrections.punctuation + corrections.doubleSpaces + corrections.spacing;
-    return { newText: currentText, correctionsCount: totalCorrections, corrections };
   }
+  var CORRECTION_RULES;
   var init_corrections = __esm({
     "src/modules/corrections.js"() {
       init_utils();
       init_config();
+      CORRECTION_RULES = [
+        {
+          id: "yPrime",
+          progressKey: "progress_step_yprime",
+          execute: (text, corrections, opts) => {
+            if (!opts.yPrime) return text;
+            const pattern = /\b(Y|y)['‘’´`ʻ]/g;
+            const newText = text.replace(pattern, (match, firstLetter) => firstLetter === "Y" ? "Y " : "y ");
+            if (newText !== text) corrections.yPrime = (text.match(pattern) || []).length;
+            return newText;
+          }
+        },
+        {
+          id: "apostrophes",
+          progressKey: "progress_step_apostrophes",
+          execute: (text, corrections, opts) => {
+            if (!opts.apostrophes) return text;
+            const pattern = /[‘’´`ʻ]/g;
+            const newText = text.replace(pattern, "'");
+            if (newText !== text) corrections.apostrophes = (text.match(pattern) || []).length;
+            return newText;
+          }
+        },
+        {
+          id: "oeuLigature",
+          progressKey: "progress_step_oeu",
+          execute: (text, corrections, opts) => {
+            if (!opts.oeuLigature) return text;
+            const pattern = /([Oo])eu/g;
+            const newText = text.replace(pattern, (match, firstLetter) => firstLetter === "O" ? "\u0152u" : "\u0153u");
+            if (newText !== text) corrections.oeuLigature = (text.match(pattern) || []).length;
+            return newText;
+          }
+        },
+        {
+          id: "frenchQuotes",
+          progressKey: "progress_step_quotes",
+          execute: (text, corrections, opts) => {
+            if (!opts.frenchQuotes) return text;
+            const pattern = /[«»]/g;
+            const newText = text.replace(pattern, '"');
+            if (newText !== text) corrections.frenchQuotes = (text.match(pattern) || []).length;
+            return newText;
+          }
+        },
+        {
+          id: "longDash",
+          progressKey: "progress_step_dash",
+          execute: (text, corrections, opts) => {
+            if (!opts.longDash) return text;
+            if (typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) {
+              const pattern = / - /g;
+              const newText = text.replace(pattern, " \u2014 ");
+              if (newText !== text) corrections.longDash = (text.match(pattern) || []).length;
+              return newText;
+            } else {
+              const pattern = /[—–]/g;
+              const newText = text.replace(pattern, "-");
+              if (newText !== text) corrections.longDash = (text.match(pattern) || []).length;
+              return newText;
+            }
+          }
+        },
+        {
+          id: "punctuation",
+          progressKey: "progress_step_punctuation",
+          execute: (text, corrections, opts) => {
+            if (!opts.punctuation) return text;
+            if (!(typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) && !(typeof isEnglishTranscriptionMode === "function" && isEnglishTranscriptionMode())) {
+              const pattern = /([^ \n\[(<])([?!])/g;
+              const newText = text.replace(pattern, "$1 $2");
+              if (newText !== text) corrections.punctuation = (text.match(pattern) || []).length;
+              return newText;
+            }
+            return text;
+          }
+        },
+        {
+          id: "doubleSpaces",
+          progressKey: "progress_step_spaces",
+          execute: (text, corrections, opts) => {
+            if (!opts.doubleSpaces) return text;
+            const pattern = /  +/g;
+            const newText = text.replace(pattern, " ");
+            if (newText !== text) corrections.doubleSpaces = (text.match(pattern) || []).length;
+            return newText;
+          }
+        },
+        {
+          id: "spacing",
+          progressKey: "progress_step_spacing",
+          execute: (text, corrections, opts) => {
+            if (!opts.spacing) return text;
+            const result = correctLineSpacing(text);
+            if (result.correctionsCount > 0) {
+              corrections.spacing = result.correctionsCount;
+              return result.newText;
+            }
+            return text;
+          }
+        }
+      ];
     }
   });
 
@@ -2057,6 +2023,411 @@
     }
   });
 
+  // src/modules/ui.js
+  function showFeedbackMessage(message, duration = 3e3, container = null) {
+    let feedbackEl = document.getElementById(FEEDBACK_MESSAGE_ID);
+    if (!feedbackEl) {
+      let toast = document.getElementById("gft-global-toast");
+      if (!toast) {
+        toast = document.createElement("div");
+        toast.id = "gft-global-toast";
+        toast.style.cssText = `
+                position: fixed; top: 20px; right: 20px; z-index: 10002;
+                background: #333; color: white; padding: 12px 20px;
+                border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                font-family: sans-serif; font-size: 14px; opacity: 0;
+                transition: opacity 0.3s ease; pointer-events: none;
+            `;
+        document.body.appendChild(toast);
+      }
+      feedbackEl = toast;
+      feedbackEl.style.display = "block";
+    }
+    if (GFT_STATE.feedbackTimeout) {
+      clearTimeout(GFT_STATE.feedbackTimeout);
+      GFT_STATE.feedbackTimeout = null;
+    }
+    if (GFT_STATE.feedbackAnimationTimeout) {
+      clearTimeout(GFT_STATE.feedbackAnimationTimeout);
+      GFT_STATE.feedbackAnimationTimeout = null;
+    }
+    feedbackEl.textContent = message;
+    feedbackEl.style.display = "block";
+    requestAnimationFrame(() => {
+      feedbackEl.style.visibility = "visible";
+      feedbackEl.style.opacity = "1";
+      if (feedbackEl.id === FEEDBACK_MESSAGE_ID) {
+        feedbackEl.style.maxHeight = "100px";
+        feedbackEl.style.marginTop = "10px";
+        feedbackEl.style.marginBottom = "10px";
+        feedbackEl.style.paddingTop = "8px";
+        feedbackEl.style.paddingBottom = "8px";
+      }
+    });
+    if (duration > 0) {
+      GFT_STATE.feedbackTimeout = setTimeout(() => {
+        feedbackEl.style.opacity = "0";
+        if (feedbackEl.id === FEEDBACK_MESSAGE_ID) {
+          feedbackEl.style.maxHeight = "0";
+          feedbackEl.style.marginTop = "0";
+          feedbackEl.style.marginBottom = "0";
+          feedbackEl.style.paddingTop = "0";
+          feedbackEl.style.paddingBottom = "0";
+        }
+        GFT_STATE.feedbackAnimationTimeout = setTimeout(() => {
+          feedbackEl.style.visibility = "hidden";
+          if (feedbackEl.id === "gft-global-toast") {
+          } else {
+            feedbackEl.style.display = "none";
+          }
+          GFT_STATE.feedbackAnimationTimeout = null;
+        }, 300);
+        GFT_STATE.feedbackTimeout = null;
+      }, duration);
+    }
+  }
+  function showRestoreDraftNotification(timeStr, contentToRestore, onRestore, onDiscard) {
+    const container = document.body;
+    const notification = document.createElement("div");
+    notification.className = "gft-draft-notification";
+    notification.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #333;
+        color: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        z-index: 2147483647;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        font-family: 'Programme', sans-serif;
+        border-left: 4px solid #ffff64;
+        animation: slideIn 0.3s ease-out;
+        pointer-events: auto;
+        cursor: default;
+    `;
+    const text = document.createElement("div");
+    text.innerHTML = `<strong>${getTranslation("draft_found_title")}</strong><br>${getTranslation("draft_saved_at")} ${timeStr}`;
+    const buttons = document.createElement("div");
+    buttons.style.display = "flex";
+    buttons.style.gap = "10px";
+    const restoreBtn = document.createElement("button");
+    restoreBtn.textContent = getTranslation("draft_btn_restore");
+    restoreBtn.style.cssText = `
+        background-color: #ffff64;
+        color: black;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        pointer-events: auto;
+    `;
+    restoreBtn.onclick = (e) => {
+      e.stopPropagation();
+      if (onRestore) onRestore();
+      showFeedbackMessage(getTranslation("draft_restored"));
+      notification.remove();
+    };
+    const discardBtn = document.createElement("button");
+    discardBtn.textContent = getTranslation("draft_btn_discard");
+    discardBtn.style.cssText = `
+        background-color: transparent;
+        color: #aaa;
+        border: 1px solid #555;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        pointer-events: auto;
+    `;
+    discardBtn.onclick = (e) => {
+      e.stopPropagation();
+      if (onDiscard) onDiscard();
+      notification.remove();
+    };
+    buttons.appendChild(restoreBtn);
+    buttons.appendChild(discardBtn);
+    notification.appendChild(text);
+    notification.appendChild(buttons);
+    container.appendChild(notification);
+    setTimeout(() => {
+      if (document.body.contains(notification)) {
+        notification.remove();
+        if (onDiscard) onDiscard();
+      }
+    }, 15e3);
+  }
+  function createProgressBar() {
+    const progressContainer = document.createElement("div");
+    progressContainer.id = "gft-progress-container";
+    progressContainer.className = "gft-progress-container";
+    const progressBar = document.createElement("div");
+    progressBar.id = "gft-progress-bar";
+    progressBar.className = "gft-progress-bar";
+    const progressText = document.createElement("div");
+    progressText.id = "gft-progress-text";
+    progressText.className = "gft-progress-text";
+    progressText.textContent = "Pr\xE9paration...";
+    progressContainer.appendChild(progressBar);
+    progressContainer.appendChild(progressText);
+    return progressContainer;
+  }
+  function showProgress(step, total, message) {
+    let progressContainer = document.getElementById("gft-progress-container");
+    if (!progressContainer && GFT_STATE.shortcutsContainerElement) {
+      progressContainer = createProgressBar();
+      const feedbackMsg = document.getElementById(FEEDBACK_MESSAGE_ID);
+      if (feedbackMsg) {
+        GFT_STATE.shortcutsContainerElement.insertBefore(progressContainer, feedbackMsg.nextSibling);
+      } else {
+        const panelTitle = document.getElementById("gftPanelTitle");
+        if (panelTitle) {
+          GFT_STATE.shortcutsContainerElement.insertBefore(progressContainer, panelTitle.nextSibling);
+        } else {
+          GFT_STATE.shortcutsContainerElement.insertBefore(progressContainer, GFT_STATE.shortcutsContainerElement.firstChild);
+        }
+      }
+    }
+    if (!progressContainer) return;
+    progressContainer.style.display = "block";
+    const progressBar = document.getElementById("gft-progress-bar");
+    const progressText = document.getElementById("gft-progress-text");
+    const percentage = Math.round(step / total * 100);
+    if (progressBar) {
+      progressBar.style.width = `${percentage}%`;
+    }
+    if (progressText) {
+      progressText.textContent = `${message} (${step}/${total})`;
+    }
+  }
+  function hideProgress() {
+    const progressContainer = document.getElementById("gft-progress-container");
+    if (progressContainer) {
+      progressContainer.style.display = "none";
+    }
+  }
+  function computeDiff(original, modified) {
+    const m = original.length;
+    const n = modified.length;
+    const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
+    for (let i2 = 1; i2 <= m; i2++) {
+      for (let j2 = 1; j2 <= n; j2++) {
+        if (original[i2 - 1] === modified[j2 - 1]) {
+          dp[i2][j2] = dp[i2 - 1][j2 - 1] + 1;
+        } else {
+          dp[i2][j2] = Math.max(dp[i2 - 1][j2], dp[i2][j2 - 1]);
+        }
+      }
+    }
+    const chunks = [];
+    let i = m, j = n;
+    let currentCommon = "";
+    let currentAdded = "";
+    let currentRemoved = "";
+    while (i > 0 || j > 0) {
+      if (i > 0 && j > 0 && original[i - 1] === modified[j - 1]) {
+        if (currentAdded) {
+          chunks.unshift({ type: "added", value: currentAdded });
+          currentAdded = "";
+        }
+        if (currentRemoved) {
+          chunks.unshift({ type: "removed", value: currentRemoved });
+          currentRemoved = "";
+        }
+        currentCommon = original[i - 1] + currentCommon;
+        i--;
+        j--;
+      } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+        if (currentCommon) {
+          chunks.unshift({ type: "common", value: currentCommon });
+          currentCommon = "";
+        }
+        if (currentRemoved) {
+          chunks.unshift({ type: "removed", value: currentRemoved });
+          currentRemoved = "";
+        }
+        currentAdded = modified[j - 1] + currentAdded;
+        j--;
+      } else {
+        if (currentCommon) {
+          chunks.unshift({ type: "common", value: currentCommon });
+          currentCommon = "";
+        }
+        if (currentAdded) {
+          chunks.unshift({ type: "added", value: currentAdded });
+          currentAdded = "";
+        }
+        currentRemoved = original[i - 1] + currentRemoved;
+        i--;
+      }
+    }
+    if (currentCommon) chunks.unshift({ type: "common", value: currentCommon });
+    if (currentAdded) chunks.unshift({ type: "added", value: currentAdded });
+    if (currentRemoved) chunks.unshift({ type: "removed", value: currentRemoved });
+    return chunks;
+  }
+  function highlightDifferences(originalText, correctedText) {
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+    const diffChunks = computeDiff(originalText, correctedText);
+    let html = "";
+    diffChunks.forEach((chunk) => {
+      let escapedValue = escapeHtml(chunk.value);
+      escapedValue = escapedValue.replace(/\n/g, '<span style="opacity: 0.5; font-size: 0.8em;">\u21B5</span>\n');
+      if (chunk.type === "removed") {
+        html += `<span style="background-color: #ffcccc; color: #cc0000; text-decoration: line-through; border-radius: 2px;">${escapedValue}</span>`;
+      } else if (chunk.type === "added") {
+        html += `<span style="background-color: #ccffcc; color: #006600; font-weight: bold; border-radius: 2px;">${escapedValue}</span>`;
+      } else {
+        html += escapedValue;
+      }
+    });
+    return html;
+  }
+  function showCorrectionPreview(originalText, correctedText, initialCorrections, onApply, onCancel) {
+    let currentPreviewText = correctedText;
+    let currentStats = initialCorrections;
+    const options = {
+      yPrime: true,
+      apostrophes: true,
+      oeuLigature: true,
+      frenchQuotes: true,
+      longDash: true,
+      punctuation: true,
+      doubleSpaces: true,
+      spacing: true
+    };
+    const overlay = document.createElement("div");
+    overlay.id = "gft-preview-overlay";
+    overlay.className = "gft-preview-overlay";
+    const modal = document.createElement("div");
+    modal.id = "gft-preview-modal";
+    modal.className = "gft-preview-modal";
+    const isDarkMode = localStorage.getItem(DARK_MODE_STORAGE_KEY) === "true";
+    if (isDarkMode) modal.classList.add(DARK_MODE_CLASS);
+    const header = document.createElement("div");
+    header.style.marginBottom = "15px";
+    const title = document.createElement("h2");
+    title.textContent = getTranslation("preview_title");
+    title.className = "gft-preview-title";
+    header.appendChild(title);
+    const optionsContainer = document.createElement("div");
+    optionsContainer.style.display = "grid";
+    optionsContainer.style.gridTemplateColumns = "repeat(auto-fit, minmax(180px, 1fr))";
+    optionsContainer.style.gap = "8px";
+    optionsContainer.style.padding = "10px";
+    optionsContainer.style.background = isDarkMode ? "rgba(255,255,255,0.05)" : "#f0f0f0";
+    optionsContainer.style.borderRadius = "5px";
+    optionsContainer.style.marginBottom = "10px";
+    const createOption = (key, label) => {
+      const labelEl = document.createElement("label");
+      labelEl.style.display = "flex";
+      labelEl.style.alignItems = "center";
+      labelEl.style.fontSize = "12px";
+      labelEl.style.cursor = "pointer";
+      if (isDarkMode) labelEl.style.color = "#ddd";
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = options[key];
+      checkbox.style.marginRight = "6px";
+      checkbox.addEventListener("change", () => {
+        options[key] = checkbox.checked;
+        updatePreview();
+      });
+      labelEl.appendChild(checkbox);
+      labelEl.appendChild(document.createTextNode(label));
+      return labelEl;
+    };
+    optionsContainer.appendChild(createOption("yPrime", getTranslation("preview_opt_yprime")));
+    optionsContainer.appendChild(createOption("apostrophes", getTranslation("preview_opt_apostrophes")));
+    optionsContainer.appendChild(createOption("oeuLigature", getTranslation("preview_opt_oeu")));
+    optionsContainer.appendChild(createOption("frenchQuotes", getTranslation("preview_opt_quotes")));
+    optionsContainer.appendChild(createOption("longDash", getTranslation("preview_opt_dash")));
+    if (!(typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) && !(typeof isEnglishTranscriptionMode === "function" && isEnglishTranscriptionMode())) {
+      optionsContainer.appendChild(createOption("punctuation", getTranslation("preview_opt_punctuation")));
+    }
+    optionsContainer.appendChild(createOption("doubleSpaces", getTranslation("preview_opt_spaces")));
+    optionsContainer.appendChild(createOption("spacing", getTranslation("preview_opt_spacing")));
+    header.appendChild(optionsContainer);
+    modal.appendChild(header);
+    const summary = document.createElement("div");
+    summary.className = "gft-preview-summary";
+    modal.appendChild(summary);
+    const diffTitle = document.createElement("h3");
+    diffTitle.textContent = getTranslation("preview_diff_title");
+    diffTitle.style.fontSize = "14px";
+    diffTitle.style.marginBottom = "5px";
+    diffTitle.style.color = isDarkMode ? "#aaa" : "#555";
+    modal.appendChild(diffTitle);
+    const diffContainer = document.createElement("div");
+    diffContainer.className = "gft-preview-content";
+    diffContainer.id = "gft-preview-diff";
+    diffContainer.style.flex = "1";
+    diffContainer.style.overflowY = "auto";
+    diffContainer.style.whiteSpace = "pre-wrap";
+    diffContainer.style.border = "1px solid #ccc";
+    if (isDarkMode) diffContainer.style.borderColor = "#444";
+    modal.appendChild(diffContainer);
+    const buttonContainer = document.createElement("div");
+    buttonContainer.className = "gft-preview-buttons";
+    const cancelButton = document.createElement("button");
+    cancelButton.textContent = getTranslation("preview_btn_cancel");
+    cancelButton.className = "gft-preview-button gft-preview-button-cancel";
+    cancelButton.addEventListener("click", () => close());
+    buttonContainer.appendChild(cancelButton);
+    const applyButton = document.createElement("button");
+    applyButton.textContent = getTranslation("preview_btn_apply");
+    applyButton.className = "gft-preview-button gft-preview-button-apply";
+    applyButton.addEventListener("click", () => {
+      close();
+      if (onApply) onApply(currentPreviewText, currentStats);
+    });
+    buttonContainer.appendChild(applyButton);
+    modal.appendChild(buttonContainer);
+    document.body.appendChild(overlay);
+    document.body.appendChild(modal);
+    function close() {
+      if (document.body.contains(overlay)) document.body.removeChild(overlay);
+      if (document.body.contains(modal)) document.body.removeChild(modal);
+      if (onCancel && !currentPreviewText) onCancel();
+    }
+    function updatePreview() {
+      const result = applyAllTextCorrectionsToString(originalText, options);
+      currentPreviewText = result.newText;
+      currentStats = result.corrections;
+      const lang = localStorage.getItem("gftLanguage") || "fr";
+      const detailsArray = [];
+      if (options.yPrime && currentStats.yPrime > 0) detailsArray.push(`${currentStats.yPrime} "y'"`);
+      if (options.apostrophes && currentStats.apostrophes > 0) detailsArray.push(`${currentStats.apostrophes} ${getTranslation("preview_stat_apostrophes", currentStats.apostrophes)}`);
+      if (options.oeuLigature && currentStats.oeuLigature > 0) detailsArray.push(`${currentStats.oeuLigature} "oeu"`);
+      if (options.frenchQuotes && currentStats.frenchQuotes > 0) detailsArray.push(`${currentStats.frenchQuotes} ${getTranslation("preview_stat_quotes", currentStats.frenchQuotes)}`);
+      if (options.longDash && currentStats.longDash > 0) detailsArray.push(`${currentStats.longDash} ${getTranslation("preview_stat_dash", currentStats.longDash)}`);
+      if (options.punctuation && currentStats.punctuation > 0) detailsArray.push(`${currentStats.punctuation} ${getTranslation("preview_stat_punctuation", currentStats.punctuation)}`);
+      if (options.doubleSpaces && currentStats.doubleSpaces > 0) detailsArray.push(`${currentStats.doubleSpaces} ${getTranslation("preview_stat_spaces", currentStats.doubleSpaces)}`);
+      if (options.spacing && currentStats.spacing > 0) detailsArray.push(`${currentStats.spacing} ${getTranslation("preview_stat_spacing", currentStats.spacing)}`);
+      const total = result.correctionsCount;
+      const summaryTemplate = getTranslation("preview_summary", total).replace("{count}", total);
+      summary.innerHTML = `<strong>${summaryTemplate}</strong><br>${detailsArray.length > 0 ? formatListWithConjunction(detailsArray, lang) : getTranslation("preview_no_corrections")}`;
+      diffContainer.innerHTML = highlightDifferences(originalText, currentPreviewText);
+    }
+    updatePreview();
+    overlay.addEventListener("click", close);
+  }
+  var init_ui = __esm({
+    "src/modules/ui.js"() {
+      init_utils();
+      init_corrections();
+      init_config();
+      init_constants();
+    }
+  });
+
   // src/content.js
   var require_content = __commonJS({
     "src/content.js"() {
@@ -2068,7 +2439,8 @@
       init_utils();
       init_corrections();
       init_export();
-      console.log("Genius Fast Transcriber v4.0.3 \u{1F3B5}");
+      init_ui();
+      console.log("Genius Fast Transcriber v4.1.0 \u{1F3B5}");
       function isContextValid() {
         return typeof chrome !== "undefined" && !!chrome.runtime && !!chrome.runtime.id;
       }
@@ -3021,88 +3393,23 @@
           if (Date.now() - draftData.timestamp > ONE_DAY) return;
           const date = new Date(draftData.timestamp);
           const timeStr = date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-          showRestoreDraftNotification(timeStr, draftData.content);
+          showRestoreDraftNotification(
+            timeStr,
+            draftData.content,
+            () => {
+              setEditorContent(draftData.content);
+              saveToHistory();
+              draftNotificationShown = false;
+            },
+            () => {
+              localStorage.removeItem(getDraftKey());
+              draftNotificationShown = false;
+            }
+          );
           draftNotificationShown = true;
         } catch (e) {
           console.warn("[GFT] Erreur lecture brouillon:", e);
         }
-      }
-      function showRestoreDraftNotification(timeStr, contentToRestore) {
-        const container = document.body;
-        const notification = document.createElement("div");
-        notification.className = "gft-draft-notification";
-        notification.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background-color: #333;
-        color: white;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-        z-index: 2147483647; /* Max z-index pour \xEAtre s\xFBr d'\xEAtre au-dessus de tout */
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        font-family: 'Programme', sans-serif;
-        border-left: 4px solid #ffff64;
-        animation: slideIn 0.3s ease-out;
-        pointer-events: auto; /* Force la r\xE9activit\xE9 aux clics */
-        cursor: default;
-    `;
-        const text = document.createElement("div");
-        text.innerHTML = `<strong>${getTranslation("draft_found_title")}</strong><br>${getTranslation("draft_saved_at")} ${timeStr}`;
-        const buttons = document.createElement("div");
-        buttons.style.display = "flex";
-        buttons.style.gap = "10px";
-        const restoreBtn = document.createElement("button");
-        restoreBtn.textContent = getTranslation("draft_btn_restore");
-        restoreBtn.style.cssText = `
-        background-color: #ffff64;
-        color: black;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: bold;
-        pointer-events: auto;
-    `;
-        restoreBtn.onclick = (e) => {
-          e.stopPropagation();
-          setEditorContent(contentToRestore);
-          saveToHistory();
-          showFeedbackMessage(getTranslation("draft_restored"));
-          notification.remove();
-          draftNotificationShown = false;
-        };
-        const discardBtn = document.createElement("button");
-        discardBtn.textContent = getTranslation("draft_btn_discard");
-        discardBtn.style.cssText = `
-        background-color: transparent;
-        color: #aaa;
-        border: 1px solid #555;
-        padding: 5px 10px;
-        border-radius: 4px;
-        cursor: pointer;
-        pointer-events: auto;
-    `;
-        discardBtn.onclick = (e) => {
-          e.stopPropagation();
-          notification.remove();
-          localStorage.removeItem(getDraftKey());
-          draftNotificationShown = false;
-        };
-        buttons.appendChild(restoreBtn);
-        buttons.appendChild(discardBtn);
-        notification.appendChild(text);
-        notification.appendChild(buttons);
-        container.appendChild(notification);
-        setTimeout(() => {
-          if (document.body.contains(notification)) {
-            notification.remove();
-            draftNotificationShown = false;
-          }
-        }, 15e3);
       }
       function undoLastChange() {
         if (!GFT_STATE.currentActiveEditor || GFT_STATE.undoStack.length === 0) {
@@ -3176,265 +3483,6 @@
             redoButton.style.cursor = "pointer";
           }
         }
-      }
-      function createProgressBar() {
-        const progressContainer = document.createElement("div");
-        progressContainer.id = "gft-progress-container";
-        progressContainer.className = "gft-progress-container";
-        const progressBar = document.createElement("div");
-        progressBar.id = "gft-progress-bar";
-        progressBar.className = "gft-progress-bar";
-        const progressText = document.createElement("div");
-        progressText.id = "gft-progress-text";
-        progressText.className = "gft-progress-text";
-        progressText.textContent = "Pr\xE9paration...";
-        progressContainer.appendChild(progressBar);
-        progressContainer.appendChild(progressText);
-        return progressContainer;
-      }
-      function showProgress(step, total, message) {
-        let progressContainer = document.getElementById("gft-progress-container");
-        if (!progressContainer && GFT_STATE.shortcutsContainerElement) {
-          progressContainer = createProgressBar();
-          const feedbackMsg = document.getElementById(FEEDBACK_MESSAGE_ID);
-          if (feedbackMsg) {
-            GFT_STATE.shortcutsContainerElement.insertBefore(progressContainer, feedbackMsg.nextSibling);
-          } else {
-            const panelTitle = document.getElementById("gftPanelTitle");
-            if (panelTitle) {
-              GFT_STATE.shortcutsContainerElement.insertBefore(progressContainer, panelTitle.nextSibling);
-            } else {
-              GFT_STATE.shortcutsContainerElement.insertBefore(progressContainer, GFT_STATE.shortcutsContainerElement.firstChild);
-            }
-          }
-        }
-        if (!progressContainer) return;
-        progressContainer.style.display = "block";
-        const progressBar = document.getElementById("gft-progress-bar");
-        const progressText = document.getElementById("gft-progress-text");
-        const percentage = Math.round(step / total * 100);
-        if (progressBar) {
-          progressBar.style.width = `${percentage}%`;
-        }
-        if (progressText) {
-          progressText.textContent = `${message} (${step}/${total})`;
-        }
-      }
-      function hideProgress() {
-        const progressContainer = document.getElementById("gft-progress-container");
-        if (progressContainer) {
-          progressContainer.style.display = "none";
-        }
-      }
-      function computeDiff(original, modified) {
-        const m = original.length;
-        const n = modified.length;
-        const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
-        for (let i2 = 1; i2 <= m; i2++) {
-          for (let j2 = 1; j2 <= n; j2++) {
-            if (original[i2 - 1] === modified[j2 - 1]) {
-              dp[i2][j2] = dp[i2 - 1][j2 - 1] + 1;
-            } else {
-              dp[i2][j2] = Math.max(dp[i2 - 1][j2], dp[i2][j2 - 1]);
-            }
-          }
-        }
-        const chunks = [];
-        let i = m, j = n;
-        let currentCommon = "";
-        let currentAdded = "";
-        let currentRemoved = "";
-        while (i > 0 || j > 0) {
-          if (i > 0 && j > 0 && original[i - 1] === modified[j - 1]) {
-            if (currentAdded) {
-              chunks.unshift({ type: "added", value: currentAdded });
-              currentAdded = "";
-            }
-            if (currentRemoved) {
-              chunks.unshift({ type: "removed", value: currentRemoved });
-              currentRemoved = "";
-            }
-            currentCommon = original[i - 1] + currentCommon;
-            i--;
-            j--;
-          } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
-            if (currentCommon) {
-              chunks.unshift({ type: "common", value: currentCommon });
-              currentCommon = "";
-            }
-            if (currentRemoved) {
-              chunks.unshift({ type: "removed", value: currentRemoved });
-              currentRemoved = "";
-            }
-            currentAdded = modified[j - 1] + currentAdded;
-            j--;
-          } else {
-            if (currentCommon) {
-              chunks.unshift({ type: "common", value: currentCommon });
-              currentCommon = "";
-            }
-            if (currentAdded) {
-              chunks.unshift({ type: "added", value: currentAdded });
-              currentAdded = "";
-            }
-            currentRemoved = original[i - 1] + currentRemoved;
-            i--;
-          }
-        }
-        if (currentCommon) chunks.unshift({ type: "common", value: currentCommon });
-        if (currentAdded) chunks.unshift({ type: "added", value: currentAdded });
-        if (currentRemoved) chunks.unshift({ type: "removed", value: currentRemoved });
-        return chunks;
-      }
-      function highlightDifferences(originalText, correctedText) {
-        function escapeHtml(text) {
-          const div = document.createElement("div");
-          div.textContent = text;
-          return div.innerHTML;
-        }
-        const diffChunks = computeDiff(originalText, correctedText);
-        let html = "";
-        diffChunks.forEach((chunk) => {
-          let escapedValue = escapeHtml(chunk.value);
-          escapedValue = escapedValue.replace(/\n/g, '<span style="opacity: 0.5; font-size: 0.8em;">\u21B5</span>\n');
-          if (chunk.type === "removed") {
-            html += `<span style="background-color: #ffcccc; color: #cc0000; text-decoration: line-through; border-radius: 2px;">${escapedValue}</span>`;
-          } else if (chunk.type === "added") {
-            html += `<span style="background-color: #ccffcc; color: #006600; font-weight: bold; border-radius: 2px;">${escapedValue}</span>`;
-          } else {
-            html += escapedValue;
-          }
-        });
-        return html;
-      }
-      function showCorrectionPreview(originalText, correctedText, initialCorrections, onApply, onCancel) {
-        let currentPreviewText = correctedText;
-        let currentStats = initialCorrections;
-        const options = {
-          yPrime: true,
-          apostrophes: true,
-          oeuLigature: true,
-          frenchQuotes: true,
-          longDash: true,
-          punctuation: true,
-          doubleSpaces: true,
-          spacing: true
-        };
-        const overlay = document.createElement("div");
-        overlay.id = "gft-preview-overlay";
-        overlay.className = "gft-preview-overlay";
-        const modal = document.createElement("div");
-        modal.id = "gft-preview-modal";
-        modal.className = "gft-preview-modal";
-        const isDarkMode = localStorage.getItem(DARK_MODE_STORAGE_KEY) === "true";
-        if (isDarkMode) modal.classList.add(DARK_MODE_CLASS);
-        const header = document.createElement("div");
-        header.style.marginBottom = "15px";
-        const title = document.createElement("h2");
-        title.textContent = getTranslation("preview_title");
-        title.className = "gft-preview-title";
-        header.appendChild(title);
-        const optionsContainer = document.createElement("div");
-        optionsContainer.style.display = "grid";
-        optionsContainer.style.gridTemplateColumns = "repeat(auto-fit, minmax(180px, 1fr))";
-        optionsContainer.style.gap = "8px";
-        optionsContainer.style.padding = "10px";
-        optionsContainer.style.background = isDarkMode ? "rgba(255,255,255,0.05)" : "#f0f0f0";
-        optionsContainer.style.borderRadius = "5px";
-        optionsContainer.style.marginBottom = "10px";
-        const createOption = (key, label) => {
-          const labelEl = document.createElement("label");
-          labelEl.style.display = "flex";
-          labelEl.style.alignItems = "center";
-          labelEl.style.fontSize = "12px";
-          labelEl.style.cursor = "pointer";
-          if (isDarkMode) labelEl.style.color = "#ddd";
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.checked = options[key];
-          checkbox.style.marginRight = "6px";
-          checkbox.addEventListener("change", () => {
-            options[key] = checkbox.checked;
-            updatePreview();
-          });
-          labelEl.appendChild(checkbox);
-          labelEl.appendChild(document.createTextNode(label));
-          return labelEl;
-        };
-        optionsContainer.appendChild(createOption("yPrime", getTranslation("preview_opt_yprime")));
-        optionsContainer.appendChild(createOption("apostrophes", getTranslation("preview_opt_apostrophes")));
-        optionsContainer.appendChild(createOption("oeuLigature", getTranslation("preview_opt_oeu")));
-        optionsContainer.appendChild(createOption("frenchQuotes", getTranslation("preview_opt_quotes")));
-        optionsContainer.appendChild(createOption("longDash", getTranslation("preview_opt_dash")));
-        if (!(typeof isPolishTranscriptionMode === "function" && isPolishTranscriptionMode()) && !(typeof isEnglishTranscriptionMode === "function" && isEnglishTranscriptionMode())) {
-          optionsContainer.appendChild(createOption("punctuation", getTranslation("preview_opt_punctuation")));
-        }
-        optionsContainer.appendChild(createOption("doubleSpaces", getTranslation("preview_opt_spaces")));
-        optionsContainer.appendChild(createOption("spacing", getTranslation("preview_opt_spacing")));
-        header.appendChild(optionsContainer);
-        modal.appendChild(header);
-        const summary = document.createElement("div");
-        summary.className = "gft-preview-summary";
-        modal.appendChild(summary);
-        const diffTitle = document.createElement("h3");
-        diffTitle.textContent = getTranslation("preview_diff_title");
-        diffTitle.style.fontSize = "14px";
-        diffTitle.style.marginBottom = "5px";
-        diffTitle.style.color = isDarkMode ? "#aaa" : "#555";
-        modal.appendChild(diffTitle);
-        const diffContainer = document.createElement("div");
-        diffContainer.className = "gft-preview-content";
-        diffContainer.id = "gft-preview-diff";
-        diffContainer.style.flex = "1";
-        diffContainer.style.overflowY = "auto";
-        diffContainer.style.whiteSpace = "pre-wrap";
-        diffContainer.style.border = "1px solid #ccc";
-        if (isDarkMode) diffContainer.style.borderColor = "#444";
-        modal.appendChild(diffContainer);
-        const buttonContainer = document.createElement("div");
-        buttonContainer.className = "gft-preview-buttons";
-        const cancelButton = document.createElement("button");
-        cancelButton.textContent = getTranslation("preview_btn_cancel");
-        cancelButton.className = "gft-preview-button gft-preview-button-cancel";
-        cancelButton.addEventListener("click", () => close());
-        buttonContainer.appendChild(cancelButton);
-        const applyButton = document.createElement("button");
-        applyButton.textContent = getTranslation("preview_btn_apply");
-        applyButton.className = "gft-preview-button gft-preview-button-apply";
-        applyButton.addEventListener("click", () => {
-          close();
-          if (onApply) onApply(currentPreviewText, currentStats);
-        });
-        buttonContainer.appendChild(applyButton);
-        modal.appendChild(buttonContainer);
-        document.body.appendChild(overlay);
-        document.body.appendChild(modal);
-        function close() {
-          document.body.removeChild(overlay);
-          document.body.removeChild(modal);
-          if (onCancel && !currentPreviewText) onCancel();
-        }
-        function updatePreview() {
-          const result = applyAllTextCorrectionsToString(originalText, options);
-          currentPreviewText = result.newText;
-          currentStats = result.corrections;
-          const lang = localStorage.getItem("gftLanguage") || "fr";
-          const detailsArray = [];
-          if (options.yPrime && currentStats.yPrime > 0) detailsArray.push(`${currentStats.yPrime} "y'"`);
-          if (options.apostrophes && currentStats.apostrophes > 0) detailsArray.push(`${currentStats.apostrophes} ${getTranslation("preview_stat_apostrophes", currentStats.apostrophes)}`);
-          if (options.oeuLigature && currentStats.oeuLigature > 0) detailsArray.push(`${currentStats.oeuLigature} "oeu"`);
-          if (options.frenchQuotes && currentStats.frenchQuotes > 0) detailsArray.push(`${currentStats.frenchQuotes} ${getTranslation("preview_stat_quotes", currentStats.frenchQuotes)}`);
-          if (options.longDash && currentStats.longDash > 0) detailsArray.push(`${currentStats.longDash} ${getTranslation("preview_stat_dash", currentStats.longDash)}`);
-          if (options.punctuation && currentStats.punctuation > 0) detailsArray.push(`${currentStats.punctuation} ${getTranslation("preview_stat_punctuation", currentStats.punctuation)}`);
-          if (options.doubleSpaces && currentStats.doubleSpaces > 0) detailsArray.push(`${currentStats.doubleSpaces} ${getTranslation("preview_stat_spaces", currentStats.doubleSpaces)}`);
-          if (options.spacing && currentStats.spacing > 0) detailsArray.push(`${currentStats.spacing} ${getTranslation("preview_stat_spacing", currentStats.spacing)}`);
-          const total = result.correctionsCount;
-          const summaryTemplate = getTranslation("preview_summary", total).replace("{count}", total);
-          summary.innerHTML = `<strong>${summaryTemplate}</strong><br>${detailsArray.length > 0 ? formatListWithConjunction(detailsArray, lang) : getTranslation("preview_no_corrections")}`;
-          diffContainer.innerHTML = highlightDifferences(originalText, currentPreviewText);
-        }
-        updatePreview();
-        overlay.addEventListener("click", close);
       }
       function isFirstLaunch() {
         return localStorage.getItem("gft-tutorial-completed") !== "true";
@@ -5510,8 +5558,8 @@
               creditLabel.style.userSelect = "none";
               const versionLabel = document.createElement("div");
               versionLabel.id = "gft-version-label";
-              versionLabel.textContent = "v4.0.3";
-              versionLabel.title = "Genius Fast Transcriber v4.0.3 - Nouvelle Interface Premium";
+              versionLabel.textContent = "v4.1.0";
+              versionLabel.title = "Genius Fast Transcriber v4.1.0 - Nouvelle Interface Premium";
               versionLabel.style.fontSize = "10px";
               versionLabel.style.color = "#888";
               versionLabel.style.opacity = "0.6";
@@ -6019,7 +6067,7 @@
         const titleText = document.createTextNode(getTranslation("lc_modal_title"));
         title.appendChild(titleText);
         const versionSpan = document.createElement("span");
-        versionSpan.textContent = "v4.0.3";
+        versionSpan.textContent = "v4.1.0";
         versionSpan.style.fontSize = "11px";
         versionSpan.style.color = isDarkMode ? "#888" : "#aaa";
         versionSpan.style.fontWeight = "normal";
@@ -6580,68 +6628,6 @@ ${window.location.href}
           document.body.classList.add(DARK_MODE_CLASS);
         } else {
           document.body.classList.remove(DARK_MODE_CLASS);
-        }
-      }
-      function showFeedbackMessage(message, duration = 3e3, container = null) {
-        let feedbackEl = document.getElementById(FEEDBACK_MESSAGE_ID);
-        if (!feedbackEl) {
-          let toast = document.getElementById("gft-global-toast");
-          if (!toast) {
-            toast = document.createElement("div");
-            toast.id = "gft-global-toast";
-            toast.style.cssText = `
-                position: fixed; top: 20px; right: 20px; z-index: 10002;
-                background: #333; color: white; padding: 12px 20px;
-                border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                font-family: sans-serif; font-size: 14px; opacity: 0;
-                transition: opacity 0.3s ease; pointer-events: none;
-            `;
-            document.body.appendChild(toast);
-          }
-          feedbackEl = toast;
-          feedbackEl.style.display = "block";
-        }
-        if (GFT_STATE.feedbackTimeout) {
-          clearTimeout(GFT_STATE.feedbackTimeout);
-          GFT_STATE.feedbackTimeout = null;
-        }
-        if (GFT_STATE.feedbackAnimationTimeout) {
-          clearTimeout(GFT_STATE.feedbackAnimationTimeout);
-          GFT_STATE.feedbackAnimationTimeout = null;
-        }
-        feedbackEl.textContent = message;
-        feedbackEl.style.display = "block";
-        requestAnimationFrame(() => {
-          feedbackEl.style.visibility = "visible";
-          feedbackEl.style.opacity = "1";
-          if (feedbackEl.id === FEEDBACK_MESSAGE_ID) {
-            feedbackEl.style.maxHeight = "100px";
-            feedbackEl.style.marginTop = "10px";
-            feedbackEl.style.marginBottom = "10px";
-            feedbackEl.style.paddingTop = "8px";
-            feedbackEl.style.paddingBottom = "8px";
-          }
-        });
-        if (duration > 0) {
-          GFT_STATE.feedbackTimeout = setTimeout(() => {
-            feedbackEl.style.opacity = "0";
-            if (feedbackEl.id === FEEDBACK_MESSAGE_ID) {
-              feedbackEl.style.maxHeight = "0";
-              feedbackEl.style.marginTop = "0";
-              feedbackEl.style.marginBottom = "0";
-              feedbackEl.style.paddingTop = "0";
-              feedbackEl.style.paddingBottom = "0";
-            }
-            GFT_STATE.feedbackAnimationTimeout = setTimeout(() => {
-              feedbackEl.style.visibility = "hidden";
-              if (feedbackEl.id === "gft-global-toast") {
-              } else {
-                feedbackEl.style.display = "none";
-              }
-              GFT_STATE.feedbackAnimationTimeout = null;
-            }, 300);
-            GFT_STATE.feedbackTimeout = null;
-          }, duration);
         }
       }
       function getCustomButtons() {

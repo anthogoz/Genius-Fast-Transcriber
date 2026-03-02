@@ -22,6 +22,8 @@ The project has reached a major milestone with **Version 4.0.0**! The infrastruc
 - [x] **Fixes & Improvements (v4.0.3)**:
   - [x] **Bug Fix**: Incorrect apostrophe counts and regex patterns fixed.
   - [x] **Feature**: Auto-spacing before punctuation (`?` and `!`) in French transcription mode.
+- [x] **Refactoring (v4.1.0)**:
+  - [x] Merged duplicated text cleanup code into a unified pipeline in `corrections.js`.
   ### 🛠️ Personalization (Custom Commands System)
 - [x] Create an interface allowing users to define their own buttons and regex macros without       touching the code.
 - [x] Import/Export system for "Button Packs" for the community.

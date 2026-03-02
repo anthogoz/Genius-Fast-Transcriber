@@ -103,6 +103,7 @@ La version est **toujours synchronisée** avec le manifest.json !
 ## 🎯 Versions Actuelles et Futures
 
 **v4.0.3** — Bug fixes (Apostrophes & Punctuation Spacing)
+**v4.1.0** — Refactoring Text Cleanup Logic into unified `CORRECTION_RULES` pipeline
 **v4.1.0** — New features (i18n, Shortcuts, Custom commands)
 **v5.0.0** — Major changes
 

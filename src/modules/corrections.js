@@ -269,31 +269,125 @@ function applyTextTransformToDivEditor(editorNode, transformFunction) {
     return correctionsCount;
 }
 
-/**
- * Chaîne toutes les corrections de texte individuelles en une seule passe.
- * @param {string} text - Le texte d'origine.
- * @param {object} options - Options de corrections activées (par défaut toutes true).
- * @returns {{newText: string, correctionsCount: number, corrections: object}} Le texte final corrigé, le nombre total et les détails par type.
- */
-function applyAllTextCorrectionsToString(text, options = {}) {
-    // Options par défaut (tout activé)
-    const opts = {
+const CORRECTION_RULES = [
+    {
+        id: 'yPrime',
+        progressKey: 'progress_step_yprime',
+        execute: (text, corrections, opts) => {
+            if (!opts.yPrime) return text;
+            const pattern = /\b(Y|y)['‘’´`ʻ]/g;
+            const newText = text.replace(pattern, (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y '));
+            if (newText !== text) corrections.yPrime = (text.match(pattern) || []).length;
+            return newText;
+        }
+    },
+    {
+        id: 'apostrophes',
+        progressKey: 'progress_step_apostrophes',
+        execute: (text, corrections, opts) => {
+            if (!opts.apostrophes) return text;
+            const pattern = /[‘’´`ʻ]/g;
+            const newText = text.replace(pattern, "'");
+            if (newText !== text) corrections.apostrophes = (text.match(pattern) || []).length;
+            return newText;
+        }
+    },
+    {
+        id: 'oeuLigature',
+        progressKey: 'progress_step_oeu',
+        execute: (text, corrections, opts) => {
+            if (!opts.oeuLigature) return text;
+            const pattern = /([Oo])eu/g;
+            const newText = text.replace(pattern, (match, firstLetter) => (firstLetter === 'O' ? 'Œu' : 'œu'));
+            if (newText !== text) corrections.oeuLigature = (text.match(pattern) || []).length;
+            return newText;
+        }
+    },
+    {
+        id: 'frenchQuotes',
+        progressKey: 'progress_step_quotes',
+        execute: (text, corrections, opts) => {
+            if (!opts.frenchQuotes) return text;
+            const pattern = /[«»]/g;
+            const newText = text.replace(pattern, '"');
+            if (newText !== text) corrections.frenchQuotes = (text.match(pattern) || []).length;
+            return newText;
+        }
+    },
+    {
+        id: 'longDash',
+        progressKey: 'progress_step_dash',
+        execute: (text, corrections, opts) => {
+            if (!opts.longDash) return text;
+            if (typeof isPolishTranscriptionMode === 'function' && isPolishTranscriptionMode()) {
+                const pattern = / - /g;
+                const newText = text.replace(pattern, ' — ');
+                if (newText !== text) corrections.longDash = (text.match(pattern) || []).length;
+                return newText;
+            } else {
+                const pattern = /[—–]/g;
+                const newText = text.replace(pattern, '-');
+                if (newText !== text) corrections.longDash = (text.match(pattern) || []).length;
+                return newText;
+            }
+        }
+    },
+    {
+        id: 'punctuation',
+        progressKey: 'progress_step_punctuation',
+        execute: (text, corrections, opts) => {
+            if (!opts.punctuation) return text;
+            if (!(typeof isPolishTranscriptionMode === 'function' && isPolishTranscriptionMode()) &&
+                !(typeof isEnglishTranscriptionMode === 'function' && isEnglishTranscriptionMode())) {
+                const pattern = /([^ \n\[(<])([?!])/g;
+                const newText = text.replace(pattern, '$1 $2');
+                if (newText !== text) corrections.punctuation = (text.match(pattern) || []).length;
+                return newText;
+            }
+            return text;
+        }
+    },
+    {
+        id: 'doubleSpaces',
+        progressKey: 'progress_step_spaces',
+        execute: (text, corrections, opts) => {
+            if (!opts.doubleSpaces) return text;
+            const pattern = /  +/g;
+            const newText = text.replace(pattern, ' ');
+            if (newText !== text) corrections.doubleSpaces = (text.match(pattern) || []).length;
+            return newText;
+        }
+    },
+    {
+        id: 'spacing',
+        progressKey: 'progress_step_spacing',
+        execute: (text, corrections, opts) => {
+            if (!opts.spacing) return text;
+            const result = correctLineSpacing(text);
+            if (result.correctionsCount > 0) {
+                corrections.spacing = result.correctionsCount;
+                return result.newText;
+            }
+            return text;
+        }
+    }
+];
+
+function getDefaultOptions(options = {}) {
+    return {
         yPrime: options.yPrime !== false,
         apostrophes: options.apostrophes !== false,
         oeuLigature: options.oeuLigature !== false,
         frenchQuotes: options.frenchQuotes !== false,
         longDash: options.longDash !== false,
         doubleSpaces: options.doubleSpaces !== false,
-        capitalization: options.capitalization !== false,
         punctuation: options.punctuation !== false,
         spacing: options.spacing !== false
     };
+}
 
-    let currentText = text;
-    let result;
-
-    // Objet pour tracker les corrections par type
-    const corrections = {
+function initCorrectionsObject() {
+    return {
         yPrime: 0,
         apostrophes: 0,
         oeuLigature: 0,
@@ -303,115 +397,32 @@ function applyAllTextCorrectionsToString(text, options = {}) {
         doubleSpaces: 0,
         spacing: 0
     };
+}
 
-    // Correction de "y'" -> "y "
-    if (opts.yPrime) {
-        const yPrimePattern = /\b(Y|y)['‘’´`ʻ]/g;
-        const yPrimeReplacement = (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y ');
-        const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
-        if (textAfterYPrime !== currentText) {
-            corrections.yPrime = (currentText.match(yPrimePattern) || []).length;
-            currentText = textAfterYPrime;
-        }
-    }
+function calculateTotalCorrections(corrections) {
+    return Object.values(corrections).reduce((sum, val) => sum + (val || 0), 0);
+}
 
-    // Correction de l'apostrophe typographique ' -> '
-    if (opts.apostrophes) {
-        const apostrophePattern = /[‘’´`ʻ]/g;
-        const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
-        if (textAfterApostrophe !== currentText) {
-            corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
-            currentText = textAfterApostrophe;
-        }
-    }
+/**
+ * Chaîne toutes les corrections de texte individuelles en une seule passe.
+ * @param {string} text - Le texte d'origine.
+ * @param {object} options - Options de corrections activées (par défaut toutes true).
+ * @returns {{newText: string, correctionsCount: number, corrections: object}} Le texte final corrigé, le nombre total et les détails par type.
+ */
+function applyAllTextCorrectionsToString(text, options = {}) {
+    const opts = getDefaultOptions(options);
+    let currentText = text;
+    const corrections = initCorrectionsObject();
 
-    // Correction de "oeu" -> "œu"
-    if (opts.oeuLigature) {
-        const oeuPattern = /([Oo])eu/g;
-        const oeuReplacement = (match, firstLetter) => (firstLetter === 'O' ? 'Œu' : 'œu');
-        const textAfterOeu = currentText.replace(oeuPattern, oeuReplacement);
-        if (textAfterOeu !== currentText) {
-            corrections.oeuLigature = (currentText.match(oeuPattern) || []).length;
-            currentText = textAfterOeu;
-        }
-    }
+    CORRECTION_RULES.forEach(rule => {
+        currentText = rule.execute(currentText, corrections, opts);
+    });
 
-    // Correction des guillemets français «» -> "
-    if (opts.frenchQuotes) {
-        const frenchQuotesPattern = /[«»]/g;
-        const textAfterFrenchQuotes = currentText.replace(frenchQuotesPattern, '"');
-        if (textAfterFrenchQuotes !== currentText) {
-            corrections.frenchQuotes = (currentText.match(frenchQuotesPattern) || []).length;
-            currentText = textAfterFrenchQuotes;
-        }
-    }
-
-    // Correction des tirets longs — – -> - (ou inversement pour PL)
-    if (opts.longDash) {
-        if (typeof isPolishTranscriptionMode === 'function' && isPolishTranscriptionMode()) {
-            // Pour le polonais : standardiser les tirets de séparation (-) en tirets longs (—)
-            // On vise les tirets entourés d'espaces : " - " -> " — "
-            const polishDashPattern = / - /g;
-            const textAfterPolishDash = currentText.replace(polishDashPattern, ' — ');
-            if (textAfterPolishDash !== currentText) {
-                corrections.longDash = (currentText.match(polishDashPattern) || []).length;
-                currentText = textAfterPolishDash;
-            }
-        } else {
-            // Comportement standard (FR/EN) : tirets longs -> tirets courts
-            const longDashPattern = /[—–]/g;
-            const textAfterLongDash = currentText.replace(longDashPattern, '-');
-            if (textAfterLongDash !== currentText) {
-                corrections.longDash = (currentText.match(longDashPattern) || []).length;
-                currentText = textAfterLongDash;
-            }
-        }
-    }
-
-    // Correction de la ponctuation (espaces avant ! et ?) - Uniquement en Français
-    if (opts.punctuation) {
-        if (!(typeof isPolishTranscriptionMode === 'function' && isPolishTranscriptionMode()) &&
-            !(typeof isEnglishTranscriptionMode === 'function' && isEnglishTranscriptionMode())) {
-
-            // Regex cible: une lettre/chiffre collée directement à ? ou !
-            // Ex: "Où es tu?" -> "Où es tu ?"
-            // Ex excluant les balises, et autres: On vise simplement \w suivi de [?!] (ou gérant les ponctuations multiples)
-
-            const punctuationPattern = /([^ \n\[(<])([?!])/g;
-            const textAfterPunctuation = currentText.replace(punctuationPattern, '$1 $2');
-
-            if (textAfterPunctuation !== currentText) {
-                corrections.punctuation = (currentText.match(punctuationPattern) || []).length;
-                currentText = textAfterPunctuation;
-            }
-        }
-    }
-
-    // Correction des doubles espaces
-    if (opts.doubleSpaces) {
-        const doubleSpacesPattern = /  +/g;
-        const textAfterDoubleSpaces = currentText.replace(doubleSpacesPattern, ' ');
-        if (textAfterDoubleSpaces !== currentText) {
-            corrections.doubleSpaces = (currentText.match(doubleSpacesPattern) || []).length;
-            currentText = textAfterDoubleSpaces;
-        }
-    }
-
-    // Application de la correction d'espacement
-    if (opts.spacing) {
-        result = correctLineSpacing(currentText);
-        if (result.correctionsCount > 0) {
-            corrections.spacing = result.correctionsCount;
-            currentText = result.newText;
-        }
-    }
-
-    // Calcul du total
-    const totalCorrections = corrections.yPrime + corrections.apostrophes +
-        corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash +
-        corrections.doubleSpaces + corrections.spacing + (corrections.punctuation || 0);
-
-    return { newText: currentText, correctionsCount: totalCorrections, corrections: corrections };
+    return {
+        newText: currentText,
+        correctionsCount: calculateTotalCorrections(corrections),
+        corrections
+    };
 }
 
 /**
@@ -422,131 +433,29 @@ function applyAllTextCorrectionsToString(text, options = {}) {
  */
 async function applyAllTextCorrectionsAsync(text, showProgressFn) {
     const showProgress = showProgressFn || (() => { });
+    const opts = getDefaultOptions({}); // All enabled by default when running via main button
     let currentText = text;
-    let result;
-    const totalSteps = 8;
+    const corrections = initCorrectionsObject();
+    const totalSteps = CORRECTION_RULES.length;
 
-    // Objet pour tracker les corrections par type
-    const corrections = {
-        yPrime: 0,
-        apostrophes: 0,
-        oeuLigature: 0,
-        frenchQuotes: 0,
-        longDash: 0,
-        punctuation: 0,
-        doubleSpaces: 0,
-        spacing: 0
+    for (let i = 0; i < CORRECTION_RULES.length; i++) {
+        const rule = CORRECTION_RULES[i];
+
+        if (rule.progressKey) {
+            showProgress(i + 1, totalSteps, getTranslation(rule.progressKey));
+        }
+
+        // Simulate a small delay to allow the UI to update the progress bar
+        await new Promise(resolve => setTimeout(resolve, 50));
+
+        currentText = rule.execute(currentText, corrections, opts);
+    }
+
+    return {
+        newText: currentText,
+        correctionsCount: calculateTotalCorrections(corrections),
+        corrections
     };
-
-    // Étape 1: Correction de "y'" -> "y "
-    showProgress(1, totalSteps, getTranslation('progress_step_yprime'));
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    const yPrimePattern = /\b(Y|y)['‘’´`ʻ]/g;
-    const yPrimeReplacement = (match, firstLetter) => (firstLetter === 'Y' ? 'Y ' : 'y ');
-    const textAfterYPrime = currentText.replace(yPrimePattern, yPrimeReplacement);
-    if (textAfterYPrime !== currentText) {
-        corrections.yPrime = (currentText.match(yPrimePattern) || []).length;
-        currentText = textAfterYPrime;
-    }
-
-    // Étape 2: Correction de l'apostrophe typographique
-    showProgress(2, totalSteps, getTranslation('progress_step_apostrophes'));
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    const apostrophePattern = /[‘’´`ʻ]/g;
-    const textAfterApostrophe = currentText.replace(apostrophePattern, "'");
-    if (textAfterApostrophe !== currentText) {
-        corrections.apostrophes = (currentText.match(apostrophePattern) || []).length;
-        currentText = textAfterApostrophe;
-    }
-
-    // Étape 3: Correction de "oeu" -> "œu"
-    showProgress(3, totalSteps, getTranslation('progress_step_oeu'));
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    const oeuPattern = /([Oo])eu/g;
-    const oeuReplacement = (match, firstLetter) => (firstLetter === 'O' ? 'Œu' : 'œu');
-    const textAfterOeu = currentText.replace(oeuPattern, oeuReplacement);
-    if (textAfterOeu !== currentText) {
-        corrections.oeuLigature = (currentText.match(oeuPattern) || []).length;
-        currentText = textAfterOeu;
-    }
-
-    // Étape 4: Correction des guillemets français «» -> "
-    showProgress(4, totalSteps, getTranslation('progress_step_quotes'));
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    const frenchQuotesPattern = /[«»]/g;
-    const textAfterFrenchQuotes = currentText.replace(frenchQuotesPattern, '"');
-    if (textAfterFrenchQuotes !== currentText) {
-        corrections.frenchQuotes = (currentText.match(frenchQuotesPattern) || []).length;
-        currentText = textAfterFrenchQuotes;
-    }
-
-    // Étape 5: Correction des tirets longs
-    showProgress(5, totalSteps, getTranslation('progress_step_dash'));
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    if (typeof isPolishTranscriptionMode === 'function' && isPolishTranscriptionMode()) {
-        const polishDashPattern = / - /g;
-        const textAfterPolishDash = currentText.replace(polishDashPattern, ' — ');
-        if (textAfterPolishDash !== currentText) {
-            corrections.longDash = (currentText.match(polishDashPattern) || []).length;
-            currentText = textAfterPolishDash;
-        }
-    } else {
-        const longDashPattern = /[—–]/g;
-        const textAfterLongDash = currentText.replace(longDashPattern, '-');
-        if (textAfterLongDash !== currentText) {
-            corrections.longDash = (currentText.match(longDashPattern) || []).length;
-            currentText = textAfterLongDash;
-        }
-    }
-
-    // Étape 6: Ponctuation (espace avant ? et !) en Français
-    showProgress(6, totalSteps, getTranslation('progress_step_punctuation')); // Note: Needs trans key later if applicable
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    if (!(typeof isPolishTranscriptionMode === 'function' && isPolishTranscriptionMode()) &&
-        !(typeof isEnglishTranscriptionMode === 'function' && isEnglishTranscriptionMode())) {
-
-        const punctuationPattern = /([^ \n\[(<])([?!])/g;
-        const textAfterPunctuation = currentText.replace(punctuationPattern, '$1 $2');
-
-        if (textAfterPunctuation !== currentText) {
-            corrections.punctuation = (currentText.match(punctuationPattern) || []).length;
-            currentText = textAfterPunctuation;
-        }
-    }
-
-    // Étape 7: Correction des doubles espaces
-    showProgress(7, totalSteps, getTranslation('progress_step_spaces'));
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    const doubleSpacesPattern = /  +/g;
-    const textAfterDoubleSpaces = currentText.replace(doubleSpacesPattern, ' ');
-    if (textAfterDoubleSpaces !== currentText) {
-        corrections.doubleSpaces = (currentText.match(doubleSpacesPattern) || []).length;
-        currentText = textAfterDoubleSpaces;
-    }
-
-    // Étape 8: Espacement
-    showProgress(8, totalSteps, getTranslation('progress_step_spacing'));
-    await new Promise(resolve => setTimeout(resolve, 50));
-
-    result = correctLineSpacing(currentText);
-    if (result.correctionsCount > 0) {
-        corrections.spacing = result.correctionsCount;
-        currentText = result.newText;
-    }
-
-    // Calcul du total
-    const totalCorrections = corrections.yPrime + corrections.apostrophes +
-        corrections.oeuLigature + corrections.frenchQuotes + corrections.longDash +
-        corrections.punctuation + corrections.doubleSpaces + corrections.spacing;
-
-    return { newText: currentText, correctionsCount: totalCorrections, corrections: corrections };
 }
 
 
