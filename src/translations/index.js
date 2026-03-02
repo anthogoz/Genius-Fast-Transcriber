@@ -211,7 +211,7 @@ export const TRANSLATIONS = {
         toolbar_num_to_words: "Nombre → Lettres",
         toolbar_bold_tooltip: "Mettre le texte sélectionné en gras",
         toolbar_italic_tooltip: "Mettre le texte sélectionné en italique",
-        toolbar_lyric_card_tooltip: "Générer une Lyric Card (1280x720)",
+        toolbar_lyric_card_tooltip: "Générer une Lyric Card",
         toolbar_num_to_words_tooltip: "Convertir le nombre sélectionné en lettres",
         // Tutorial Buttons
         tuto_prev: "Précédent",
@@ -332,7 +332,12 @@ export const TRANSLATIONS = {
         export_opt_raw: "📄 Texte brut",
         export_filename_suffix: " (GFT Export)",
         footer_buy_me_a_coffee: "M'offrir une pinte",
-        footer_github: "GitHub"
+        footer_github: "GitHub",
+        yt_player_not_found: "Lecteur YouTube introuvable.",
+        yt_pause_sync: "⏸️ Pause (Sync)",
+        panel_toggle_tooltip: "Cliquer pour replier/déplier",
+        confirm_delete_button: "Supprimer \"{label}\" ?",
+        import_failed_invalid: "Échec de l'import. Code invalide."
     },
     en: {
         panel_title: "Genius Fast Transcriber",
@@ -457,12 +462,12 @@ export const TRANSLATIONS = {
         btn_french_quotes_label: "«» → \"",
         cleanup_french_quotes_tooltip: "Replace French quotes «» with straight quotes \"",
         btn_long_dash_label: "— → -",
-        cleanup_long_dash_tooltip: "Remplace les tirets longs (— –) par des tirets courts (-)",
+        cleanup_long_dash_tooltip: "Replace long dashes (— –) with short dashes (-)",
         btn_double_spaces_label: "Double spaces",
         cleanup_double_spaces_tooltip: "Remove double spaces",
         btn_duplicate_line_label: "📋 Duplicate line",
         cleanup_duplicate_line_tooltip: "Duplicate current line (Ctrl+D)",
-        cleanup_adlib_tooltip: "Entoure le texte sélectionné de parenthèses pour les ad-libs",
+        cleanup_adlib_tooltip: "Wrap selected text in parentheses for ad-libs",
         btn_capitalize_label: "Maj. début ligne",
         btn_punctuation_label: "Suppr. ., fin ligne",
         btn_punctuation_spacing_label: "Space ?!",
@@ -531,7 +536,7 @@ export const TRANSLATIONS = {
         toolbar_num_to_words: "Number → Words",
         toolbar_bold_tooltip: "Make selected text bold",
         toolbar_italic_tooltip: "Make selected text italic",
-        toolbar_lyric_card_tooltip: "Generate a Lyric Card (1280x720)",
+        toolbar_lyric_card_tooltip: "Generate a Lyric Card",
         toolbar_num_to_words_tooltip: "Convert selected number to words (French logic)",
         // Tutorial Steps (Translated)
         // Tutorial Buttons
@@ -670,7 +675,12 @@ export const TRANSLATIONS = {
         export_opt_raw: "📄 Raw text",
         export_filename_suffix: " (GFT Export)",
         footer_buy_me_a_coffee: "Buy Me a Coffee",
-        footer_github: "GitHub"
+        footer_github: "GitHub",
+        yt_player_not_found: "YouTube player not found.",
+        yt_pause_sync: "⏸️ Pause (Sync)",
+        panel_toggle_tooltip: "Click to collapse/expand",
+        confirm_delete_button: "Delete \"{label}\"?",
+        import_failed_invalid: "Import failed. Invalid code."
     },
     // Polish translations - UI strings are placeholders for contributor PR
     // Structure tags and cleanup tools are Polish-specific per Genius Polska guidelines
@@ -725,6 +735,8 @@ export const TRANSLATIONS = {
         undo_tooltip: "Cofnij ostatnią zmianę (Ctrl+Z)",
         redo_tooltip: "Ponów ostatnią cofniętą zmianę (Ctrl+Y)",
         panel_title_img_alt: "Logo GFT",
+        settings_tooltip: "Ustawienia (Tryb ciemny, Statystyki, Pomoc)",
+        error_corrections: "❌ Błąd podczas poprawiania",
         // Sections
         section_structure: "Struktura i wykonawcy",
         section_cleanup: "Szybkie poprawki",
@@ -873,7 +885,7 @@ export const TRANSLATIONS = {
         toolbar_num_to_words: "Liczba → Słowa",
         toolbar_bold_tooltip: "Pogrub zaznaczony tekst",
         toolbar_italic_tooltip: "Pochyl zaznaczony tekst",
-        toolbar_lyric_card_tooltip: "Wygeneruj Lyric Card (1280x720)",
+        toolbar_lyric_card_tooltip: "Wygeneruj Lyric Card",
         toolbar_num_to_words_tooltip: "Zapisz zaznaczoną liczbę słownie (w mianowniku)",
         // Tutorial Buttons
         tuto_prev: "Wstecz",
@@ -996,6 +1008,11 @@ export const TRANSLATIONS = {
         export_opt_raw: "📄 Czysty tekst",
         export_filename_suffix: " (GFT Eksport)",
         footer_buy_me_a_coffee: "Kup mi kawę",
-        footer_github: "GitHub"
+        footer_github: "GitHub",
+        yt_player_not_found: "Nie znaleziono odtwarzacza YouTube.",
+        yt_pause_sync: "⏸️ Pauza (Sync)",
+        panel_toggle_tooltip: "Kliknij, aby zwinąć/rozwinąć",
+        confirm_delete_button: "Usunąć \"{label}\"?",
+        import_failed_invalid: "Import nie powiódł się. Nieprawidłowy kod."
     }
 };

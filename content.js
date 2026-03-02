@@ -285,7 +285,7 @@
           toolbar_num_to_words: "Nombre \u2192 Lettres",
           toolbar_bold_tooltip: "Mettre le texte s\xE9lectionn\xE9 en gras",
           toolbar_italic_tooltip: "Mettre le texte s\xE9lectionn\xE9 en italique",
-          toolbar_lyric_card_tooltip: "G\xE9n\xE9rer une Lyric Card (1280x720)",
+          toolbar_lyric_card_tooltip: "G\xE9n\xE9rer une Lyric Card",
           toolbar_num_to_words_tooltip: "Convertir le nombre s\xE9lectionn\xE9 en lettres",
           // Tutorial Buttons
           tuto_prev: "Pr\xE9c\xE9dent",
@@ -406,7 +406,12 @@
           export_opt_raw: "\u{1F4C4} Texte brut",
           export_filename_suffix: " (GFT Export)",
           footer_buy_me_a_coffee: "M'offrir une pinte",
-          footer_github: "GitHub"
+          footer_github: "GitHub",
+          yt_player_not_found: "Lecteur YouTube introuvable.",
+          yt_pause_sync: "\u23F8\uFE0F Pause (Sync)",
+          panel_toggle_tooltip: "Cliquer pour replier/d\xE9plier",
+          confirm_delete_button: 'Supprimer "{label}" ?',
+          import_failed_invalid: "\xC9chec de l'import. Code invalide."
         },
         en: {
           panel_title: "Genius Fast Transcriber",
@@ -531,12 +536,12 @@
           btn_french_quotes_label: '\xAB\xBB \u2192 "',
           cleanup_french_quotes_tooltip: 'Replace French quotes \xAB\xBB with straight quotes "',
           btn_long_dash_label: "\u2014 \u2192 -",
-          cleanup_long_dash_tooltip: "Remplace les tirets longs (\u2014 \u2013) par des tirets courts (-)",
+          cleanup_long_dash_tooltip: "Replace long dashes (\u2014 \u2013) with short dashes (-)",
           btn_double_spaces_label: "Double spaces",
           cleanup_double_spaces_tooltip: "Remove double spaces",
           btn_duplicate_line_label: "\u{1F4CB} Duplicate line",
           cleanup_duplicate_line_tooltip: "Duplicate current line (Ctrl+D)",
-          cleanup_adlib_tooltip: "Entoure le texte s\xE9lectionn\xE9 de parenth\xE8ses pour les ad-libs",
+          cleanup_adlib_tooltip: "Wrap selected text in parentheses for ad-libs",
           btn_capitalize_label: "Maj. d\xE9but ligne",
           btn_punctuation_label: "Suppr. ., fin ligne",
           btn_punctuation_spacing_label: "Space ?!",
@@ -605,7 +610,7 @@
           toolbar_num_to_words: "Number \u2192 Words",
           toolbar_bold_tooltip: "Make selected text bold",
           toolbar_italic_tooltip: "Make selected text italic",
-          toolbar_lyric_card_tooltip: "Generate a Lyric Card (1280x720)",
+          toolbar_lyric_card_tooltip: "Generate a Lyric Card",
           toolbar_num_to_words_tooltip: "Convert selected number to words (French logic)",
           // Tutorial Steps (Translated)
           // Tutorial Buttons
@@ -744,7 +749,12 @@
           export_opt_raw: "\u{1F4C4} Raw text",
           export_filename_suffix: " (GFT Export)",
           footer_buy_me_a_coffee: "Buy Me a Coffee",
-          footer_github: "GitHub"
+          footer_github: "GitHub",
+          yt_player_not_found: "YouTube player not found.",
+          yt_pause_sync: "\u23F8\uFE0F Pause (Sync)",
+          panel_toggle_tooltip: "Click to collapse/expand",
+          confirm_delete_button: 'Delete "{label}"?',
+          import_failed_invalid: "Import failed. Invalid code."
         },
         // Polish translations - UI strings are placeholders for contributor PR
         // Structure tags and cleanup tools are Polish-specific per Genius Polska guidelines
@@ -799,6 +809,8 @@
           undo_tooltip: "Cofnij ostatni\u0105 zmian\u0119 (Ctrl+Z)",
           redo_tooltip: "Pon\xF3w ostatni\u0105 cofni\u0119t\u0105 zmian\u0119 (Ctrl+Y)",
           panel_title_img_alt: "Logo GFT",
+          settings_tooltip: "Ustawienia (Tryb ciemny, Statystyki, Pomoc)",
+          error_corrections: "\u274C B\u0142\u0105d podczas poprawiania",
           // Sections
           section_structure: "Struktura i wykonawcy",
           section_cleanup: "Szybkie poprawki",
@@ -947,7 +959,7 @@
           toolbar_num_to_words: "Liczba \u2192 S\u0142owa",
           toolbar_bold_tooltip: "Pogrub zaznaczony tekst",
           toolbar_italic_tooltip: "Pochyl zaznaczony tekst",
-          toolbar_lyric_card_tooltip: "Wygeneruj Lyric Card (1280x720)",
+          toolbar_lyric_card_tooltip: "Wygeneruj Lyric Card",
           toolbar_num_to_words_tooltip: "Zapisz zaznaczon\u0105 liczb\u0119 s\u0142ownie (w mianowniku)",
           // Tutorial Buttons
           tuto_prev: "Wstecz",
@@ -1070,7 +1082,12 @@
           export_opt_raw: "\u{1F4C4} Czysty tekst",
           export_filename_suffix: " (GFT Eksport)",
           footer_buy_me_a_coffee: "Kup mi kaw\u0119",
-          footer_github: "GitHub"
+          footer_github: "GitHub",
+          yt_player_not_found: "Nie znaleziono odtwarzacza YouTube.",
+          yt_pause_sync: "\u23F8\uFE0F Pauza (Sync)",
+          panel_toggle_tooltip: "Kliknij, aby zwin\u0105\u0107/rozwin\u0105\u0107",
+          confirm_delete_button: 'Usun\u0105\u0107 "{label}"?',
+          import_failed_invalid: "Import nie powi\xF3d\u0142 si\u0119. Nieprawid\u0142owy kod."
         }
       };
     }
@@ -3977,7 +3994,7 @@
         enableYoutubeJsApi();
         const playerIframe = findVisibleYoutubePlayer();
         if (!playerIframe) {
-          showFeedbackMessage("Lecteur YouTube introuvable.", 2e3);
+          showFeedbackMessage(getTranslation("yt_player_not_found"), 2e3);
           return;
         }
         const postCmd = (func, args) => {
@@ -4001,7 +4018,7 @@
             } else {
               postCmd("pauseVideo");
               gftYoutubePlayerState.isPlaying = false;
-              showFeedbackMessage("\u23F8\uFE0F Pause (Sync)", 1e3);
+              showFeedbackMessage(getTranslation("yt_pause_sync"), 1e3);
             }
             break;
           case "rewind":
@@ -4884,7 +4901,7 @@
               saveIndicator.textContent = "\u{1F4BE}";
               saveIndicator.title = getTranslation("draft_saved_at") || "Draft saved";
               panelTitle.appendChild(saveIndicator);
-              addTooltip(clickableTitleArea, "Cliquer pour replier/d\xE9plier");
+              addTooltip(clickableTitleArea, getTranslation("panel_toggle_tooltip"));
               const transcriptionModeSelect = document.createElement("select");
               transcriptionModeSelect.id = "gft-transcription-mode-select";
               transcriptionModeSelect.classList.add("gft-transcription-mode-select");
@@ -6103,10 +6120,10 @@
         optionSearch.value = "MANUAL_SEARCH";
         optionSearch.text = getTranslation("lc_manual_search");
         imageSelector.appendChild(optionSearch);
-        let currentFormat = "16:9";
+        let currentFormat = "1:1";
         const formatSelector = document.createElement("select");
         formatSelector.className = "gft-lc-select";
-        const formats = ["16:9", "1:1", "9:16"];
+        const formats = ["1:1", "16:9", "9:16"];
         formats.forEach((f) => {
           const opt = document.createElement("option");
           opt.value = f;
@@ -6918,7 +6935,7 @@ ${window.location.href}
               delBtn.innerHTML = "\u{1F5D1}\uFE0F";
               delBtn.title = "Delete";
               delBtn.onclick = () => {
-                if (confirm(`Delete "${btn.label}"?`)) {
+                if (confirm(getTranslation("confirm_delete_button").replace("{label}", btn.label))) {
                   deleteCustomButton(btn.id);
                   renderList();
                 }
@@ -6949,9 +6966,13 @@ ${window.location.href}
           exportBtn.onclick = () => {
             const code = exportCustomButtons();
             codeArea.value = code;
-            codeArea.select();
-            document.execCommand("copy");
-            showFeedbackMessage(getTranslation("common_copy_success") || "Copied!", 2e3);
+            navigator.clipboard.writeText(code).then(() => {
+              showFeedbackMessage(getTranslation("common_copy_success") || "Copied!", 2e3);
+            }).catch(() => {
+              codeArea.select();
+              document.execCommand("copy");
+              showFeedbackMessage(getTranslation("common_copy_success") || "Copied!", 2e3);
+            });
           };
           const importBtn = document.createElement("button");
           importBtn.textContent = getTranslation("custom_mgr_import_button");
@@ -6968,7 +6989,7 @@ ${window.location.href}
               showFeedbackMessage(getTranslation("custom_mgr_success_imported"), 3e3);
               setTimeout(() => window.location.reload(), 1500);
             } else {
-              alert("Import failed. Invalid code.");
+              alert(getTranslation("import_failed_invalid"));
             }
           };
           btnContainer.appendChild(exportBtn);

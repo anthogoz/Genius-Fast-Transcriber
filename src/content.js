@@ -2383,7 +2383,7 @@ function controlYoutubePlayer(command) {
     const playerIframe = findVisibleYoutubePlayer();
 
     if (!playerIframe) {
-        showFeedbackMessage("Lecteur YouTube introuvable.", 2000);
+        showFeedbackMessage(getTranslation('yt_player_not_found'), 2000);
         return;
     }
 
@@ -2411,7 +2411,7 @@ function controlYoutubePlayer(command) {
                 // État NULL (inconnu) - on privilégie PAUSE car souvent la vidéo joue déjà
                 postCmd('pauseVideo');
                 gftYoutubePlayerState.isPlaying = false;
-                showFeedbackMessage('⏸️ Pause (Sync)', 1000);
+                showFeedbackMessage(getTranslation('yt_pause_sync'), 1000);
             }
             break;
 
@@ -3533,7 +3533,7 @@ function initLyricsEditorEnhancer() {
                 saveIndicator.title = getTranslation('draft_saved_at') || 'Draft saved';
                 panelTitle.appendChild(saveIndicator);
 
-                addTooltip(clickableTitleArea, 'Cliquer pour replier/déplier');
+                addTooltip(clickableTitleArea, getTranslation('panel_toggle_tooltip'));
 
                 // Sélecteur de mode de transcription (FR/EN/PL)
                 const transcriptionModeSelect = document.createElement('select');
@@ -5126,11 +5126,11 @@ function showLyricCardPreviewModal(text, artistName, songTitle, albumUrl, artist
     imageSelector.appendChild(optionSearch);
 
     // Sélecteur de Format
-    let currentFormat = '16:9';
+    let currentFormat = '1:1';
     const formatSelector = document.createElement('select');
     formatSelector.className = 'gft-lc-select';
 
-    const formats = ['16:9', '1:1', '9:16'];
+    const formats = ['1:1', '16:9', '9:16'];
     formats.forEach(f => {
         const opt = document.createElement('option');
         opt.value = f;
@@ -6176,7 +6176,7 @@ function openCustomButtonManager(defaultType = 'structure', initialTab = 'create
                 delBtn.innerHTML = '🗑️';
                 delBtn.title = 'Delete';
                 delBtn.onclick = () => {
-                    if (confirm(`Delete "${btn.label}"?`)) {
+                    if (confirm(getTranslation('confirm_delete_button').replace('{label}', btn.label))) {
                         deleteCustomButton(btn.id);
                         renderList();
                     }
@@ -6209,9 +6209,13 @@ function openCustomButtonManager(defaultType = 'structure', initialTab = 'create
         exportBtn.onclick = () => {
             const code = exportCustomButtons();
             codeArea.value = code;
-            codeArea.select();
-            document.execCommand('copy');
-            showFeedbackMessage(getTranslation('common_copy_success') || "Copied!", 2000);
+            navigator.clipboard.writeText(code).then(() => {
+                showFeedbackMessage(getTranslation('common_copy_success') || "Copied!", 2000);
+            }).catch(() => {
+                codeArea.select();
+                document.execCommand('copy');
+                showFeedbackMessage(getTranslation('common_copy_success') || "Copied!", 2000);
+            });
         };
 
         const importBtn = document.createElement('button');
@@ -6226,7 +6230,7 @@ function openCustomButtonManager(defaultType = 'structure', initialTab = 'create
                 showFeedbackMessage(getTranslation('custom_mgr_success_imported'), 3000);
                 setTimeout(() => window.location.reload(), 1500);
             } else {
-                alert("Import failed. Invalid code.");
+                alert(getTranslation('import_failed_invalid'));
             }
         };
 

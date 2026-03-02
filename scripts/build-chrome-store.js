@@ -26,7 +26,11 @@ try {
     process.exit(1);
 }
 
-const OUTPUT_ZIP = path.join(ROOT, `Genius Fast Transcriber v${version}.zip`);
+const DIST_DIR = path.join(ROOT, 'dist');
+if (!fs.existsSync(DIST_DIR)) {
+    fs.mkdirSync(DIST_DIR, { recursive: true });
+}
+const OUTPUT_ZIP = path.join(DIST_DIR, `Genius Fast Transcriber v${version}.zip`);
 
 // Step 1: Build the extension
 console.log('1️⃣  Building extension...');
