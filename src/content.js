@@ -1,4 +1,4 @@
-// content.js (Version 4.1.0 - Modular)
+// content.js (Version 4.1.1 - Modular)
 /**
  * @file Main entry point for "Genius Fast Transcriber" extension.
  * @author Lnkhey  
@@ -58,7 +58,7 @@ import {
 
 // ===========================
 
-const GFT_VERSION = (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest) ? chrome.runtime.getManifest().version : '4.1.0';
+const GFT_VERSION = (typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.getManifest) ? chrome.runtime.getManifest().version : '4.1.1';
 console.log(`Genius Fast Transcriber v${GFT_VERSION} 🎵`);
 
 /**
@@ -4420,8 +4420,8 @@ function initLyricsEditorEnhancer() {
 
                 const versionLabel = document.createElement('div');
                 versionLabel.id = 'gft-version-label';
-                versionLabel.textContent = 'v4.1.0'; // Bump version visuelle pour le user
-                versionLabel.title = 'Genius Fast Transcriber v4.1.0 - Nouvelle Interface Premium';
+                versionLabel.textContent = 'v4.1.1'; // Bump version visuelle pour le user
+                versionLabel.title = 'Genius Fast Transcriber v4.1.1 - Nouvelle Interface Premium';
                 versionLabel.style.fontSize = '10px';
                 versionLabel.style.color = '#888';
                 versionLabel.style.opacity = '0.6';
@@ -4894,7 +4894,7 @@ function renderLyricCardToCanvas(canvas, text, artistName, songTitle, imageObj, 
     } else {
         // Fallback text "GENIUS" width approximation
         ctx.save();
-        ctx.font = '900 36px "Programme", "Arial Black", sans-serif';
+        ctx.font = '900 36px "Programme Pan", "Arial Black", sans-serif';
         ctx.letterSpacing = "4px";
         logoWidth = ctx.measureText("G E N I U S").width;
         ctx.restore();
@@ -4904,7 +4904,7 @@ function renderLyricCardToCanvas(canvas, text, artistName, songTitle, imageObj, 
     const logoX = WIDTH - 60 - logoWidth;
 
     // 3. Texte Artiste / Titre
-    ctx.font = `normal ${FONT_SIZE_FOOTER}px "Programme", "Arial", sans-serif`;
+    ctx.font = `normal ${FONT_SIZE_FOOTER}px "Programme Pan", "Arial", sans-serif`;
     ctx.fillStyle = textColor;
     ctx.textBaseline = 'middle';
     ctx.letterSpacing = "2px";
@@ -4958,7 +4958,7 @@ function renderLyricCardToCanvas(canvas, text, artistName, songTitle, imageObj, 
     } else {
         ctx.save();
         ctx.textAlign = 'left'; // On dessine depuis logoX
-        ctx.font = '900 36px "Programme", "Arial Black", sans-serif';
+        ctx.font = '900 36px "Programme Pan", "Arial Black", sans-serif';
         ctx.letterSpacing = "4px";
         ctx.fillStyle = textColor;
         ctx.fillText("G E N I U S", logoX, HEIGHT - (FOOTER_HEIGHT / 2)); // Corrigé position Y centré
@@ -4969,7 +4969,7 @@ function renderLyricCardToCanvas(canvas, text, artistName, songTitle, imageObj, 
     const maxTextWidth = WIDTH - 120;
     const fontSize = FONT_SIZE_TEXT;
     const lineHeight = LINE_HEIGHT_TEXT;
-    ctx.font = `300 ${fontSize}px "Programme", "Arial", sans-serif`;
+    ctx.font = `300 ${fontSize}px "Programme Pan", "Arial", sans-serif`;
 
     const originalLines = text.split(/\r?\n/);
     const lines = [];

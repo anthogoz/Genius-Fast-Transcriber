@@ -10,7 +10,7 @@
   margin-bottom: 30px;
   width: 100%;
   box-sizing: border-box;
-  font-family: Programme, sans-serif;
+  font-family: 'Programme Pan', sans-serif;
   font-weight: bold;
   display: flex;
   flex-direction: column;
@@ -182,7 +182,7 @@
   color: #212529;
   cursor: pointer;
   font-size: 11px;
-  font-family: Programme, sans-serif;
+  font-family: 'Programme Pan', sans-serif;
   min-width: 35px;
   transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
   /* Transition fluide */
@@ -261,7 +261,7 @@
   background: transparent;
   cursor: pointer;
   font-size: 10px;
-  font-family: Programme, sans-serif;
+  font-family: 'Programme Pan', sans-serif;
   color: #212529;
   padding: 2px 5px;
   transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -500,7 +500,7 @@
 .gft-transcription-mode-select {
   padding: 3px 8px;
   font-size: 10px;
-  font-family: Programme, sans-serif;
+  font-family: 'Programme Pan', sans-serif;
   font-weight: bold;
   border: 1px solid #adadad;
   border-radius: 4px;
@@ -714,7 +714,7 @@
   color: #212529;
   cursor: pointer;
   font-size: 11px;
-  font-family: Programme, sans-serif;
+  font-family: 'Programme Pan', sans-serif;
   font-weight: bold;
   min-width: 50px;
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
@@ -912,7 +912,7 @@
   margin: 0 0 12px 0;
   font-size: 20px;
   color: #0e0e0e;
-  font-family: Programme, sans-serif;
+  font-family: 'Programme Pan', sans-serif;
   font-weight: bold;
   flex-shrink: 0;
 }
@@ -948,7 +948,7 @@
   margin: 0 0 8px 0;
   font-size: 14px;
   color: #333;
-  font-family: Programme, sans-serif;
+  font-family: 'Programme Pan', sans-serif;
   font-weight: bold;
   flex-shrink: 0;
 }
@@ -990,7 +990,7 @@
   border: none;
   border-radius: 4px;
   font-size: 13px;
-  font-family: Programme, sans-serif;
+  font-family: 'Programme Pan', sans-serif;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1096,7 +1096,7 @@
   font-size: 22px;
   margin: 0 0 16px 0;
   color: #0e0e0e;
-  font-family: Programme, sans-serif;
+  font-family: 'Programme Pan', sans-serif;
   font-weight: bold;
 }
 
@@ -1135,7 +1135,7 @@
   border: none;
   border-radius: 4px;
   font-size: 13px;
-  font-family: Programme, sans-serif;
+  font-family: 'Programme Pan', sans-serif;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -1241,7 +1241,7 @@
   text-align: left;
   cursor: pointer;
   font-size: 13px;
-  font-family: Programme, sans-serif;
+  font-family: 'Programme Pan', sans-serif;
   transition: background 0.15s ease;
   border-bottom: 1px solid #f0f0f0;
 }

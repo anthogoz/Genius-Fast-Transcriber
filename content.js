@@ -2143,7 +2143,7 @@
         display: flex;
         flex-direction: column;
         gap: 10px;
-        font-family: 'Programme', sans-serif;
+        font-family: 'Programme Pan', sans-serif;
         border-left: 4px solid #ffff64;
         animation: slideIn 0.3s ease-out;
         pointer-events: auto;
@@ -2480,7 +2480,7 @@
       init_corrections();
       init_export();
       init_ui();
-      var GFT_VERSION = typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.getManifest ? chrome.runtime.getManifest().version : "4.1.0";
+      var GFT_VERSION = typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.getManifest ? chrome.runtime.getManifest().version : "4.1.1";
       console.log(`Genius Fast Transcriber v${GFT_VERSION} \u{1F3B5}`);
       function isContextValid() {
         return typeof chrome !== "undefined" && !!chrome.runtime && !!chrome.runtime.id;
@@ -5599,8 +5599,8 @@
               creditLabel.style.userSelect = "none";
               const versionLabel = document.createElement("div");
               versionLabel.id = "gft-version-label";
-              versionLabel.textContent = "v4.1.0";
-              versionLabel.title = "Genius Fast Transcriber v4.1.0 - Nouvelle Interface Premium";
+              versionLabel.textContent = "v4.1.1";
+              versionLabel.title = "Genius Fast Transcriber v4.1.1 - Nouvelle Interface Premium";
               versionLabel.style.fontSize = "10px";
               versionLabel.style.color = "#888";
               versionLabel.style.opacity = "0.6";
@@ -5976,13 +5976,13 @@
           logoWidth = logoObj.width * (logoHeight / logoObj.height);
         } else {
           ctx.save();
-          ctx.font = '900 36px "Programme", "Arial Black", sans-serif';
+          ctx.font = '900 36px "Programme Pan", "Arial Black", sans-serif';
           ctx.letterSpacing = "4px";
           logoWidth = ctx.measureText("G E N I U S").width;
           ctx.restore();
         }
         const logoX = WIDTH - 60 - logoWidth;
-        ctx.font = `normal ${FONT_SIZE_FOOTER}px "Programme", "Arial", sans-serif`;
+        ctx.font = `normal ${FONT_SIZE_FOOTER}px "Programme Pan", "Arial", sans-serif`;
         ctx.fillStyle = textColor;
         ctx.textBaseline = "middle";
         ctx.letterSpacing = "2px";
@@ -6018,7 +6018,7 @@
         } else {
           ctx.save();
           ctx.textAlign = "left";
-          ctx.font = '900 36px "Programme", "Arial Black", sans-serif';
+          ctx.font = '900 36px "Programme Pan", "Arial Black", sans-serif';
           ctx.letterSpacing = "4px";
           ctx.fillStyle = textColor;
           ctx.fillText("G E N I U S", logoX, HEIGHT - FOOTER_HEIGHT / 2);
@@ -6027,7 +6027,7 @@
         const maxTextWidth = WIDTH - 120;
         const fontSize = FONT_SIZE_TEXT;
         const lineHeight = LINE_HEIGHT_TEXT;
-        ctx.font = `300 ${fontSize}px "Programme", "Arial", sans-serif`;
+        ctx.font = `300 ${fontSize}px "Programme Pan", "Arial", sans-serif`;
         const originalLines = text.split(/\r?\n/);
         const lines = [];
         originalLines.forEach((originalLine) => {
