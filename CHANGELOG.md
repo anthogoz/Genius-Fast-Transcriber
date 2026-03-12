@@ -10,7 +10,6 @@ All notable changes to this project will be documented in this file.
 - Vue 3 SFC components for all UI (panel, toolbar, modals, popup, onboarding).
 - Type-safe codebase with strict TypeScript and `vue-tsc` checking.
 - Reactive state management via Vue composables (`useGftState`, `useSettings`, `useEditor`, etc.).
-- Tailwind CSS v4 for styling.
 - `@wxt-dev/i18n` for Chrome manifest i18n, `vue-i18n` for runtime translations with locale switching.
 - Vite-based build with HMR dev server replacing esbuild.
 - New documentation in the `docs/` folder.

@@ -140,7 +140,7 @@ npm run typecheck    # TypeScript type-checking
 ```
 src/
 ├── entrypoints/          # WXT entrypoints
-│   ├── content/          # Content script (injected on Genius.com)
+│   ├── content/          # Content script (injected on *://*.genius.com/*-lyrics)
 │   └── popup/            # Extension popup
 ├── components/           # Vue 3 SFC components
 │   ├── content/          # Panel, toolbar, modals (15 components)

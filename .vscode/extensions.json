@@ -2,7 +2,6 @@
   "recommendations": [
     "Nuxtr.nuxtr-vscode",
     "Nuxtr.nuxt-vscode-extentions",
-    "bradlc.vscode-tailwindcss",
     "Vue.volar",
     "biomejs.biome"
   ]

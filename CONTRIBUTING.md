@@ -134,9 +134,7 @@ WXT will open a new Chrome window with the extension loaded. Changes to Vue comp
 ```
 src/
 ├── entrypoints/
-│   ├── content/          # Injected on *://*.genius.com/*-lyrics
-│   │   ├── index.ts      # MutationObserver → detects editor → mounts Vue panel
-│   │   └── style.css     # Injected styles (Tailwind + custom)
+│   ├── content.ts        # Injected on *://*.genius.com/*-lyrics
 │   └── popup/            # Extension popup (settings UI)
 │       ├── index.html
 │       ├── main.ts
