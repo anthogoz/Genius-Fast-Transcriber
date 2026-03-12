@@ -1,9 +1,9 @@
 # 🎵 Genius Fast Transcriber + Lyric Card Maker
 
-![Version](https://img.shields.io/badge/version-4.0.0-blue.svg?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-4.2.0-blue.svg?style=for-the-badge)
 ![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-green.svg?style=for-the-badge&logo=google-chrome)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg?style=for-the-badge)
-![Build](https://img.shields.io/badge/build-esbuild-yellow.svg?style=for-the-badge)
+![Built with](https://img.shields.io/badge/built_with-WXT_+_Vue_+_TypeScript-blueviolet.svg?style=for-the-badge)
 
 **The ultimate tool for transcribers on Genius.com.**
 Transform your editing experience with a suite of professional tools, a modern interface, smart automations, and full customization.
@@ -90,7 +90,7 @@ Transform your editing experience with a suite of professional tools, a modern i
 ## ⌨️ Pro Keyboard Shortcuts
 
 | Shortcut | Action |
-|-----------|--------|
+|---|---|
 | `Ctrl + 1` to `5` | Insert structure tags (Verse, Chorus...) |
 | `Ctrl + Shift + C` | **Fix All** (Opens preview) |
 | `Ctrl + D` | Duplicate current line |
@@ -105,78 +105,65 @@ Transform your editing experience with a suite of professional tools, a modern i
 
 ## 📥 Installation
 
-1.  Go to the **Chrome Web Store** here: https://chromewebstore.google.com/detail/cbldlkiakadclpjfkkafpjomilmmgdjm.
-2.  Or install manually (Developer Mode):
-    *   Download the code.
-    *   Go to `chrome://extensions`.
-    *   Enable "Developer mode".
-    *   "Load unpacked" and select the folder.
+### Chrome Web Store
+Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/cbldlkiakadclpjfkkafpjomilmmgdjm).
+
+### Manual (Developer Mode)
+1. Clone or download the repository.
+2. Install dependencies and build:
+   ```bash
+   npm install
+   npm run build
+   ```
+3. Go to `chrome://extensions`, enable **Developer mode**.
+4. Click **Load unpacked** and select the `.output/chrome-mv3` folder.
 
 ---
 
-## 🆕 What's New in v4.0.0 🚀
+## Development
 
-- **📤 Export to .txt Tool**:
-    - A new professional button in the Genius "Sticky Toolbar" to export lyrics instantly.
-    - **Smart Extraction**: Cleanly filters out Genius headers, contributors, and hyperlinks.
-    - **Custom Formats**: Choose between Standard, No Tags, No Spacing, or Raw text.
-    - **Multi-language**: Fully translated in French, English, and Polish.
-- **🏗️ Modern Architecture**:
-    - **Modular System**: Complete migration to a modular structure for better performance and easier contributions.
-    - **Fast Build**: esbuild integration for near-instant development.
-- **🛠️ Refined UI**:
-    - Native Genius styling for seamless integration.
-    - **Custom Buttons Manager**: UI/UX overhaul for more intuitive command creation.
-    - Smoother dropdown menus and improved button alignment.
+The project is built with [WXT](https://wxt.dev), [Vue 3](https://vuejs.org), and [TypeScript](https://www.typescriptlang.org).
 
-## 🆕 What's New in v3.1.0
+```bash
+npm install
+npm run dev          # Start dev server with HMR
+npm run build        # Production build
+npm run zip          # Package for Chrome Web Store
+npm run typecheck        # TypeScript type-checking
+```
 
-- 🇵🇱 **Polish Language Support**: Full support for Genius Polska guidelines!
-    - **UI Translation**: Interface fully localized in Polish.
-    - **Smart Tags**: `[Zwrotka]`, `[Refren]`, `[Przyśpiewka]`, etc. with correct variations.
-    - **Specific Cleanups**: Polish quotes `„”` and Em-dashes `-` → `—`.
-- 🔍 **Find & Replace Tool**:
-    - A powerful new tool integrated directly into the panel.
-    - **Regex Support**: toggleable regex mode for advanced users.
-    - **Collapsible UI**: Keeps the panel clean when not in use.
-- 🎨 **UI Overhaul**:
-    - **Transitions**: Smooth animations for opening/closing sections.
-    - **Improved Layout**: Better button placement and consistent sizing.
-    - **Auto-save Indicator**: Clearer `💾` icon pulsation when drafts are saved.
-- 🛠️ **Fixes & Optimizations**:
-    - Enhanced tooltip visibility.
-    - Improved formatting for multi-line replacements.
+### Project Structure
 
-## 🆕 What's New in v3.0.1
-
-- 🇵🇱 **Polish Language Support**: Full support for Genius Polska guidelines!
-    - **UI Translation**: Interface available in Polish.
-    - **Smart Tags**: `[Zwrotka]`, `[Refren]`, `[Przyśpiewka]`, etc.
-    - **Specific Cleanups**: Polish quotes `„""` -> `"` and Em-dashes `-` -> `—`.
-- 🐛 **Bug Fixes**: Improved notification translations and formatting fixes.
-
-## 🆕 What's New in v3.0.0
-
-- ✨ **Custom Buttons Manager**: Power to the users! Create your own insertion or cleanup buttons.
-- 🌍 **Full English Support**: Number conversion, tags, and tools are now fully localized.
-- � **Number to Words**: Convert digits to words in seconds (English & French supported).
-- �️ **Lyric Card Only Mode**: For users who just want to share lyrics.
-- 🎨 **Premium UI**: New animations, better spacing, and improved readability.
-- � **Bug fixes**: Stability and performance improvements.
+```
+src/
+├── entrypoints/          # WXT entrypoints
+│   ├── content/          # Content script (injected on Genius.com)
+│   └── popup/            # Extension popup
+├── components/           # Vue 3 SFC components
+│   ├── content/          # Panel, toolbar, modals (15 components)
+│   └── popup/            # Mode, theme, language selectors
+├── composables/          # Reactive state management
+├── utils/                # Pure utility functions
+├── types/                # TypeScript type definitions
+├── locales/              # @wxt-dev/i18n (Chrome manifest strings)
+│   └── app/              # vue-i18n (in-app translations, 320+ keys)
+└── i18n/                 # vue-i18n setup
+```
 
 ---
 
 ## 🛠️ Contribute
 
-This project is open-source and community-driven!
-We specifically need help with **Phase 2 & 3 of Code Modularization** (extracting logic from `content.js` into separate modules).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, coding standards, and PR workflow.
 
-> [!TIP]
-> **Help Wanted!** 🚀  
-> If you're a developer looking to contribute to a popular browser extension, check out our [MODULARIZATION_STATUS.md](./MODULARIZATION_STATUS.md) guide.
+Additional documentation is available in the [`docs/`](docs/) folder:
 
-👉 **See [CONTRIBUTING.md](CONTRIBUTING.md) for general contribution guidelines.**
+- [ROADMAP.md](docs/ROADMAP.md) — Feature ideas and priorities
+- [PUBLISHING.md](docs/PUBLISHING.md) — Chrome Web Store publishing guide
+- [TESTING.md](docs/TESTING.md) — Testing checklist
 
 ---
 
-*Developed with ❤️ by Lnkhey.*
+## License
+
+[MIT](LICENSE) — Developed with ❤️ by [Lnkhey](https://github.com/anthogoz).

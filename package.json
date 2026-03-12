@@ -1,13 +1,9 @@
 {
   "name": "genius-fast-transcriber",
-  "version": "4.1.1",
   "description": "The ultimate tool for Genius.com contributors — smart tags, auto-corrections, and Lyric Card creation.",
-  "scripts": {
-    "build": "node esbuild.config.js",
-    "watch": "node esbuild.config.js --watch",
-    "package:chrome": "node scripts/build-chrome-store.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "version": "4.2.0",
+  "author": "Lnkhey",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/anthogoz/Genius-Fast-Transcriber.git"
@@ -21,14 +17,33 @@
     "lyric-card",
     "esbuild"
   ],
-  "author": "Lnkhey",
-  "license": "MIT",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/anthogoz/Genius-Fast-Transcriber/issues"
   },
   "homepage": "https://github.com/anthogoz/Genius-Fast-Transcriber#readme",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "dev:firefox": "wxt --browser firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build --browser firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip --browser firefox",
+    "typecheck": "wxt prepare && vue-tsc -b --noEmit",
+    "postinstall": "wxt prepare"
+  },
+  "dependencies": {
+    "@wxt-dev/i18n": "0.2.5",
+    "vue": "3.5.30",
+    "vue-i18n": "11.3.0"
+  },
   "devDependencies": {
-    "esbuild": "^0.27.3"
+    "@tailwindcss/vite": "4.2.1",
+    "@wxt-dev/module-vue": "1.0.3",
+    "tailwindcss": "4.2.1",
+    "typescript": "5.9.3",
+    "vue-tsc": "3.2.5",
+    "wxt": "0.20.18"
   }
 }
