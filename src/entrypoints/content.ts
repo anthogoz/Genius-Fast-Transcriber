@@ -11,7 +11,7 @@ import type { Locale, PopupState } from '@/types';
 
 export default defineContentScript({
   matches: ['*://*.genius.com/*-lyrics'],
-  cssInjectionMode: 'ui',
+  cssInjectionMode: 'manifest',
 
   async main(ctx) {
     const settings = useSettings();
