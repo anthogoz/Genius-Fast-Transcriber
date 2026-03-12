@@ -1,7 +1,4 @@
 {
   "extends": "./.wxt/tsconfig.json",
-  "exclude": [
-    "node_modules",
-    "public",
-  ]
+  "exclude": ["node_modules", "public"]
 }

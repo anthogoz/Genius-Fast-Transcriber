@@ -7,8 +7,30 @@ export function numberToFrenchWords(num: number): string {
   if (num === 0) return 'zéro';
 
   const ones = ['', 'un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'];
-  const teens = ['dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
-  const tens = ['', '', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante', 'quatre-vingt', 'quatre-vingt'];
+  const teens = [
+    'dix',
+    'onze',
+    'douze',
+    'treize',
+    'quatorze',
+    'quinze',
+    'seize',
+    'dix-sept',
+    'dix-huit',
+    'dix-neuf',
+  ];
+  const tens = [
+    '',
+    '',
+    'vingt',
+    'trente',
+    'quarante',
+    'cinquante',
+    'soixante',
+    'soixante',
+    'quatre-vingt',
+    'quatre-vingt',
+  ];
 
   function convertUpTo99(n: number): string {
     if (n < 10) return ones[n];
@@ -88,8 +110,30 @@ export function numberToEnglishWords(num: number): string {
   if (num === 0) return 'zero';
 
   const ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
-  const teens = ['ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
-  const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+  const teens = [
+    'ten',
+    'eleven',
+    'twelve',
+    'thirteen',
+    'fourteen',
+    'fifteen',
+    'sixteen',
+    'seventeen',
+    'eighteen',
+    'nineteen',
+  ];
+  const tens = [
+    '',
+    '',
+    'twenty',
+    'thirty',
+    'forty',
+    'fifty',
+    'sixty',
+    'seventy',
+    'eighty',
+    'ninety',
+  ];
 
   function convertUpTo99(n: number): string {
     if (n < 10) return ones[n];
@@ -142,10 +186,54 @@ export function numberToEnglishWords(num: number): string {
 export function numberToPolishWords(num: number): string {
   if (num === 0) return 'zero';
 
-  const ones = ['', 'jeden', 'dwa', 'trzy', 'cztery', 'pięć', 'sześć', 'siedem', 'osiem', 'dziewięć'];
-  const teens = ['dziesięć', 'jedenaście', 'dwanaście', 'trzynaście', 'czternaście', 'piętnaście', 'szesnaście', 'siedemnaście', 'osiemnaście', 'dziewiętnaście'];
-  const tens = ['', '', 'dwadzieścia', 'trzydzieści', 'czterdzieści', 'pięćdziesiąt', 'sześćdziesiąt', 'siedemdziesiąt', 'osiemdziesiąt', 'dziewięćdziesiąt'];
-  const hundreds = ['', 'sto', 'dwieście', 'trzysta', 'czterysta', 'pięćset', 'sześćset', 'siedemset', 'osiemset', 'dziewięćset'];
+  const ones = [
+    '',
+    'jeden',
+    'dwa',
+    'trzy',
+    'cztery',
+    'pięć',
+    'sześć',
+    'siedem',
+    'osiem',
+    'dziewięć',
+  ];
+  const teens = [
+    'dziesięć',
+    'jedenaście',
+    'dwanaście',
+    'trzynaście',
+    'czternaście',
+    'piętnaście',
+    'szesnaście',
+    'siedemnaście',
+    'osiemnaście',
+    'dziewiętnaście',
+  ];
+  const tens = [
+    '',
+    '',
+    'dwadzieścia',
+    'trzydzieści',
+    'czterdzieści',
+    'pięćdziesiąt',
+    'sześćdziesiąt',
+    'siedemdziesiąt',
+    'osiemdziesiąt',
+    'dziewięćdziesiąt',
+  ];
+  const hundreds = [
+    '',
+    'sto',
+    'dwieście',
+    'trzysta',
+    'czterysta',
+    'pięćset',
+    'sześćset',
+    'siedemset',
+    'osiemset',
+    'dziewięćset',
+  ];
 
   function convertUpTo99(n: number): string {
     if (n < 10) return ones[n];

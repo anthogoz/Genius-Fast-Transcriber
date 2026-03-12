@@ -49,9 +49,10 @@ export function formatArtistList(artists: string[]): string {
   return `${artists.slice(0, -1).join(', ')} & ${artists[artists.length - 1]}`;
 }
 
-export function extractArtistsFromMetaContent(
-  metaContent: string,
-): { main: string[]; ft: string[] } {
+export function extractArtistsFromMetaContent(metaContent: string): {
+  main: string[];
+  ft: string[];
+} {
   const result: { main: string[]; ft: string[] } = { main: [], ft: [] };
   if (!metaContent) return result;
 

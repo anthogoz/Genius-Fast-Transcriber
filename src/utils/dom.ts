@@ -126,7 +126,8 @@ export function replaceAndHighlightInDiv(
     const parent = textNode.parentNode;
     if (
       !parent ||
-      (parent.nodeType === Node.ELEMENT_NODE && (parent as Element).classList.contains(highlightClass))
+      (parent.nodeType === Node.ELEMENT_NODE &&
+        (parent as Element).classList.contains(highlightClass))
     )
       continue;
 
@@ -253,8 +254,12 @@ export function createTextareaReplacementOverlay(
   const parentRect = textarea.offsetParent
     ? textarea.offsetParent.getBoundingClientRect()
     : { top: 0, left: 0 };
-  const parentScrollTop = textarea.offsetParent ? (textarea.offsetParent as HTMLElement).scrollTop : 0;
-  const parentScrollLeft = textarea.offsetParent ? (textarea.offsetParent as HTMLElement).scrollLeft : 0;
+  const parentScrollTop = textarea.offsetParent
+    ? (textarea.offsetParent as HTMLElement).scrollTop
+    : 0;
+  const parentScrollLeft = textarea.offsetParent
+    ? (textarea.offsetParent as HTMLElement).scrollLeft
+    : 0;
 
   overlay.style.top = rect.top - parentRect.top + parentScrollTop + 'px';
   overlay.style.left = rect.left - parentRect.left + parentScrollLeft + 'px';
@@ -265,7 +270,15 @@ export function createTextareaReplacementOverlay(
   for (let i = 0; i < newText.length; i++) {
     const char = newText[i];
     const escaped =
-      char === '<' ? '&lt;' : char === '>' ? '&gt;' : char === '&' ? '&amp;' : char === '\n' ? '<br>' : char;
+      char === '<'
+        ? '&lt;'
+        : char === '>'
+          ? '&gt;'
+          : char === '&'
+            ? '&amp;'
+            : char === '\n'
+              ? '<br>'
+              : char;
 
     if (modifiedPositions.has(i)) {
       htmlContent += `<span class="gft-correction-overlay" style="background-color: ${color}; opacity: 0.6; border-radius: 2px; padding: 0 1px; color: transparent; font-weight: inherit;">${escaped}</span>`;

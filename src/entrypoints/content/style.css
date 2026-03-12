@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
   --gft-primary: #f9ff55;
@@ -37,7 +37,9 @@
   margin: 10px 0;
   max-width: 360px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-  transition: background-color 0.3s ease, border-color 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
 }
 
 .gft-dark-mode .gft-panel {

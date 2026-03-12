@@ -1,0 +1,10 @@
+{
+  "files.exclude": {
+    "**/.output": true,
+    "**/.wxt": true
+  },
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "editor.tabSize": 2
+}

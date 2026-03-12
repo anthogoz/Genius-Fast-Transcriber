@@ -14,6 +14,8 @@ This produces a `.zip` file in the `.output/` directory, ready for upload.
 
 - [ ] Version bumped in `package.json`
 - [ ] `CHANGELOG.md` updated with new version entry
+- [ ] `npm run lint` passes (no linting errors)
+- [ ] `npm run format` passes (code is formatted)
 - [ ] `npm run typecheck` passes (zero TypeScript errors)
 - [ ] `npm run build` succeeds
 - [ ] Tested manually on a Genius lyrics page (both editor types)

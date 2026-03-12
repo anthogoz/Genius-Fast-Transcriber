@@ -24,7 +24,8 @@ const SELECTORS = {
   TEXTAREA_EDITOR: 'textarea[class*="ExpandingTextarea__Textarea"]',
   DIV_EDITOR: 'div[data-testid="lyrics-input"]',
   CONTROLS_STICKY: 'div[class^="LyricsEdit-desktop__Controls-sc-"]',
-  GENIUS_HELPER: 'div[class*="LyricsEditExplainer__Container-sc-"][class*="LyricsEdit-desktop__Explainer-sc-"]',
+  GENIUS_HELPER:
+    'div[class*="LyricsEditExplainer__Container-sc-"][class*="LyricsEdit-desktop__Explainer-sc-"]',
   LYRICS_CONTAINER: '[data-lyrics-container="true"]',
 } as const;
 
@@ -120,7 +121,9 @@ export function useSongData() {
     }
 
     if (rawTitleText) {
-      let ttc = decodeHtmlEntities(rawTitleText.trim()).replace(/\s+Lyrics$/i, '').trim();
+      let ttc = decodeHtmlEntities(rawTitleText.trim())
+        .replace(/\s+Lyrics$/i, '')
+        .trim();
       if (artistsFromMeta.main.length === 0 && songData._rawMainArtists.length > 0) {
         const blk = formatArtistList(songData._rawMainArtists.map((a) => cleanArtistName(a)));
         if (blk) {
@@ -156,19 +159,17 @@ export function useSongData() {
         ? songData._rawFeaturingArtistsFromTitleExtract
         : songData._rawFeaturingArtistsFromSection;
 
-    songData.featuringArtists = rawFtSource
-      .map(cleanArtistName)
-      .filter((name) => {
-        if (
-          !name ||
-          seenFt.has(name.toLowerCase()) ||
-          songData.mainArtists.some((m) => m.toLowerCase() === name.toLowerCase())
-        ) {
-          return false;
-        }
-        seenFt.add(name.toLowerCase());
-        return true;
-      });
+    songData.featuringArtists = rawFtSource.map(cleanArtistName).filter((name) => {
+      if (
+        !name ||
+        seenFt.has(name.toLowerCase()) ||
+        songData.mainArtists.some((m) => m.toLowerCase() === name.toLowerCase())
+      ) {
+        return false;
+      }
+      seenFt.add(name.toLowerCase());
+      return true;
+    });
 
     return songData;
   }

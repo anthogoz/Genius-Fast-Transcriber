@@ -129,7 +129,10 @@ npm install
 npm run dev          # Start dev server with HMR
 npm run build        # Production build
 npm run zip          # Package for Chrome Web Store
-npm run typecheck        # TypeScript type-checking
+npm run lint         # Lint the code with Biome
+npm run lint:fix     # Fix linting errors with Biome
+npm run format       # Format the code with Biome
+npm run typecheck    # TypeScript type-checking
 ```
 
 ### Project Structure

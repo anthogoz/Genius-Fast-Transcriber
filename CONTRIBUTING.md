@@ -124,6 +124,9 @@ WXT will open a new Chrome window with the extension loaded. Changes to Vue comp
 | `npm run dev` | Dev server with hot module replacement (HMR) |
 | `npm run build` | Production build to `.output/chrome-mv3/` |
 | `npm run zip` | Package `.zip` for Chrome Web Store |
+| `npm run lint` | Lint the code with Biome |
+| `npm run lint:fix` | Fix linting errors with Biome |
+| `npm run format` | Format the code with Biome |
 | `npm run typecheck` | TypeScript type-checking via `vue-tsc` |
 
 ## Project Architecture
