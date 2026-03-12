@@ -43,7 +43,7 @@ export function applyTextTransformToDivEditor(
     } else if (el.nodeType === Node.TEXT_NODE) {
       currentTextContent += el.textContent;
     } else if (el.nodeName === 'DIV' || el.nodeName === 'P') {
-      currentTextContent += el.textContent + '\n';
+      currentTextContent += `${el.textContent}\n`;
     }
   }
   currentTextContent = currentTextContent.replace(/\n+$/, '');
@@ -118,7 +118,7 @@ export function replaceAndHighlightInDiv(
   for (const textNode of nodesToProcess) {
     const localSearchRegex = new RegExp(
       searchRegex.source,
-      searchRegex.flags.includes('g') ? searchRegex.flags : searchRegex.flags + 'g',
+      searchRegex.flags.includes('g') ? searchRegex.flags : `${searchRegex.flags}g`,
     );
 
     if (!textNode.nodeValue?.match(localSearchRegex)) continue;
@@ -133,14 +133,14 @@ export function replaceAndHighlightInDiv(
 
     const fragment = document.createDocumentFragment();
     let lastIndex = 0;
-    let match: RegExpExecArray | null;
+    let match: RegExpExecArray | null = localSearchRegex.exec(textNode.nodeValue ?? '');
     let nodeChangedThisIteration = false;
     localSearchRegex.lastIndex = 0;
 
-    while ((match = localSearchRegex.exec(textNode.nodeValue!)) !== null) {
+    while (match !== null) {
       if (match.index > lastIndex) {
         fragment.appendChild(
-          document.createTextNode(textNode.nodeValue!.substring(lastIndex, match.index)),
+          document.createTextNode(textNode.nodeValue?.substring(lastIndex, match.index)),
         );
       }
 
@@ -164,10 +164,12 @@ export function replaceAndHighlightInDiv(
 
       if (lastIndex === match.index && localSearchRegex.source !== '') localSearchRegex.lastIndex++;
       if (lastIndex === 0 && localSearchRegex.source === '' && match[0] === '') break;
+
+      match = localSearchRegex.exec(textNode.nodeValue ?? '');
     }
 
-    if (lastIndex < textNode.nodeValue!.length) {
-      fragment.appendChild(document.createTextNode(textNode.nodeValue!.substring(lastIndex)));
+    if (lastIndex < textNode.nodeValue?.length) {
+      fragment.appendChild(document.createTextNode(textNode.nodeValue?.substring(lastIndex)));
     }
 
     if (nodeChangedThisIteration && fragment.childNodes.length > 0) {
@@ -194,16 +196,18 @@ export function createTextareaReplacementOverlay(
 
   const originalMatches: { start: number; end: number; text: string }[] = [];
   const localSearchRegex = new RegExp(searchPattern.source, searchPattern.flags);
-  let match: RegExpExecArray | null;
+  let match: RegExpExecArray | null = localSearchRegex.exec(originalText);
   localSearchRegex.lastIndex = 0;
 
-  while ((match = localSearchRegex.exec(originalText)) !== null) {
+  while (match !== null) {
     originalMatches.push({
       start: match.index,
       end: match.index + match[0].length,
       text: match[0],
     });
     if (!searchPattern.flags.includes('g')) break;
+
+    match = localSearchRegex.exec(originalText);
   }
 
   let offset = 0;
@@ -261,10 +265,10 @@ export function createTextareaReplacementOverlay(
     ? (textarea.offsetParent as HTMLElement).scrollLeft
     : 0;
 
-  overlay.style.top = rect.top - parentRect.top + parentScrollTop + 'px';
-  overlay.style.left = rect.left - parentRect.left + parentScrollLeft + 'px';
-  overlay.style.width = textarea.offsetWidth + 'px';
-  overlay.style.height = textarea.offsetHeight + 'px';
+  overlay.style.top = `${rect.top - parentRect.top + parentScrollTop}px`;
+  overlay.style.left = `${rect.left - parentRect.left + parentScrollLeft}px`;
+  overlay.style.width = `${textarea.offsetWidth}px`;
+  overlay.style.height = `${textarea.offsetHeight}px`;
 
   let htmlContent = '';
   for (let i = 0; i < newText.length; i++) {
@@ -288,7 +292,7 @@ export function createTextareaReplacementOverlay(
   }
 
   overlay.innerHTML = htmlContent;
-  textarea.parentNode!.insertBefore(overlay, textarea);
+  textarea.parentNode?.insertBefore(overlay, textarea);
 
   const syncScroll = () => {
     overlay.scrollTop = textarea.scrollTop;

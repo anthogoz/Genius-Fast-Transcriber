@@ -16,14 +16,16 @@ export function useUndoRedo() {
 
   function undo(currentContent: string): string | null {
     if (undoStack.value.length === 0) return null;
-    const previousState = undoStack.value.pop()!;
+    const previousState = undoStack.value.pop();
+    if (previousState === undefined) return null;
     redoStack.value.push(currentContent);
     return previousState;
   }
 
   function redo(currentContent: string): string | null {
     if (redoStack.value.length === 0) return null;
-    const nextState = redoStack.value.pop()!;
+    const nextState = redoStack.value.pop();
+    if (nextState === undefined) return null;
     undoStack.value.push(currentContent);
     return nextState;
   }

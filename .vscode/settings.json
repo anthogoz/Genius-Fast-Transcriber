@@ -1,8 +1,4 @@
 {
-  "files.exclude": {
-    "**/.output": true,
-    "**/.wxt": true
-  },
   "editor.quickSuggestions": {
     "strings": "on"
   },

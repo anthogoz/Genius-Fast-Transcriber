@@ -40,8 +40,14 @@ function handleAction(action: ToolbarAction) {
       <button
         v-for="action in actions"
         :key="action.key"
-        class="gft-floating-toolbar__btn"
-        :class="{ 'gft-floating-toolbar__btn--bold': action.key === 'bold', 'gft-floating-toolbar__btn--italic': action.key === 'italic' }"
+        type="button"
+        :class="[
+          'gft-floating-toolbar__btn',
+          {
+            'gft-floating-toolbar__btn--bold': action.key === 'bold',
+            'gft-floating-toolbar__btn--italic': action.key === 'italic'
+          }
+        ]"
         :title="t(action.tooltipKey)"
         @mousedown.prevent="handleAction(action.key)"
       >

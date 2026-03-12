@@ -31,6 +31,7 @@ function select(locale: Locale) {
     <button
       v-for="loc in locales"
       :key="loc.id"
+      type="button"
       class="btn-pill"
       :class="{ active: modelValue === loc.id }"
       @click="select(loc.id)"

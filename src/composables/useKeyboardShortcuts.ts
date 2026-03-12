@@ -1,5 +1,4 @@
 import { onMounted, onUnmounted } from 'vue';
-import type { Locale } from '@/types';
 
 interface ShortcutHandlers {
   onChorus: () => void;

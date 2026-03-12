@@ -23,6 +23,7 @@ function select(theme: Theme) {
   <div class="section-title">{{ t('popup_theme_title') }}</div>
   <div class="btn-group">
     <button
+      type="button"
       class="btn-pill"
       :class="{ active: modelValue === 'light' }"
       @click="select('light')"
@@ -30,6 +31,7 @@ function select(theme: Theme) {
       ☀️ {{ t('popup_light') }}
     </button>
     <button
+      type="button"
       class="btn-pill"
       :class="{ active: modelValue === 'dark' }"
       @click="select('dark')"

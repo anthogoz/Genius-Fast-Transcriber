@@ -42,16 +42,16 @@ const CUSTOM_LIBRARY_URL = '#';
 <template>
   <Transition name="gft-menu">
     <div v-if="visible" class="gft-settings-menu" @click.stop>
-      <button class="gft-settings-menu__item" @click="isDarkMode = !isDarkMode">
+      <button type="button" class="gft-settings-menu__item" @click="isDarkMode = !isDarkMode">
         {{ darkModeLabel }}
       </button>
-      <button class="gft-settings-menu__item" @click="areTooltipsEnabled = !areTooltipsEnabled">
+      <button type="button" class="gft-settings-menu__item" @click="areTooltipsEnabled = !areTooltipsEnabled">
         {{ tooltipsLabel }}
       </button>
-      <button class="gft-settings-menu__item" @click="isHeaderFeatEnabled = !isHeaderFeatEnabled">
+      <button type="button" class="gft-settings-menu__item" @click="isHeaderFeatEnabled = !isHeaderFeatEnabled">
         {{ headerFeatLabel }}
       </button>
-      <button class="gft-settings-menu__item" @click="isTagNewlinesDisabled = !isTagNewlinesDisabled">
+      <button type="button" class="gft-settings-menu__item" @click="isTagNewlinesDisabled = !isTagNewlinesDisabled">
         {{ newlineLabel }}
       </button>
 
@@ -65,7 +65,7 @@ const CUSTOM_LIBRARY_URL = '#';
       >
         {{ t('tutorial_link') }}
       </a>
-      <button class="gft-settings-menu__item" @click="emit('close')">
+      <button type="button" class="gft-settings-menu__item" @click="emit('close')">
         {{ t('settings_custom_library') }}
       </button>
     </div>

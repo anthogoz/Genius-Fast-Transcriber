@@ -20,6 +20,7 @@ const exportButtons = [
       <button
         v-for="btn in exportButtons"
         :key="btn.key"
+        type="button"
         class="gft-btn gft-btn--export"
         @click="btn.action"
       >

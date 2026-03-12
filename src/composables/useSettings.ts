@@ -1,5 +1,5 @@
 import { ref, watch } from 'vue';
-import type { Locale, Theme, ExtensionMode } from '@/types';
+import type { ExtensionMode, Locale, Theme } from '@/types';
 
 const STORAGE_KEYS = {
   darkMode: 'gftDarkModeEnabled',

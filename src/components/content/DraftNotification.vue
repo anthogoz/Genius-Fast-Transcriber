@@ -33,10 +33,10 @@ onUnmounted(() => {
         {{ t('draft_saved_at') }} {{ timestamp }}
       </div>
       <div class="gft-draft-notification__buttons">
-        <button class="gft-draft-btn gft-draft-btn--restore" @click="emit('restore')">
+        <button type="button" class="gft-draft-btn gft-draft-btn--restore" @click="emit('restore')">
           {{ t('draft_btn_restore') }}
         </button>
-        <button class="gft-draft-btn gft-draft-btn--discard" @click="emit('discard')">
+        <button type="button" class="gft-draft-btn gft-draft-btn--discard" @click="emit('discard')">
           {{ t('draft_btn_discard') }}
         </button>
       </div>

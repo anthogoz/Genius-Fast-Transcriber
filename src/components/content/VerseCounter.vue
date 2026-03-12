@@ -17,22 +17,25 @@ function insertVerse() {
 <template>
   <div class="gft-verse-counter">
     <button
-      class="gft-verse-counter__arrow"
       :title="t('btn_prev_couplet_tooltip')"
+      type="button"
+      class="gft-verse-counter__arrow"
       @click="decrementVerseCounter"
     >
       ←
     </button>
     <button
-      class="gft-verse-counter__main"
       :title="t('btn_verse_num_tooltip')"
+      type="button"
+      class="gft-verse-counter__main"
       @click="insertVerse"
     >
       {{ t('btn_verse_num').replace(/\d+/, String(verseCounter)) }}
     </button>
     <button
-      class="gft-verse-counter__arrow"
       :title="t('btn_next_couplet_tooltip')"
+      type="button"
+      class="gft-verse-counter__arrow"
       @click="incrementVerseCounter"
     >
       →

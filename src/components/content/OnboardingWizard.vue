@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useSettings } from '@/composables/useSettings';
-import type { Locale, ExtensionMode, Theme } from '@/types';
+import type { ExtensionMode, Locale, Theme } from '@/types';
 
 const { t } = useI18n();
 const { locale, mode, theme, isTutorialCompleted } = useSettings();
@@ -117,6 +117,7 @@ const locales: { value: Locale; label: string }[] = [
           <h3>{{ t('theme_select_title') }}</h3>
           <div class="gft-onboarding__theme-buttons">
             <button
+              type="button"
               class="gft-onboarding__theme-btn"
               :class="{ 'gft-onboarding__theme-btn--active': selectedTheme === 'light' }"
               @click="selectedTheme = 'light'"
@@ -124,6 +125,7 @@ const locales: { value: Locale; label: string }[] = [
               {{ t('theme_light_btn') }}
             </button>
             <button
+              type="button"
               class="gft-onboarding__theme-btn"
               :class="{ 'gft-onboarding__theme-btn--active': selectedTheme === 'dark' }"
               @click="selectedTheme = 'dark'"
@@ -140,6 +142,7 @@ const locales: { value: Locale; label: string }[] = [
             <button
               v-for="loc in locales"
               :key="loc.value"
+              type="button"
               class="gft-onboarding__lang-btn"
               :class="{ 'gft-onboarding__lang-btn--active': selectedLocale === loc.value }"
               @click="selectedLocale = loc.value"
@@ -164,19 +167,21 @@ const locales: { value: Locale; label: string }[] = [
       <div class="gft-onboarding__footer">
         <button
           v-if="currentStep > 0"
+          type="button"
           class="gft-onboarding__btn gft-onboarding__btn--secondary"
           @click="prev"
         >
           {{ t('tuto_prev') }}
         </button>
         <button
+          type="button"
           class="gft-onboarding__btn gft-onboarding__btn--secondary"
           @click="skip"
         >
           {{ t('tuto_skip') }}
         </button>
         <div style="flex: 1" />
-        <button class="gft-onboarding__btn gft-onboarding__btn--primary" @click="next">
+        <button type="button" class="gft-onboarding__btn gft-onboarding__btn--primary" @click="next">
           {{ isFinishStep ? t('tuto_finish') : t('tuto_next') }}
         </button>
       </div>
@@ -252,6 +257,7 @@ const locales: { value: Locale; label: string }[] = [
   line-height: 1.7;
 }
 
+/* biome-ignore lint/correctness/noUnknownPseudoClass: Vue SFC deep selector for scoped styles */
 .gft-onboarding__content :deep(kbd) {
   background: rgba(255, 255, 255, 0.1);
   padding: 2px 6px;

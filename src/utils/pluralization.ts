@@ -30,7 +30,8 @@ export function formatListWithConjunction(items: string[], locale: Locale): stri
   }
 
   const itemsCopy = [...items];
-  const lastItem = itemsCopy.pop()!;
+  const lastItem = itemsCopy.pop();
+  if (lastItem === undefined) return '';
   const conjunctions: Record<Locale, string> = {
     fr: ' et ',
     en: ' and ',

@@ -42,12 +42,12 @@ export function numberToFrenchWords(num: number): string {
     if (ten === 7) {
       if (one === 0) return 'soixante-dix';
       if (one === 1) return 'soixante et onze';
-      return 'soixante-' + teens[one];
+      return `soixante-${teens[one]}`;
     }
 
     if (ten === 9) {
       if (one === 0) return 'quatre-vingt-dix';
-      return 'quatre-vingt-' + teens[one];
+      return `quatre-vingt-${teens[one]}`;
     }
 
     if (one === 0) {
@@ -56,11 +56,11 @@ export function numberToFrenchWords(num: number): string {
     }
 
     if (one === 1 && (ten === 2 || ten === 3 || ten === 4 || ten === 5 || ten === 6)) {
-      return tens[ten] + ' et un';
+      return `${tens[ten]} et un`;
     }
 
-    if (ten === 8) return 'quatre-vingt-' + ones[one];
-    return tens[ten] + '-' + ones[one];
+    if (ten === 8) return `quatre-vingt-${ones[one]}`;
+    return `${tens[ten]}-${ones[one]}`;
   }
 
   function convertUpTo999(n: number): string {
@@ -69,12 +69,12 @@ export function numberToFrenchWords(num: number): string {
     const hundred = Math.floor(n / 100);
     const rest = n % 100;
 
-    let result = hundred === 1 ? 'cent' : ones[hundred] + ' cent';
+    let result = hundred === 1 ? 'cent' : `${ones[hundred]} cent`;
 
     if (rest === 0 && hundred > 1) {
       result += 's';
     } else if (rest > 0) {
-      result += ' ' + convertUpTo99(rest);
+      result += ` ${convertUpTo99(rest)}`;
     }
 
     return result;
@@ -86,23 +86,23 @@ export function numberToFrenchWords(num: number): string {
   if (num >= 1000000000) {
     const billions = Math.floor(num / 1000000000);
     const rest = num % 1000000000;
-    let result = billions === 1 ? 'un milliard' : convertUpTo999(billions) + ' milliards';
-    if (rest > 0) result += ' ' + numberToFrenchWords(rest);
+    let result = billions === 1 ? 'un milliard' : `${convertUpTo999(billions)} milliards`;
+    if (rest > 0) result += ` ${numberToFrenchWords(rest)}`;
     return result;
   }
 
   if (num >= 1000000) {
     const millions = Math.floor(num / 1000000);
     const rest = num % 1000000;
-    let result = millions === 1 ? 'un million' : convertUpTo999(millions) + ' millions';
-    if (rest > 0) result += ' ' + numberToFrenchWords(rest);
+    let result = millions === 1 ? 'un million' : `${convertUpTo999(millions)} millions`;
+    if (rest > 0) result += ` ${numberToFrenchWords(rest)}`;
     return result;
   }
 
   const thousand = Math.floor(num / 1000);
   const rest = num % 1000;
-  let result = thousand === 1 ? 'mille' : convertUpTo999(thousand) + ' mille';
-  if (rest > 0) result += ' ' + convertUpTo999(rest);
+  let result = thousand === 1 ? 'mille' : `${convertUpTo999(thousand)} mille`;
+  if (rest > 0) result += ` ${convertUpTo999(rest)}`;
   return result;
 }
 
@@ -143,7 +143,7 @@ export function numberToEnglishWords(num: number): string {
     const one = n % 10;
 
     if (one === 0) return tens[ten];
-    return tens[ten] + '-' + ones[one];
+    return `${tens[ten]}-${ones[one]}`;
   }
 
   function convertUpTo999(n: number): string {
@@ -152,8 +152,8 @@ export function numberToEnglishWords(num: number): string {
     const hundred = Math.floor(n / 100);
     const rest = n % 100;
 
-    let result = ones[hundred] + ' hundred';
-    if (rest > 0) result += ' ' + convertUpTo99(rest);
+    let result = `${ones[hundred]} hundred`;
+    if (rest > 0) result += ` ${convertUpTo99(rest)}`;
     return result;
   }
 
@@ -163,23 +163,23 @@ export function numberToEnglishWords(num: number): string {
   if (num >= 1000000000) {
     const billions = Math.floor(num / 1000000000);
     const rest = num % 1000000000;
-    let result = convertUpTo999(billions) + ' billion';
-    if (rest > 0) result += ' ' + numberToEnglishWords(rest);
+    let result = `${convertUpTo999(billions)} billion`;
+    if (rest > 0) result += ` ${numberToEnglishWords(rest)}`;
     return result;
   }
 
   if (num >= 1000000) {
     const millions = Math.floor(num / 1000000);
     const rest = num % 1000000;
-    let result = convertUpTo999(millions) + ' million';
-    if (rest > 0) result += ' ' + numberToEnglishWords(rest);
+    let result = `${convertUpTo999(millions)} million`;
+    if (rest > 0) result += ` ${numberToEnglishWords(rest)}`;
     return result;
   }
 
   const thousand = Math.floor(num / 1000);
   const rest = num % 1000;
-  let result = convertUpTo999(thousand) + ' thousand';
-  if (rest > 0) result += ' ' + convertUpTo999(rest);
+  let result = `${convertUpTo999(thousand)} thousand`;
+  if (rest > 0) result += ` ${convertUpTo999(rest)}`;
   return result;
 }
 
@@ -243,7 +243,7 @@ export function numberToPolishWords(num: number): string {
     const one = n % 10;
 
     if (one === 0) return tens[ten];
-    return tens[ten] + ' ' + ones[one];
+    return `${tens[ten]} ${ones[one]}`;
   }
 
   function convertUpTo999(n: number): string {
@@ -253,7 +253,7 @@ export function numberToPolishWords(num: number): string {
     const rest = n % 100;
 
     let result = hundreds[hundred];
-    if (rest > 0) result += ' ' + convertUpTo99(rest);
+    if (rest > 0) result += ` ${convertUpTo99(rest)}`;
     return result;
   }
 
@@ -290,22 +290,22 @@ export function numberToPolishWords(num: number): string {
   if (num >= 1000000000) {
     const billions = Math.floor(num / 1000000000);
     const rest = num % 1000000000;
-    let result = (billions === 1 ? '' : convertUpTo999(billions) + ' ') + getBillionForm(billions);
-    if (rest > 0) result += ' ' + numberToPolishWords(rest);
+    let result = (billions === 1 ? '' : `${convertUpTo999(billions)} `) + getBillionForm(billions);
+    if (rest > 0) result += ` ${numberToPolishWords(rest)}`;
     return result.trim();
   }
 
   if (num >= 1000000) {
     const millions = Math.floor(num / 1000000);
     const rest = num % 1000000;
-    let result = (millions === 1 ? '' : convertUpTo999(millions) + ' ') + getMillionForm(millions);
-    if (rest > 0) result += ' ' + numberToPolishWords(rest);
+    let result = (millions === 1 ? '' : `${convertUpTo999(millions)} `) + getMillionForm(millions);
+    if (rest > 0) result += ` ${numberToPolishWords(rest)}`;
     return result.trim();
   }
 
   const thousand = Math.floor(num / 1000);
   const rest = num % 1000;
-  let result = (thousand === 1 ? '' : convertUpTo999(thousand) + ' ') + getThousandForm(thousand);
-  if (rest > 0) result += ' ' + convertUpTo999(rest);
+  let result = (thousand === 1 ? '' : `${convertUpTo999(thousand)} `) + getThousandForm(thousand);
+  if (rest > 0) result += ` ${convertUpTo999(rest)}`;
   return result.trim();
 }

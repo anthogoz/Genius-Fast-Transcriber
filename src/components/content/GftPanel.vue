@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useSettings } from '@/composables/useSettings';
 import { useEditor } from '@/composables/useEditor';
+import { useSettings } from '@/composables/useSettings';
 import { useUndoRedo } from '@/composables/useUndoRedo';
-import StructureSection from './StructureSection.vue';
 import CleanupSection from './CleanupSection.vue';
 import ExportSection from './ExportSection.vue';
+import FeedbackToast from './FeedbackToast.vue';
+import FindReplace from './FindReplace.vue';
+import ProgressBar from './ProgressBar.vue';
 import SettingsMenu from './SettingsMenu.vue';
 import StatsDisplay from './StatsDisplay.vue';
-import FindReplace from './FindReplace.vue';
-import FeedbackToast from './FeedbackToast.vue';
-import ProgressBar from './ProgressBar.vue';
+import StructureSection from './StructureSection.vue';
 
 const { t } = useI18n();
 const { isPanelCollapsed, isDarkMode } = useSettings();
@@ -96,25 +96,28 @@ defineExpose({
       </div>
       <div class="gft-panel__header-right" @click.stop>
         <button
-          class="gft-panel__icon-btn"
           :title="t('undo_tooltip')"
           :disabled="!canUndo()"
+          type="button"
+          class="gft-panel__icon-btn"
           @click="handleUndo"
         >
           ↩
         </button>
         <button
-          class="gft-panel__icon-btn"
           :title="t('redo_tooltip')"
           :disabled="!canRedo()"
+          type="button"
+          class="gft-panel__icon-btn"
           @click="handleRedo"
         >
           ↪
         </button>
         <div class="gft-panel__settings-wrapper">
           <button
-            class="gft-panel__icon-btn"
             :title="t('settings_tooltip')"
+            type="button"
+            class="gft-panel__icon-btn"
             @click="toggleSettings"
           >
             ⚙️
@@ -147,6 +150,7 @@ defineExpose({
       <StatsDisplay v-if="showStats" :content="editorContent" />
 
       <button
+        type="button"
         class="gft-panel__stats-toggle"
         @click="showStats = !showStats"
       >

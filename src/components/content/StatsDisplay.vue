@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { isSectionTag } from '@/utils/corrections';
 import type { LyricsStats } from '@/types';
+import { isSectionTag } from '@/utils/corrections';
 
 const { t } = useI18n();
 

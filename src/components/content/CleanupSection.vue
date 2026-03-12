@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useSettings } from '@/composables/useSettings';
 import { useCorrections } from '@/composables/useCorrections';
 import { useEditor } from '@/composables/useEditor';
-import CorrectionPreview from './CorrectionPreview.vue';
+import { useSettings } from '@/composables/useSettings';
 import type { CorrectionResult } from '@/types';
+import CorrectionPreview from './CorrectionPreview.vue';
 
 const { t } = useI18n();
 const { locale } = useSettings();
@@ -243,7 +243,7 @@ function handleFixAll() {
   showPreview.value = true;
 }
 
-function handlePreviewApply(correctedText: string) {
+function handlePreviewApply(_correctedText: string) {
   showPreview.value = false;
   if (previewResult.value) {
     applyAndSetCorrections(previewResult.value);
@@ -265,8 +265,9 @@ function handlePreviewCancel() {
       <button
         v-for="btn in cleanupButtons"
         :key="btn.id"
-        class="gft-btn gft-btn--cleanup"
         :title="t(btn.tooltipKey)"
+        type="button"
+        class="gft-btn gft-btn--cleanup"
         @click="btn.action"
       >
         {{ t(btn.labelKey) }}
@@ -275,15 +276,17 @@ function handlePreviewCancel() {
 
     <div class="gft-cleanup-section__actions">
       <button
-        class="gft-btn gft-btn--check"
         :title="t('global_check_tooltip')"
+        type="button"
+        class="gft-btn gft-btn--check"
         @click="handleCheckBrackets"
       >
         {{ t('btn_check_label') }}
       </button>
       <button
-        class="gft-btn gft-btn--fix-all"
         :title="t('global_fix_tooltip')"
+        type="button"
+        class="gft-btn gft-btn--fix-all"
         @click="handleFixAll"
       >
         {{ t('btn_fix_all_short') }}

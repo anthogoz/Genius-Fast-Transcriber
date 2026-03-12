@@ -1,9 +1,9 @@
 import type {
-  Locale,
-  CorrectionOptions,
   CorrectionCounts,
+  CorrectionOptions,
   CorrectionResult,
   CorrectionRule,
+  Locale,
 } from '@/types';
 
 export function isSectionTag(line: string): boolean {
@@ -171,7 +171,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     execute: (text, corrections, opts, locale) => {
       if (!opts.punctuation) return text;
       if (locale !== 'pl' && locale !== 'en') {
-        const pattern = /([^ \n\[(<])([?!])/g;
+        const pattern = /([^ \n[(<])([?!])/g;
         const newText = text.replace(pattern, '$1 $2');
         if (newText !== text) corrections.punctuation = (text.match(pattern) || []).length;
         return newText;
@@ -184,7 +184,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     progressKey: 'progress_step_spaces',
     execute: (text, corrections, opts) => {
       if (!opts.doubleSpaces) return text;
-      const pattern = /  +/g;
+      const pattern = / {2,}/g;
       const newText = text.replace(pattern, ' ');
       if (newText !== text) corrections.doubleSpaces = (text.match(pattern) || []).length;
       return newText;

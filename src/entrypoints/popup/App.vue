@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { browser } from 'wxt/browser';
-import type { ExtensionMode, Theme, Locale, PopupState } from '@/types';
-import { setLocale } from '@/i18n';
+import LanguageSelector from '@/components/popup/LanguageSelector.vue';
 import ModeSelector from '@/components/popup/ModeSelector.vue';
 import ThemeSelector from '@/components/popup/ThemeSelector.vue';
-import LanguageSelector from '@/components/popup/LanguageSelector.vue';
+import { setLocale } from '@/i18n';
+import type { ExtensionMode, Locale, PopupState, Theme } from '@/types';
 
 const { t } = useI18n();
 
@@ -98,7 +98,7 @@ function restartTutorial() {
       <LanguageSelector v-model="locale" />
 
       <div class="section-title">{{ t('popup_help_title') }}</div>
-      <button class="restart-btn" @click="restartTutorial">
+      <button type="button" class="restart-btn" @click="restartTutorial">
         ❓ {{ t('popup_restart_tutorial') }}
       </button>
     </div>

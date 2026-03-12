@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useSettings } from '@/composables/useSettings';
+import type { CorrectionCounts, CorrectionOptions, CorrectionResult } from '@/types';
 import { applyAllTextCorrectionsToString } from '@/utils/corrections';
 import { highlightDifferences } from '@/utils/diff';
-import type { CorrectionOptions, CorrectionResult, CorrectionCounts } from '@/types';
 
 const { t } = useI18n();
 const { isDarkMode, locale } = useSettings();
@@ -114,10 +114,10 @@ function handleApply() {
       <div class="gft-preview-modal__diff" v-html="diffHtml" />
 
       <div class="gft-preview-modal__buttons">
-        <button class="gft-preview-btn gft-preview-btn--cancel" @click="emit('cancel')">
+        <button type="button" class="gft-preview-btn gft-preview-btn--cancel" @click="emit('cancel')">
           {{ t('preview_btn_cancel') }}
         </button>
-        <button class="gft-preview-btn gft-preview-btn--apply" @click="handleApply">
+        <button type="button" class="gft-preview-btn gft-preview-btn--apply" @click="handleApply">
           {{ t('preview_btn_apply') }}
         </button>
       </div>

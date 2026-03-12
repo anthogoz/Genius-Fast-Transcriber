@@ -1,6 +1,6 @@
 import { createI18n } from 'vue-i18n';
-import fr from '@/locales/app/fr.json';
 import en from '@/locales/app/en.json';
+import fr from '@/locales/app/fr.json';
 import pl from '@/locales/app/pl.json';
 import type { Locale } from '@/types';
 

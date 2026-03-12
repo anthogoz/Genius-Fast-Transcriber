@@ -1,10 +1,10 @@
-import type { SongData, SongDataRaw } from '@/types';
+import type { SongDataRaw } from '@/types';
 import {
-  extractArtistsFromMetaContent,
-  decodeHtmlEntities,
-  formatArtistList,
   cleanArtistName,
+  decodeHtmlEntities,
   escapeRegExp,
+  extractArtistsFromMetaContent,
+  formatArtistList,
 } from '@/utils/artists';
 
 const SELECTORS = {

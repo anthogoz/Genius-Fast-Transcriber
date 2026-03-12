@@ -1,5 +1,5 @@
 import { reactive, toRefs } from 'vue';
-import type { GftState, EditorType } from '@/types';
+import type { EditorType, GftState } from '@/types';
 
 const state = reactive<GftState>({
   verseCounter: 1,

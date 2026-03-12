@@ -1,13 +1,13 @@
 import { createApp } from 'vue';
-import { i18n, setLocale } from '@/i18n';
-import { useSettings } from '@/composables/useSettings';
-import { useGftState } from '@/composables/useGftState';
-import { useSongData, SELECTORS } from '@/composables/useSongData';
+import { browser } from 'wxt/browser';
+import FloatingToolbar from '@/components/content/FloatingToolbar.vue';
 import GftPanel from '@/components/content/GftPanel.vue';
 import OnboardingWizard from '@/components/content/OnboardingWizard.vue';
-import FloatingToolbar from '@/components/content/FloatingToolbar.vue';
-import { browser } from 'wxt/browser';
-import type { PopupAction, PopupState, Locale } from '@/types';
+import { useGftState } from '@/composables/useGftState';
+import { useSettings } from '@/composables/useSettings';
+import { SELECTORS, useSongData } from '@/composables/useSongData';
+import { i18n, setLocale } from '@/i18n';
+import type { Locale, PopupState } from '@/types';
 
 export default defineContentScript({
   matches: ['*://*.genius.com/*-lyrics'],
@@ -45,7 +45,7 @@ export default defineContentScript({
         const divEditor = document.querySelector<HTMLElement>(SELECTORS.DIV_EDITOR);
 
         if (textarea || divEditor) {
-          const editor = textarea ?? divEditor!;
+          const editor = textarea ?? (divEditor as HTMLElement);
           const type = textarea ? 'textarea' : 'contenteditable';
 
           if (state.currentActiveEditor !== editor) {
@@ -68,7 +68,7 @@ export default defineContentScript({
       );
       const existingDiv = document.querySelector<HTMLElement>(SELECTORS.DIV_EDITOR);
       if (existingTextarea || existingDiv) {
-        const editor = existingTextarea ?? existingDiv!;
+        const editor = existingTextarea ?? (existingDiv as HTMLElement);
         const type = existingTextarea ? 'textarea' : 'contenteditable';
         setEditor(editor as HTMLElement, type);
 
@@ -80,7 +80,7 @@ export default defineContentScript({
       }
     }
 
-    async function mountPanel(ctx: any) {
+    async function mountPanel(_ctx: any) {
       const existingPanel = document.getElementById('gft-panel-root');
       if (existingPanel) return;
 
@@ -108,7 +108,7 @@ export default defineContentScript({
       app.mount(container);
     }
 
-    async function showOnboarding(ctx: any) {
+    async function showOnboarding(_ctx: any) {
       return new Promise<void>((resolve) => {
         const overlay = document.createElement('div');
         overlay.id = 'gft-onboarding-root';
@@ -129,7 +129,7 @@ export default defineContentScript({
       });
     }
 
-    function initLyricCardMode(ctx: any) {
+    function initLyricCardMode(_ctx: any) {
       const container = document.createElement('div');
       container.id = 'gft-toolbar-root';
       document.body.appendChild(container);

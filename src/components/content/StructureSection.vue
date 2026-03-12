@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
-import { useSettings } from '@/composables/useSettings';
-import { useGftState } from '@/composables/useGftState';
 import { useEditor } from '@/composables/useEditor';
+import { useGftState } from '@/composables/useGftState';
+import { useSettings } from '@/composables/useSettings';
 import { formatArtistList } from '@/utils/artists';
 import ArtistSelector from './ArtistSelector.vue';
 import VerseCounter from './VerseCounter.vue';
-import { ref } from 'vue';
 
 const { t } = useI18n();
 const { locale, isTagNewlinesDisabled, isHeaderFeatEnabled } = useSettings();
@@ -106,8 +105,9 @@ function handleVerseInsert(tag: string) {
 
     <div class="gft-structure-section__buttons">
       <button
-        class="gft-btn gft-btn--header"
         :title="t('btn_header_tooltip')"
+        type="button"
+        class="gft-btn gft-btn--header"
         @click="insertHeader"
       >
         {{ t('btn_header') }}
@@ -116,8 +116,9 @@ function handleVerseInsert(tag: string) {
       <div class="gft-structure-section__tags">
         <template v-for="tagDef in visibleTags" :key="tagDef.key">
           <button
-            class="gft-btn gft-btn--tag"
             :title="t(`${tagDef.key}_tooltip`)"
+            type="button"
+            class="gft-btn gft-btn--tag"
             @click="insertTag(tagDef)"
           >
             {{ t(tagDef.key) }}

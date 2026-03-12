@@ -87,10 +87,10 @@ function replaceAll() {
         {{ t('regex_toggle') }}
       </label>
       <div class="gft-find-replace__buttons">
-        <button class="gft-btn gft-btn--sm" @click="replaceFirst">
+        <button type="button" class="gft-btn gft-btn--sm" @click="replaceFirst">
           {{ t('btn_replace') }}
         </button>
-        <button class="gft-btn gft-btn--sm" @click="replaceAll">
+        <button type="button" class="gft-btn gft-btn--sm" @click="replaceAll">
           {{ t('btn_replace_all') }}
         </button>
       </div>

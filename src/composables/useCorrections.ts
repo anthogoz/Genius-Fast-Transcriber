@@ -1,16 +1,15 @@
-import { useGftState } from './useGftState';
-import { useEditor } from './useEditor';
-import { useUndoRedo } from './useUndoRedo';
-import { useSettings } from './useSettings';
-import {
-  applyAllTextCorrectionsToString,
-  applyAllTextCorrectionsAsync,
-  isSectionTag,
-  correctLineSpacing,
-} from '@/utils/corrections';
-import { applyTextTransformToDivEditor, replaceAndHighlightInDiv } from '@/utils/dom';
+import type { CorrectionOptions, CorrectionResult } from '@/types';
 import { findUnmatchedBracketsAndParentheses } from '@/utils/brackets';
-import type { CorrectionOptions, CorrectionResult, Locale } from '@/types';
+import {
+  applyAllTextCorrectionsAsync,
+  applyAllTextCorrectionsToString,
+  correctLineSpacing,
+  isSectionTag,
+} from '@/utils/corrections';
+import { useEditor } from './useEditor';
+import { useGftState } from './useGftState';
+import { useSettings } from './useSettings';
+import { useUndoRedo } from './useUndoRedo';
 
 export function useCorrections() {
   const { state } = useGftState();
@@ -19,7 +18,7 @@ export function useCorrections() {
   const { locale } = useSettings();
 
   function applyCorrections(
-    options?: Partial<CorrectionOptions>,
+    _options?: Partial<CorrectionOptions>,
     progressFn?: (step: number, total: number, msg: string) => void,
   ): Promise<CorrectionResult> {
     const content = getEditorContent();
@@ -92,7 +91,7 @@ export function useCorrections() {
   function removeZeroWidthSpaces() {
     const content = getEditorContent();
     saveState(content);
-    const newText = content.replace(/[\u200B\u200C\u200D\uFEFF]/g, '');
+    const newText = content.replace(/\u200B|\u200C|\u200D|\uFEFF/g, '');
     const count = content.length - newText.length;
     if (count > 0) setEditorContent(newText);
     return count;
