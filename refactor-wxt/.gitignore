@@ -1,0 +1,32 @@
+# Dependencies
+node_modules
+
+# WXT files
+.output
+.wxt
+dist
+
+# Logs
+*.log
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Backups
+*.backup
+*.bak
+
+# Temporary files
+*.tmp
+.cache
+
+# Extension package files
+*.zip
+*.crx
+*.pem
