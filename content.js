@@ -2480,7 +2480,7 @@
       init_corrections();
       init_export();
       init_ui();
-      var GFT_VERSION = typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.getManifest ? chrome.runtime.getManifest().version : "4.1.1";
+      var GFT_VERSION = typeof chrome !== "undefined" && chrome.runtime && chrome.runtime.getManifest ? chrome.runtime.getManifest().version : "4.1.5";
       console.log(`Genius Fast Transcriber v${GFT_VERSION} \u{1F3B5}`);
       function isContextValid() {
         return typeof chrome !== "undefined" && !!chrome.runtime && !!chrome.runtime.id;
@@ -4567,14 +4567,16 @@
           } else {
             return {
               buttons: [
-                { label: getTranslation("btn_header"), getText: () => {
-                  let txt = `[Paroles de "${GFT_STATE.currentSongTitle}"`;
-                  const fts = formatArtistList(GFT_STATE.currentFeaturingArtists);
-                  if (fts && isHeaderFeatEnabled()) txt += ` ft. ${fts}`;
-                  txt += "]";
-                  if (!isTagNewlinesDisabled()) txt += "\n";
-                  return txt;
-                }, tooltip: getTranslation("btn_header_tooltip") },
+                {
+                  label: getTranslation("btn_header"), getText: () => {
+                    let txt = `[Paroles de "${GFT_STATE.currentSongTitle}"`;
+                    const fts = formatArtistList(GFT_STATE.currentFeaturingArtists);
+                    if (fts && isHeaderFeatEnabled()) txt += ` ft. ${fts}`;
+                    txt += "]";
+                    if (!isTagNewlinesDisabled()) txt += "\n";
+                    return txt;
+                  }, tooltip: getTranslation("btn_header_tooltip")
+                },
                 {
                   type: "coupletManager",
                   prev: { label: "\u2190", title: getTranslation("btn_prev_couplet_title"), tooltip: getTranslation("btn_prev_couplet_tooltip") },
@@ -5599,8 +5601,8 @@
               creditLabel.style.userSelect = "none";
               const versionLabel = document.createElement("div");
               versionLabel.id = "gft-version-label";
-              versionLabel.textContent = "v4.1.1";
-              versionLabel.title = "Genius Fast Transcriber v4.1.1 - Nouvelle Interface Premium";
+              versionLabel.textContent = "v4.1.5";
+              versionLabel.title = "Genius Fast Transcriber v4.1.5 - Nouvelle Interface Premium";
               versionLabel.style.fontSize = "10px";
               versionLabel.style.color = "#888";
               versionLabel.style.opacity = "0.6";
@@ -5688,13 +5690,18 @@
         if (!isContextValid()) return;
         const isSongPage = document.querySelector('meta[property="og:type"][content="music.song"]') !== null || window.location.pathname.includes("-lyrics");
         if (!isSongPage) return;
-        const toolbarLeft = document.querySelector('[data-testid="sticky-contributor-toolbar"] .StickyToolbar__Left-sc-335d47e5-1') || document.querySelector(".StickyToolbar__Left-sc-335d47e5-1");
+        const toolbarLeft = document.querySelector('[data-testid="sticky-contributor-toolbar"] div[class*="StickyToolbar__Left"]') || document.querySelector('div[class*="StickyToolbar__Left"]');
         if (!toolbarLeft) return;
         if (document.getElementById("gft-toolbar-export-btn")) return;
         const lang = getTranscriptionMode();
         const exportBtn = document.createElement("button");
         exportBtn.id = "gft-toolbar-export-btn";
-        exportBtn.className = "SmallButton__Container-sc-f92f54a0-0 cmagge StickyToolbar__SmallButton-sc-335d47e5-5 aIzQu";
+        let btnClass = "SmallButton__Container-sc-f92f54a0-0 cmagge StickyToolbar__SmallButton-sc-6f69c667-5 aIzQu";
+        const existingBtn = toolbarLeft.querySelector('button[class*="SmallButton"]');
+        if (existingBtn) {
+          btnClass = existingBtn.className;
+        }
+        exportBtn.className = btnClass;
         exportBtn.innerHTML = `<span>${TRANSLATIONS[lang].export_btn}</span>`;
         exportBtn.style.marginLeft = "0px";
         exportBtn.style.position = "relative";

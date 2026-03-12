@@ -8,6 +8,7 @@ node_modules/
 # Chrome Web Store builds
 *.zip
 dist/
+CHROME_STORE_DESCRIPTION*.txt
 Genius Fast Transcriber v*.zip
 .temp-chrome-package/
 
