@@ -1,14 +1,12 @@
 # 🎵 Genius Fast Transcriber + Lyric Card Maker
 
-![Version](https://img.shields.io/badge/version-4.2.0-blue.svg?style=for-the-badge)
+[![Version](https://img.shields.io/github/v/release/anthogoz/Genius-Fast-Transcriber?display_name=tag&style=for-the-badge&label=version)](https://github.com/anthogoz/Genius-Fast-Transcriber/releases/latest)
 ![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-green.svg?style=for-the-badge&logo=google-chrome)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg?style=for-the-badge)
 ![Built with](https://img.shields.io/badge/built_with-WXT_+_Vue_+_TypeScript-blueviolet.svg?style=for-the-badge)
 
 **The ultimate tool for transcribers on Genius.com.**
 Transform your editing experience with a suite of professional tools, a modern interface, smart automations, and full customization.
-
----
 
 ---
 

@@ -29,11 +29,7 @@ export default defineContentScript({
 
     setLocale(settings.locale.value);
 
-    let GFT_VERSION = '4.2.0';
-    try {
-      GFT_VERSION = browser.runtime.getManifest().version;
-    } catch {}
-    console.log(`Genius Fast Transcriber v${GFT_VERSION}`);
+    const GFT_VERSION = browser.runtime.getManifest().version;
 
     if (!settings.isTutorialCompleted.value) {
       await showOnboarding(ctx);
