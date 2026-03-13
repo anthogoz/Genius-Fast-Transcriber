@@ -169,10 +169,9 @@ export default defineContentScript({
         toolbar.visible = false;
       }
 
-      function getTextareaCaretPosition(textarea: HTMLTextAreaElement, selectionPoint: number) {
-        const div = document.createElement('div');
-        const computed = window.getComputedStyle(textarea);
+      function getTextareaCaretPosition(element: HTMLTextAreaElement, position: number) {
         const properties = [
+          'direction',
           'boxSizing',
           'width',
           'height',
@@ -182,6 +181,7 @@ export default defineContentScript({
           'borderRightWidth',
           'borderBottomWidth',
           'borderLeftWidth',
+          'borderStyle',
           'paddingTop',
           'paddingRight',
           'paddingBottom',
@@ -201,44 +201,51 @@ export default defineContentScript({
           'letterSpacing',
           'wordSpacing',
           'tabSize',
-          'whiteSpace',
-          'wordBreak',
-          'wordWrap',
+          'MozTabSize',
         ];
 
-        for (const prop of properties) {
-          const value = computed.getPropertyValue(prop);
-          if (typeof value === 'string') {
-            div.style.setProperty(prop, value);
-          }
-        }
-
-        div.style.position = 'absolute';
-        div.style.visibility = 'hidden';
-        div.style.whiteSpace = 'pre-wrap';
-        div.style.overflowWrap = 'break-word';
-        div.style.overflow = 'hidden';
-        div.style.top = '0px';
-        div.style.left = '0px';
+        const div = document.createElement('div');
         document.body.appendChild(div);
 
-        const textBeforeCaret = textarea.value.substring(0, selectionPoint);
-        div.textContent = textBeforeCaret;
+        const style = div.style;
+        const computed = window.getComputedStyle(element);
+
+        style.whiteSpace = 'pre-wrap';
+        style.overflowWrap = 'break-word';
+        style.position = 'absolute';
+        style.visibility = 'hidden';
+
+        properties.forEach((prop) => {
+          (style as any)[prop] = (computed as any)[prop];
+        });
+
+        // Simulate scrollbar presence (or absence) so text wraps at the same width.
+        if (element.scrollHeight > Number.parseInt(computed.height, 10)) {
+          style.overflowY = 'scroll';
+        } else {
+          style.overflow = 'hidden';
+        }
+
+        div.textContent = element.value.substring(0, position);
 
         const span = document.createElement('span');
-        span.textContent = textarea.value.substring(selectionPoint) || '.';
+        span.textContent = element.value.substring(position) || '.';
         div.appendChild(span);
 
-        const spanRect = span.getBoundingClientRect();
-        const divRect = div.getBoundingClientRect();
-        const relativeTop = spanRect.top - divRect.top;
-        const relativeLeft = spanRect.left - divRect.left;
-        document.body.removeChild(div);
-
-        return {
-          top: relativeTop - textarea.scrollTop,
-          left: relativeLeft - textarea.scrollLeft,
+        // offsetTop and offsetLeft give the position relative to the DIV.
+        const coordinates = {
+          top:
+            span.offsetTop
+            + Number.parseInt(computed.borderTopWidth || '0', 10)
+            - element.scrollTop,
+          left:
+            span.offsetLeft
+            + Number.parseInt(computed.borderLeftWidth || '0', 10)
+            - element.scrollLeft,
         };
+
+        document.body.removeChild(div);
+        return coordinates;
       }
 
       function isLyricsSelection(): boolean {
@@ -303,8 +310,8 @@ export default defineContentScript({
           const startPos = getTextareaCaretPosition(textarea, start);
 
           toolbar.showLyricCardOnly = false;
-          toolbar.position.x = rect.left + startPos.left + 50;
-          toolbar.position.y = rect.top + startPos.top - 8;
+          toolbar.position.x = rect.left + startPos.left + 20; // Slightly offset from the start of the selection.
+          toolbar.position.y = rect.top + startPos.top;
           toolbar.visible = true;
           return;
         }
@@ -317,7 +324,7 @@ export default defineContentScript({
 
         toolbar.showLyricCardOnly = lyricCardOnly || !state.currentActiveEditor;
         toolbar.position.x = rect.left + rect.width / 2;
-        toolbar.position.y = rect.top - 8;
+        toolbar.position.y = rect.top;
         toolbar.visible = true;
       }
 

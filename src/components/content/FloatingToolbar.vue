@@ -80,7 +80,7 @@ function handleAction(action: ToolbarAction) {
   border-radius: 8px;
   padding: 4px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-  transform: translateX(-50%);
+  transform: translate(-50%, calc(-100% - 8px));
 }
 
 .gft-floating-toolbar__btn {
@@ -110,6 +110,6 @@ function handleAction(action: ToolbarAction) {
 .gft-toolbar-enter-from,
 .gft-toolbar-leave-to {
   opacity: 0;
-  transform: translateX(-50%) translateY(4px);
+  transform: translate(-50%, calc(-100% - 4px));
 }
 </style>
