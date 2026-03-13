@@ -1,5 +1,7 @@
 function getYouTubeIframe(): HTMLIFrameElement | null {
-  return document.querySelector<HTMLIFrameElement>('iframe[src*="youtube.com/embed/"]');
+  return document.querySelector<HTMLIFrameElement>(
+    'iframe[src*="youtube.com/embed/"], iframe[src*="youtube-nocookie.com/embed/"]',
+  );
 }
 
 function getVideoElement(): HTMLVideoElement | null {
@@ -33,6 +35,68 @@ function postPlayerCommand(iframe: HTMLIFrameElement, func: string, args: unknow
   );
 }
 
+let iframeTelemetryBound = false;
+let lastKnownIframeTime: number | null = null;
+
+function isYoutubeMessageOrigin(origin: string): boolean {
+  return origin.includes('youtube.com') || origin.includes('youtube-nocookie.com');
+}
+
+function bindIframeTelemetry() {
+  if (iframeTelemetryBound) return;
+
+  window.addEventListener('message', (event) => {
+    if (!isYoutubeMessageOrigin(event.origin)) return;
+
+    let payload: unknown = event.data;
+    if (typeof payload === 'string') {
+      try {
+        payload = JSON.parse(payload);
+      } catch {
+        return;
+      }
+    }
+
+    if (!payload || typeof payload !== 'object') return;
+
+    const info = (payload as { info?: { currentTime?: unknown } }).info;
+    if (!info || typeof info !== 'object') return;
+
+    const currentTime = info.currentTime;
+    if (typeof currentTime === 'number' && Number.isFinite(currentTime)) {
+      lastKnownIframeTime = currentTime;
+    }
+  });
+
+  iframeTelemetryBound = true;
+}
+
+function seekIframeBy(iframe: HTMLIFrameElement, seconds: number): boolean {
+  ensureJsApi(iframe);
+  bindIframeTelemetry();
+
+  postPlayerCommand(iframe, 'addEventListener', ['onStateChange']);
+  postPlayerCommand(iframe, 'getCurrentTime');
+
+  const seekFromKnownTime = () => {
+    if (lastKnownIframeTime === null) return false;
+
+    const target = Math.max(0, lastKnownIframeTime + seconds);
+    postPlayerCommand(iframe, 'seekTo', [target, true]);
+    lastKnownIframeTime = target;
+    return true;
+  };
+
+  if (seekFromKnownTime()) return true;
+
+  // Best effort: request current time first, then retry seek once telemetry arrives.
+  setTimeout(() => {
+    void seekFromKnownTime();
+  }, 120);
+
+  return true;
+}
+
 export function useYoutubeControls() {
   function togglePlayPause(): boolean {
     const video = getVideoElement();
@@ -60,7 +124,10 @@ export function useYoutubeControls() {
       return true;
     }
 
-    return false;
+    const iframe = getYouTubeIframe();
+    if (!iframe) return false;
+
+    return seekIframeBy(iframe, seconds);
   }
 
   return {

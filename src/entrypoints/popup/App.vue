@@ -40,7 +40,7 @@ function sendMessage(
   data: Record<string, unknown> = {},
   options: { closeOnSuccess?: boolean } = {},
 ) {
-  if (!currentTabId) return;
+  if (currentTabId === null) return;
   const { closeOnSuccess = true } = options;
   status.value = t('popup_status_updating');
   browser.tabs.sendMessage(currentTabId, { action, ...data }).then(() => {
@@ -66,7 +66,7 @@ onMounted(async () => {
     }
 
     currentTabId = tab.id ?? null;
-    if (!currentTabId) return;
+  if (currentTabId === null) return;
 
     const response = await browser.tabs.sendMessage(currentTabId, {
       action: 'GET_STATUS',
@@ -104,7 +104,7 @@ watch(locale, (val) => {
 });
 
 function restartTutorial() {
-  if (!currentTabId) return;
+  if (currentTabId === null) return;
   browser.tabs.sendMessage(currentTabId, { action: 'RESET_TUTORIAL' });
   window.close();
 }
@@ -132,12 +132,13 @@ function restartTutorial() {
 
     <div class="footer">
       <div class="footer-links">
-        <a href="https://buymeacoffee.com/lnkhey" target="_blank">
+        <a href="https://buymeacoffee.com/lnkhey" target="_blank" rel="noopener noreferrer">
           ☕ {{ t('footer_buy_me_a_coffee') }}
         </a>
         <a
           href="https://github.com/anthogoz/Genius-Fast-Transcriber"
           target="_blank"
+          rel="noopener noreferrer"
         >
           💻 {{ t('footer_github') }}
         </a>

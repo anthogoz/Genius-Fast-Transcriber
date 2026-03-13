@@ -30,6 +30,7 @@ export default defineContentScript({
     setLocale(settings.locale.value);
 
     const GFT_VERSION = browser.runtime.getManifest().version;
+    let cleanupFloatingToolbar: (() => void) | null = null;
 
     if (!settings.isTutorialCompleted.value) {
       await showOnboarding(ctx);
@@ -140,8 +141,8 @@ export default defineContentScript({
     }
 
     function initFloatingToolbar(lyricCardOnly: boolean) {
-      const existing = document.getElementById('gft-toolbar-root');
-      existing?.remove();
+      cleanupFloatingToolbar?.();
+      cleanupFloatingToolbar = null;
 
       const container = document.createElement('div');
       container.id = 'gft-toolbar-root';
@@ -386,6 +387,15 @@ export default defineContentScript({
       document.addEventListener('mouseup', selectionHandler);
       document.addEventListener('keyup', selectionHandler);
       window.addEventListener('scroll', hideHandler, true);
+
+      cleanupFloatingToolbar = () => {
+        document.removeEventListener('selectionchange', selectionHandler);
+        document.removeEventListener('mouseup', selectionHandler);
+        document.removeEventListener('keyup', selectionHandler);
+        window.removeEventListener('scroll', hideHandler, true);
+        toolbarApp.unmount();
+        container.remove();
+      };
     }
 
     function setupMessageListener() {
