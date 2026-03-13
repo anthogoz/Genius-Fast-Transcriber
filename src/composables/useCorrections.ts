@@ -121,6 +121,37 @@ export function useCorrections() {
       lines.splice(lineIndex + 1, 0, lines[lineIndex]);
       ta.value = lines.join('\n');
       ta.dispatchEvent(new Event('input', { bubbles: true }));
+      return;
+    }
+
+    if (state.currentEditorType === 'contenteditable') {
+      const selection = window.getSelection();
+      const activeEditor = state.currentActiveEditor;
+      if (!selection || selection.rangeCount === 0 || !activeEditor) return;
+
+      const range = selection.getRangeAt(0);
+      let lineNode: Node | null = range.startContainer;
+
+      if (lineNode.nodeType === Node.TEXT_NODE) {
+        lineNode = lineNode.parentNode;
+      }
+
+      while (lineNode && lineNode !== activeEditor && !(lineNode instanceof HTMLDivElement)) {
+        lineNode = lineNode.parentNode;
+      }
+
+      if (!lineNode || lineNode === activeEditor) return;
+
+      const sourceDiv = lineNode as HTMLDivElement;
+      const clone = sourceDiv.cloneNode(true) as HTMLDivElement;
+      sourceDiv.insertAdjacentElement('afterend', clone);
+      activeEditor.dispatchEvent(new Event('input', { bubbles: true }));
+
+      const newRange = document.createRange();
+      newRange.selectNodeContents(clone);
+      newRange.collapse(false);
+      selection.removeAllRanges();
+      selection.addRange(newRange);
     }
   }
 

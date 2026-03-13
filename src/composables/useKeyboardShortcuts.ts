@@ -1,12 +1,13 @@
 import { onMounted, onUnmounted } from 'vue';
 
 interface ShortcutHandlers {
+  onVerse: () => void;
   onChorus: () => void;
-  onChorusWithArtist: () => void;
-  onPreChorus: () => void;
-  onIntro: () => void;
   onBridge: () => void;
+  onIntro: () => void;
+  onOutro: () => void;
   onFixAll: () => void;
+  onToggleStats: () => void;
   onDuplicateLine: () => void;
   onUndo: () => void;
   onRedo: () => void;
@@ -43,18 +44,24 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
       return;
     }
 
+    if (e.shiftKey && (e.key === 'S' || e.key === 's')) {
+      e.preventDefault();
+      handlers.onToggleStats();
+      return;
+    }
+
     switch (e.key) {
       case '1':
         e.preventDefault();
-        handlers.onChorus();
+        handlers.onVerse();
         break;
       case '2':
         e.preventDefault();
-        handlers.onChorusWithArtist();
+        handlers.onChorus();
         break;
       case '3':
         e.preventDefault();
-        handlers.onPreChorus();
+        handlers.onBridge();
         break;
       case '4':
         e.preventDefault();
@@ -62,7 +69,7 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
         break;
       case '5':
         e.preventDefault();
-        handlers.onBridge();
+        handlers.onOutro();
         break;
       case 'd':
       case 'D':
@@ -71,7 +78,10 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
         break;
       case 'z':
       case 'Z':
-        if (!e.shiftKey) {
+        if (e.shiftKey) {
+          e.preventDefault();
+          handlers.onRedo();
+        } else {
           e.preventDefault();
           handlers.onUndo();
         }

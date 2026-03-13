@@ -10,7 +10,7 @@ import VerseCounter from './VerseCounter.vue';
 
 const { t } = useI18n();
 const { locale, isTagNewlinesDisabled, isHeaderFeatEnabled } = useSettings();
-const { currentSongTitle, currentMainArtists, currentFeaturingArtists, incrementVerseCounter } = useGftState();
+const { currentSongTitle, currentMainArtists, currentFeaturingArtists, incrementVerseCounter, verseCounter } = useGftState();
 const { insertTextAtCursor } = useEditor();
 
 const artistSelector = ref<InstanceType<typeof ArtistSelector> | null>(null);
@@ -95,98 +95,136 @@ function handleVerseInsert(tag: string) {
   insertTextAtCursor(formatTag(withArtists));
   incrementVerseCounter();
 }
+
+function insertTagByKey(key: string) {
+  const tagDef = allTags.find(tag => tag.key === key);
+  if (!tagDef) return;
+  insertTag(tagDef);
+}
+
+function insertVerseByShortcut() {
+  handleVerseInsert(`[${t('btn_verse_num').replace(/\[|\]/g, '').replace(/\d+/, String(verseCounter.value))}]`);
+}
+
+function openCustomStructureButtonManager() {
+  // Placeholder UI control kept for parity with legacy layout.
+}
+
+defineExpose({
+  insertVerseByShortcut,
+  insertChorusByShortcut: () => insertTagByKey('btn_chorus'),
+  insertBridgeByShortcut: () => insertTagByKey('btn_bridge'),
+  insertIntroByShortcut: () => insertTagByKey('btn_intro'),
+  insertOutroByShortcut: () => insertTagByKey('btn_outro'),
+});
 </script>
 
 <template>
   <section class="gft-structure-section">
-    <h3 class="gft-section-title">{{ t('section_structure') }}</h3>
-
     <ArtistSelector ref="artistSelector" @artists-selected="() => {}" />
 
-    <div class="gft-structure-section__buttons">
+    <hr class="gft-structure-section__divider" />
+
+    <h3 class="gft-section-title">{{ t('section_structure') }}</h3>
+
+    <div class="gft-structure-section__tags">
+      <VerseCounter @insert="handleVerseInsert" />
+
       <button
         :title="t('btn_header_tooltip')"
         type="button"
-        class="gft-btn gft-btn--header"
+        class="gft-btn"
         @click="insertHeader"
       >
         {{ t('btn_header') }}
       </button>
 
-      <div class="gft-structure-section__tags">
-        <template v-for="tagDef in visibleTags" :key="tagDef.key">
-          <button
-            :title="t(`${tagDef.key}_tooltip`)"
-            type="button"
-            class="gft-btn gft-btn--tag"
-            @click="insertTag(tagDef)"
-          >
-            {{ t(tagDef.key) }}
-          </button>
-        </template>
-      </div>
+      <template v-for="tagDef in visibleTags" :key="tagDef.key">
+        <button
+          :title="t(`${tagDef.key}_tooltip`)"
+          type="button"
+          class="gft-btn gft-btn--tag"
+          @click="insertTag(tagDef)"
+        >
+          {{ t(tagDef.key) }}
+        </button>
+      </template>
 
-      <VerseCounter @insert="handleVerseInsert" />
+      <button
+        :title="t('btn_add_custom_structure_title')"
+        type="button"
+        class="gft-btn gft-btn--plus"
+        @click="openCustomStructureButtonManager"
+      >
+        +
+      </button>
     </div>
   </section>
 </template>
 
 <style scoped>
 .gft-structure-section {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .gft-section-title {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.5px;
   margin: 0 0 8px 0;
-  color: #ffff64;
+  color: #777;
 }
 
-.gft-structure-section__buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-top: 8px;
+.gft-structure-section__divider {
+  margin: 8px 0 10px;
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .gft-structure-section__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 8px;
 }
 
 .gft-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--gft-btn-bg, #fffdef);
+  border: 1px solid var(--gft-btn-border, #adadad);
+  height: 20px;
   color: inherit;
-  padding: 4px 8px;
+  padding: 2px 6px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 10px;
+  font-weight: 400;
   transition: background 0.15s, border-color 0.15s;
 }
 
 .gft-btn:hover {
-  background: rgba(255, 255, 100, 0.15);
-  border-color: rgba(255, 255, 100, 0.4);
-}
-
-.gft-btn--header {
-  background: rgba(255, 255, 100, 0.1);
-  border-color: rgba(255, 255, 100, 0.3);
-  font-weight: 700;
+  background: var(--gft-btn-hover-bg, #0e0e0e);
+  border-color: var(--gft-btn-hover-border, #0e0e0e);
+  color: var(--gft-btn-hover-text, #f9ff55);
 }
 
 .gft-btn--tag {
-  font-size: 11px;
-  padding: 3px 7px;
+  font-size: 10px;
+  padding: 2px 6px;
 }
 
-.gft-dark-mode .gft-section-title {
-  color: #ffff64;
+.gft-btn--plus {
+  text-align: center;
+  padding: 0 8px;
+  border-style: dashed;
+  border-color: #818181;
+  background: transparent;
+  color: #818181;
+  font-weight: 700;
+}
+
+.gft-btn--plus:hover {
+  background: #f9ff55;
+  color: #0e0e0e;
+  border-color: #f9ff55;
 }
 </style>

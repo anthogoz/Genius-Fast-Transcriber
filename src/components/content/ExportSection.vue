@@ -41,7 +41,7 @@ const exportButtons = [
   text-transform: uppercase;
   letter-spacing: 0.8px;
   margin: 0 0 8px 0;
-  color: #ffff64;
+  color: var(--gft-title-color, #0e0e0e);
 }
 
 .gft-export-section__buttons {
@@ -51,8 +51,8 @@ const exportButtons = [
 }
 
 .gft-btn--export {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--gft-btn-bg, #fffdef);
+  border: 1px solid var(--gft-btn-border, #adadad);
   color: inherit;
   padding: 4px 8px;
   border-radius: 4px;
@@ -63,7 +63,8 @@ const exportButtons = [
 }
 
 .gft-btn--export:hover {
-  background: rgba(255, 255, 100, 0.15);
-  border-color: rgba(255, 255, 100, 0.4);
+  background: var(--gft-btn-hover-bg, #0e0e0e);
+  border-color: var(--gft-btn-hover-border, #0e0e0e);
+  color: var(--gft-btn-hover-text, #f9ff55);
 }
 </style>

@@ -101,9 +101,9 @@ export function useSongData() {
       listContainer.querySelectorAll(SELECTORS.CREDITS_ARTIST_NAME).forEach((s) => {
         const n = s.textContent?.trim();
         if (
-          n &&
-          !songData._rawFeaturingArtistsFromSection.includes(n) &&
-          !songData._rawMainArtists.includes(n)
+          n
+          && !songData._rawFeaturingArtistsFromSection.includes(n)
+          && !songData._rawMainArtists.includes(n)
         ) {
           songData._rawFeaturingArtistsFromSection.push(n);
         }
@@ -161,9 +161,9 @@ export function useSongData() {
 
     songData.featuringArtists = rawFtSource.map(cleanArtistName).filter((name) => {
       if (
-        !name ||
-        seenFt.has(name.toLowerCase()) ||
-        songData.mainArtists.some((m) => m.toLowerCase() === name.toLowerCase())
+        !name
+        || seenFt.has(name.toLowerCase())
+        || songData.mainArtists.some((m) => m.toLowerCase() === name.toLowerCase())
       ) {
         return false;
       }

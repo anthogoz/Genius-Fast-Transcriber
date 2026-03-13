@@ -6,6 +6,7 @@ import { useEditor } from '@/composables/useEditor';
 import { useSettings } from '@/composables/useSettings';
 import type { CorrectionResult } from '@/types';
 import CorrectionPreview from './CorrectionPreview.vue';
+import FindReplace from './FindReplace.vue';
 
 const { t } = useI18n();
 const { locale } = useSettings();
@@ -14,13 +15,11 @@ const {
   previewCorrections,
   applyAndSetCorrections,
   checkBrackets,
-  capitalizeLines,
-  removeEndPunctuation,
   fixSpacing,
   removeZeroWidthSpaces,
   duplicateCurrentLine,
 } = useCorrections();
-const { getEditorContent, wrapSelection } = useEditor();
+const { getEditorContent } = useEditor();
 
 const emit = defineEmits<{
   feedback: [message: string];
@@ -29,6 +28,7 @@ const emit = defineEmits<{
 const showPreview = ref(false);
 const previewOriginal = ref('');
 const previewResult = ref<CorrectionResult | null>(null);
+const showFindReplace = ref(false);
 
 interface CleanupButton {
   id: string;
@@ -54,6 +54,31 @@ const cleanupButtons = computed<CleanupButton[]>(() => {
   }
 
   buttons.push({
+      id: 'oeu',
+      labelKey: 'btn_oeu_label',
+      tooltipKey: 'cleanup_oeu_tooltip',
+      action: () => applySingleCorrection({ oeuLigature: true }, 'oeu'),
+    });
+
+  if (!isPl.value) {
+    buttons.push({
+      id: 'long-dash',
+      labelKey: 'btn_long_dash_label',
+      tooltipKey: 'cleanup_long_dash_tooltip',
+      action: () => applySingleCorrection({ longDash: true }, '—'),
+    });
+  }
+
+  if (locale.value === 'fr') {
+    buttons.push({
+      id: 'punctuation-spacing',
+      labelKey: 'btn_punctuation_spacing_label',
+      tooltipKey: 'cleanup_punctuation_spacing_tooltip',
+      action: () => applySingleCorrection({ punctuation: true }, t('btn_punctuation_spacing_label')),
+    });
+  }
+
+  buttons.push({
     id: 'apostrophes',
     labelKey: 'btn_apostrophe_label',
     tooltipKey: 'cleanup_apostrophe_tooltip',
@@ -61,12 +86,6 @@ const cleanupButtons = computed<CleanupButton[]>(() => {
   });
 
   if (isFr.value) {
-    buttons.push({
-      id: 'oeu',
-      labelKey: 'btn_oeu_label',
-      tooltipKey: 'cleanup_oeu_tooltip',
-      action: () => applySingleCorrection({ oeuLigature: true }, 'oeu'),
-    });
     buttons.push({
       id: 'french-quotes',
       labelKey: 'btn_french_quotes_label',
@@ -96,15 +115,6 @@ const cleanupButtons = computed<CleanupButton[]>(() => {
     });
   }
 
-  if (!isPl.value) {
-    buttons.push({
-      id: 'long-dash',
-      labelKey: 'btn_long_dash_label',
-      tooltipKey: 'cleanup_long_dash_tooltip',
-      action: () => applySingleCorrection({ longDash: true }, '—'),
-    });
-  }
-
   buttons.push({
     id: 'double-spaces',
     labelKey: 'btn_double_spaces_label',
@@ -123,51 +133,6 @@ const cleanupButtons = computed<CleanupButton[]>(() => {
       } else {
         emit('feedback', t('feedback_no_correction_needed', { item: t('btn_spacing_short') }));
       }
-    },
-  });
-
-  buttons.push({
-    id: 'capitalize',
-    labelKey: 'btn_capitalize_short',
-    tooltipKey: 'cleanup_capitalize_tooltip',
-    action: () => {
-      const changed = capitalizeLines();
-      emit('feedback', changed
-        ? t('feedback_corrected', { count: '', item: t('btn_capitalize_short') })
-        : t('feedback_no_correction_needed', { item: t('btn_capitalize_short') }),
-      );
-    },
-  });
-
-  if (locale.value === 'fr') {
-    buttons.push({
-      id: 'punctuation-spacing',
-      labelKey: 'btn_punctuation_spacing_label',
-      tooltipKey: 'cleanup_punctuation_spacing_tooltip',
-      action: () => applySingleCorrection({ punctuation: true }, t('btn_punctuation_spacing_label')),
-    });
-  }
-
-  buttons.push({
-    id: 'punctuation',
-    labelKey: 'btn_punctuation_short',
-    tooltipKey: 'cleanup_punct_tooltip',
-    action: () => {
-      const changed = removeEndPunctuation();
-      emit('feedback', changed
-        ? t('feedback_corrected', { count: '', item: t('btn_punctuation_short') })
-        : t('feedback_no_correction_needed', { item: t('btn_punctuation_short') }),
-      );
-    },
-  });
-
-  buttons.push({
-    id: 'adlib',
-    labelKey: 'btn_adlib_label',
-    tooltipKey: 'cleanup_adlib_tooltip',
-    action: () => {
-      wrapSelection('(', ')');
-      emit('feedback', t('feedback_adlib_added'));
     },
   });
 
@@ -243,6 +208,14 @@ function handleFixAll() {
   showPreview.value = true;
 }
 
+function toggleFindReplace() {
+  showFindReplace.value = !showFindReplace.value;
+}
+
+function openCustomLibrary() {
+  emit('feedback', t('settings_custom_library'));
+}
+
 function handlePreviewApply(_correctedText: string) {
   showPreview.value = false;
   if (previewResult.value) {
@@ -255,6 +228,20 @@ function handlePreviewCancel() {
   showPreview.value = false;
   emit('feedback', t('feedback_corrections_cancelled'));
 }
+
+function triggerFixAll() {
+  handleFixAll();
+}
+
+function triggerDuplicateLine() {
+  duplicateCurrentLine();
+  emit('feedback', t('feedback_duplicate_line'));
+}
+
+defineExpose({
+  triggerFixAll,
+  triggerDuplicateLine,
+});
 </script>
 
 <template>
@@ -267,31 +254,46 @@ function handlePreviewCancel() {
         :key="btn.id"
         :title="t(btn.tooltipKey)"
         type="button"
-        class="gft-btn gft-btn--cleanup"
+        class="gft-btn"
         @click="btn.action"
       >
         {{ t(btn.labelKey) }}
       </button>
-    </div>
 
-    <div class="gft-cleanup-section__actions">
       <button
         :title="t('global_check_tooltip')"
         type="button"
-        class="gft-btn gft-btn--check"
+        class="gft-btn"
         @click="handleCheckBrackets"
       >
         {{ t('btn_check_label') }}
       </button>
+
       <button
-        :title="t('global_fix_tooltip')"
+        :title="t('find_replace_title')"
         type="button"
-        class="gft-btn gft-btn--fix-all"
-        @click="handleFixAll"
+        class="gft-btn"
+        :class="{ 'gft-btn--active': showFindReplace }"
+        @click="toggleFindReplace"
       >
-        {{ t('btn_fix_all_short') }}
+        🔍 {{ t('find_replace_title') }}
+      </button>
+
+      <button
+        :title="t('btn_add_custom_cleanup_title')"
+        type="button"
+        class="gft-btn gft-btn--plus"
+        @click="openCustomLibrary"
+      >
+        +
       </button>
     </div>
+
+    <Transition name="gft-find-replace-slide">
+      <div v-if="showFindReplace" class="gft-cleanup-section__find-replace">
+        <FindReplace embedded @feedback="(message) => emit('feedback', message)" />
+      </div>
+    </Transition>
 
     <CorrectionPreview
       v-if="showPreview && previewResult"
@@ -305,55 +307,81 @@ function handlePreviewCancel() {
 
 <style scoped>
 .gft-cleanup-section {
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .gft-section-title {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 0.5px;
   margin: 0 0 8px 0;
-  color: #ffff64;
+  color: #777;
 }
 
 .gft-cleanup-section__buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
-}
-
-.gft-cleanup-section__actions {
-  display: flex;
-  gap: 4px;
-  margin-top: 6px;
+  gap: 8px;
 }
 
 .gft-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--gft-btn-bg, #fffdef);
+  border: 1px solid var(--gft-btn-border, #adadad);
+  height: 20px;
   color: inherit;
-  padding: 4px 8px;
+  padding: 2px 6px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 11px;
-  font-weight: 500;
+  font-size: 10px;
+  font-weight: 400;
   transition: background 0.15s, border-color 0.15s;
 }
 
 .gft-btn:hover {
-  background: rgba(255, 255, 100, 0.15);
-  border-color: rgba(255, 255, 100, 0.4);
+  background: var(--gft-btn-hover-bg, #0e0e0e);
+  border-color: var(--gft-btn-hover-border, #0e0e0e);
+  color: var(--gft-btn-hover-text, #f9ff55);
 }
 
-.gft-btn--check {
-  flex: 1;
-}
-
-.gft-btn--fix-all {
-  flex: 1;
-  background: rgba(255, 255, 100, 0.12);
-  border-color: rgba(255, 255, 100, 0.35);
+.gft-btn--plus {
+  text-align: center;
+  padding: 0 8px;
+  border-style: dashed;
+  border-color: #818181;
+  background: transparent;
+  color: #818181;
   font-weight: 700;
+}
+
+.gft-btn--plus:hover {
+  background: #f9ff55;
+  color: #0e0e0e;
+  border-color: #f9ff55;
+}
+
+.gft-btn--active {
+  background: var(--gft-btn-hover-bg, #0e0e0e);
+  border-color: var(--gft-btn-hover-border, #0e0e0e);
+  color: var(--gft-btn-hover-text, #f9ff55);
+}
+
+.gft-cleanup-section__find-replace {
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.gft-find-replace-slide-enter-active,
+.gft-find-replace-slide-leave-active {
+  transition: all 0.2s ease;
+}
+
+.gft-find-replace-slide-enter-from,
+.gft-find-replace-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 </style>

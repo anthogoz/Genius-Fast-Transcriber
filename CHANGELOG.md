@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [4.2.0] — 2026-03-12
+## [4.2.0] — 2026-03-xx
 
 ### Changed
 - **Complete rewrite** using [WXT](https://wxt.dev), Vue 3, and TypeScript.
@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - `@wxt-dev/i18n` for Chrome manifest i18n, `vue-i18n` for runtime translations with locale switching.
 - Vite-based build with HMR dev server replacing esbuild.
 - New documentation in the `docs/` folder.
+- Biome for linting and formatting.
 
 ## [4.1.1]
 

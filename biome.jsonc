@@ -33,7 +33,8 @@
       "semicolons": "always",
       "arrowParentheses": "always",
       "bracketSpacing": true,
-      "bracketSameLine": false
+      "bracketSameLine": false,
+      "operatorLinebreak": "before"
     }
   },
   "css": {

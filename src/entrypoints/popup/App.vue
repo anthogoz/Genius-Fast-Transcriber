@@ -16,22 +16,38 @@ const locale = ref<Locale>('fr');
 const status = ref(t('popup_status_loading'));
 const disabled = ref(false);
 const version = ref('');
+const isHydrating = ref(true);
+const syncedMode = ref<ExtensionMode>('full');
+const syncedTheme = ref<Theme>('dark');
+const syncedLocale = ref<Locale>('fr');
 
 let currentTabId: number | null = null;
 
 function applyState(state: PopupState) {
+  isHydrating.value = true;
   mode.value = state.lyricCardOnly ? 'lyric-card-only' : 'full';
   theme.value = state.isDarkMode ? 'dark' : 'light';
   locale.value = state.language;
+  syncedMode.value = mode.value;
+  syncedTheme.value = theme.value;
+  syncedLocale.value = locale.value;
   setLocale(state.language);
+  isHydrating.value = false;
 }
 
-function sendMessage(action: string, data: Record<string, unknown> = {}) {
+function sendMessage(
+  action: string,
+  data: Record<string, unknown> = {},
+  options: { closeOnSuccess?: boolean } = {},
+) {
   if (!currentTabId) return;
+  const { closeOnSuccess = true } = options;
   status.value = t('popup_status_updating');
   browser.tabs.sendMessage(currentTabId, { action, ...data }).then(() => {
     status.value = t('popup_status_saved');
-    setTimeout(() => window.close(), 800);
+    if (closeOnSuccess) {
+      setTimeout(() => window.close(), 800);
+    }
   });
 }
 
@@ -66,16 +82,25 @@ onMounted(async () => {
 });
 
 watch(mode, (val) => {
+  if (isHydrating.value) return;
+  if (val === syncedMode.value) return;
+  syncedMode.value = val;
   sendMessage('SET_MODE', { lyricCardOnly: val === 'lyric-card-only' });
 });
 
 watch(theme, (val) => {
-  sendMessage('SET_THEME', { isDarkMode: val === 'dark' });
+  if (isHydrating.value) return;
+  if (val === syncedTheme.value) return;
+  syncedTheme.value = val;
+  sendMessage('SET_THEME', { isDarkMode: val === 'dark' }, { closeOnSuccess: false });
 });
 
 watch(locale, (val) => {
+  if (isHydrating.value) return;
+  if (val === syncedLocale.value) return;
+  syncedLocale.value = val;
   setLocale(val);
-  sendMessage('SET_LANGUAGE', { language: val });
+  sendMessage('SET_LANGUAGE', { language: val }, { closeOnSuccess: false });
 });
 
 function restartTutorial() {

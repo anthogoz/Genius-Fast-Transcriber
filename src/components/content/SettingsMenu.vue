@@ -13,10 +13,12 @@ const {
 
 defineProps<{
   visible: boolean;
+  showStats?: boolean;
 }>();
 
 const emit = defineEmits<{
   close: [];
+  toggleStats: [];
 }>();
 
 const darkModeLabel = computed(() =>
@@ -41,7 +43,7 @@ const CUSTOM_LIBRARY_URL = '#';
 
 <template>
   <Transition name="gft-menu">
-    <div v-if="visible" class="gft-settings-menu" @click.stop>
+    <div v-if="visible" class="gft-settings-menu" :class="{ 'gft-settings-menu--dark': isDarkMode }" @click.stop>
       <button type="button" class="gft-settings-menu__item" @click="isDarkMode = !isDarkMode">
         {{ darkModeLabel }}
       </button>
@@ -53,6 +55,9 @@ const CUSTOM_LIBRARY_URL = '#';
       </button>
       <button type="button" class="gft-settings-menu__item" @click="isTagNewlinesDisabled = !isTagNewlinesDisabled">
         {{ newlineLabel }}
+      </button>
+      <button type="button" class="gft-settings-menu__item" @click="emit('toggleStats')">
+        {{ showStats ? t('stats_hide') : t('stats_show') }}
       </button>
 
       <hr class="gft-settings-menu__divider" />
@@ -78,11 +83,19 @@ const CUSTOM_LIBRARY_URL = '#';
   top: 100%;
   right: 0;
   z-index: 100;
-  background: #333;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: #ffffff;
+  border: 1px solid rgba(14, 14, 14, 0.16);
+  color: #1d1d1d;
   border-radius: 8px;
   padding: 4px 0;
   min-width: 220px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+
+.gft-settings-menu--dark {
+  background: #333;
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #efefef;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
 }
 
@@ -101,6 +114,10 @@ const CUSTOM_LIBRARY_URL = '#';
 }
 
 .gft-settings-menu__item:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.gft-settings-menu--dark .gft-settings-menu__item:hover {
   background: rgba(255, 255, 100, 0.1);
 }
 
@@ -110,8 +127,12 @@ const CUSTOM_LIBRARY_URL = '#';
 
 .gft-settings-menu__divider {
   border: none;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(14, 14, 14, 0.12);
   margin: 4px 0;
+}
+
+.gft-settings-menu--dark .gft-settings-menu__divider {
+  border-top-color: rgba(255, 255, 255, 0.1);
 }
 
 .gft-menu-enter-active,

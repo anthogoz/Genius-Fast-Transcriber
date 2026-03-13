@@ -125,9 +125,9 @@ export function replaceAndHighlightInDiv(
 
     const parent = textNode.parentNode;
     if (
-      !parent ||
-      (parent.nodeType === Node.ELEMENT_NODE &&
-        (parent as Element).classList.contains(highlightClass))
+      !parent
+      || (parent.nodeType === Node.ELEMENT_NODE
+        && (parent as Element).classList.contains(highlightClass))
     )
       continue;
 

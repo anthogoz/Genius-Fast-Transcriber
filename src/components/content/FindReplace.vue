@@ -12,6 +12,12 @@ const emit = defineEmits<{
   feedback: [message: string];
 }>();
 
+withDefaults(defineProps<{
+  embedded?: boolean;
+}>(), {
+  embedded: false,
+});
+
 const searchQuery = ref('');
 const replaceQuery = ref('');
 const useRegex = ref(false);
@@ -66,7 +72,7 @@ function replaceAll() {
 
 <template>
   <div class="gft-find-replace">
-    <h4 class="gft-find-replace__title">{{ t('find_replace_title') }}</h4>
+    <h4 v-if="!embedded" class="gft-find-replace__title">{{ t('find_replace_title') }}</h4>
     <div class="gft-find-replace__fields">
       <input
         v-model="searchQuery"
@@ -100,7 +106,7 @@ function replaceAll() {
 
 <style scoped>
 .gft-find-replace {
-  padding: 8px 0;
+  padding: 4px 0;
 }
 
 .gft-find-replace__title {
@@ -109,7 +115,7 @@ function replaceAll() {
   text-transform: uppercase;
   letter-spacing: 0.8px;
   margin: 0 0 6px 0;
-  color: #ffff64;
+  color: var(--gft-title-color, #0e0e0e);
 }
 
 .gft-find-replace__fields {
@@ -120,8 +126,8 @@ function replaceAll() {
 }
 
 .gft-find-replace__input {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--gft-input-bg, rgba(255, 255, 255, 0.65));
+  border: 1px solid var(--gft-input-border, rgba(14, 14, 14, 0.25));
   color: inherit;
   padding: 5px 8px;
   border-radius: 4px;
@@ -131,7 +137,7 @@ function replaceAll() {
 }
 
 .gft-find-replace__input:focus {
-  border-color: #ffff64;
+  border-color: #f9ff55;
 }
 
 .gft-find-replace__controls {
@@ -155,8 +161,8 @@ function replaceAll() {
 }
 
 .gft-btn--sm {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--gft-btn-bg, #fffdef);
+  border: 1px solid var(--gft-btn-border, #adadad);
   color: inherit;
   padding: 3px 8px;
   border-radius: 4px;
@@ -166,7 +172,8 @@ function replaceAll() {
 }
 
 .gft-btn--sm:hover {
-  background: rgba(255, 255, 100, 0.15);
-  border-color: rgba(255, 255, 100, 0.4);
+  background: var(--gft-btn-hover-bg, #0e0e0e);
+  border-color: var(--gft-btn-hover-border, #0e0e0e);
+  color: var(--gft-btn-hover-text, #f9ff55);
 }
 </style>

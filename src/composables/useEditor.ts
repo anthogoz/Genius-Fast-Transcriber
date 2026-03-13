@@ -104,6 +104,15 @@ export function useEditor() {
   }
 
   function getSelectedText(): string {
+    const { currentActiveEditor, currentEditorType } = state;
+    if (currentActiveEditor && currentEditorType === 'textarea') {
+      const ta = currentActiveEditor as HTMLTextAreaElement;
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      if (start === end) return '';
+      return ta.value.substring(start, end);
+    }
+
     const selection = window.getSelection();
     return selection?.toString() ?? '';
   }
@@ -112,22 +121,25 @@ export function useEditor() {
     const { currentActiveEditor, currentEditorType } = state;
     if (!currentActiveEditor) return;
 
-    const selection = window.getSelection();
-    const selectedText = selection?.toString() ?? '';
-    if (!selectedText) return;
-
     saveState(getEditorContent());
 
     if (currentEditorType === 'textarea') {
       const ta = currentActiveEditor as HTMLTextAreaElement;
       const start = ta.selectionStart;
       const end = ta.selectionEnd;
+      if (start === end) return;
+
+      const selectedText = ta.value.substring(start, end);
       ta.value =
         ta.value.substring(0, start) + before + selectedText + after + ta.value.substring(end);
       ta.selectionStart = start + before.length;
       ta.selectionEnd = start + before.length + selectedText.length;
       ta.dispatchEvent(new Event('input', { bubbles: true }));
     } else {
+      const selection = window.getSelection();
+      const selectedText = selection?.toString() ?? '';
+      if (!selectedText) return;
+
       document.execCommand('insertText', false, before + selectedText + after);
     }
 

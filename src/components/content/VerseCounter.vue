@@ -47,18 +47,20 @@ function insertVerse() {
 .gft-verse-counter {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: 0;
+  border: 1px solid var(--gft-btn-border, #adadad);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
 .gft-verse-counter__arrow {
-  background: rgba(255, 255, 100, 0.15);
-  border: 1px solid rgba(255, 255, 100, 0.3);
+  background: var(--gft-btn-bg, #fffdef);
+  border: none;
   color: inherit;
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
+  width: 20px;
+  height: 20px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -66,22 +68,28 @@ function insertVerse() {
 }
 
 .gft-verse-counter__arrow:hover {
-  background: rgba(255, 255, 100, 0.3);
+  background: var(--gft-btn-hover-bg, #0e0e0e);
+  border-color: var(--gft-btn-hover-border, #0e0e0e);
+  color: var(--gft-btn-hover-text, #f9ff55);
 }
 
 .gft-verse-counter__main {
-  background: #ffff64;
-  color: #000;
+  background: var(--gft-btn-bg, #fffdef);
+  color: inherit;
   border: none;
-  padding: 4px 12px;
-  border-radius: 4px;
+  border-left: 1px solid var(--gft-btn-border, #adadad);
+  border-right: 1px solid var(--gft-btn-border, #adadad);
+  padding: 2px 8px;
+  height: 20px;
   cursor: pointer;
-  font-weight: 700;
-  font-size: 13px;
+  font-weight: 400;
+  font-size: 10px;
   transition: opacity 0.15s;
+  line-height: 1;
 }
 
 .gft-verse-counter__main:hover {
-  opacity: 0.85;
+  background: var(--gft-btn-hover-bg, #0e0e0e);
+  color: var(--gft-btn-hover-text, #f9ff55);
 }
 </style>
