@@ -26,17 +26,17 @@ onUnmounted(() => {
 
 <template>
   <Transition name="gft-draft-slide">
-    <div class="gft-draft-notification">
+    <div class="gft-draft-notification gft-u-toast">
       <div class="gft-draft-notification__text">
         <strong>{{ t('draft_found_title') }}</strong>
         <br />
         {{ t('draft_saved_at') }} {{ timestamp }}
       </div>
       <div class="gft-draft-notification__buttons">
-        <button type="button" class="gft-draft-btn gft-draft-btn--restore" @click="emit('restore')">
+        <button type="button" class="gft-u-btn gft-draft-btn gft-draft-btn--restore" @click="emit('restore')">
           {{ t('draft_btn_restore') }}
         </button>
-        <button type="button" class="gft-draft-btn gft-draft-btn--discard" @click="emit('discard')">
+        <button type="button" class="gft-u-btn gft-draft-btn gft-draft-btn--discard" @click="emit('discard')">
           {{ t('draft_btn_discard') }}
         </button>
       </div>
@@ -46,19 +46,12 @@ onUnmounted(() => {
 
 <style scoped>
 .gft-draft-notification {
-  position: fixed;
   bottom: 20px;
-  right: 20px;
-  background-color: #333;
-  color: white;
   padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   z-index: 2147483647;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
   border-left: 4px solid #ffff64;
   animation: gft-slide-in 0.3s ease-out;
   pointer-events: auto;
@@ -88,12 +81,10 @@ onUnmounted(() => {
 }
 
 .gft-draft-btn {
+  height: auto;
   padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
   font-size: 13px;
   pointer-events: auto;
-  transition: opacity 0.15s;
 }
 
 .gft-draft-btn:hover {
@@ -107,7 +98,19 @@ onUnmounted(() => {
   font-weight: bold;
 }
 
+.gft-draft-btn--restore:hover {
+  background-color: #ffff64;
+  color: black;
+  border: none;
+}
+
 .gft-draft-btn--discard {
+  background-color: transparent;
+  color: #aaa;
+  border: 1px solid #555;
+}
+
+.gft-draft-btn--discard:hover {
   background-color: transparent;
   color: #aaa;
   border: 1px solid #555;

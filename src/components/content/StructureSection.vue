@@ -125,7 +125,7 @@ defineExpose({
 
     <hr class="gft-structure-section__divider" />
 
-    <h3 class="gft-section-title">{{ t('section_structure') }}</h3>
+    <h3 class="gft-u-section-title">{{ t('section_structure') }}</h3>
 
     <div class="gft-structure-section__tags">
       <VerseCounter @insert="handleVerseInsert" />
@@ -133,7 +133,7 @@ defineExpose({
       <button
         :title="t('btn_header_tooltip')"
         type="button"
-        class="gft-btn"
+        class="gft-u-btn"
         @click="insertHeader"
       >
         {{ t('btn_header') }}
@@ -143,7 +143,7 @@ defineExpose({
         <button
           :title="t(`${tagDef.key}_tooltip`)"
           type="button"
-          class="gft-btn gft-btn--tag"
+          class="gft-u-btn gft-u-btn--tag"
           @click="insertTag(tagDef)"
         >
           {{ t(tagDef.key) }}
@@ -153,7 +153,7 @@ defineExpose({
       <button
         :title="t('btn_add_custom_structure_title')"
         type="button"
-        class="gft-btn gft-btn--plus"
+        class="gft-u-btn gft-u-btn--plus"
         @click="openCustomStructureButtonManager"
       >
         +
@@ -167,15 +167,6 @@ defineExpose({
   margin-bottom: 8px;
 }
 
-.gft-section-title {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0 0 8px 0;
-  color: #777;
-}
-
 .gft-structure-section__divider {
   margin: 8px 0 10px;
   border: none;
@@ -186,45 +177,5 @@ defineExpose({
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-}
-
-.gft-btn {
-  background: var(--gft-btn-bg, #fffdef);
-  border: 1px solid var(--gft-btn-border, #adadad);
-  height: 20px;
-  color: inherit;
-  padding: 2px 6px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 10px;
-  font-weight: 400;
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.gft-btn:hover {
-  background: var(--gft-btn-hover-bg, #0e0e0e);
-  border-color: var(--gft-btn-hover-border, #0e0e0e);
-  color: var(--gft-btn-hover-text, #f9ff55);
-}
-
-.gft-btn--tag {
-  font-size: 10px;
-  padding: 2px 6px;
-}
-
-.gft-btn--plus {
-  text-align: center;
-  padding: 0 8px;
-  border-style: dashed;
-  border-color: #818181;
-  background: transparent;
-  color: #818181;
-  font-weight: 700;
-}
-
-.gft-btn--plus:hover {
-  background: #f9ff55;
-  color: #0e0e0e;
-  border-color: #f9ff55;
 }
 </style>

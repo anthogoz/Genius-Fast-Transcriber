@@ -20,7 +20,7 @@ function select(mode: ExtensionMode) {
 </script>
 
 <template>
-  <div class="section-title">{{ t('mode_select_title') }}</div>
+  <div class="gft-u-popup-section-title">{{ t('mode_select_title') }}</div>
   <div
     class="card"
     :class="{ active: modelValue === 'full' }"
@@ -40,15 +40,6 @@ function select(mode: ExtensionMode) {
 </template>
 
 <style scoped>
-.section-title {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  margin: 16px 0 8px 0;
-}
-
 .card {
   background: var(--card-bg);
   padding: 12px;

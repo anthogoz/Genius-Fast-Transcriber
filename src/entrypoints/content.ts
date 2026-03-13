@@ -1,5 +1,6 @@
 import { createApp, defineComponent, h, reactive } from 'vue';
 import { browser } from 'wxt/browser';
+import '@/assets/content.css';
 import FloatingToolbar from '@/components/content/FloatingToolbar.vue';
 import GftPanel from '@/components/content/GftPanel.vue';
 import OnboardingWizard from '@/components/content/OnboardingWizard.vue';

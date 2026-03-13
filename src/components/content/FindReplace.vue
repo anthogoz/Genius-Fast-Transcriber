@@ -72,17 +72,17 @@ function replaceAll() {
 
 <template>
   <div class="gft-find-replace">
-    <h4 v-if="!embedded" class="gft-find-replace__title">{{ t('find_replace_title') }}</h4>
+    <h4 v-if="!embedded" class="gft-u-section-title gft-find-replace__title">{{ t('find_replace_title') }}</h4>
     <div class="gft-find-replace__fields">
       <input
         v-model="searchQuery"
-        class="gft-find-replace__input"
+        class="gft-u-input"
         :placeholder="t('find_placeholder')"
         @keydown.enter="replaceFirst"
       />
       <input
         v-model="replaceQuery"
-        class="gft-find-replace__input"
+        class="gft-u-input"
         :placeholder="t('replace_placeholder')"
         @keydown.enter="replaceFirst"
       />
@@ -93,10 +93,10 @@ function replaceAll() {
         {{ t('regex_toggle') }}
       </label>
       <div class="gft-find-replace__buttons">
-        <button type="button" class="gft-btn gft-btn--sm" @click="replaceFirst">
+        <button type="button" class="gft-u-btn gft-u-btn--sm" @click="replaceFirst">
           {{ t('btn_replace') }}
         </button>
-        <button type="button" class="gft-btn gft-btn--sm" @click="replaceAll">
+        <button type="button" class="gft-u-btn gft-u-btn--sm" @click="replaceAll">
           {{ t('btn_replace_all') }}
         </button>
       </div>
@@ -110,12 +110,7 @@ function replaceAll() {
 }
 
 .gft-find-replace__title {
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.8px;
-  margin: 0 0 6px 0;
-  color: var(--gft-title-color, #0e0e0e);
+  margin-bottom: 6px;
 }
 
 .gft-find-replace__fields {
@@ -123,21 +118,6 @@ function replaceAll() {
   flex-direction: column;
   gap: 4px;
   margin-bottom: 6px;
-}
-
-.gft-find-replace__input {
-  background: var(--gft-input-bg, rgba(255, 255, 255, 0.65));
-  border: 1px solid var(--gft-input-border, rgba(14, 14, 14, 0.25));
-  color: inherit;
-  padding: 5px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  outline: none;
-  transition: border-color 0.15s;
-}
-
-.gft-find-replace__input:focus {
-  border-color: #f9ff55;
 }
 
 .gft-find-replace__controls {
@@ -158,22 +138,5 @@ function replaceAll() {
 .gft-find-replace__buttons {
   display: flex;
   gap: 4px;
-}
-
-.gft-btn--sm {
-  background: var(--gft-btn-bg, #fffdef);
-  border: 1px solid var(--gft-btn-border, #adadad);
-  color: inherit;
-  padding: 3px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 11px;
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.gft-btn--sm:hover {
-  background: var(--gft-btn-hover-bg, #0e0e0e);
-  border-color: var(--gft-btn-hover-border, #0e0e0e);
-  color: var(--gft-btn-hover-text, #f9ff55);
 }
 </style>

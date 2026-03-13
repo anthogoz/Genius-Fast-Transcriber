@@ -83,8 +83,8 @@ function handleApply() {
 
 <template>
   <Teleport to="body">
-    <div class="gft-preview-overlay" @click="emit('cancel')" />
-    <div class="gft-preview-modal" :class="{ 'gft-dark-mode': isDarkMode }">
+    <div class="gft-u-overlay gft-preview-overlay" @click="emit('cancel')" />
+    <div class="gft-u-modal gft-preview-modal" :class="{ 'gft-u-modal--dark gft-dark-mode': isDarkMode }">
       <div class="gft-preview-modal__header">
         <h2 class="gft-preview-modal__title">{{ t('preview_title') }}</h2>
 
@@ -114,7 +114,7 @@ function handleApply() {
       <div class="gft-preview-modal__diff" v-html="diffHtml" />
 
       <div class="gft-preview-modal__buttons">
-        <button type="button" class="gft-preview-btn gft-preview-btn--cancel" @click="emit('cancel')">
+        <button type="button" class="gft-preview-btn gft-u-btn" @click="emit('cancel')">
           {{ t('preview_btn_cancel') }}
         </button>
         <button type="button" class="gft-preview-btn gft-preview-btn--apply" @click="handleApply">
@@ -126,34 +126,12 @@ function handleApply() {
 </template>
 
 <style scoped>
-.gft-preview-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 10000;
-}
-
 .gft-preview-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 10001;
-  background: #fff;
-  color: #222;
-  border-radius: 12px;
-  padding: 20px;
   max-width: 700px;
   width: 90vw;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.gft-preview-modal.gft-dark-mode {
-  background: #2a2a2a;
-  color: #ddd;
 }
 
 .gft-preview-modal__title {
@@ -232,26 +210,16 @@ function handleApply() {
   cursor: pointer;
   font-weight: 600;
   font-size: 13px;
-  border: none;
-  transition: opacity 0.15s;
+  height: auto;
 }
 
 .gft-preview-btn:hover {
   opacity: 0.85;
 }
 
-.gft-preview-btn--cancel {
-  background: #e0e0e0;
-  color: #333;
-}
-
-.gft-dark-mode .gft-preview-btn--cancel {
-  background: #444;
-  color: #ddd;
-}
-
 .gft-preview-btn--apply {
   background: #ffff64;
   color: #000;
+  border: none;
 }
 </style>

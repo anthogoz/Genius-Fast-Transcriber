@@ -246,7 +246,7 @@ defineExpose({
 
 <template>
   <section class="gft-cleanup-section">
-    <h3 class="gft-section-title">{{ t('section_cleanup') }}</h3>
+    <h3 class="gft-u-section-title">{{ t('section_cleanup') }}</h3>
 
     <div class="gft-cleanup-section__buttons">
       <button
@@ -254,7 +254,7 @@ defineExpose({
         :key="btn.id"
         :title="t(btn.tooltipKey)"
         type="button"
-        class="gft-btn"
+        class="gft-u-btn"
         @click="btn.action"
       >
         {{ t(btn.labelKey) }}
@@ -263,7 +263,7 @@ defineExpose({
       <button
         :title="t('global_check_tooltip')"
         type="button"
-        class="gft-btn"
+        class="gft-u-btn"
         @click="handleCheckBrackets"
       >
         {{ t('btn_check_label') }}
@@ -272,8 +272,8 @@ defineExpose({
       <button
         :title="t('find_replace_title')"
         type="button"
-        class="gft-btn"
-        :class="{ 'gft-btn--active': showFindReplace }"
+        class="gft-u-btn"
+        :class="{ 'gft-u-btn--active': showFindReplace }"
         @click="toggleFindReplace"
       >
         🔍 {{ t('find_replace_title') }}
@@ -282,7 +282,7 @@ defineExpose({
       <button
         :title="t('btn_add_custom_cleanup_title')"
         type="button"
-        class="gft-btn gft-btn--plus"
+        class="gft-u-btn gft-u-btn--plus"
         @click="openCustomLibrary"
       >
         +
@@ -310,60 +310,10 @@ defineExpose({
   margin-bottom: 8px;
 }
 
-.gft-section-title {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin: 0 0 8px 0;
-  color: #777;
-}
-
 .gft-cleanup-section__buttons {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-}
-
-.gft-btn {
-  background: var(--gft-btn-bg, #fffdef);
-  border: 1px solid var(--gft-btn-border, #adadad);
-  height: 20px;
-  color: inherit;
-  padding: 2px 6px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 10px;
-  font-weight: 400;
-  transition: background 0.15s, border-color 0.15s;
-}
-
-.gft-btn:hover {
-  background: var(--gft-btn-hover-bg, #0e0e0e);
-  border-color: var(--gft-btn-hover-border, #0e0e0e);
-  color: var(--gft-btn-hover-text, #f9ff55);
-}
-
-.gft-btn--plus {
-  text-align: center;
-  padding: 0 8px;
-  border-style: dashed;
-  border-color: #818181;
-  background: transparent;
-  color: #818181;
-  font-weight: 700;
-}
-
-.gft-btn--plus:hover {
-  background: #f9ff55;
-  color: #0e0e0e;
-  border-color: #f9ff55;
-}
-
-.gft-btn--active {
-  background: var(--gft-btn-hover-bg, #0e0e0e);
-  border-color: var(--gft-btn-hover-border, #0e0e0e);
-  color: var(--gft-btn-hover-text, #f9ff55);
 }
 
 .gft-cleanup-section__find-replace {

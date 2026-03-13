@@ -278,7 +278,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="gft-lc-overlay" @click.self="closeModal">
+  <div class="gft-u-overlay gft-u-overlay--center gft-u-overlay--blur gft-lc-overlay" @click.self="closeModal">
     <div class="gft-lc-modal" :class="{ 'gft-lc-modal--dark': isDarkMode }">
       <button type="button" class="gft-lc-close" @click="closeModal">&times;</button>
 
@@ -358,14 +358,8 @@ onMounted(() => {
 
 <style scoped>
 .gft-lc-overlay {
-  position: fixed;
-  inset: 0;
   z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: blur(5px);
 }
 
 .gft-lc-modal {

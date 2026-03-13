@@ -137,7 +137,7 @@ src/
 │   ├── content.ts        # Injected on *://*.genius.com/*-lyrics
 │   └── popup/            # Extension popup (settings UI)
 │       ├── index.html
-│       ├── main.ts
+│       ├── index.ts
 │       └── App.vue
 ├── components/
 │   ├── content/          # 15 components for the content script UI

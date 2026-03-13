@@ -28,7 +28,7 @@ onUnmounted(() => {
 
 <template>
   <Transition name="gft-toast">
-    <div class="gft-toast" v-if="message">
+    <div class="gft-toast gft-u-toast" v-if="message">
       {{ message }}
     </div>
   </Transition>
@@ -36,16 +36,9 @@ onUnmounted(() => {
 
 <style scoped>
 .gft-toast {
-  position: fixed;
   top: 20px;
-  right: 20px;
   z-index: 10002;
-  background: #333;
-  color: white;
   padding: 12px 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  font-family: sans-serif;
   font-size: 14px;
   pointer-events: none;
 }

@@ -138,7 +138,7 @@ const locales: { value: Locale; label: string }[] = [
 </script>
 
 <template>
-  <div class="gft-onboarding-overlay">
+  <div class="gft-u-overlay gft-u-overlay--center gft-onboarding-overlay">
     <div class="gft-onboarding" :class="onboardingClass">
       <div class="gft-onboarding__header">
         <h2 class="gft-onboarding__title" v-html="onboardingTitle" />
@@ -289,13 +289,8 @@ const locales: { value: Locale; label: string }[] = [
 
 <style scoped>
 .gft-onboarding-overlay {
-  position: fixed;
-  inset: 0;
   z-index: 2147483646;
   background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 .gft-onboarding {

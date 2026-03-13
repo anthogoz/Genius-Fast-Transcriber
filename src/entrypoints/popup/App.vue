@@ -122,8 +122,8 @@ function restartTutorial() {
       <ThemeSelector v-model="theme" />
       <LanguageSelector v-model="locale" />
 
-      <div class="section-title">{{ t('popup_help_title') }}</div>
-      <button type="button" class="restart-btn" @click="restartTutorial">
+      <div class="gft-u-popup-section-title">{{ t('popup_help_title') }}</div>
+      <button type="button" class="gft-u-popup-dashed-btn" @click="restartTutorial">
         ❓ {{ t('popup_restart_tutorial') }}
       </button>
     </div>
@@ -213,32 +213,6 @@ function restartTutorial() {
 .disabled {
   opacity: 0.5;
   pointer-events: none;
-}
-
-.section-title {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  margin: 16px 0 8px 0;
-}
-
-.restart-btn {
-  width: 100%;
-  background: none;
-  border: 1px dashed var(--border);
-  color: var(--text-muted);
-  padding: 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 11px;
-  transition: all 0.2s;
-}
-
-.restart-btn:hover {
-  border-color: var(--primary);
-  color: var(--text);
 }
 
 .status {
