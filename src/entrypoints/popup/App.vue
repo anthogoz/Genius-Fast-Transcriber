@@ -6,7 +6,7 @@ import LanguageSelector from '@/components/popup/LanguageSelector.vue';
 import ModeSelector from '@/components/popup/ModeSelector.vue';
 import ThemeSelector from '@/components/popup/ThemeSelector.vue';
 import { setLocale } from '@/i18n';
-import type { ExtensionMode, Locale, PopupState, Theme } from '@/types';
+import type { ExtensionMode, Locale, PopupState, PopupAction, Theme } from '@/types';
 
 const { t } = useI18n();
 
@@ -36,7 +36,7 @@ function applyState(state: PopupState) {
 }
 
 function sendMessage(
-  action: string,
+  action: PopupAction['action'],
   data: Record<string, unknown> = {},
   options: { closeOnSuccess?: boolean } = {},
 ) {

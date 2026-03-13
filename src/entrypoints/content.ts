@@ -47,36 +47,92 @@ export default defineContentScript({
     initFloatingToolbar(false);
 
     function startEditorObserver(ctx: any) {
-      const observer = new MutationObserver(() => {
+      const OBSERVER_DEBOUNCE_MS = 120;
+      let mutationTimer: number | null = null;
+      let observedRoot: Node | null = null;
+
+      const observer = new MutationObserver((mutations) => {
+        if (
+          observedRoot
+          && observedRoot !== document.body
+          && observedRoot instanceof Node
+          && !document.contains(observedRoot)
+        ) {
+          observeRoot(document.body);
+        }
+
+        if (state.currentActiveEditor && document.contains(state.currentActiveEditor)) return;
+
+        const hasRelevantMutation = mutations.some((mutation) => {
+          if (isPotentialEditorNode(mutation.target)) return true;
+
+          for (const node of mutation.addedNodes) {
+            if (isPotentialEditorNode(node)) return true;
+          }
+
+          for (const node of mutation.removedNodes) {
+            if (isPotentialEditorNode(node)) return true;
+          }
+
+          return false;
+        });
+
+        if (!hasRelevantMutation) return;
+
+        if (mutationTimer !== null) {
+          clearTimeout(mutationTimer);
+        }
+
+        mutationTimer = window.setTimeout(() => {
+          mutationTimer = null;
+          syncEditorAndPanel();
+        }, OBSERVER_DEBOUNCE_MS);
+      });
+
+      function observeRoot(root: Node) {
+        if (observedRoot === root) return;
+        observer.disconnect();
+        observer.observe(root, { childList: true, subtree: true });
+        observedRoot = root;
+        state.observer = observer;
+      }
+
+      function getPreferredObserveRoot(editor: HTMLElement): Node {
+        const mainRoot = editor.closest('main');
+        if (mainRoot) return mainRoot;
+
+        const formRoot = editor.closest('form');
+        if (formRoot) return formRoot;
+
+        return editor.parentElement ?? document.body;
+      }
+
+      function isPotentialEditorNode(node: Node): boolean {
+        if (!(node instanceof Element)) return false;
+        if (node.matches(SELECTORS.TEXTAREA_EDITOR) || node.matches(SELECTORS.DIV_EDITOR)) {
+          return true;
+        }
+        return Boolean(
+          node.querySelector(SELECTORS.TEXTAREA_EDITOR) || node.querySelector(SELECTORS.DIV_EDITOR),
+        );
+      }
+
+      function syncEditorAndPanel() {
         const textarea = document.querySelector<HTMLTextAreaElement>(SELECTORS.TEXTAREA_EDITOR);
         const divEditor = document.querySelector<HTMLElement>(SELECTORS.DIV_EDITOR);
 
-        if (textarea || divEditor) {
-          const editor = textarea ?? (divEditor as HTMLElement);
-          const type = textarea ? 'textarea' : 'contenteditable';
-
-          if (state.currentActiveEditor !== editor) {
-            setEditor(editor as HTMLElement, type);
-
-            const songData = extractSongData();
-            setSongTitle(songData.title);
-            setArtists(songData.mainArtists, songData.featuringArtists);
-
-            mountPanel(ctx);
-          }
+        if (!(textarea || divEditor)) {
+          observeRoot(document.body);
+          return;
         }
-      });
 
-      observer.observe(document.body, { childList: true, subtree: true });
-      state.observer = observer;
+        const editor = textarea ?? (divEditor as HTMLElement);
+        const type = textarea ? 'textarea' : 'contenteditable';
 
-      const existingTextarea = document.querySelector<HTMLTextAreaElement>(
-        SELECTORS.TEXTAREA_EDITOR,
-      );
-      const existingDiv = document.querySelector<HTMLElement>(SELECTORS.DIV_EDITOR);
-      if (existingTextarea || existingDiv) {
-        const editor = existingTextarea ?? (existingDiv as HTMLElement);
-        const type = existingTextarea ? 'textarea' : 'contenteditable';
+        observeRoot(getPreferredObserveRoot(editor));
+
+        if (state.currentActiveEditor === editor) return;
+
         setEditor(editor as HTMLElement, type);
 
         const songData = extractSongData();
@@ -85,6 +141,10 @@ export default defineContentScript({
 
         mountPanel(ctx);
       }
+
+      observeRoot(document.body);
+
+      syncEditorAndPanel();
     }
 
     async function mountPanel(_ctx: any) {
