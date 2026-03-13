@@ -122,7 +122,7 @@ export function showRestoreDraftNotification(timeStr, contentToRestore, onRestor
         display: flex;
         flex-direction: column;
         gap: 10px;
-        font-family: 'Programme Pan', sans-serif;
+        font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
         border-left: 4px solid #ffff64;
         animation: slideIn 0.3s ease-out;
         pointer-events: auto;
