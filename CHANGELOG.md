@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [4.2.0] — 2026-03-xx
+## [4.2.0] — 2026-03-14
+
+### Added
+- Manual GitHub Actions release workflow (`.github/workflows/release.yml`) for validated version bumps, build artifacts, and tagged GitHub releases.
+- VS Code workspace recommendations/settings (`.vscode/extensions.json`, `.vscode/settings.json`).
+
+### Fixed
+- YouTube iframe seeking behavior in the editor workflow.
+- Lint/type-related issues discovered during the migration stabilization.
 
 ### Changed
 - **Complete rewrite** using [WXT](https://wxt.dev), Vue 3, and TypeScript.
@@ -14,6 +22,12 @@ All notable changes to this project will be documented in this file.
 - Vite-based build with HMR dev server replacing esbuild.
 - New documentation in the `docs/` folder.
 - Biome for linting and formatting.
+- Performance improvements for diff/comparison-related flows and general UI responsiveness.
+- CI/CD and release process modernization with reproducible zip artifacts for Chromium and Firefox.
+
+### Removed
+- Legacy monolithic implementation and obsolete module files from the previous architecture.
+- Old build/documentation files replaced by the new project structure.
 
 ## [4.1.1]
 
