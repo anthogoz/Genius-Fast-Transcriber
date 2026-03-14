@@ -145,10 +145,10 @@ src/
 ├── composables/          # Reactive logic (useSettings, useEditor, useCorrections…)
 ├── utils/                # Pure functions (corrections, numberToWords, diff, artists…)
 ├── types/index.ts        # Shared TypeScript types
-├── locales/              # Chrome manifest i18n (@wxt-dev/i18n)
-│   ├── en.json           # extName, extDescription (translation used for the manifest)
-│   └── app/              # In-app translations (vue-i18n, 320+ keys per locale)
-└── i18n/index.ts         # vue-i18n setup
+├── locales/
+│   └── app/              # In-app translations (vue-i18n)
+│   └── <code>.json       # extName, extDescription (wxt-dev/i18n for manifest)
+│   └── index.ts          # i18n setup and locale registration
 ```
 
 ### Key Concepts
@@ -208,5 +208,5 @@ Use the following prefixes:
 1. Create `src/locales/<code>.json` with `extName` and `extDescription`.
 2. Create `src/locales/app/<code>.json` with all translation keys.
 3. Add the locale to the `Locale` type in `src/types/index.ts`.
-4. Register it in `src/i18n/index.ts`.
+4. Register it in `src/locales/index.ts`.
 5. Add a button in `src/components/popup/LanguageSelector.vue`.

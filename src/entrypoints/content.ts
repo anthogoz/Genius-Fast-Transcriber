@@ -9,7 +9,7 @@ import { useGftState } from '@/composables/useGftState';
 import { useLyricCard } from '@/composables/useLyricCard';
 import { useSettings } from '@/composables/useSettings';
 import { SELECTORS, useSongData } from '@/composables/useSongData';
-import { i18n, setLocale } from '@/i18n';
+import { i18n, setLocale } from '@/locales';
 import type { Locale, PopupState } from '@/types';
 import {
   isValidNumber,

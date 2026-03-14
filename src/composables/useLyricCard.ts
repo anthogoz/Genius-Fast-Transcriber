@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import LyricCardModal from '@/components/content/LyricCardModal.vue';
-import { i18n } from '@/i18n';
+import { i18n } from '@/locales';
 import { extractArtistImage, fetchArtistImageFromApi } from '@/utils/lyricCard';
 
 type LyricCardConfig = {

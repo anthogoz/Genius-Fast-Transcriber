@@ -5,7 +5,7 @@ import { browser } from 'wxt/browser';
 import LanguageSelector from '@/components/popup/LanguageSelector.vue';
 import ModeSelector from '@/components/popup/ModeSelector.vue';
 import ThemeSelector from '@/components/popup/ThemeSelector.vue';
-import { setLocale } from '@/i18n';
+import { setLocale } from '@/locales';
 import type { ExtensionMode, Locale, PopupState, PopupAction, Theme } from '@/types';
 
 const { t } = useI18n();

@@ -5,7 +5,7 @@ import { browser } from 'wxt/browser';
 import { useDraft } from '@/composables/useDraft';
 import { useEditor } from '@/composables/useEditor';
 import { useGftState } from '@/composables/useGftState';
-import { setLocale } from '@/i18n';
+import { setLocale } from '@/locales';
 import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts';
 import { useSettings } from '@/composables/useSettings';
 import { useYoutubeControls } from '@/composables/useYoutubeControls';

@@ -146,9 +146,10 @@ src/
 ├── composables/          # Reactive state management
 ├── utils/                # Pure utility functions
 ├── types/                # TypeScript type definitions
-├── locales/              # @wxt-dev/i18n (Chrome manifest strings)
-│   └── app/              # vue-i18n (in-app translations, 320+ keys)
-└── i18n/                 # vue-i18n setup
+├── locales/
+│   └── app/              # In-app translations (vue-i18n)
+│   └── <code>.json       # extName, extDescription (wxt-dev/i18n for manifest)
+│   └── index.ts          # i18n setup and locale registration
 ```
 
 ---

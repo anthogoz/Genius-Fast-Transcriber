@@ -14,8 +14,7 @@
     "lyrics",
     "transcription",
     "genius.com",
-    "lyric-card",
-    "esbuild"
+    "lyric-card"
   ],
   "bugs": {
     "url": "https://github.com/anthogoz/Genius-Fast-Transcriber/issues"
