@@ -314,7 +314,11 @@ onMounted(() => {
       </div>
 
       <div class="gft-lc-row">
-        <select v-model="imageSource" class="gft-lc-input" @change="applySelectedSource">
+        <select
+          v-model="imageSource"
+          class="gft-lc-input gft-u-pill-control gft-u-hover-lift"
+          @change="applySelectedSource"
+        >
           <option value="ALBUM">{{ t('lc_album_default') }}</option>
           <option v-for="artist in allArtists" :key="artist" :value="artist">{{ artist }}</option>
           <option value="MANUAL_SEARCH">{{ t('lc_manual_search') }}</option>
@@ -366,13 +370,25 @@ onMounted(() => {
       </div>
 
       <div class="gft-lc-row gft-lc-row--actions">
-        <label class="gft-lc-upload">
+        <label class="gft-lc-upload gft-u-pill-control gft-u-pill-control--inline gft-u-hover-lift">
           {{ t('lc_upload_btn') }}
           <input type="file" accept="image/*" @change="onFileChange" />
         </label>
 
-        <button type="button" class="gft-lc-btn gft-lc-btn--primary" @click="downloadCard">{{ t('lc_download_btn') }}</button>
-        <button type="button" class="gft-lc-btn gft-lc-btn--x" @click="shareToX">{{ t('lc_share_btn') }}</button>
+        <button
+          type="button"
+          class="gft-lc-btn gft-u-pill-control gft-u-pill-control--inline gft-u-hover-lift gft-lc-btn--primary"
+          @click="downloadCard"
+        >
+          {{ t('lc_download_btn') }}
+        </button>
+        <button
+          type="button"
+          class="gft-lc-btn gft-u-pill-control gft-u-pill-control--inline gft-u-hover-lift gft-lc-btn--x"
+          @click="shareToX"
+        >
+          {{ t('lc_share_btn') }}
+        </button>
       </div>
     </div>
   </div>
@@ -477,26 +493,12 @@ onMounted(() => {
   appearance: none;
   min-width: 50px;
   max-width: 250px;
-  height: 42px;
   padding: 10px 32px 10px 18px;
-  border-radius: 999px;
-  border: 1px solid rgba(128, 128, 128, 0.2);
   background-color: rgba(128, 128, 128, 0.1);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='currentColor' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: calc(100% - 12px) center;
-  font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  color: inherit;
   outline: none;
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.gft-lc-input:hover {
-  transform: scale(1.03);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .gft-lc-modal--dark .gft-lc-input {
@@ -629,29 +631,6 @@ onMounted(() => {
   gap: 15px;
 }
 
-.gft-lc-upload {
-  padding: 10px 18px;
-  border-radius: 999px;
-  font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  border: 1px solid rgba(128, 128, 128, 0.2);
-  background: rgba(128, 128, 128, 0.1);
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: 42px;
-  box-sizing: border-box;
-}
-
-.gft-lc-upload:hover {
-  transform: scale(1.03);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
 .gft-lc-modal--dark .gft-lc-upload {
   background: rgba(255, 255, 255, 0.05);
   color: #fff;
@@ -662,32 +641,7 @@ onMounted(() => {
 }
 
 .gft-lc-btn {
-  padding: 10px 18px;
-  border-radius: 999px;
-  font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  border: 1px solid rgba(128, 128, 128, 0.2);
-  background: rgba(128, 128, 128, 0.1);
-  cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
   outline: none;
-  height: 42px;
-  box-sizing: border-box;
-  color: inherit;
-}
-
-.gft-lc-btn:hover {
-  transform: scale(1.03);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.gft-lc-btn:active {
-  transform: scale(0.98);
 }
 
 .gft-lc-btn--primary {

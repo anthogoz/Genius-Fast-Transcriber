@@ -4,3 +4,123 @@ body {
   padding: 0;
   scroll-behavior: smooth;
 }
+
+.gft-u-popup-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin: 16px 0 8px;
+}
+
+.gft-u-popup-pill {
+  flex: 1;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px;
+  border-radius: 99px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.gft-u-popup-pill:hover {
+  background: var(--border);
+}
+
+.gft-u-popup-pill.active {
+  border-color: var(--primary);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.gft-u-popup-btn-group {
+  display: flex;
+  gap: 8px;
+}
+
+.gft-u-popup-dashed-btn {
+  width: 100%;
+  background: none;
+  border: 1px dashed var(--border);
+  color: var(--text-muted);
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 11px;
+  transition: all 0.2s;
+}
+
+.gft-u-popup-dashed-btn:hover {
+  border-color: var(--primary);
+  color: var(--text);
+}
+
+.gft-u-popup-card {
+  background: var(--card-bg);
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gft-u-popup-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary);
+}
+
+.gft-u-popup-card.active {
+  border-color: var(--primary);
+  background: var(--card-bg);
+  box-shadow: 0 0 15px var(--accent-shadow);
+}
+
+.gft-u-popup-card-title {
+  margin: 0 0 4px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.gft-u-popup-card.active .gft-u-popup-card-title {
+  color: var(--text-active);
+}
+
+.gft-u-popup-card-desc {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.gft-u-popup-link {
+  flex: 1;
+  color: var(--text);
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.gft-u-popup-link:hover {
+  background: var(--primary);
+  color: #000;
+  border-color: var(--primary);
+}

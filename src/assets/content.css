@@ -143,62 +143,35 @@
   border-color: #f9ff55;
 }
 
-.gft-u-popup-section-title {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: var(--text-muted);
-  margin: 16px 0 8px;
+.gft-u-pill-control {
+  border-radius: 999px;
+  font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  background: rgba(128, 128, 128, 0.1);
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 42px;
+  box-sizing: border-box;
 }
 
-.gft-u-popup-pill {
-  flex: 1;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 10px;
-  border-radius: 99px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 600;
-  transition: all 0.2s;
-  display: flex;
+.gft-u-pill-control--inline {
+  padding: 10px 18px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-}
-
-.gft-u-popup-pill:hover {
-  background: var(--border);
-}
-
-.gft-u-popup-pill.active {
-  border-color: var(--primary);
-  background: var(--bg);
-  color: var(--text);
-}
-
-.gft-u-popup-btn-group {
-  display: flex;
   gap: 8px;
 }
 
-.gft-u-popup-dashed-btn {
-  width: 100%;
-  background: none;
-  border: 1px dashed var(--border);
-  color: var(--text-muted);
-  padding: 8px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 11px;
-  transition: all 0.2s;
+.gft-u-hover-lift:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.gft-u-popup-dashed-btn:hover {
-  border-color: var(--primary);
-  color: var(--text);
+.gft-u-hover-lift:active {
+  transform: scale(0.98);
 }
 
 .gft-u-overlay {

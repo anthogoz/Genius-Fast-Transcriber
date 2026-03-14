@@ -549,7 +549,6 @@ defineExpose({
   --gft-input-border: rgba(255, 255, 255, 0.16);
   --gft-title-color: #f9ff55;
 
-  font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
   background: var(--gft-panel-bg);
   color: var(--gft-panel-text);
   border-radius: 6px;
@@ -640,7 +639,6 @@ defineExpose({
 .gft-panel__mode-select {
   padding: 2px 18px 2px 7px;
   font-size: 10px;
-  font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
   font-weight: 700;
   border: 1px solid var(--gft-btn-border);
   border-radius: 6px;
@@ -746,7 +744,6 @@ defineExpose({
   background: var(--gft-btn-primary-bg, #f9ff55);
   border: 1px solid var(--gft-btn-primary-border, #f9ff55);
   color: var(--gft-btn-primary-text, #0e0e0e);
-  font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
   font-weight: 800;
   font-size: 13px;
   line-height: 1;

@@ -132,13 +132,19 @@ function restartTutorial() {
 
     <div class="footer">
       <div class="footer-links">
-        <a href="https://buymeacoffee.com/lnkhey" target="_blank" rel="noopener noreferrer">
+        <a
+          href="https://buymeacoffee.com/lnkhey"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="gft-u-popup-link"
+        >
           ☕ {{ t('footer_buy_me_a_coffee') }}
         </a>
         <a
           href="https://github.com/anthogoz/Genius-Fast-Transcriber"
           target="_blank"
           rel="noopener noreferrer"
+          class="gft-u-popup-link"
         >
           💻 {{ t('footer_github') }}
         </a>
@@ -237,29 +243,6 @@ function restartTutorial() {
   display: flex;
   gap: 10px;
   width: 100%;
-}
-
-.footer-links a {
-  flex: 1;
-  color: var(--text);
-  text-decoration: none;
-  font-size: 11px;
-  font-weight: 600;
-  padding: 8px;
-  border-radius: 8px;
-  background: var(--card-bg);
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  transition: all 0.2s;
-}
-
-.footer-links a:hover {
-  background: var(--primary);
-  color: #000;
-  border-color: var(--primary);
 }
 
 .version {
