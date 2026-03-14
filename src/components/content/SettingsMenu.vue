@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { browser } from 'wxt/browser';
 import { useSettings } from '@/composables/useSettings';
 
 const { t } = useI18n();
@@ -19,6 +20,7 @@ defineProps<{
 const emit = defineEmits<{
   close: [];
   toggleStats: [];
+  openCustomLibrary: [];
 }>();
 
 const darkModeLabel = computed(() =>
@@ -37,8 +39,10 @@ const newlineLabel = computed(() =>
   isTagNewlinesDisabled.value ? t('newline_enable') : t('newline_disable'),
 );
 
-const TUTORIAL_URL = 'https://github.com/anthogoz/Genius-Fast-Transcriber#readme';
-const CUSTOM_LIBRARY_URL = '#';
+function relaunchTutorial() {
+  void browser.runtime.sendMessage({ action: 'RESET_TUTORIAL' });
+  emit('close');
+}
 </script>
 
 <template>
@@ -62,15 +66,10 @@ const CUSTOM_LIBRARY_URL = '#';
 
       <hr class="gft-settings-menu__divider" />
 
-      <a
-        class="gft-settings-menu__item gft-settings-menu__item--link"
-        :href="TUTORIAL_URL"
-        target="_blank"
-        rel="noopener"
-      >
+      <button type="button" class="gft-settings-menu__item" @click="relaunchTutorial">
         {{ t('tutorial_link') }}
-      </a>
-      <button type="button" class="gft-settings-menu__item" @click="emit('close')">
+      </button>
+      <button type="button" class="gft-settings-menu__item" @click="emit('openCustomLibrary')">
         {{ t('settings_custom_library') }}
       </button>
     </div>

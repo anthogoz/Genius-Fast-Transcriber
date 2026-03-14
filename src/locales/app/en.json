@@ -234,8 +234,6 @@
   "cleanup_spacing_tooltip": "Fix line spacing (remove extra empty lines)",
   "global_check_tooltip": "Check for unmatched brackets and parentheses",
   "global_fix_tooltip": "Apply all text corrections at once",
-  "cleanup_y_tooltip": "Replace \"y'\" with \"y \" (French typography rule)",
-  "cleanup_oeu_tooltip": "Replace \"oeu\" with the special character \"œu\" (French typography rule)",
   "draft_found_title": "Draft found!",
   "draft_saved_at": "Saved at",
   "draft_btn_restore": "Restore",

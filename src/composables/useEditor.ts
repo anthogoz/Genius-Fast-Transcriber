@@ -84,19 +84,37 @@ export function useEditor() {
 
     if (currentEditorType === 'textarea') {
       const ta = currentActiveEditor as HTMLTextAreaElement;
+      ta.focus();
       const start = ta.selectionStart;
       const end = ta.selectionEnd;
       ta.value = ta.value.substring(0, start) + text + ta.value.substring(end);
       ta.selectionStart = ta.selectionEnd = start + text.length;
       ta.dispatchEvent(new Event('input', { bubbles: true }));
     } else {
+      currentActiveEditor.focus();
       const selection = window.getSelection();
-      if (!selection || selection.rangeCount === 0) {
-        currentActiveEditor.focus();
-        document.execCommand('insertText', false, text);
-      } else {
-        document.execCommand('insertText', false, text);
+      if (!selection) return;
+
+      if (selection.rangeCount === 0 || !currentActiveEditor.contains(selection.anchorNode)) {
+        const range = document.createRange();
+        range.selectNodeContents(currentActiveEditor);
+        range.collapse(false);
+        selection.removeAllRanges();
+        selection.addRange(range);
       }
+
+      const range = selection.getRangeAt(0);
+      range.deleteContents();
+      const textNode = document.createTextNode(text);
+      range.insertNode(textNode);
+
+      const nextRange = document.createRange();
+      nextRange.setStartAfter(textNode);
+      nextRange.collapse(true);
+      selection.removeAllRanges();
+      selection.addRange(nextRange);
+
+      currentActiveEditor.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
     }
 
     scheduleAutoSave(getEditorContent);
@@ -125,6 +143,7 @@ export function useEditor() {
 
     if (currentEditorType === 'textarea') {
       const ta = currentActiveEditor as HTMLTextAreaElement;
+      ta.focus();
       const start = ta.selectionStart;
       const end = ta.selectionEnd;
       if (start === end) return;
@@ -136,11 +155,24 @@ export function useEditor() {
       ta.selectionEnd = start + before.length + selectedText.length;
       ta.dispatchEvent(new Event('input', { bubbles: true }));
     } else {
+      currentActiveEditor.focus();
       const selection = window.getSelection();
+      if (!selection || selection.rangeCount === 0) return;
       const selectedText = selection?.toString() ?? '';
       if (!selectedText) return;
 
-      document.execCommand('insertText', false, before + selectedText + after);
+      const range = selection.getRangeAt(0);
+      range.deleteContents();
+      const textNode = document.createTextNode(before + selectedText + after);
+      range.insertNode(textNode);
+
+      const nextRange = document.createRange();
+      nextRange.setStart(textNode, before.length + selectedText.length);
+      nextRange.setEnd(textNode, before.length + selectedText.length);
+      selection.removeAllRanges();
+      selection.addRange(nextRange);
+
+      currentActiveEditor.dispatchEvent(new Event('input', { bubbles: true, cancelable: true }));
     }
 
     scheduleAutoSave(getEditorContent);

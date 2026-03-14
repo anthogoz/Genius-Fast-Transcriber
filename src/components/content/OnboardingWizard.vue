@@ -441,6 +441,7 @@ const locales: { value: Locale; label: string }[] = [
   border: 2px solid transparent;
   border-radius: 12px;
   padding: 14px;
+  color: var(--fg);
   cursor: pointer;
   transition: border-color 0.2s, box-shadow 0.2s;
   position: relative;
@@ -457,6 +458,7 @@ const locales: { value: Locale; label: string }[] = [
 
 .gft-onboarding__card strong {
   font-size: 14px;
+  color: inherit;
 }
 
 .gft-onboarding__card p {
@@ -536,7 +538,14 @@ const locales: { value: Locale; label: string }[] = [
 
 .gft-onboarding__btn--secondary {
   background: color-mix(in srgb, var(--card) 90%, transparent);
-  color: inherit;
+  color: var(--fg);
+  border: 1px solid color-mix(in srgb, var(--fg) 25%, transparent);
+}
+
+.gft-onboarding.gft-onboarding--dark .gft-onboarding__btn--secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f2f2f2;
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .gft-onboarding__footer--single {

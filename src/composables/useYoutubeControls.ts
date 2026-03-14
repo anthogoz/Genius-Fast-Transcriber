@@ -1,6 +1,17 @@
 function getYouTubeIframe(): HTMLIFrameElement | null {
-  return document.querySelector<HTMLIFrameElement>(
-    'iframe[src*="youtube.com/embed/"], iframe[src*="youtube-nocookie.com/embed/"]',
+  const candidates = Array.from(
+    document.querySelectorAll<HTMLIFrameElement>(
+      'iframe[src*="youtube.com"], iframe[src*="youtube-nocookie.com"], iframe[src*="youtu.be"]',
+    ),
+  );
+
+  return (
+    candidates.find((iframe) => {
+      const rect = iframe.getBoundingClientRect();
+      return rect.width > 120 && rect.height > 80;
+    })
+    ?? candidates[0]
+    ?? null
   );
 }
 
@@ -37,6 +48,7 @@ function postPlayerCommand(iframe: HTMLIFrameElement, func: string, args: unknow
 
 let iframeTelemetryBound = false;
 let lastKnownIframeTime: number | null = null;
+let lastKnownIframePlayerState: number | null = null;
 
 function isYoutubeMessageOrigin(origin: string): boolean {
   return origin.includes('youtube.com') || origin.includes('youtube-nocookie.com');
@@ -59,12 +71,17 @@ function bindIframeTelemetry() {
 
     if (!payload || typeof payload !== 'object') return;
 
-    const info = (payload as { info?: { currentTime?: unknown } }).info;
+    const info = (payload as { info?: { currentTime?: unknown; playerState?: unknown } }).info;
     if (!info || typeof info !== 'object') return;
 
     const currentTime = info.currentTime;
     if (typeof currentTime === 'number' && Number.isFinite(currentTime)) {
       lastKnownIframeTime = currentTime;
+    }
+
+    const playerState = info.playerState;
+    if (typeof playerState === 'number' && Number.isFinite(playerState)) {
+      lastKnownIframePlayerState = playerState;
     }
   });
 
@@ -113,7 +130,13 @@ export function useYoutubeControls() {
     if (!iframe) return false;
 
     ensureJsApi(iframe);
-    postPlayerCommand(iframe, 'playVideo');
+    bindIframeTelemetry();
+    postPlayerCommand(iframe, 'getPlayerState');
+    if (lastKnownIframePlayerState === 1) {
+      postPlayerCommand(iframe, 'pauseVideo');
+    } else {
+      postPlayerCommand(iframe, 'playVideo');
+    }
     return true;
   }
 

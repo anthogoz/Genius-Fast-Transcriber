@@ -389,6 +389,12 @@ export default defineContentScript({
         toolbar.visible = true;
       }
 
+      function shouldShowNumberToWords(): boolean {
+        if (lyricCardOnly) return false;
+        const selected = getSelectedText().trim();
+        return isValidNumber(selected);
+      }
+
       const toolbarApp = createApp(
         defineComponent({
           name: 'GftFloatingToolbarRoot',
@@ -424,6 +430,7 @@ export default defineContentScript({
                 visible: toolbar.visible,
                 position: toolbar.position,
                 lyricCardOnly: toolbar.showLyricCardOnly,
+                showNumberToWords: shouldShowNumberToWords(),
                 onBold: () => wrapWith('b'),
                 onItalic: () => wrapWith('i'),
                 onNumberToWords: convertSelectedNumber,

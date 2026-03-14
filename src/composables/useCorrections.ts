@@ -17,6 +17,44 @@ export function useCorrections() {
   const { saveState } = useUndoRedo();
   const { locale } = useSettings();
 
+  function highlightContentEditableBracket(position: number) {
+    const editor = state.currentActiveEditor;
+    if (!editor) return;
+
+    const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+    let traversed = 0;
+
+    while (walker.nextNode()) {
+      const textNode = walker.currentNode as Text;
+      const value = textNode.nodeValue ?? '';
+      if (position < traversed + value.length) {
+        const localIndex = position - traversed;
+        const parent = textNode.parentNode;
+        if (!parent) return;
+
+        const before = value.slice(0, localIndex);
+        const char = value[localIndex] ?? '';
+        const after = value.slice(localIndex + 1);
+
+        const frag = document.createDocumentFragment();
+        if (before) frag.appendChild(document.createTextNode(before));
+        const marker = document.createElement('span');
+        marker.className = 'gft-bracket-highlight';
+        marker.textContent = char;
+        frag.appendChild(marker);
+        if (after) frag.appendChild(document.createTextNode(after));
+
+        parent.replaceChild(frag, textNode);
+        window.setTimeout(() => {
+          const replacement = document.createTextNode((before ?? '') + char + (after ?? ''));
+          marker.parentNode?.replaceChild(replacement, marker);
+        }, 1800);
+        return;
+      }
+      traversed += value.length;
+    }
+  }
+
   function applyCorrections(
     _options?: Partial<CorrectionOptions>,
     progressFn?: (step: number, total: number, msg: string) => void,
@@ -45,7 +83,27 @@ export function useCorrections() {
 
   function checkBrackets() {
     const content = getEditorContent();
-    return findUnmatchedBracketsAndParentheses(content);
+    const issues = findUnmatchedBracketsAndParentheses(content);
+    if (issues.length === 0 || !state.currentActiveEditor) return issues;
+
+    const firstIssue = issues[0];
+    if (state.currentEditorType === 'textarea') {
+      const ta = state.currentActiveEditor as HTMLTextAreaElement;
+      const pos = Math.max(0, Math.min(firstIssue.position, ta.value.length - 1));
+      ta.focus();
+      ta.setSelectionRange(pos, Math.min(pos + 1, ta.value.length));
+      ta.classList.add('gft-bracket-editor-alert');
+      window.setTimeout(() => ta.classList.remove('gft-bracket-editor-alert'), 1800);
+    } else if (state.currentEditorType === 'contenteditable') {
+      highlightContentEditableBracket(firstIssue.position);
+      state.currentActiveEditor.classList.add('gft-bracket-editor-alert');
+      window.setTimeout(
+        () => state.currentActiveEditor?.classList.remove('gft-bracket-editor-alert'),
+        1800,
+      );
+    }
+
+    return issues;
   }
 
   function capitalizeLines() {

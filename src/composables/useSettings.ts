@@ -29,7 +29,7 @@ function readString<T extends string>(key: string, defaultValue: T): T {
 }
 
 const isDarkMode = ref(true);
-const isHeaderFeatEnabled = ref(false);
+const isHeaderFeatEnabled = ref(true);
 const isTagNewlinesDisabled = ref(false);
 const isLyricCardOnly = ref(false);
 const isPanelCollapsed = ref(false);
@@ -47,7 +47,7 @@ let watchersBound = false;
 export function useSettings() {
   if (!initialized) {
     isDarkMode.value = readBool(STORAGE_KEYS.darkMode, true);
-    isHeaderFeatEnabled.value = readBool(STORAGE_KEYS.headerFeat);
+    isHeaderFeatEnabled.value = readBool(STORAGE_KEYS.headerFeat, true);
     isTagNewlinesDisabled.value = readBool(STORAGE_KEYS.tagNewlines);
     isLyricCardOnly.value = readBool(STORAGE_KEYS.lyricCardOnly);
     isPanelCollapsed.value = readBool(STORAGE_KEYS.panelCollapsed);

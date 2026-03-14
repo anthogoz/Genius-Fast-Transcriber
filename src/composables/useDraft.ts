@@ -1,32 +1,41 @@
 import { ref } from 'vue';
 
-const DRAFT_KEY = 'gftDraftContent';
-const DRAFT_TIME_KEY = 'gftDraftTime';
 const AUTOSAVE_DELAY = 3000;
+let autoSaveTimeout: ReturnType<typeof setTimeout> | null = null;
+const hasDraft = ref(false);
+const draftTimestamp = ref<string | null>(null);
+
+function getDraftKeys() {
+  const path = (window.location.pathname || '/').trim() || '/';
+  const scoped = encodeURIComponent(path);
+  return {
+    content: `gftDraftContent:${scoped}`,
+    time: `gftDraftTime:${scoped}`,
+  };
+}
 
 export function useDraft() {
-  let autoSaveTimeout: ReturnType<typeof setTimeout> | null = null;
-  const hasDraft = ref(false);
-  const draftTimestamp = ref<string | null>(null);
-
   function saveDraft(content: string) {
     if (!content.trim()) return;
-    localStorage.setItem(DRAFT_KEY, content);
-    localStorage.setItem(DRAFT_TIME_KEY, new Date().toLocaleTimeString());
+    const keys = getDraftKeys();
+    localStorage.setItem(keys.content, content);
+    localStorage.setItem(keys.time, new Date().toLocaleTimeString());
     hasDraft.value = true;
-    draftTimestamp.value = localStorage.getItem(DRAFT_TIME_KEY);
+    draftTimestamp.value = localStorage.getItem(keys.time);
   }
 
   function loadDraft(): { content: string; time: string } | null {
-    const content = localStorage.getItem(DRAFT_KEY);
-    const time = localStorage.getItem(DRAFT_TIME_KEY);
+    const keys = getDraftKeys();
+    const content = localStorage.getItem(keys.content);
+    const time = localStorage.getItem(keys.time);
     if (!content) return null;
     return { content, time: time ?? '' };
   }
 
   function discardDraft() {
-    localStorage.removeItem(DRAFT_KEY);
-    localStorage.removeItem(DRAFT_TIME_KEY);
+    const keys = getDraftKeys();
+    localStorage.removeItem(keys.content);
+    localStorage.removeItem(keys.time);
     hasDraft.value = false;
     draftTimestamp.value = null;
   }
@@ -50,7 +59,11 @@ export function useDraft() {
     if (draft) {
       hasDraft.value = true;
       draftTimestamp.value = draft.time;
+    } else {
+      hasDraft.value = false;
+      draftTimestamp.value = null;
     }
+    return draft;
   }
 
   return {

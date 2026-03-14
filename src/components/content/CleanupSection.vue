@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useCorrections } from '@/composables/useCorrections';
 import { useEditor } from '@/composables/useEditor';
 import { useSettings } from '@/composables/useSettings';
-import type { CorrectionResult } from '@/types';
+import type { CorrectionResult, CustomButton } from '@/types';
 import CorrectionPreview from './CorrectionPreview.vue';
 import FindReplace from './FindReplace.vue';
 
@@ -19,16 +19,18 @@ const {
   removeZeroWidthSpaces,
   duplicateCurrentLine,
 } = useCorrections();
-const { getEditorContent } = useEditor();
+const { getEditorContent, setEditorContent } = useEditor();
 
 const emit = defineEmits<{
   feedback: [message: string];
+  openCustomLibrary: [defaultType: 'cleanup' | 'structure'];
 }>();
 
 const showPreview = ref(false);
 const previewOriginal = ref('');
 const previewResult = ref<CorrectionResult | null>(null);
 const showFindReplace = ref(false);
+const customButtonsRevision = ref(0);
 
 interface CleanupButton {
   id: string;
@@ -53,12 +55,14 @@ const cleanupButtons = computed<CleanupButton[]>(() => {
     });
   }
 
-  buttons.push({
+  if (isFr.value) {
+    buttons.push({
       id: 'oeu',
       labelKey: 'btn_oeu_label',
       tooltipKey: 'cleanup_oeu_tooltip',
       action: () => applySingleCorrection({ oeuLigature: true }, 'oeu'),
     });
+  }
 
   if (!isPl.value) {
     buttons.push({
@@ -171,6 +175,18 @@ const cleanupButtons = computed<CleanupButton[]>(() => {
   return buttons;
 });
 
+const customCleanupButtons = computed<CustomButton[]>(() => {
+  void customButtonsRevision.value;
+  try {
+    const raw = localStorage.getItem('gftCustomButtons');
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as CustomButton[];
+    return parsed.filter((btn) => btn.type === 'cleanup' && Boolean(btn.findPattern));
+  } catch {
+    return [];
+  }
+});
+
 function applySingleCorrection(opts: Record<string, boolean>, itemName: string) {
   const disableAll = {
     yPrime: false,
@@ -203,6 +219,10 @@ function handleCheckBrackets() {
 function handleFixAll() {
   const original = getEditorContent();
   const result = previewCorrections();
+  if (result.correctionsCount === 0 || result.newText === original) {
+    emit('feedback', t('feedback_no_text_corrections'));
+    return;
+  }
   previewOriginal.value = original;
   previewResult.value = result;
   showPreview.value = true;
@@ -213,7 +233,36 @@ function toggleFindReplace() {
 }
 
 function openCustomLibrary() {
-  emit('feedback', t('settings_custom_library'));
+  emit('openCustomLibrary', 'cleanup');
+}
+
+function runCustomCleanup(btn: CustomButton) {
+  const find = btn.findPattern;
+  if (!find) return;
+
+  const source = getEditorContent();
+  let pattern: RegExp;
+  try {
+    if (btn.isRegex) {
+      pattern = new RegExp(find, btn.caseSensitive ? 'g' : 'gi');
+    } else {
+      const escaped = find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      pattern = new RegExp(escaped, btn.caseSensitive ? 'g' : 'gi');
+    }
+  } catch {
+    emit('feedback', t('import_failed_invalid'));
+    return;
+  }
+
+  if (!pattern.test(source)) {
+    emit('feedback', t('feedback_no_replacement'));
+    return;
+  }
+
+  const replacement = btn.replaceWith ?? '';
+  const next = source.replace(pattern, replacement);
+  setEditorContent(next);
+  emit('feedback', t('feedback_replaced', { count: (source.match(pattern) || []).length, item: btn.label }));
 }
 
 function handlePreviewApply(_correctedText: string) {
@@ -242,6 +291,18 @@ defineExpose({
   triggerFixAll,
   triggerDuplicateLine,
 });
+
+function handleCustomButtonsUpdated() {
+  customButtonsRevision.value++;
+}
+
+onMounted(() => {
+  window.addEventListener('gft-custom-buttons-updated', handleCustomButtonsUpdated);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('gft-custom-buttons-updated', handleCustomButtonsUpdated);
+});
 </script>
 
 <template>
@@ -258,6 +319,16 @@ defineExpose({
         @click="btn.action"
       >
         {{ t(btn.labelKey) }}
+      </button>
+
+      <button
+        v-for="btn in customCleanupButtons"
+        :key="btn.id"
+        type="button"
+        class="gft-u-btn"
+        @click="runCustomCleanup(btn)"
+      >
+        {{ btn.label }}
       </button>
 
       <button
@@ -313,7 +384,7 @@ defineExpose({
 .gft-cleanup-section__buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px;
 }
 
 .gft-cleanup-section__find-replace {

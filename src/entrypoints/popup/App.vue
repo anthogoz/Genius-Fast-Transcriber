@@ -160,8 +160,7 @@ function restartTutorial() {
   --accent-shadow: rgba(255, 255, 100, 0.1);
 
   width: 320px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    sans-serif;
+  font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
   padding: 16px;

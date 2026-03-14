@@ -213,6 +213,18 @@ function handleApply() {
   height: auto;
 }
 
+.gft-preview-btn.gft-u-btn {
+  background: #efefef;
+  border-color: #bdbdbd;
+  color: #1d1d1d;
+}
+
+.gft-dark-mode .gft-preview-btn.gft-u-btn {
+  background: #2f2f2f;
+  border-color: #555;
+  color: #efefef;
+}
+
 .gft-preview-btn:hover {
   opacity: 0.85;
 }

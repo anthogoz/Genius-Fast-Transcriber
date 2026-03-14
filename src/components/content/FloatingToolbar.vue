@@ -8,6 +8,7 @@ const props = defineProps<{
   visible: boolean;
   position: { x: number; y: number };
   lyricCardOnly?: boolean;
+  showNumberToWords?: boolean;
 }>();
 
 const emit = defineEmits(['bold', 'italic', 'numberToWords', 'lyricCard', 'adlib']);
@@ -24,13 +25,22 @@ const actions = computed<{ key: ToolbarAction; tooltipKey: string; icon: string 
     return [{ key: 'lyricCard', tooltipKey: 'toolbar_lyric_card_tooltip', icon: '🎨' }];
   }
 
-  return [
+  const baseActions: { key: ToolbarAction; tooltipKey: string; icon: string }[] = [
     { key: 'bold', tooltipKey: 'toolbar_bold_tooltip', icon: 'B' },
     { key: 'italic', tooltipKey: 'toolbar_italic_tooltip', icon: 'I' },
-    { key: 'numberToWords', tooltipKey: 'toolbar_num_to_words_tooltip', icon: '#' },
     { key: 'adlib', tooltipKey: 'cleanup_adlib_tooltip', icon: '( )' },
     { key: 'lyricCard', tooltipKey: 'toolbar_lyric_card_tooltip', icon: '🎨' },
   ];
+
+  if (props.showNumberToWords) {
+    baseActions.push({
+      key: 'numberToWords',
+      tooltipKey: 'toolbar_num_to_words_tooltip',
+      icon: '123→abc',
+    });
+  }
+
+  return baseActions;
 });
 
 function handleAction(action: ToolbarAction) {
@@ -61,7 +71,7 @@ function handleAction(action: ToolbarAction) {
       >
         <span v-if="action.key === 'bold'" style="font-weight: 800;">B</span>
         <span v-else-if="action.key === 'italic'" style="font-style: italic;">I</span>
-        <span v-else-if="action.key === 'numberToWords'">#→</span>
+        <span v-else-if="action.key === 'numberToWords'">123→abc</span>
         <span v-else-if="action.key === 'adlib'">( )</span>
         <span v-else>{{ action.icon }}</span>
       </button>

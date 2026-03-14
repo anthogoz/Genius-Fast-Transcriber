@@ -41,6 +41,7 @@ const searchError = ref(false);
 const showSearch = computed(() => imageSource.value === 'MANUAL_SEARCH');
 const currentUploadedImage = ref<string | null>(null);
 const artistImageCache = ref<Record<string, string>>({});
+const artistImageLabels = ref<Record<string, string>>({});
 
 const allArtists = computed(() => {
   return [...new Set([...props.mainArtists, ...props.featuringArtists])].filter(Boolean);
@@ -204,9 +205,30 @@ function onSearchInput() {
   }, 300);
 }
 
+function hashString(value: string): string {
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) {
+    hash = (hash << 5) - hash + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(36);
+}
+
+function buildSearchResultKey(candidate: ArtistSearchCandidate): string {
+  const normalizedName = candidate.name
+    .toLowerCase()
+    .normalize('NFKD')
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+  const normalizedUrl = candidate.image_url.trim().toLowerCase();
+  return `SEARCH_RESULT_${normalizedName}_${hashString(normalizedUrl)}`;
+}
+
 function applySearchResult(candidate: ArtistSearchCandidate) {
-  const key = `SEARCH_RESULT_${Date.now()}`;
+  const key = buildSearchResultKey(candidate);
   artistImageCache.value[key] = candidate.image_url;
+  artistImageLabels.value[key] = candidate.name;
   imageSource.value = key;
   searchResults.value = [];
   searchQuery.value = '';
@@ -302,7 +324,7 @@ onMounted(() => {
             :key="key"
             :value="key"
           >
-            {{ key }}
+            {{ artistImageLabels[key] || key }}
           </option>
         </select>
 
@@ -463,7 +485,7 @@ onMounted(() => {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='currentColor' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: calc(100% - 12px) center;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
   font-size: 14px;
   font-weight: 600;
   color: inherit;
@@ -610,7 +632,7 @@ onMounted(() => {
 .gft-lc-upload {
   padding: 10px 18px;
   border-radius: 999px;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
   font-size: 14px;
   font-weight: 600;
   border: 1px solid rgba(128, 128, 128, 0.2);
@@ -642,7 +664,7 @@ onMounted(() => {
 .gft-lc-btn {
   padding: 10px 18px;
   border-radius: 999px;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
   font-size: 14px;
   font-weight: 600;
   border: 1px solid rgba(128, 128, 128, 0.2);

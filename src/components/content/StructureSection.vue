@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useEditor } from '@/composables/useEditor';
 import { useGftState } from '@/composables/useGftState';
 import { useSettings } from '@/composables/useSettings';
+import type { CustomButton } from '@/types';
 import { formatArtistList } from '@/utils/artists';
 import ArtistSelector from './ArtistSelector.vue';
 import VerseCounter from './VerseCounter.vue';
@@ -13,7 +14,12 @@ const { locale, isTagNewlinesDisabled, isHeaderFeatEnabled } = useSettings();
 const { currentSongTitle, currentMainArtists, currentFeaturingArtists, incrementVerseCounter, verseCounter } = useGftState();
 const { insertTextAtCursor } = useEditor();
 
+const emit = defineEmits<{
+  openCustomLibrary: [defaultType: 'cleanup' | 'structure'];
+}>();
+
 const artistSelector = ref<InstanceType<typeof ArtistSelector> | null>(null);
+const customButtonsRevision = ref(0);
 
 interface StructureTag {
   key: string;
@@ -48,6 +54,20 @@ const visibleTags = computed(() =>
   }),
 );
 
+const showHeaderButton = computed(() => locale.value !== 'en');
+
+const customStructureButtons = computed<CustomButton[]>(() => {
+  void customButtonsRevision.value;
+  try {
+    const raw = localStorage.getItem('gftCustomButtons');
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as CustomButton[];
+    return parsed.filter((btn) => btn.type === 'structure' && typeof btn.content === 'string');
+  } catch {
+    return [];
+  }
+});
+
 function getSelectedArtists(): string[] {
   return artistSelector.value?.getSelectedArtists() ?? [];
 }
@@ -79,14 +99,17 @@ function insertTag(tagDef: StructureTag) {
 }
 
 function insertHeader() {
+  if (locale.value === 'en') return;
+
   const title = currentSongTitle.value;
-  const main = currentMainArtists.value;
   const feat = currentFeaturingArtists.value;
 
-  let headerText = `${formatArtistList(main)} - ${title} Lyrics`;
+  let headerText = `[Paroles de "${title}"`;
   if (isHeaderFeatEnabled.value && feat.length > 0) {
-    headerText += ` (Ft. ${formatArtistList(feat)})`;
+    headerText += ` ft. ${formatArtistList(feat)}`;
   }
+  headerText += ']';
+
   insertTextAtCursor(formatTag(headerText));
 }
 
@@ -107,7 +130,15 @@ function insertVerseByShortcut() {
 }
 
 function openCustomStructureButtonManager() {
-  // Placeholder UI control kept for parity with legacy layout.
+  emit('openCustomLibrary', 'structure');
+}
+
+function insertCustomStructureButton(button: CustomButton) {
+  if (!button.content) return;
+  const textToInsert = button.content.trim().startsWith('[')
+    ? addArtistsToTag(button.content)
+    : button.content;
+  insertTextAtCursor(formatTag(textToInsert));
 }
 
 defineExpose({
@@ -116,6 +147,18 @@ defineExpose({
   insertBridgeByShortcut: () => insertTagByKey('btn_bridge'),
   insertIntroByShortcut: () => insertTagByKey('btn_intro'),
   insertOutroByShortcut: () => insertTagByKey('btn_outro'),
+});
+
+function handleCustomButtonsUpdated() {
+  customButtonsRevision.value++;
+}
+
+onMounted(() => {
+  window.addEventListener('gft-custom-buttons-updated', handleCustomButtonsUpdated);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('gft-custom-buttons-updated', handleCustomButtonsUpdated);
 });
 </script>
 
@@ -131,6 +174,7 @@ defineExpose({
       <VerseCounter @insert="handleVerseInsert" />
 
       <button
+        v-if="showHeaderButton"
         :title="t('btn_header_tooltip')"
         type="button"
         class="gft-u-btn"
@@ -149,6 +193,16 @@ defineExpose({
           {{ t(tagDef.key) }}
         </button>
       </template>
+
+      <button
+        v-for="btn in customStructureButtons"
+        :key="btn.id"
+        type="button"
+        class="gft-u-btn gft-u-btn--tag"
+        @click="insertCustomStructureButton(btn)"
+      >
+        {{ btn.label }}
+      </button>
 
       <button
         :title="t('btn_add_custom_structure_title')"
@@ -176,6 +230,6 @@ defineExpose({
 .gft-structure-section__tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 4px;
 }
 </style>

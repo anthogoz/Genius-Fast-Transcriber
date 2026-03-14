@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { browser } from 'wxt/browser';
+import { useDraft } from '@/composables/useDraft';
 import { useEditor } from '@/composables/useEditor';
 import { useGftState } from '@/composables/useGftState';
 import { setLocale } from '@/i18n';
@@ -10,6 +11,9 @@ import { useSettings } from '@/composables/useSettings';
 import { useYoutubeControls } from '@/composables/useYoutubeControls';
 import { useUndoRedo } from '@/composables/useUndoRedo';
 import CleanupSection from './CleanupSection.vue';
+import CustomButtonManager from './CustomButtonManager.vue';
+import DraftNotification from './DraftNotification.vue';
+import ExportSection from './ExportSection.vue';
 import FeedbackToast from './FeedbackToast.vue';
 import ProgressBar from './ProgressBar.vue';
 import SettingsMenu from './SettingsMenu.vue';
@@ -21,11 +25,20 @@ const props = defineProps<{
 }>();
 
 const { t } = useI18n();
-const { isPanelCollapsed, isDarkMode, locale, transcriptionMode } = useSettings();
+const { isPanelCollapsed, isDarkMode, locale, transcriptionMode, areTooltipsEnabled } = useSettings();
 const { getEditorContent, setEditorContent } = useEditor();
 const { currentActiveEditor } = useGftState();
 const { togglePlayPause, seekBy } = useYoutubeControls();
 const { undo, redo, canUndo, canRedo } = useUndoRedo();
+const {
+  hasDraft,
+  draftTimestamp,
+  checkForDraft,
+  loadDraft,
+  discardDraft,
+  scheduleAutoSave,
+  cancelAutoSave,
+} = useDraft();
 
 const settingsVisible = ref(false);
 const panelRef = ref<HTMLElement | null>(null);
@@ -36,6 +49,10 @@ const progressStep = ref(0);
 const progressTotal = ref(0);
 const progressMessage = ref('');
 const showProgress = ref(false);
+const showDraftNotification = ref(false);
+const draftTime = ref('');
+const showCustomButtonManager = ref(false);
+const customManagerDefaultType = ref<'structure' | 'cleanup'>('structure');
 const structureSection = ref<{
   insertVerseByShortcut: () => void;
   insertChorusByShortcut: () => void;
@@ -61,10 +78,48 @@ function updateTranscriptionMode(mode: 'fr' | 'en' | 'pl') {
 
 function togglePanel() {
   isPanelCollapsed.value = !isPanelCollapsed.value;
+  if (isPanelCollapsed.value) {
+    settingsVisible.value = false;
+  }
 }
 
 function toggleSettings() {
+  if (isPanelCollapsed.value) return;
   settingsVisible.value = !settingsVisible.value;
+}
+
+function handleDocumentClick(event: MouseEvent) {
+  if (!settingsVisible.value) return;
+  const target = event.target as Node | null;
+  if (!target || !panelRef.value) return;
+  if (!panelRef.value.contains(target)) {
+    settingsVisible.value = false;
+  }
+}
+
+function maybeShowDraftNotification() {
+  const draft = checkForDraft();
+  if (draft) {
+    draftTime.value = draft.time;
+    showDraftNotification.value = true;
+  }
+}
+
+function restoreDraft() {
+  const draft = loadDraft();
+  if (!draft) {
+    showDraftNotification.value = false;
+    return;
+  }
+
+  setEditorContent(draft.content);
+  showFeedback(t('draft_restored'));
+  showDraftNotification.value = false;
+}
+
+function dismissDraftNotification() {
+  discardDraft();
+  showDraftNotification.value = false;
 }
 
 function handleUndo() {
@@ -100,6 +155,20 @@ function clearFeedback() {
   feedbackMessage.value = '';
 }
 
+function openCustomButtonManager(defaultType: 'structure' | 'cleanup' = 'structure') {
+  customManagerDefaultType.value = defaultType;
+  showCustomButtonManager.value = true;
+  settingsVisible.value = false;
+}
+
+function closeCustomButtonManager() {
+  showCustomButtonManager.value = false;
+}
+
+function handleCustomButtonsSaved() {
+  window.dispatchEvent(new Event('gft-custom-buttons-updated'));
+}
+
 function handleFixAllMain() {
   cleanupSection.value?.triggerFixAll();
 }
@@ -120,6 +189,7 @@ function hydrateTooltips(root: HTMLElement) {
 }
 
 function showCustomTooltip(target: HTMLElement) {
+  if (!areTooltipsEnabled.value) return;
   if (!tooltipEl) return;
   const text = target.dataset.gftTooltip;
   if (!text) return;
@@ -145,6 +215,10 @@ function hideCustomTooltip() {
 }
 
 function handlePanelMouseOver(event: MouseEvent) {
+  if (!areTooltipsEnabled.value) {
+    hideCustomTooltip();
+    return;
+  }
   if (!panelRef.value) return;
   const target = event.target as HTMLElement;
   const withTooltip = target.closest<HTMLElement>('[data-gft-tooltip]');
@@ -162,6 +236,8 @@ onMounted(async () => {
   await nextTick();
   if (!panelRef.value) return;
 
+  maybeShowDraftNotification();
+
   tooltipEl = document.createElement('div');
   tooltipEl.className = 'gft-custom-tooltip';
   tooltipEl.style.opacity = '0';
@@ -171,6 +247,7 @@ onMounted(async () => {
 
   panelRef.value.addEventListener('mouseover', handlePanelMouseOver);
   panelRef.value.addEventListener('mouseout', handlePanelMouseOut);
+  document.addEventListener('click', handleDocumentClick, true);
 
   tooltipObserver = new MutationObserver(() => {
     if (!panelRef.value) return;
@@ -179,13 +256,53 @@ onMounted(async () => {
   tooltipObserver.observe(panelRef.value, { childList: true, subtree: true });
 });
 
+watch(areTooltipsEnabled, (enabled) => {
+  if (!enabled) {
+    hideCustomTooltip();
+  }
+});
+
+let boundEditor: HTMLElement | null = null;
+let boundInputHandler: ((event: Event) => void) | null = null;
+
+function unbindEditorAutoSave() {
+  if (boundEditor && boundInputHandler) {
+    boundEditor.removeEventListener('input', boundInputHandler);
+  }
+  boundEditor = null;
+  boundInputHandler = null;
+}
+
+function bindEditorAutoSave(editor: HTMLElement | null) {
+  unbindEditorAutoSave();
+  if (!editor) return;
+
+  boundInputHandler = () => {
+    scheduleAutoSave(() => getEditorContent());
+  };
+
+  editor.addEventListener('input', boundInputHandler);
+  boundEditor = editor;
+}
+
+watch(currentActiveEditor, (nextEditor) => {
+  bindEditorAutoSave(nextEditor);
+});
+
+onMounted(() => {
+  bindEditorAutoSave(currentActiveEditor.value);
+});
+
 onBeforeUnmount(() => {
   panelRef.value?.removeEventListener('mouseover', handlePanelMouseOver);
   panelRef.value?.removeEventListener('mouseout', handlePanelMouseOut);
+  document.removeEventListener('click', handleDocumentClick, true);
   tooltipObserver?.disconnect();
   tooltipObserver = null;
   tooltipEl?.remove();
   tooltipEl = null;
+  unbindEditorAutoSave();
+  cancelAutoSave();
 });
 
 function isEditorFocused() {
@@ -278,6 +395,13 @@ defineExpose({
         </div>
       </div>
       <div class="gft-panel__header-right" @click.stop>
+        <span
+          v-if="hasDraft"
+          class="gft-panel__draft-indicator"
+          :title="`${t('draft_saved_at')} ${draftTimestamp || ''}`"
+        >
+          💾
+        </span>
         <select
           :value="transcriptionMode"
           class="gft-panel__mode-select"
@@ -320,13 +444,22 @@ defineExpose({
             :visible="settingsVisible"
             :show-stats="showStats"
             @toggle-stats="showStats = !showStats"
+            @open-custom-library="openCustomButtonManager('structure')"
             @close="settingsVisible = false"
           />
         </div>
       </div>
     </div>
 
-    <div v-show="!isPanelCollapsed" class="gft-panel__body">
+    <Transition name="gft-panel-collapse">
+      <div v-show="!isPanelCollapsed" class="gft-panel__body">
+        <DraftNotification
+          v-if="showDraftNotification"
+          :timestamp="draftTime"
+          @restore="restoreDraft"
+          @discard="dismissDraftNotification"
+        />
+
       <FeedbackToast
         v-if="feedbackMessage"
         :key="feedbackKey"
@@ -341,8 +474,11 @@ defineExpose({
         :message="progressMessage"
       />
 
-      <StructureSection ref="structureSection" />
-      <CleanupSection ref="cleanupSection" @feedback="handleFeedback" />
+      <StatsDisplay v-if="showStats" :content="editorContent" />
+
+      <StructureSection ref="structureSection" @open-custom-library="openCustomButtonManager" />
+      <CleanupSection ref="cleanupSection" @feedback="handleFeedback" @open-custom-library="openCustomButtonManager" />
+      <ExportSection />
 
       <button
         :title="t('global_fix_tooltip')"
@@ -352,8 +488,6 @@ defineExpose({
       >
         {{ t('btn_fix_all_short') }}
       </button>
-
-      <StatsDisplay v-if="showStats" :content="editorContent" />
 
       <div class="gft-panel__footer">
         <span class="gft-panel__footer-credit">Made with ❤️ by Lnkhey</span>
@@ -381,7 +515,16 @@ defineExpose({
         </a>
         <span class="gft-panel__footer-version">{{ panelVersion }}</span>
       </div>
-    </div>
+      </div>
+    </Transition>
+
+    <CustomButtonManager
+      :visible="showCustomButtonManager"
+      :default-type="customManagerDefaultType"
+      @feedback="handleFeedback"
+      @saved="handleCustomButtonsSaved"
+      @close="closeCustomButtonManager"
+    />
   </div>
 </template>
 
@@ -411,11 +554,20 @@ defineExpose({
   color: var(--gft-panel-text);
   border-radius: 6px;
   border: 1px solid var(--gft-panel-border);
-  overflow: hidden;
+  overflow: visible;
   font-size: 12px;
   width: 100%;
   box-shadow: none;
   margin-bottom: 30px;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.gft-panel input,
+.gft-panel textarea,
+.gft-panel [contenteditable='true'] {
+  user-select: text;
+  -webkit-user-select: text;
 }
 
 .gft-panel:not(.gft-dark-mode) {
@@ -514,6 +666,12 @@ defineExpose({
   gap: 6px;
 }
 
+.gft-panel__draft-indicator {
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0.65;
+}
+
 .gft-panel__settings-wrapper {
   position: relative;
 }
@@ -549,10 +707,21 @@ defineExpose({
   display: flex;
   flex-direction: column;
   gap: 4px;
+  overflow: visible;
 }
 
 .gft-panel--collapsed .gft-panel__body {
   display: none;
+}
+
+.gft-panel-collapse-enter-active,
+.gft-panel-collapse-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.gft-panel-collapse-enter-from,
+.gft-panel-collapse-leave-to {
+  opacity: 0;
 }
 
 .gft-panel__stats-toggle {
