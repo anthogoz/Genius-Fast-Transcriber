@@ -35,7 +35,7 @@ export function correctLineSpacing(text: string): { newText: string; corrections
     const currentLine = originalLines[i];
     linesWithAddedSpacing.push(currentLine);
 
-    if (currentLine.trim() !== '' && !isSectionTag(currentLine)) {
+    if (currentLine.trim() !== '') {
       if (i + 1 < originalLines.length) {
         const nextLine = originalLines[i + 1];
         if (nextLine.trim() !== '' && isSectionTag(nextLine)) {
