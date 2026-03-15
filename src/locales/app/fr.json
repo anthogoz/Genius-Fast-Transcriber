@@ -320,6 +320,8 @@
   "export_opt_no_tags": "📄 Sans tags [Couplet...]",
   "export_opt_no_spacing": "📄 Sans espacement",
   "export_opt_raw": "📄 Texte brut",
+  "export_preview": "Aperçu",
+  "export_download": "Télécharger (.txt)",
   "export_filename_suffix": " (GFT Export)",
   "footer_buy_me_a_coffee": "M'offrir une pinte",
   "footer_github": "GitHub",

@@ -86,14 +86,14 @@ watch([optNoTags, optNoSpacing], () => {
               </div>
               
               <div class="gft-export-preview">
-                <div class="gft-export-preview-header">Aperçu</div>
+                <div class="gft-export-preview-header">{{ t('export_preview') }}</div>
                 <textarea class="gft-export-preview-content" readonly v-model="previewText"></textarea>
               </div>
             </div>
             
             <div class="gft-export-footer">
               <button class="gft-btn-download" @click="handleDownload" type="button">
-                Télécharger (.txt)
+                {{ t('export_download') }}
               </button>
             </div>
           </div>
@@ -222,6 +222,7 @@ watch([optNoTags, optNoSpacing], () => {
 }
 
 .gft-btn-download {
+  font-family: inherit;
   background: #f9ff55;
   color: #000;
   border: none;

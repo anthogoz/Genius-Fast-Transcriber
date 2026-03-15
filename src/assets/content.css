@@ -55,7 +55,8 @@
 .gft-u-toast,
 .gft-floating-toolbar,
 .gft-onboarding,
-.gft-lc-modal {
+.gft-lc-modal,
+.gft-export-modal {
   font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
   user-select: none;
   -webkit-user-select: none;

@@ -317,6 +317,8 @@
   "export_opt_no_tags": "📄 No tags [Verse...]",
   "export_opt_no_spacing": "📄 No extra spacing",
   "export_opt_raw": "📄 Raw text",
+  "export_preview": "Preview",
+  "export_download": "Download (.txt)",
   "export_filename_suffix": " (GFT Export)",
   "footer_buy_me_a_coffee": "Buy Me a Coffee",
   "footer_github": "GitHub",
