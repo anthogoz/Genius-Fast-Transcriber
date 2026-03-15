@@ -77,17 +77,32 @@ export function useCorrections() {
   ): Promise<CorrectionResult> {
     const content = getEditorContent();
     saveState(content);
-    return applyAllTextCorrectionsAsync(content, locale.value, progressFn);
+    const songData = {
+      title: state.currentSongTitle,
+      mainArtists: state.currentMainArtists,
+      featuringArtists: state.currentFeaturingArtists,
+    };
+    return applyAllTextCorrectionsAsync(content, locale.value, progressFn, songData);
   }
 
   function applySyncCorrections(options?: Partial<CorrectionOptions>): CorrectionResult {
     const content = getEditorContent();
-    return applyAllTextCorrectionsToString(content, locale.value, options);
+    const songData = {
+      title: state.currentSongTitle,
+      mainArtists: state.currentMainArtists,
+      featuringArtists: state.currentFeaturingArtists,
+    };
+    return applyAllTextCorrectionsToString(content, locale.value, options, songData);
   }
 
   function previewCorrections(options?: Partial<CorrectionOptions>): CorrectionResult {
     const content = getEditorContent();
-    return applyAllTextCorrectionsToString(content, locale.value, options);
+    const songData = {
+      title: state.currentSongTitle,
+      mainArtists: state.currentMainArtists,
+      featuringArtists: state.currentFeaturingArtists,
+    };
+    return applyAllTextCorrectionsToString(content, locale.value, options, songData);
   }
 
   function applyAndSetCorrections(result: CorrectionResult) {

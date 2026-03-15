@@ -46,6 +46,7 @@ export interface CorrectionOptions {
   spacing: boolean;
   quoteSpaces: boolean;
   majuscules: boolean;
+  songHeader: boolean;
 }
 
 export interface CorrectionCounts {
@@ -59,6 +60,7 @@ export interface CorrectionCounts {
   spacing: number;
   quoteSpaces: number;
   majuscules: number;
+  songHeader: number;
 }
 
 export interface CorrectionResult {
@@ -75,6 +77,7 @@ export interface CorrectionRule {
     corrections: CorrectionCounts,
     opts: CorrectionOptions,
     locale: Locale,
+    songData?: SongData,
   ) => string;
 }
 

@@ -216,7 +216,9 @@
   "preview_opt_spacing": "Espacement (lignes)",
   "preview_opt_quote_spaces": "Espaces guillemets",
   "preview_opt_majuscules": "Majuscules",
-  "preview_stat_apostrophes": "apostrophe(s) '",
+    "preview_opt_songHeader": "SEO Header [Paroles de...]",
+    "preview_stat_songHeader": "en-tête SEO",
+    "preview_stat_apostrophes": "apostrophe(s) '",
   "preview_stat_quotes": "guillemet(s) français",
   "preview_stat_dash": "tiret(s) long(s)",
   "preview_stat_punctuation": "espace(s) ponctuation",
@@ -237,8 +239,9 @@
   "progress_step_quotes": "Correction des guillemets «»...",
   "progress_step_dash": "Correction des tirets longs...",
   "progress_step_spaces": "Suppression des doubles espaces...",
-  "progress_step_spacing": "Correction de l'espacement...",
-  "feedback_adlib_added": "(Ad-lib) ajouté !",
+    "progress_step_spacing": "Correction de l'espacement...",
+    "progress_step_songHeader": "Correction de l'en-tête SEO...",
+    "feedback_adlib_added": "(Ad-lib) ajouté !",
   "feedback_added": "ajouté !",
   "feedback_select_text_first": "⚠️ Sélectionnez du texte d'abord",
   "feedback_no_replacement": "Aucune occurrence trouvée.",
@@ -347,5 +350,6 @@
   "popup_status_error": "Erreur d'initialisation",
   "popup_restart_tutorial": "Relancer le tutoriel",
   "popup_light": "Clair",
-  "popup_dark": "Sombre"
+  "popup_dark": "Sombre",
+  "header_format": "[Paroles de \"{title}\"{feat}]"
 }

@@ -6,12 +6,19 @@ import { useGftState } from '@/composables/useGftState';
 import { useSettings } from '@/composables/useSettings';
 import type { CustomButton } from '@/types';
 import { formatArtistList } from '@/utils/artists';
+import { generateSongHeader } from '@/utils/corrections';
 import ArtistSelector from './ArtistSelector.vue';
 import VerseCounter from './VerseCounter.vue';
 
 const { t } = useI18n();
-const { locale, isTagNewlinesDisabled, isHeaderFeatEnabled } = useSettings();
-const { currentSongTitle, currentMainArtists, currentFeaturingArtists, incrementVerseCounter, verseCounter } = useGftState();
+const { locale, isTagNewlinesDisabled } = useSettings();
+const {
+  currentSongTitle,
+  currentMainArtists,
+  currentFeaturingArtists,
+  incrementVerseCounter,
+  verseCounter,
+} = useGftState();
 const { insertTextAtCursor } = useEditor();
 
 const emit = defineEmits<{
@@ -103,14 +110,14 @@ function insertTag(tagDef: StructureTag) {
 function insertHeader() {
   if (locale.value === 'en') return;
 
-  const title = currentSongTitle.value;
-  const feat = currentFeaturingArtists.value;
-
-  let headerText = `[Paroles de "${title}"`;
-  if (isHeaderFeatEnabled.value && feat.length > 0) {
-    headerText += ` ft. ${formatArtistList(feat)}`;
-  }
-  headerText += ']';
+  const headerText = generateSongHeader(
+    {
+      title: currentSongTitle.value,
+      mainArtists: currentMainArtists.value,
+      featuringArtists: currentFeaturingArtists.value,
+    },
+    locale.value,
+  );
 
   insertTextAtCursor(formatTag(headerText));
   emit('feedback', `🏠 ${t('btn_header')} ${t('feedback_added', 'ajouté !')}`);

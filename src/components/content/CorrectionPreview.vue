@@ -2,7 +2,7 @@
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useSettings } from '@/composables/useSettings';
-import type { CorrectionCounts, CorrectionOptions, CorrectionResult } from '@/types';
+import type { CorrectionCounts, CorrectionOptions, CorrectionResult, SongData } from '@/types';
 import { applyAllTextCorrectionsToString } from '@/utils/corrections';
 import { highlightDifferences } from '@/utils/diff';
 
@@ -12,6 +12,7 @@ const { isDarkMode, locale } = useSettings();
 const props = defineProps<{
   originalText: string;
   correctionResult: CorrectionResult;
+  songData?: SongData;
 }>();
 
 const emit = defineEmits<{
@@ -30,6 +31,7 @@ const options = ref<CorrectionOptions>({
   spacing: true,
   quoteSpaces: true,
   majuscules: true,
+  songHeader: true,
 });
 
 const currentResult = ref<CorrectionResult>(props.correctionResult);
@@ -59,6 +61,7 @@ const optionDefs = computed<OptionDef[]>(() => [
   { key: 'spacing', labelKey: 'preview_opt_spacing', statKey: 'spacing', statLabelKey: 'preview_stat_spacing' },
   { key: 'quoteSpaces', labelKey: 'preview_opt_quote_spaces', statKey: 'quoteSpaces', statLabelKey: 'preview_stat_quote_spaces' },
   { key: 'majuscules', labelKey: 'preview_opt_majuscules', statKey: 'majuscules', statLabelKey: 'preview_stat_majuscules' },
+  { key: 'songHeader', labelKey: 'preview_opt_songHeader', statKey: 'songHeader', statLabelKey: 'preview_stat_songHeader' },
 ]);
 
 const visibleOptions = computed(() => optionDefs.value.filter((o) => o.show !== false));
@@ -75,6 +78,7 @@ function updatePreview() {
     props.originalText,
     locale.value,
     options.value,
+    props.songData,
   );
 }
 

@@ -208,6 +208,7 @@
   "feedback_no_text_corrections": "Brak poprawek tekstu. Zweryfikuj nawiasy.",
   "feedback_brackets_ok": "Nie znaleziono żadnych problemów! Wszystkie nawiasy są domknięte.",
   "feedback_brackets_issue": "Znaleziono {count} niesparowany nawias i zaznaczono go na czerwono!|Znaleziono {count} niesparowane nawiasy i zaznaczono je na czerwono!|Znaleziono {count} niesparowanych nawiasów i zaznaczono je na czerwono!",
+  "preview_stat_songHeader": "Nagłówek SEO",
   "stats_lines": "linia|linie|linii",
   "stats_words": "słowo|słowa|słów",
   "stats_sections": "sekcja|sekcje|sekcji",
@@ -243,6 +244,7 @@
   "preview_stat_quote_spaces": "spacja wewnątrz cudzysłowu|spacje wewnątrz cudzysłowu|spacji wewnątrz cudzysłowu",
   "preview_stat_orphans": "sierotka|sierotki|sierotek",
   "preview_opt_orphans": "Sierotki (spójniki)",
+  "preview_opt_songHeader": "Nagłówek SEO [Słowa do...]",
   "draft_found_title": "Znaleziono wersję roboczą!",
   "draft_saved_at": "Zapisano o",
   "draft_btn_restore": "Przywróć",
@@ -263,6 +265,7 @@
   "progress_step_dash": "Poprawianie myślników…",
   "progress_step_spaces": "Usuwanie podwójnych spacji…",
   "progress_step_spacing": "Poprawianie odstępów…",
+  "progress_step_songHeader": "Poprawianie nagłówka SEO…",
   "feedback_adlib_added": "Otoczono tekst nawiasami!",
   "feedback_no_correction_needed": "Zamiana {item} nie jest wymagana",
   "feedback_corrected": "Poprawiono {count} {item}!",
@@ -299,7 +302,6 @@
   "export_opt_standard": "📄 Standardowy tekst",
   "export_opt_no_tags": "📄 Bez tagów sekcji",
   "export_opt_no_spacing": "📄 Bez pustych linii",
-  "export_opt_raw": "📄 Czysty tekst",
   "export_opt_raw": "📄 Czysty tekst",
   "export_preview": "Podgląd",
   "export_download": "Pobierz (.txt)",
@@ -338,5 +340,6 @@
   "yt_play_pause": "YouTube Odtwórz/wstrzymaj",
   "yt_seek_back": "YouTube Przewiń w tył o 5 sek.",
   "yt_seek_forward": "YouTube Przewiń w przód o 5 sek.",
-  "duplicate_line": "📋 Duplikuj linię"
+  "duplicate_line": "📋 Duplikuj linię",
+  "header_format": "[Słowa do utworu \"{title}\"{feat}]"
 }

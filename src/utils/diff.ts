@@ -3,19 +3,16 @@ import type { DiffChunk } from '@/types';
 export function computeDiff(original: string, modified: string): DiffChunk[] {
   const m = original.length;
   const n = modified.length;
-
-  // Use Int32Array to save memory on large strings
   const dp = new Int32Array((m + 1) * (n + 1));
 
   for (let i = 1; i <= m; i++) {
+    const row = i * (n + 1);
+    const prevRow = (i - 1) * (n + 1);
     for (let j = 1; j <= n; j++) {
       if (original[i - 1] === modified[j - 1]) {
-        dp[i * (n + 1) + j] = dp[(i - 1) * (n + 1) + (j - 1)] + 1;
+        dp[row + j] = dp[prevRow + (j - 1)] + 1;
       } else {
-        dp[i * (n + 1) + j] = Math.max(
-          dp[(i - 1) * (n + 1) + j],
-          dp[i * (n + 1) + (j - 1)],
-        );
+        dp[row + j] = Math.max(dp[prevRow + j], dp[row + (j - 1)]);
       }
     }
   }
@@ -23,53 +20,46 @@ export function computeDiff(original: string, modified: string): DiffChunk[] {
   const chunks: DiffChunk[] = [];
   let i = m;
   let j = n;
-  let currentCommon = '';
-  let currentAdded = '';
-  let currentRemoved = '';
+
+  let currentCommon: string[] = [];
+  let currentAdded: string[] = [];
+  let currentRemoved: string[] = [];
+
+  const flush = (type: 'added' | 'removed' | 'common' | 'all') => {
+    if ((type === 'common' || type === 'all') && currentCommon.length > 0) {
+      chunks.push({ type: 'common', value: currentCommon.reverse().join('') });
+      currentCommon = [];
+    }
+    if ((type === 'added' || type === 'all') && currentAdded.length > 0) {
+      chunks.push({ type: 'added', value: currentAdded.reverse().join('') });
+      currentAdded = [];
+    }
+    if ((type === 'removed' || type === 'all') && currentRemoved.length > 0) {
+      chunks.push({ type: 'removed', value: currentRemoved.reverse().join('') });
+      currentRemoved = [];
+    }
+  };
 
   while (i > 0 || j > 0) {
     if (i > 0 && j > 0 && original[i - 1] === modified[j - 1]) {
-      if (currentAdded) {
-        chunks.unshift({ type: 'added', value: currentAdded });
-        currentAdded = '';
-      }
-      if (currentRemoved) {
-        chunks.unshift({ type: 'removed', value: currentRemoved });
-        currentRemoved = '';
-      }
-      currentCommon = original[i - 1] + currentCommon;
+      flush('added');
+      flush('removed');
+      currentCommon.push(original[i - 1]);
       i--;
       j--;
     } else if (j > 0 && (i === 0 || dp[i * (n + 1) + (j - 1)] >= dp[(i - 1) * (n + 1) + j])) {
-      if (currentCommon) {
-        chunks.unshift({ type: 'common', value: currentCommon });
-        currentCommon = '';
-      }
-      if (currentRemoved) {
-        chunks.unshift({ type: 'removed', value: currentRemoved });
-        currentRemoved = '';
-      }
-      currentAdded = modified[j - 1] + currentAdded;
+      flush('common');
+      currentAdded.push(modified[j - 1]);
       j--;
     } else {
-      if (currentCommon) {
-        chunks.unshift({ type: 'common', value: currentCommon });
-        currentCommon = '';
-      }
-      if (currentAdded) {
-        chunks.unshift({ type: 'added', value: currentAdded });
-        currentAdded = '';
-      }
-      currentRemoved = original[i - 1] + currentRemoved;
+      flush('common');
+      currentRemoved.push(original[i - 1]);
       i--;
     }
   }
 
-  if (currentCommon) chunks.unshift({ type: 'common', value: currentCommon });
-  if (currentAdded) chunks.unshift({ type: 'added', value: currentAdded });
-  if (currentRemoved) chunks.unshift({ type: 'removed', value: currentRemoved });
-
-  return chunks;
+  flush('all');
+  return chunks.reverse();
 }
 
 function computeLineDiff(original: string, modified: string): DiffChunk[] {
@@ -80,11 +70,13 @@ function computeLineDiff(original: string, modified: string): DiffChunk[] {
 
   const dp = new Int32Array((m + 1) * (n + 1));
   for (let i = 1; i <= m; i++) {
+    const row = i * (n + 1);
+    const prevRow = (i - 1) * (n + 1);
     for (let j = 1; j <= n; j++) {
       if (originalLines[i - 1] === modifiedLines[j - 1]) {
-        dp[i * (n + 1) + j] = dp[(i - 1) * (n + 1) + (j - 1)] + 1;
+        dp[row + j] = dp[prevRow + (j - 1)] + 1;
       } else {
-        dp[i * (n + 1) + j] = Math.max(dp[(i - 1) * (n + 1) + j], dp[i * (n + 1) + (j - 1)]);
+        dp[row + j] = Math.max(dp[prevRow + j], dp[row + (j - 1)]);
       }
     }
   }
@@ -95,36 +87,35 @@ function computeLineDiff(original: string, modified: string): DiffChunk[] {
   while (i > 0 || j > 0) {
     if (i > 0 && j > 0 && originalLines[i - 1] === modifiedLines[j - 1]) {
       const line = `${originalLines[i - 1]}${i < m ? '\n' : ''}`;
-      if (chunks.length > 0 && chunks[0].type === 'common') {
-        chunks[0].value = line + chunks[0].value;
+      if (chunks.length > 0 && chunks[chunks.length - 1].type === 'common') {
+        chunks[chunks.length - 1].value = line + chunks[chunks.length - 1].value;
       } else {
-        chunks.unshift({ type: 'common', value: line });
+        chunks.push({ type: 'common', value: line });
       }
       i--; j--;
     } else if (j > 0 && (i === 0 || dp[i * (n + 1) + (j - 1)] >= dp[(i - 1) * (n + 1) + j])) {
       const line = `${modifiedLines[j - 1]}${j < n ? '\n' : ''}`;
-      if (chunks.length > 0 && chunks[0].type === 'added') {
-        chunks[0].value = line + chunks[0].value;
+      if (chunks.length > 0 && chunks[chunks.length - 1].type === 'added') {
+        chunks[chunks.length - 1].value = line + chunks[chunks.length - 1].value;
       } else {
-        chunks.unshift({ type: 'added', value: line });
+        chunks.push({ type: 'added', value: line });
       }
       j--;
     } else {
       const line = `${originalLines[i - 1]}${i < m ? '\n' : ''}`;
-      if (chunks.length > 0 && chunks[0].type === 'removed') {
-        chunks[0].value = line + chunks[0].value;
+      if (chunks.length > 0 && chunks[chunks.length - 1].type === 'removed') {
+        chunks[chunks.length - 1].value = line + chunks[chunks.length - 1].value;
       } else {
-        chunks.unshift({ type: 'removed', value: line });
+        chunks.push({ type: 'removed', value: line });
       }
       i--;
     }
   }
-  return chunks;
+  return chunks.reverse();
 }
 
-
 export function highlightDifferences(originalText: string, correctedText: string): string {
-  const MAX_DP_MATRIX_CELLS = 2_500_000;
+  const MAX_DP_MATRIX_CELLS = 30_000_000;
 
   function escapeHtml(text: string): string {
     return text

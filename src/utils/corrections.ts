@@ -4,6 +4,7 @@ import type {
   CorrectionResult,
   CorrectionRule,
   Locale,
+  SongData,
 } from '@/types';
 
 export function isSectionTag(line: string): boolean {
@@ -356,7 +357,56 @@ export const CORRECTION_RULES: CorrectionRule[] = [
       return robustLines.join('\n');
     },
   },
+  {
+    id: 'songHeader',
+    progressKey: 'progress_step_songHeader',
+    execute: (text, corrections, opts, locale, songData) => {
+      if (!opts.songHeader || !songData || locale === 'en') return text;
+
+      const lines = text.split('\n');
+      let headerIndex = -1;
+      const frPattern = /^\[Paroles de.*\]$/i;
+      const plPattern = /^\[Słowa do.*\]$/i;
+
+      for (let i = 0; i < Math.min(lines.length, 5); i++) {
+        const trimmed = lines[i].trim();
+        if (frPattern.test(trimmed) || plPattern.test(trimmed)) {
+          headerIndex = i;
+          break;
+        }
+      }
+
+      const expectedHeader = generateSongHeader(songData, locale);
+
+      if (headerIndex !== -1) {
+        if (lines[headerIndex].trim() !== expectedHeader) {
+          lines[headerIndex] = expectedHeader;
+          corrections.songHeader = 1;
+          return lines.join('\n');
+        }
+        return text;
+      }
+
+      corrections.songHeader = 1;
+      return `${expectedHeader}\n\n${text.trimStart()}`;
+    },
+  },
 ];
+
+export function generateSongHeader(songData: SongData, locale: Locale): string {
+  let featStr = '';
+  if (songData.featuringArtists.length > 0) {
+    featStr =
+      (locale === 'fr' ? ' ft. ' : ' (feat. ') +
+      songData.featuringArtists.join(', ') +
+      (locale === 'pl' ? ')' : '');
+  }
+
+  return locale === 'fr'
+    ? `[Paroles de "${songData.title}"${featStr}]`
+    : `[Słowa do utworu "${songData.title}"${featStr}]`;
+}
+
 
 export function getDefaultOptions(options: Partial<CorrectionOptions> = {}): CorrectionOptions {
   return {
@@ -370,6 +420,7 @@ export function getDefaultOptions(options: Partial<CorrectionOptions> = {}): Cor
     spacing: options.spacing !== false,
     quoteSpaces: options.quoteSpaces !== false,
     majuscules: options.majuscules !== false,
+    songHeader: options.songHeader !== false,
   };
 }
 
@@ -385,6 +436,7 @@ function initCorrectionsObject(): CorrectionCounts {
     spacing: 0,
     quoteSpaces: 0,
     majuscules: 0,
+    songHeader: 0,
   };
 }
 
@@ -396,13 +448,14 @@ export function applyAllTextCorrectionsToString(
   text: string,
   locale: Locale,
   options: Partial<CorrectionOptions> = {},
+  songData?: SongData,
 ): CorrectionResult {
   const opts = getDefaultOptions(options);
   let currentText = text;
   const corrections = initCorrectionsObject();
 
   for (const rule of CORRECTION_RULES) {
-    currentText = rule.execute(currentText, corrections, opts, locale);
+    currentText = rule.execute(currentText, corrections, opts, locale, songData);
   }
 
   return {
@@ -416,6 +469,7 @@ export async function applyAllTextCorrectionsAsync(
   text: string,
   locale: Locale,
   showProgressFn?: (step: number, total: number, message: string) => void,
+  songData?: SongData,
 ): Promise<CorrectionResult> {
   const showProgress = showProgressFn ?? (() => {});
   const opts = getDefaultOptions({});
@@ -432,7 +486,7 @@ export async function applyAllTextCorrectionsAsync(
 
     await new Promise<void>((resolve) => setTimeout(resolve, 50));
 
-    currentText = rule.execute(currentText, corrections, opts, locale);
+    currentText = rule.execute(currentText, corrections, opts, locale, songData);
   }
 
   return {

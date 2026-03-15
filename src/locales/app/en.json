@@ -210,6 +210,8 @@
   "preview_stat_quote_spaces": "internal quote space(s)",
   "preview_stat_orphans": "orphans",
   "preview_opt_orphans": "Orphans (Polish rules)",
+  "preview_opt_songHeader": "SEO Header",
+  "preview_stat_songHeader": "SEO header",
   "feedback_detail_orphans": "{count} orphan|{count} orphans",
   "feedback_replaced": "{count} {item} replaced!",
   "feedback_no_replacement": "No replacement made.",
@@ -250,6 +252,7 @@
   "progress_step_dash": "Fixing long dashes...",
   "progress_step_spaces": "Removing double spaces...",
   "progress_step_spacing": "Fixing spacing...",
+  "progress_step_songHeader": "Correcting SEO header...",
   "feedback_adlib_added": "(Ad-lib) added!",
   "feedback_added": "added!",
   "feedback_select_text_first": "⚠️ Select text first",
@@ -344,5 +347,6 @@
   "popup_status_error": "Initialization error",
   "popup_restart_tutorial": "Restart tutorial",
   "popup_light": "Light",
-  "popup_dark": "Dark"
+  "popup_dark": "Dark",
+  "header_format": "[Lyrics of \"{title}\"{feat}]"
 }

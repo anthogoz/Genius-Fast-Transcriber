@@ -3,13 +3,15 @@ import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useCorrections } from '@/composables/useCorrections';
 import { useEditor } from '@/composables/useEditor';
+import { useGftState } from '@/composables/useGftState';
 import { useSettings } from '@/composables/useSettings';
-import type { CorrectionResult, CustomButton } from '@/types';
+import type { CorrectionResult, CustomButton, SongData } from '@/types';
 import CorrectionPreview from './CorrectionPreview.vue';
 import FindReplace from './FindReplace.vue';
 
 const { t } = useI18n();
 const { locale } = useSettings();
+const { state } = useGftState();
 const {
   applySyncCorrections,
   previewCorrections,
@@ -175,6 +177,12 @@ const cleanupButtons = computed<CleanupButton[]>(() => {
   return buttons;
 });
 
+const currentSongData = computed<SongData>(() => ({
+  title: state.currentSongTitle,
+  mainArtists: state.currentMainArtists,
+  featuringArtists: state.currentFeaturingArtists,
+}));
+
 const customCleanupButtons = computed<CustomButton[]>(() => {
   void customButtonsRevision.value;
   try {
@@ -198,6 +206,8 @@ function applySingleCorrection(opts: Record<string, boolean>, itemName: string) 
     doubleSpaces: false,
     spacing: false,
     quoteSpaces: false,
+    majuscules: false,
+    songHeader: false,
   };
   const result = applySyncCorrections({ ...disableAll, ...opts });
   if (result.correctionsCount > 0) {
@@ -385,6 +395,7 @@ onUnmounted(() => {
       v-if="showPreview && previewResult"
       :original-text="previewOriginal"
       :correction-result="previewResult"
+      :song-data="currentSongData"
       @apply="handlePreviewApply"
       @cancel="handlePreviewCancel"
     />
