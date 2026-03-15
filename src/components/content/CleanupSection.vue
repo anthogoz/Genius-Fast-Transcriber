@@ -213,7 +213,7 @@ function handleCheckBrackets() {
   if (issues.length === 0) {
     emit('feedback', t('feedback_brackets_ok'));
   } else {
-    emit('feedback', t('feedback_brackets_issue', { count: issues.length }));
+    emit('feedback', (t as any)('feedback_brackets_issue', issues.length, { count: issues.length }));
   }
 }
 
@@ -226,7 +226,7 @@ function handleFixAll() {
   
   if (result.correctionsCount === 0 || result.newText === original) {
     if (bracketIssues.length > 0) {
-      emit('feedback', t('feedback_brackets_issue', { count: bracketIssues.length }));
+      emit('feedback', (t as any)('feedback_brackets_issue', bracketIssues.length, { count: bracketIssues.length }));
     } else {
       emit('feedback', t('feedback_no_text_corrections'));
     }
@@ -239,7 +239,7 @@ function handleFixAll() {
   
   if (bracketIssues.length > 0) {
     // On notifie quand même pour les brackets même si la preview s'ouvre
-    emit('feedback', t('feedback_brackets_issue', { count: bracketIssues.length }));
+    emit('feedback', (t as any)('feedback_brackets_issue', bracketIssues.length, { count: bracketIssues.length }));
   }
 }
 
@@ -284,7 +284,7 @@ function handlePreviewApply(_correctedText: string) {
   showPreview.value = false;
   if (previewResult.value) {
     applyAndSetCorrections(previewResult.value);
-    emit('feedback', `🚀 ${t('feedback_summary_correction', { count: previewResult.value.correctionsCount })}`);
+    emit('feedback', `🚀 ${(t as any)('feedback_summary_correction', previewResult.value.correctionsCount, { count: previewResult.value.correctionsCount })}`);
   }
 }
 

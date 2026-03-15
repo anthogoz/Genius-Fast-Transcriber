@@ -32,9 +32,7 @@ const stats = computed<LyricsStats>(() => {
 });
 
 function pluralize(key: string, count: number): string {
-  const forms = t(key).split('|');
-  if (forms.length === 1) return forms[0];
-  return count === 1 ? forms[0] : forms[forms.length - 1];
+  return (t as any)(key, count);
 }
 </script>
 

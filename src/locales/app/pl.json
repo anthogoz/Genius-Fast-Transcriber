@@ -207,7 +207,7 @@
   "feedback_select_text_first": "⚠️ Zaznacz najpierw tekst",
   "feedback_no_text_corrections": "Brak poprawek tekstu. Zweryfikuj nawiasy.",
   "feedback_brackets_ok": "Nie znaleziono żadnych problemów! Wszystkie nawiasy są domknięte.",
-  "feedback_brackets_issue": "Znaleziono {count} niesparowanych nawiasów i zaznaczono je na czerwono!",
+  "feedback_brackets_issue": "Znaleziono {count} niesparowany nawias i zaznaczono go na czerwono!|Znaleziono {count} niesparowane nawiasy i zaznaczono je na czerwono!|Znaleziono {count} niesparowanych nawiasów i zaznaczono je na czerwono!",
   "stats_lines": "linia|linie|linii",
   "stats_words": "słowo|słowa|słów",
   "stats_sections": "sekcja|sekcje|sekcji",

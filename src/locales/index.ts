@@ -11,6 +11,16 @@ export const i18n = createI18n({
   locale: 'fr',
   fallbackLocale: 'fr',
   messages: { fr, en, pl },
+  pluralizationRules: {
+    pl: (choice: number) => {
+      if (choice === 0) return 2;
+      if (choice === 1) return 0;
+      const teen = choice % 100 > 10 && choice % 100 < 20;
+      const endsWith = choice % 10;
+      if (!teen && endsWith > 1 && endsWith < 5) return 1;
+      return 2;
+    },
+  },
 });
 
 export function setLocale(locale: Locale) {
