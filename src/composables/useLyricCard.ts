@@ -12,6 +12,7 @@ type LyricCardConfig = {
   getSongTitle: () => string;
   getMainArtists: () => string[];
   getFeaturingArtists: () => string[];
+  showFeedback: (message: string) => void;
 };
 
 function getFallbackSelectionText(): string {
@@ -100,12 +101,19 @@ export function useLyricCard(config: LyricCardConfig) {
     }
 
     const primaryArtistName = mainArtists[0] ?? null;
+    config.showFeedback(`⏳ ${config.t('lc_searching_artist')}`);
+    
     let artistUrl = await fetchArtistImageFromApi(primaryArtistName, config.t('lc_unknown_artist'));
+    if (artistUrl) {
+      config.showFeedback(`✅ ${config.t('lc_img_found')}`);
+    }
+
     if (!artistUrl) {
       artistUrl = extractArtistImage(albumUrl, mainArtists);
     }
 
     config.hideToolbar();
+    config.showFeedback(`🎨 ${config.t('lc_opening')}`);
 
     mountLyricCardModal(config, {
       text: selectedText,

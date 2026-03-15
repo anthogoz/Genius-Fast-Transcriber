@@ -16,6 +16,7 @@ const { insertTextAtCursor } = useEditor();
 
 const emit = defineEmits<{
   openCustomLibrary: [defaultType: 'cleanup' | 'structure'];
+  feedback: [message: string];
 }>();
 
 const artistSelector = ref<InstanceType<typeof ArtistSelector> | null>(null);
@@ -96,6 +97,7 @@ function insertTag(tagDef: StructureTag) {
   const baseTag = buildTagText(tagDef.key);
   const withArtists = tagDef.withArtists ? addArtistsToTag(baseTag) : baseTag;
   insertTextAtCursor(formatTag(withArtists));
+  emit('feedback', `${t(tagDef.key)} ${t('feedback_added', 'ajouté !')}`);
 }
 
 function insertHeader() {
@@ -111,12 +113,14 @@ function insertHeader() {
   headerText += ']';
 
   insertTextAtCursor(formatTag(headerText));
+  emit('feedback', `🏠 ${t('btn_header')} ${t('feedback_added', 'ajouté !')}`);
 }
 
 function handleVerseInsert(tag: string) {
   const withArtists = addArtistsToTag(tag);
   insertTextAtCursor(formatTag(withArtists));
   incrementVerseCounter();
+  emit('feedback', `📝 ${tag} ${t('feedback_added', 'ajouté !')}`);
 }
 
 function insertTagByKey(key: string) {

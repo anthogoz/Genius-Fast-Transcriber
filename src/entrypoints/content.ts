@@ -1,6 +1,7 @@
 import { createApp, defineComponent, h, reactive } from 'vue';
 import { browser } from 'wxt/browser';
 import '@/assets/content.css';
+import FeedbackToast from '@/components/content/FeedbackToast.vue';
 import FloatingToolbar from '@/components/content/FloatingToolbar.vue';
 import GftPanel from '@/components/content/GftPanel.vue';
 import NativeExportButton from '@/components/content/NativeExportButton.vue';
@@ -28,10 +29,19 @@ export default defineContentScript({
     const { setEditor, setArtists, setSongTitle, state } = useGftState();
     const { extractSongData } = useSongData();
 
+    // Global Feedback Toast
+    const feedbackContainer = document.createElement('div');
+    feedbackContainer.id = 'gft-feedback-root';
+    document.body.appendChild(feedbackContainer);
+    const feedbackApp = createApp(FeedbackToast);
+    feedbackApp.use(i18n);
+    feedbackApp.mount(feedbackContainer);
+
     setLocale(settings.locale.value);
 
     const GFT_VERSION = browser.runtime.getManifest().version;
     let cleanupFloatingToolbar: (() => void) | null = null;
+    let panelApp: any = null;
 
     if (!settings.isTutorialCompleted.value) {
       await showOnboarding(ctx);
@@ -40,6 +50,18 @@ export default defineContentScript({
     setupMessageListener();
 
     if (settings.isLyricCardOnly.value) {
+      const updateMetadata = () => {
+        const songData = extractSongData();
+        setSongTitle(songData.title);
+        setArtists(songData.mainArtists, songData.featuringArtists);
+      };
+      
+      updateMetadata();
+      // Observer pour mettre à jour si les données arrivent tardivement ou changent (navigation SPA)
+      const metaObserver = new MutationObserver(() => updateMetadata());
+      metaObserver.observe(document.head, { childList: true, subtree: true, characterData: true });
+      metaObserver.observe(document.body, { childList: true, subtree: true });
+      
       initFloatingToolbar(true);
       return;
     }
@@ -124,7 +146,15 @@ export default defineContentScript({
         const divEditor = document.querySelector<HTMLElement>(SELECTORS.DIV_EDITOR);
 
         if (!(textarea || divEditor)) {
+          setEditor(null, null);
+          unmountPanel();
           observeRoot(document.body);
+
+          const songData = extractSongData();
+          if (songData.title !== 'TITRE INCONNU' || state.currentSongTitle === 'TITRE INCONNU') {
+            setSongTitle(songData.title);
+            setArtists(songData.mainArtists, songData.featuringArtists);
+          }
           return;
         }
 
@@ -176,9 +206,20 @@ export default defineContentScript({
     }
 
     function mountVueApp(container: HTMLElement) {
-      const app = createApp(GftPanel, { version: GFT_VERSION });
-      app.use(i18n);
-      app.mount(container);
+      panelApp = createApp(GftPanel, { version: GFT_VERSION });
+      panelApp.use(i18n);
+      panelApp.mount(container);
+    }
+
+    function unmountPanel() {
+      if (panelApp) {
+        panelApp.unmount();
+        panelApp = null;
+      }
+      const existingPanel = document.getElementById('gft-panel-root');
+      if (existingPanel) {
+        existingPanel.remove();
+      }
     }
 
     async function showOnboarding(_ctx: any) {
@@ -226,6 +267,12 @@ export default defineContentScript({
         getSongTitle: () => state.currentSongTitle,
         getMainArtists: () => state.currentMainArtists,
         getFeaturingArtists: () => state.currentFeaturingArtists,
+        showFeedback: (msg: string) => {
+          // Si le panneau est monté, on peut appeler son showFeedback
+          // Mais plus simple ici : on peut dispatcher un événement custom
+          // que GftPanel écoutera, ou utiliser le state global
+          window.dispatchEvent(new CustomEvent('gft-show-feedback', { detail: { message: msg } }));
+        }
       });
 
       function hideToolbar() {
@@ -355,7 +402,7 @@ export default defineContentScript({
       }
 
       function updateToolbarPosition() {
-        if (!isValidSelection()) {
+        if (!isValidSelection() || document.getElementById('gft-lyric-card-modal-root')) {
           hideToolbar();
           return;
         }

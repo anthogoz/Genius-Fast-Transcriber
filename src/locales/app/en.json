@@ -247,6 +247,7 @@
   "progress_step_spaces": "Removing double spaces...",
   "progress_step_spacing": "Fixing spacing...",
   "feedback_adlib_added": "(Ad-lib) added!",
+  "feedback_added": "added!",
   "feedback_select_text_first": "⚠️ Select text first",
   "feedback_no_correction_needed": "No {item} correction needed.",
   "feedback_corrected": "{count} {item} corrected!",

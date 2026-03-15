@@ -329,5 +329,6 @@
   "popup_status_error": "Błąd inicjalizacji",
   "popup_restart_tutorial": "Uruchom samouczek ponownie",
   "popup_light": "Jasny",
-  "popup_dark": "Ciemny"
+  "popup_dark": "Ciemny",
+  "feedback_added": "dodano!"
 }

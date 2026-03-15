@@ -13,7 +13,6 @@ import { useUndoRedo } from '@/composables/useUndoRedo';
 import CleanupSection from './CleanupSection.vue';
 import CustomButtonManager from './CustomButtonManager.vue';
 import DraftNotification from './DraftNotification.vue';
-import FeedbackToast from './FeedbackToast.vue';
 import ProgressBar from './ProgressBar.vue';
 import SettingsMenu from './SettingsMenu.vue';
 import StatsDisplay from './StatsDisplay.vue';
@@ -43,7 +42,6 @@ const settingsVisible = ref(false);
 const panelRef = ref<HTMLElement | null>(null);
 const showStats = ref(false);
 const feedbackMessage = ref('');
-const feedbackKey = ref(0);
 const progressStep = ref(0);
 const progressTotal = ref(0);
 const progressMessage = ref('');
@@ -142,8 +140,7 @@ function handleRedo() {
 }
 
 function showFeedback(message: string) {
-  feedbackMessage.value = message;
-  feedbackKey.value++;
+  window.dispatchEvent(new CustomEvent('gft-show-feedback', { detail: { message } }));
 }
 
 function handleFeedback(message: string) {
@@ -151,7 +148,7 @@ function handleFeedback(message: string) {
 }
 
 function clearFeedback() {
-  feedbackMessage.value = '';
+  // No longer needed internally
 }
 
 function openCustomButtonManager(defaultType: 'structure' | 'cleanup' = 'structure') {
@@ -476,13 +473,6 @@ defineExpose({
           @discard="dismissDraftNotification"
         />
 
-      <FeedbackToast
-        v-if="feedbackMessage"
-        :key="feedbackKey"
-        :message="feedbackMessage"
-        @close="clearFeedback"
-      />
-
       <ProgressBar
         v-if="showProgress"
         :step="progressStep"
@@ -492,7 +482,7 @@ defineExpose({
 
       <StatsDisplay v-if="showStats" :content="editorContent" />
 
-      <StructureSection ref="structureSection" @open-custom-library="openCustomButtonManager" />
+      <StructureSection ref="structureSection" @feedback="handleFeedback" @open-custom-library="openCustomButtonManager" />
       <CleanupSection ref="cleanupSection" @feedback="handleFeedback" @open-custom-library="openCustomButtonManager" />
 
       <button

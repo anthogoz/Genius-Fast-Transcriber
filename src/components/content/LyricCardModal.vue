@@ -47,6 +47,16 @@ const allArtists = computed(() => {
   return [...new Set([...props.mainArtists, ...props.featuringArtists])].filter(Boolean);
 });
 
+const filteredArtistImageCache = computed(() => {
+  const filtered: Record<string, string> = {};
+  for (const key in artistImageCache.value) {
+    if (!allArtists.value.some(a => a.toLowerCase() === key.toLowerCase()) && !['ALBUM', 'CUSTOM', 'MANUAL_SEARCH'].includes(key)) {
+      filtered[key] = artistImageCache.value[key];
+    }
+  }
+  return filtered;
+});
+
 function closeModal() {
   emit('close');
 }
@@ -173,6 +183,7 @@ async function applySelectedSource() {
   if (fetchedUrl) {
     artistImageCache.value[selected] = fetchedUrl;
     updateCard(fetchedUrl, props.artistName);
+    showFeedback(`✅ ${t('lc_img_found')}`);
     return;
   }
 
@@ -233,6 +244,7 @@ function applySearchResult(candidate: ArtistSearchCandidate) {
   searchResults.value = [];
   searchQuery.value = '';
   updateCard(candidate.image_url, props.artistName);
+  showFeedback(`✨ ${t('lc_img_applied')} ${candidate.name}`);
 }
 
 function onFileChange(event: Event) {
@@ -246,9 +258,14 @@ function onFileChange(event: Event) {
     imageSource.value = 'CUSTOM';
     if (currentUploadedImage.value) {
       updateCard(currentUploadedImage.value, props.artistName);
+      showFeedback(`📂 ${t('lc_img_loaded')}`);
     }
   };
   reader.readAsDataURL(file);
+}
+
+function showFeedback(message: string) {
+  window.dispatchEvent(new CustomEvent('gft-show-feedback', { detail: { message } }));
 }
 
 function downloadCard() {
@@ -259,6 +276,7 @@ function downloadCard() {
   link.download = `genius_lyric_card_${Date.now()}.png`;
   link.href = canvas.toDataURL('image/png');
   link.click();
+  showFeedback(`✅ ${t('lc_download_done')}`);
 }
 
 async function shareToX() {
@@ -267,8 +285,11 @@ async function shareToX() {
 
   const clipboardCtor = (window as typeof window & { ClipboardItem?: typeof ClipboardItem }).ClipboardItem;
   if (!clipboardCtor || !navigator.clipboard?.write) {
+    showFeedback(`❌ ${t('lc_error_copy')}`);
     return;
   }
+
+  showFeedback(`📋 ${t('lc_share_copying')}`);
 
   canvas.toBlob(async (blob) => {
     if (!blob) return;
@@ -276,6 +297,8 @@ async function shareToX() {
     try {
       const item = new clipboardCtor({ 'image/png': blob });
       await navigator.clipboard.write([item]);
+
+      showFeedback(`✅ ${t('lc_share_copied')}`);
 
       const tweetText = `${props.songTitle} by ${props.artistName}\n\n${window.location.href}\n\n#Genius #Lyrics`;
       const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
@@ -289,7 +312,7 @@ async function shareToX() {
         `width=${width},height=${height},top=${top},left=${left},scrollbars=yes,resizable=yes`,
       );
     } catch {
-      // noop
+      showFeedback(`❌ ${t('lc_error_copy')}`);
     }
   }, 'image/png');
 }
@@ -324,7 +347,7 @@ onMounted(() => {
           <option value="MANUAL_SEARCH">{{ t('lc_manual_search') }}</option>
           <option v-if="currentUploadedImage" value="CUSTOM">{{ t('lc_custom_img') }}</option>
           <option
-            v-for="(url, key) in artistImageCache"
+            v-for="(url, key) in filteredArtistImageCache"
             :key="key"
             :value="key"
           >
@@ -332,7 +355,11 @@ onMounted(() => {
           </option>
         </select>
 
-        <select v-model="format" class="gft-lc-input" @change="refreshCurrentSelection">
+        <select
+          v-model="format"
+          class="gft-lc-input gft-u-pill-control gft-u-hover-lift"
+          @change="refreshCurrentSelection"
+        >
           <option value="1:1">1:1</option>
           <option value="16:9">16:9</option>
           <option value="9:16">9:16</option>
@@ -396,7 +423,7 @@ onMounted(() => {
 
 <style scoped>
 .gft-lc-overlay {
-  z-index: 9999;
+  z-index: 2147483640;
   background: rgba(0, 0, 0, 0.85);
 }
 
@@ -491,18 +518,50 @@ onMounted(() => {
 
 .gft-lc-input {
   appearance: none;
-  min-width: 50px;
+  min-width: 80px;
   max-width: 250px;
-  padding: 10px 32px 10px 18px;
-  background-color: rgba(128, 128, 128, 0.1);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='currentColor' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  padding: 11px 36px 11px 20px;
+  background-color: rgba(128, 128, 128, 0.12);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: calc(100% - 12px) center;
+  background-position: calc(100% - 14px) center;
   outline: none;
+  border: 1px solid rgba(128, 128, 128, 0.2);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
 }
 
 .gft-lc-modal--dark .gft-lc-input {
-  background-color: rgba(255, 255, 255, 0.05);
+  background-color: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.1);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23aaa' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+}
+
+.gft-lc-input:hover {
+  background-color: rgba(128, 128, 128, 0.18);
+  border-color: rgba(128, 128, 128, 0.3);
+}
+
+.gft-lc-modal--dark .gft-lc-input:hover {
+  background-color: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.gft-lc-input:focus {
+  border-color: #f9ff55;
+  box-shadow: 0 0 0 2px rgba(249, 255, 85, 0.15);
+}
+
+.gft-lc-search .gft-lc-input {
+  max-width: none;
+  width: 100%;
+  border-radius: 999px;
+  padding-right: 20px;
+  background-image: none;
+  cursor: text;
 }
 
 .gft-lc-input option {
@@ -571,14 +630,6 @@ onMounted(() => {
 
 .gft-lc-modal--dark .gft-lc-search {
   background: rgba(255, 255, 255, 0.06);
-}
-
-.gft-lc-search .gft-lc-input {
-  max-width: none;
-  width: 100%;
-  border-radius: 8px;
-  padding-right: 12px;
-  background-image: none;
 }
 
 .gft-lc-search-state {

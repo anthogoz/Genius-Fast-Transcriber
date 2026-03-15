@@ -201,18 +201,18 @@ function applySingleCorrection(opts: Record<string, boolean>, itemName: string) 
   const result = applySyncCorrections({ ...disableAll, ...opts });
   if (result.correctionsCount > 0) {
     applyAndSetCorrections(result);
-    emit('feedback', t('feedback_corrected', { count: result.correctionsCount, item: itemName }));
+    emit('feedback', `✨ ${t('feedback_corrected', { count: result.correctionsCount, item: itemName })}`);
   } else {
-    emit('feedback', t('feedback_no_correction_needed', { item: itemName }));
+    emit('feedback', `✔️ ${t('feedback_no_correction_needed', { item: itemName })}`);
   }
 }
 
 function handleCheckBrackets() {
   const issues = checkBrackets();
   if (issues.length === 0) {
-    emit('feedback', t('feedback_brackets_ok'));
+    emit('feedback', `✅ ${t('feedback_brackets_ok')}`);
   } else {
-    emit('feedback', t('feedback_brackets_issue', { count: issues.length }));
+    emit('feedback', `⚠️ ${t('feedback_brackets_issue', { count: issues.length })}`);
   }
 }
 
@@ -269,7 +269,7 @@ function handlePreviewApply(_correctedText: string) {
   showPreview.value = false;
   if (previewResult.value) {
     applyAndSetCorrections(previewResult.value);
-    emit('feedback', t('feedback_summary_correction', { count: previewResult.value.correctionsCount }));
+    emit('feedback', `🚀 ${t('feedback_summary_correction', { count: previewResult.value.correctionsCount })}`);
   }
 }
 

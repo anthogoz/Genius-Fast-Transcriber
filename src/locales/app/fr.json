@@ -241,6 +241,7 @@
   "progress_step_spaces": "Suppression des doubles espaces...",
   "progress_step_spacing": "Correction de l'espacement...",
   "feedback_adlib_added": "(Ad-lib) ajouté !",
+  "feedback_added": "ajouté !",
   "feedback_select_text_first": "⚠️ Sélectionnez du texte d'abord",
   "feedback_no_replacement": "Aucune occurrence trouvée.",
   "feedback_replaced": "{count} occurrence(s) de \"{item}\" remplacée(s)",
