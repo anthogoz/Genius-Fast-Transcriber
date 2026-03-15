@@ -26,7 +26,7 @@ export function correctLineSpacing(text: string): { newText: string; corrections
   // Sépare d'abord les tags collés sur la même ligne (ex: [Header][Intro])
   // qui est un problème fréquent lors du copier-coller
   let internalCount = 0;
-  const preProcessedText = text.replace(/\]([^\S\r\n]*)\[/g, (match) => {
+  const preProcessedText = text.replace(/\]([^\S\r\n]*)\[/g, (_match) => {
     internalCount++;
     return ']\n\n[';
   });
@@ -278,52 +278,6 @@ export const CORRECTION_RULES: CorrectionRule[] = [
       let totalCount = 0;
       
       const lines = text.split('\n');
-      const newLines = lines.map((line) => {
-        let quoteIndex = 0;
-        // On traite chaque guillemet selon sa position (impair = ouvrant, pair = fermant)
-        return line.replace(/"/g, (match, offset) => {
-          quoteIndex++;
-          const isOpening = quoteIndex % 2 !== 0;
-          
-          if (isOpening) {
-            // Ouvrant : on nettoie les espaces qui suivent
-            const after = line.slice(offset + 1);
-            const spacesMatch = after.match(/^ +/);
-            if (spacesMatch && after[spacesMatch[0].length] && after[spacesMatch[0].length] !== ' ') {
-              totalCount++;
-              // On ne renvoie que le guillemet, le replace original s'occupe du reste
-              // Mais attendez, replace remplace SEULEMENT le guillemet.
-              // On doit aussi consommer les espaces.
-            }
-          }
-          return match;
-        });
-      });
-
-      // Correction de la logique : on doit utiliser une approche globale par ligne
-      const finalLines = lines.map(line => {
-        let isOpening = true;
-        let result = "";
-        for (let i = 0; i < line.length; i++) {
-          if (line[i] === '"') {
-            result += '"';
-            if (isOpening) {
-              // On saute les espaces après l'ouvrant
-              while (line[i+1] === ' ') {
-                i++;
-                totalCount++;
-              }
-            } else {
-              // On a déjà ajouté les espaces avant ? Non, on doit les avoir sautés AVANT d'ajouter le guillemet.
-            }
-            isOpening = !isOpening;
-          } else {
-            result += line[i];
-          }
-        }
-        return result;
-      });
-
       // Version finale simplifiée et robuste :
       const robustLines = lines.map(line => {
         let open = true;

@@ -88,26 +88,26 @@
 }
 
 .gft-bracket-editor-alert {
-  border-color: #ff4040 !important;
-  outline: none !important;
+  border-color: #ff4040;
+  outline: none;
   animation: 
     gft-bracket-pulse 0.8s ease-in-out infinite,
     gft-shake 0.4s ease-in-out;
 }
 
 .gft-bracket-editor-alert::selection {
-  background-color: #ff4040 !important;
-  color: white !important;
+  background-color: #ff4040;
+  color: white;
 }
 
 .gft-bracket-editor-alert::-moz-selection {
-  background-color: #ff4040 !important;
-  color: white !important;
+  background-color: #ff4040;
+  color: white;
 }
 
 .gft-bracket-highlight {
   background: #ff4040;
-  color: #fff !important;
+  color: #fff;
   border-radius: 3px;
   padding: 0 2px;
   font-weight: bold;

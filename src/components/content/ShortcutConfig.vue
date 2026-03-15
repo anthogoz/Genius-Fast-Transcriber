@@ -98,7 +98,7 @@ const shortcutList: { key: keyof ShortcutSettings; label: string }[] = [
         <div class="gft-u-modal gft-shortcut-modal" :class="{ 'gft-u-modal--dark': isDarkMode }" @click.stop>
           <div class="gft-shortcut-modal__header">
             <h2 class="gft-shortcut-modal__title">{{ t('shortcuts_title') }}</h2>
-            <button class="gft-shortcut-modal__close" @click="emit('close')">×</button>
+            <button type="button" class="gft-shortcut-modal__close" @click="emit('close')">×</button>
           </div>
           
           <div class="gft-shortcut-modal__body">
@@ -108,6 +108,7 @@ const shortcutList: { key: keyof ShortcutSettings; label: string }[] = [
               <div v-for="item in shortcutList" :key="item.key" class="gft-shortcut-item">
                 <span class="gft-shortcut-item__label">{{ t(item.label) }}</span>
                 <button 
+                  type="button"
                   class="gft-shortcut-item__button"
                   :class="{ 'gft-shortcut-item__button--recording': recordingKey === item.key }"
                   @click="startRecording(item.key)"
@@ -119,8 +120,8 @@ const shortcutList: { key: keyof ShortcutSettings; label: string }[] = [
           </div>
           
           <div class="gft-shortcut-modal__footer">
-            <button class="gft-u-btn gft-u-btn--sm gft-shortcut-modal__btn-reset" @click="resetShortcuts">{{ t('shortcuts_reset_all') }}</button>
-            <button class="gft-u-btn gft-u-btn--sm gft-shortcut-modal__btn-close" @click="emit('close')">{{ t('preview_btn_apply') }}</button>
+            <button type="button" class="gft-u-btn gft-u-btn--sm gft-shortcut-modal__btn-reset" @click="resetShortcuts">{{ t('shortcuts_reset_all') }}</button>
+            <button type="button" class="gft-u-btn gft-u-btn--sm gft-shortcut-modal__btn-close" @click="emit('close')">{{ t('preview_btn_apply') }}</button>
           </div>
         </div>
       </div>
@@ -227,10 +228,10 @@ const shortcutList: { key: keyof ShortcutSettings; label: string }[] = [
   border-color: #f9ff55;
 }
 
-.gft-shortcut-item__button--recording {
-  background: #444 !important;
-  color: #f9ff55 !important;
-  border-color: #f9ff55 !important;
+.gft-shortcut-item__button.gft-shortcut-item__button--recording {
+  background: #444;
+  color: #f9ff55;
+  border-color: #f9ff55;
   animation: gft-pulse 1.5s infinite;
 }
 
@@ -265,11 +266,11 @@ const shortcutList: { key: keyof ShortcutSettings; label: string }[] = [
   color: #ff4040;
 }
 
-.gft-shortcut-modal__btn-close {
-  background: #f9ff55 !important;
-  color: #0e0e0e !important;
-  border: none !important;
-  font-weight: 700 !important;
+.gft-shortcut-modal__footer .gft-shortcut-modal__btn-close {
+  background: #f9ff55;
+  color: #0e0e0e;
+  border: none;
+  font-weight: 700;
   padding: 6px 15px;
   border-radius: 8px;
   cursor: pointer;
@@ -277,8 +278,8 @@ const shortcutList: { key: keyof ShortcutSettings; label: string }[] = [
   font-size: 13px;
 }
 
-.gft-shortcut-modal__btn-close:hover {
-  background: #e9ee4e !important;
+.gft-shortcut-modal__footer .gft-shortcut-modal__btn-close:hover {
+  background: #e9ee4e;
   transform: translateY(-1px);
 }
 
