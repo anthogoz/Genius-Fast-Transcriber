@@ -67,7 +67,7 @@ function insertVerse() {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0;
 }
 
@@ -88,8 +88,10 @@ function insertVerse() {
   cursor: pointer;
   font-weight: 400;
   font-size: 10px;
-  transition: opacity 0.15s;
-  line-height: 1;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-family: inherit;
 }
 
