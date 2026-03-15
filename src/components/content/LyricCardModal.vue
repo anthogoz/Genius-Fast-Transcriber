@@ -43,6 +43,10 @@ const currentUploadedImage = ref<string | null>(null);
 const artistImageCache = ref<Record<string, string>>({});
 const artistImageLabels = ref<Record<string, string>>({});
 
+const displayArtist = ref(props.artistName);
+const displayTitle = ref(props.songTitle);
+const showMetaEditor = ref(false);
+
 const allArtists = computed(() => {
   return [...new Set([...props.mainArtists, ...props.featuringArtists])].filter(Boolean);
 });
@@ -78,18 +82,18 @@ function renderFallback(displayArtistName: string) {
   );
 }
 
-function updateCard(imageUrl: string, displayArtistName: string) {
+function updateCard(imageUrl: string) {
   const canvas = canvasRef.value;
   if (!canvas) return;
 
-  renderFallback(displayArtistName);
+  renderFallback(displayArtist.value);
 
   const image = new Image();
   let isTimedOut = false;
 
   const timeout = window.setTimeout(() => {
     isTimedOut = true;
-    renderFallback(displayArtistName);
+    renderFallback(displayArtist.value);
   }, 4000);
 
   if (imageUrl.startsWith('data:')) {
@@ -116,8 +120,8 @@ function updateCard(imageUrl: string, displayArtistName: string) {
       renderLyricCardToCanvas(
         canvas,
         props.text,
-        displayArtistName,
-        props.songTitle,
+        displayArtist.value,
+        displayTitle.value,
         image,
         dominantColor,
         contrastColor,
@@ -131,8 +135,8 @@ function updateCard(imageUrl: string, displayArtistName: string) {
       renderLyricCardToCanvas(
         canvas,
         props.text,
-        displayArtistName,
-        props.songTitle,
+        displayArtist.value,
+        displayTitle.value,
         image,
         dominantColor,
         contrastColor,
@@ -146,7 +150,7 @@ function updateCard(imageUrl: string, displayArtistName: string) {
   image.onerror = () => {
     if (isTimedOut) return;
     window.clearTimeout(timeout);
-    renderFallback(displayArtistName);
+    renderFallback(displayArtist.value); // Use displayArtist.value here
   };
 }
 
@@ -162,32 +166,32 @@ async function applySelectedSource() {
   }
 
   if (selected === 'ALBUM') {
-    updateCard(props.albumUrl, props.artistName);
+    updateCard(props.albumUrl);
     return;
   }
 
   if (selected === 'CUSTOM') {
     if (currentUploadedImage.value) {
-      updateCard(currentUploadedImage.value, props.artistName);
+      updateCard(currentUploadedImage.value);
     }
     return;
   }
 
   const cached = artistImageCache.value[selected];
   if (cached) {
-    updateCard(cached, props.artistName);
+    updateCard(cached);
     return;
   }
 
   const fetchedUrl = await fetchArtistImageFromApi(selected, props.unknownArtistLabel, true);
   if (fetchedUrl) {
     artistImageCache.value[selected] = fetchedUrl;
-    updateCard(fetchedUrl, props.artistName);
+    updateCard(fetchedUrl);
     showFeedback(`✅ ${t('lc_img_found')}`);
     return;
   }
 
-  updateCard(props.albumUrl, props.artistName);
+  updateCard(props.albumUrl);
 }
 
 let searchDebounce: number | undefined;
@@ -243,7 +247,7 @@ function applySearchResult(candidate: ArtistSearchCandidate) {
   imageSource.value = key;
   searchResults.value = [];
   searchQuery.value = '';
-  updateCard(candidate.image_url, props.artistName);
+  updateCard(candidate.image_url);
   showFeedback(`✨ ${t('lc_img_applied')} ${candidate.name}`);
 }
 
@@ -257,7 +261,7 @@ function onFileChange(event: Event) {
     currentUploadedImage.value = String(loadEvent.target?.result ?? '');
     imageSource.value = 'CUSTOM';
     if (currentUploadedImage.value) {
-      updateCard(currentUploadedImage.value, props.artistName);
+      updateCard(currentUploadedImage.value);
       showFeedback(`📂 ${t('lc_img_loaded')}`);
     }
   };
@@ -317,8 +321,12 @@ async function shareToX() {
   }, 'image/png');
 }
 
+watch([displayArtist, displayTitle], () => {
+  refreshCurrentSelection();
+});
+
 onMounted(() => {
-  updateCard(props.albumUrl, props.artistName);
+  updateCard(props.albumUrl);
 });
 </script>
 
@@ -334,6 +342,31 @@ onMounted(() => {
 
       <div class="gft-lc-canvas-wrap">
         <canvas ref="canvasRef" class="gft-lc-canvas" />
+
+        <button
+          type="button"
+          class="gft-lc-meta-toggle gft-u-hover-lift"
+          :class="{ 'gft-lc-meta-toggle--active': showMetaEditor }"
+          @click="showMetaEditor = !showMetaEditor"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+          </svg>
+          <span class="gft-lc-meta-toggle-label">{{ t('lc_edit_meta_btn') }}</span>
+        </button>
+
+        <Transition name="gft-lc-meta-fade">
+          <div v-if="showMetaEditor" class="gft-lc-meta-overlay">
+            <div class="gft-lc-meta-field">
+              <label>{{ t('lc_artist_label') }}</label>
+              <input v-model="displayArtist" type="text" spellcheck="false" />
+            </div>
+            <div class="gft-lc-meta-field">
+              <label>{{ t('lc_title_label') }}</label>
+              <input v-model="displayTitle" type="text" spellcheck="false" />
+            </div>
+          </div>
+        </Transition>
       </div>
 
       <div class="gft-lc-row">
@@ -490,7 +523,15 @@ onMounted(() => {
   color: #888;
 }
 
+.gft-lc-canvas {
+  max-width: 100%;
+  max-height: 60vh;
+  display: block;
+  background: #111;
+}
+
 .gft-lc-canvas-wrap {
+  position: relative;
   margin-top: 4px;
   border: 2px solid #555;
   border-radius: 8px;
@@ -499,11 +540,94 @@ onMounted(() => {
   overflow: hidden;
 }
 
-.gft-lc-canvas {
-  max-width: 100%;
-  max-height: 60vh;
-  display: block;
-  background: #111;
+.gft-lc-meta-toggle {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  height: 36px;
+  border-radius: 999px;
+  padding: 0 14px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gft-lc-meta-toggle-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.gft-lc-meta-toggle:hover, .gft-lc-meta-toggle--active {
+  background: #f9ff55;
+  color: black;
+  border-color: #f9ff55;
+}
+
+.gft-lc-meta-overlay {
+  position: absolute;
+  bottom: 60px;
+  right: 12px;
+  width: min(240px, 80vw);
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.gft-lc-meta-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.gft-lc-meta-field label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  opacity: 0.7;
+  color: white;
+}
+
+.gft-lc-meta-field input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 8px 10px;
+  color: white;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.gft-lc-meta-field input:focus {
+  border-color: #f9ff55;
+}
+
+.gft-lc-meta-fade-enter-active,
+.gft-lc-meta-fade-leave-active {
+  transition: all 0.3s ease;
+}
+
+.gft-lc-meta-fade-enter-from,
+.gft-lc-meta-fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
 }
 
 .gft-lc-row {
@@ -532,6 +656,13 @@ onMounted(() => {
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
+}
+
+.gft-lc-input--text-edit {
+  background-image: none;
+  padding-right: 20px;
+  cursor: text;
+  flex: 1;
 }
 
 .gft-lc-modal--dark .gft-lc-input {
