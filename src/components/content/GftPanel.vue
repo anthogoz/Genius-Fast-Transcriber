@@ -64,7 +64,7 @@ const cleanupSection = ref<{
 
 const editorContent = computed(() => getEditorContent());
 const panelVersion = computed(() => `v${props.version ?? '?.?.?'}`);
-const collapseArrow = computed(() => (isPanelCollapsed.value ? '▼' : '▲'));
+
 const logoSrc = computed(() => browser.runtime.getURL('icon/16.png' as any));
 
 function updateTranscriptionMode(mode: 'fr' | 'en' | 'pl') {
@@ -385,7 +385,7 @@ defineExpose({
         <div class="gft-panel__title-wrap">
           <img :src="logoSrc" alt="GFT" class="gft-panel__logo-image" />
           <h2 class="gft-panel__title">{{ t('panel_title') }}</h2>
-          <span class="gft-panel__collapse-arrow">{{ collapseArrow }}</span>
+          <span class="gft-panel__collapse-arrow" :style="{ transform: isPanelCollapsed ? 'rotate(180deg)' : 'rotate(0deg)' }">▲</span>
         </div>
       </div>
       <div class="gft-panel__header-right" @click.stop>
@@ -446,63 +446,66 @@ defineExpose({
     </div>
 
     <Transition name="gft-panel-collapse">
-      <div v-show="!isPanelCollapsed" class="gft-panel__body">
-        <DraftNotification
-          v-if="showDraftNotification"
-          :timestamp="draftTime"
-          @restore="restoreDraft"
-          @discard="dismissDraftNotification"
-        />
+      <div v-show="!isPanelCollapsed" class="gft-panel__collapsible">
+        <div class="gft-panel__body">
+          <ProgressBar
+            v-if="showProgress"
+            :step="progressStep"
+            :total="progressTotal"
+            :message="progressMessage"
+          />
 
-      <ProgressBar
-        v-if="showProgress"
-        :step="progressStep"
-        :total="progressTotal"
-        :message="progressMessage"
-      />
+          <StatsDisplay v-if="showStats" :content="editorContent" />
 
-      <StatsDisplay v-if="showStats" :content="editorContent" />
+          <StructureSection ref="structureSection" @feedback="handleFeedback" @open-custom-library="openCustomButtonManager" />
+          <CleanupSection ref="cleanupSection" @feedback="handleFeedback" @open-custom-library="openCustomButtonManager" />
 
-      <StructureSection ref="structureSection" @feedback="handleFeedback" @open-custom-library="openCustomButtonManager" />
-      <CleanupSection ref="cleanupSection" @feedback="handleFeedback" @open-custom-library="openCustomButtonManager" />
+          <button
+            :title="t('global_fix_tooltip')"
+            type="button"
+            class="gft-panel__main-action"
+            @click="handleFixAllMain"
+          >
+            {{ t('btn_fix_all_short') }}
+          </button>
 
-      <button
-        :title="t('global_fix_tooltip')"
-        type="button"
-        class="gft-panel__main-action"
-        @click="handleFixAllMain"
-      >
-        {{ t('btn_fix_all_short') }}
-      </button>
-
-      <div class="gft-panel__footer">
-        <span class="gft-panel__footer-credit">Made with ❤️ by Lnkhey</span>
-        <a
-          href="https://buymeacoffee.com/lnkhey"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="gft-panel__footer-link"
-        >
-          ☕ {{ t('footer_buy_me_a_coffee') }}
-        </a>
-        <a
-          href="https://github.com/anthogoz/Genius-Fast-Transcriber"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="gft-panel__footer-link"
-        >
-          <svg viewBox="0 0 16 16" aria-hidden="true" class="gft-panel__footer-icon">
-            <path
-              fill="currentColor"
-              d="M8 0C3.58 0 0 3.58 0 8a8.01 8.01 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.77 7.77 0 0 1 8 4.77c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
-            />
-          </svg>
-          {{ t('footer_github') }}
-        </a>
-        <span class="gft-panel__footer-version">{{ panelVersion }}</span>
-      </div>
+          <div class="gft-panel__footer">
+            <span class="gft-panel__footer-credit">Made with ❤️ by Lnkhey</span>
+            <a
+              href="https://buymeacoffee.com/lnkhey"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="gft-panel__footer-link"
+            >
+              ☕ {{ t('footer_buy_me_a_coffee') }}
+            </a>
+            <a
+              href="https://github.com/anthogoz/Genius-Fast-Transcriber"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="gft-panel__footer-link"
+            >
+              <svg viewBox="0 0 16 16" aria-hidden="true" class="gft-panel__footer-icon">
+                <path
+                  fill="currentColor"
+                  d="M8 0C3.58 0 0 3.58 0 8a8.01 8.01 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.77 7.77 0 0 1 8 4.77c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.28.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+                />
+              </svg>
+              {{ t('footer_github') }}
+            </a>
+            <span class="gft-panel__footer-version">{{ panelVersion }}</span>
+          </div>
+        </div>
       </div>
     </Transition>
+
+    <DraftNotification
+      v-if="showDraftNotification"
+      :timestamp="draftTime"
+      @restore="restoreDraft"
+      @discard="dismissDraftNotification"
+    />
+
 
     <CustomButtonManager
       :visible="showCustomButtonManager"
@@ -583,14 +586,15 @@ defineExpose({
   padding: 8px 10px;
   cursor: pointer;
   background: transparent;
-  border-bottom: 1px solid var(--gft-panel-header-border);
   user-select: none;
+  position: relative;
 }
+
 
 .gft-panel:not(.gft-dark-mode) .gft-panel__header {
   background: transparent;
-  border-bottom-color: rgba(14, 14, 14, 0.35);
 }
+
 
 .gft-panel__header-left {
   display: flex;
@@ -620,7 +624,10 @@ defineExpose({
 .gft-panel__collapse-arrow {
   font-size: 11px;
   opacity: 0.8;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: inline-block;
 }
+
 
 .gft-panel__mode-select {
   padding: 2px 18px 2px 7px;
@@ -687,27 +694,41 @@ defineExpose({
   cursor: not-allowed;
 }
 
-.gft-panel__body {
-  padding: 8px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  overflow: visible;
+.gft-panel__collapsible {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  border-top: 1px solid var(--gft-panel-header-border);
 }
 
-.gft-panel--collapsed .gft-panel__body {
-  display: none;
+.gft-panel:not(.gft-dark-mode) .gft-panel__collapsible {
+  border-top-color: rgba(14, 14, 14, 0.35);
 }
+
 
 .gft-panel-collapse-enter-active,
 .gft-panel-collapse-leave-active {
-  transition: opacity 0.2s ease;
+  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .gft-panel-collapse-enter-from,
 .gft-panel-collapse-leave-to {
+  grid-template-rows: 0fr;
   opacity: 0;
+  border-top-color: transparent;
 }
+
+
+.gft-panel__body {
+  min-height: 0;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+
 
 .gft-panel__stats-toggle {
   background: var(--gft-btn-bg);

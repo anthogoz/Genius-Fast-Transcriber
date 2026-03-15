@@ -84,17 +84,21 @@
   font-family: inherit;
   font-size: 10px;
   font-weight: 400;
-  transition:
-    background 0.15s,
-    border-color 0.15s,
-    color 0.15s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, background-color, border-color, color;
 }
 
 .gft-u-btn:hover {
   background: var(--gft-btn-hover-bg, #0e0e0e);
   border-color: var(--gft-btn-hover-border, #0e0e0e);
   color: var(--gft-btn-hover-text, #f9ff55);
+  transform: translateY(-1px);
 }
+
+.gft-u-btn:active {
+  transform: translateY(0) scale(0.96);
+}
+
 
 .gft-u-btn--sm {
   height: auto;
@@ -138,12 +142,14 @@
   font-family: inherit;
   font-size: 12px;
   outline: none;
-  transition: border-color 0.15s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .gft-u-input:focus {
-  border-color: #f9ff55;
+  border-color: #ffff64;
+  box-shadow: 0 0 0 2px rgba(255, 255, 100, 0.2);
 }
+
 
 .gft-u-pill-control {
   border-radius: 999px;
@@ -181,6 +187,8 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.5);
   z-index: 10000;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(0px);
 }
 
 .gft-u-overlay--center {
@@ -190,21 +198,33 @@
 }
 
 .gft-u-overlay--blur {
-  backdrop-filter: blur(5px);
+  backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.35);
 }
+
 
 .gft-u-modal {
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -48%);
   z-index: 10001;
   background: #fff;
   color: #222;
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  animation: gft-modal-enter 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
 }
+
+@keyframes gft-modal-enter {
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
 
 .gft-u-modal.gft-u-modal--dark {
   background: #2a2a2a;

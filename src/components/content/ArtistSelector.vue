@@ -38,23 +38,25 @@ defineExpose({ getSelectedArtists });
 
 <template>
   <div class="gft-artist-selector">
-    <p class="gft-artist-selector__title">{{ t('artist_selection') }}</p>
-    <span v-if="!hasArtists" class="gft-artist-selector__empty">
-      {{ t('no_artist') }}
-    </span>
-    <div v-else class="gft-artist-selector__list">
-      <label
-        v-for="artist in detectedArtists"
-        :key="artist"
-        class="gft-artist-selector__item"
-      >
-        <input
-          type="checkbox"
-          :checked="selected.has(artist)"
-          @change="toggle(artist)"
-        />
-        <span>{{ artist }}</span>
-      </label>
+    <div class="gft-artist-selector__content">
+      <p class="gft-artist-selector__title">{{ t('artist_selection') }}</p>
+      <span v-if="!hasArtists" class="gft-artist-selector__empty">
+        {{ t('no_artist') }}
+      </span>
+      <div v-else class="gft-artist-selector__list">
+        <label
+          v-for="artist in detectedArtists"
+          :key="artist"
+          class="gft-artist-selector__item"
+        >
+          <input
+            type="checkbox"
+            :checked="selected.has(artist)"
+            @change="toggle(artist)"
+          />
+          <span>{{ artist }}</span>
+        </label>
+      </div>
     </div>
   </div>
 </template>
@@ -68,33 +70,58 @@ defineExpose({ getSelectedArtists });
 }
 
 .gft-artist-selector__title {
-  width: 100%;
-  margin: 0 0 1px 0;
-  font-size: 12px;
-  font-weight: 600;
+  margin: 0;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--gft-title-color, #777);
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+
+.gft-artist-selector__content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
 }
 
 .gft-artist-selector__empty {
   font-style: italic;
-  font-size: 12px;
+  font-size: 11px;
   opacity: 0.7;
 }
 
 .gft-artist-selector__list {
   display: flex;
   flex-wrap: wrap;
-  gap: 2px 10px;
+  gap: 2px 8px;
 }
 
 .gft-artist-selector__item {
   display: flex;
   align-items: center;
   gap: 3px;
-  font-size: 13px;
+  font-size: 11px;
   cursor: pointer;
+  background: var(--gft-btn-bg, rgba(255, 255, 255, 0.05));
+  padding: 1px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--gft-btn-border, rgba(255, 255, 255, 0.1));
+  transition: all 0.2s ease;
+}
+
+.gft-artist-selector__item:hover {
+  background: var(--gft-btn-hover-bg, #ffff64);
+  color: var(--gft-btn-hover-text, #000);
 }
 
 .gft-artist-selector__item input[type="checkbox"] {
   cursor: pointer;
+  margin: 0;
+  width: 12px;
+  height: 12px;
 }
 </style>
+

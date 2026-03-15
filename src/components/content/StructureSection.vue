@@ -222,14 +222,15 @@ onUnmounted(() => {
 
 <style scoped>
 .gft-structure-section {
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .gft-structure-section__divider {
-  margin: 8px 0 10px;
+  margin: 6px 0 8px;
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.18);
 }
+
 
 .gft-structure-section__tags {
   display: flex;

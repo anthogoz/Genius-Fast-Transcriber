@@ -54,49 +54,51 @@ watch([optNoTags, optNoSpacing], () => {
       <span :class="labelClass">Export TXT</span>
     </button>
     <Teleport to="body">
-      <div v-if="isOpen" class="gft-export-overlay" @click.stop="closeModal">
-        <div class="gft-export-modal" @click.stop>
-          <div class="gft-export-header">
-            <h3>{{ t('section_export') }}</h3>
-            <button class="gft-export-close" @click="closeModal" type="button">×</button>
-          </div>
-          
-          <div class="gft-export-body">
-            <div class="gft-export-options">
-              <label class="gft-export-toggle">
-                <span>{{ t('export_opt_no_tags') }}</span>
-                <div class="gft-toggle" :class="{ 'gft-toggle--active': optNoTags }">
-                  <input type="checkbox" v-model="optNoTags" class="gft-toggle__input" />
-                  <div class="gft-toggle__track">
-                    <div class="gft-toggle__thumb"></div>
-                  </div>
-                </div>
-              </label>
-              
-              <label class="gft-export-toggle">
-                <span>{{ t('export_opt_no_spacing') }}</span>
-                <div class="gft-toggle" :class="{ 'gft-toggle--active': optNoSpacing }">
-                  <input type="checkbox" v-model="optNoSpacing" class="gft-toggle__input" />
-                  <div class="gft-toggle__track">
-                    <div class="gft-toggle__thumb"></div>
-                  </div>
-                </div>
-              </label>
+      <Transition name="gft-export-transition">
+        <div v-if="isOpen" class="gft-export-overlay" @click.stop="closeModal">
+          <div class="gft-export-modal" @click.stop>
+            <div class="gft-export-header">
+              <h3>{{ t('section_export') }}</h3>
+              <button class="gft-export-close" @click="closeModal" type="button">×</button>
             </div>
             
-            <div class="gft-export-preview">
-              <div class="gft-export-preview-header">Aperçu</div>
-              <textarea class="gft-export-preview-content" readonly v-model="previewText"></textarea>
+            <div class="gft-export-body">
+              <div class="gft-export-options">
+                <label class="gft-export-toggle">
+                  <span>{{ t('export_opt_no_tags') }}</span>
+                  <div class="gft-toggle" :class="{ 'gft-toggle--active': optNoTags }">
+                    <input type="checkbox" v-model="optNoTags" class="gft-toggle__input" />
+                    <div class="gft-toggle__track">
+                      <div class="gft-toggle__thumb"></div>
+                    </div>
+                  </div>
+                </label>
+                
+                <label class="gft-export-toggle">
+                  <span>{{ t('export_opt_no_spacing') }}</span>
+                  <div class="gft-toggle" :class="{ 'gft-toggle--active': optNoSpacing }">
+                    <input type="checkbox" v-model="optNoSpacing" class="gft-toggle__input" />
+                    <div class="gft-toggle__track">
+                      <div class="gft-toggle__thumb"></div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+              
+              <div class="gft-export-preview">
+                <div class="gft-export-preview-header">Aperçu</div>
+                <textarea class="gft-export-preview-content" readonly v-model="previewText"></textarea>
+              </div>
+            </div>
+            
+            <div class="gft-export-footer">
+              <button class="gft-btn-download" @click="handleDownload" type="button">
+                Télécharger (.txt)
+              </button>
             </div>
           </div>
-          
-          <div class="gft-export-footer">
-            <button class="gft-btn-download" @click="handleDownload" type="button">
-              Télécharger (.txt)
-            </button>
-          </div>
         </div>
-      </div>
+      </Transition>
     </Teleport>
   </div>
 </template>
@@ -284,5 +286,32 @@ watch([optNoTags, optNoSpacing], () => {
 .gft-toggle--active .gft-toggle__thumb {
   transform: translateX(16px);
   background-color: #000;
+}
+
+/* Transitions */
+.gft-export-transition-enter-active,
+.gft-export-transition-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.gft-export-transition-enter-from,
+.gft-export-transition-leave-to {
+  opacity: 0;
+}
+
+.gft-export-transition-enter-active .gft-export-modal {
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.gft-export-transition-leave-active .gft-export-modal {
+  transition: transform 0.2s ease-in;
+}
+
+.gft-export-transition-enter-from .gft-export-modal {
+  transform: scale(0.9) translateY(10px);
+}
+
+.gft-export-transition-leave-to .gft-export-modal {
+  transform: scale(0.95);
 }
 </style>

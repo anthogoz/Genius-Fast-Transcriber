@@ -24,16 +24,23 @@ body {
   cursor: pointer;
   font-size: 12px;
   font-weight: 600;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
+  will-change: transform, background-color, border-color;
 }
 
 .gft-u-popup-pill:hover {
   background: var(--border);
+  transform: translateY(-1px);
 }
+
+.gft-u-popup-pill:active {
+  transform: translateY(0) scale(0.97);
+}
+
 
 .gft-u-popup-pill.active {
   border-color: var(--primary);
@@ -55,13 +62,19 @@ body {
   border-radius: 8px;
   cursor: pointer;
   font-size: 11px;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .gft-u-popup-dashed-btn:hover {
   border-color: var(--primary);
   color: var(--text);
+  background: rgba(255, 255, 100, 0.05);
 }
+
+.gft-u-popup-dashed-btn:active {
+  transform: scale(0.98);
+}
+
 
 .gft-u-popup-card {
   background: var(--card-bg);
@@ -116,11 +129,18 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .gft-u-popup-link:hover {
   background: var(--primary);
   color: #000;
   border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
+
+.gft-u-popup-link:active {
+  transform: translateY(0) scale(0.97);
+}
+
