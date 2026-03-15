@@ -21,7 +21,7 @@ import {
 } from '@/utils/numberToWords';
 
 export default defineContentScript({
-  matches: ['*://*.genius.com/*-lyrics'],
+  matches: ['*://*.genius.com/*'],
   cssInjectionMode: 'manifest',
 
   async main(ctx) {

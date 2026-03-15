@@ -25,6 +25,7 @@ desktop.ini
 # Temporary files
 *.tmp
 .cache
+tmp/
 
 # Extension package files
 *.zip

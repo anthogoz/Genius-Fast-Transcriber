@@ -45,6 +45,7 @@ export interface CorrectionOptions {
   doubleSpaces: boolean;
   spacing: boolean;
   quoteSpaces: boolean;
+  majuscules: boolean;
 }
 
 export interface CorrectionCounts {
@@ -57,6 +58,7 @@ export interface CorrectionCounts {
   doubleSpaces: number;
   spacing: number;
   quoteSpaces: number;
+  majuscules: number;
 }
 
 export interface CorrectionResult {

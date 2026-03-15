@@ -29,6 +29,7 @@ const options = ref<CorrectionOptions>({
   doubleSpaces: true,
   spacing: true,
   quoteSpaces: true,
+  majuscules: true,
 });
 
 const currentResult = ref<CorrectionResult>(props.correctionResult);
@@ -57,6 +58,7 @@ const optionDefs = computed<OptionDef[]>(() => [
   { key: 'doubleSpaces', labelKey: 'preview_opt_spaces', statKey: 'doubleSpaces', statLabelKey: 'preview_stat_spaces' },
   { key: 'spacing', labelKey: 'preview_opt_spacing', statKey: 'spacing', statLabelKey: 'preview_stat_spacing' },
   { key: 'quoteSpaces', labelKey: 'preview_opt_quote_spaces', statKey: 'quoteSpaces', statLabelKey: 'preview_stat_quote_spaces' },
+  { key: 'majuscules', labelKey: 'preview_opt_majuscules', statKey: 'majuscules', statLabelKey: 'preview_stat_majuscules' },
 ]);
 
 const visibleOptions = computed(() => optionDefs.value.filter((o) => o.show !== false));

@@ -109,6 +109,31 @@ export function correctLineSpacing(text: string): { newText: string; corrections
 
 export const CORRECTION_RULES: CorrectionRule[] = [
   {
+    id: 'majuscules',
+    progressKey: 'progress_step_majuscules',
+    execute: (text, corrections, opts) => {
+      if (!opts.majuscules) return text;
+      // Met une majuscule au début de chaque ligne et supprime les espaces initiaux, sauf si c'est un tag [Section]
+      const lines = text.split('\n');
+      let count = 0;
+      const newLines = lines.map((line) => {
+        const trimmed = line.trim();
+        if (!trimmed || isSectionTag(trimmed)) return line;
+        
+        const firstChar = trimmed[0];
+        const capitalized = firstChar.toUpperCase() + trimmed.slice(1);
+        
+        if (line !== capitalized) {
+          count++;
+          return capitalized;
+        }
+        return line;
+      });
+      if (count > 0) corrections.majuscules = count;
+      return newLines.join('\n');
+    },
+  },
+  {
     id: 'yPrime',
     progressKey: 'progress_step_yprime',
     execute: (text, corrections, opts) => {
@@ -178,13 +203,46 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     progressKey: 'progress_step_punctuation',
     execute: (text, corrections, opts, locale) => {
       if (!opts.punctuation) return text;
-      if (locale !== 'pl' && locale !== 'en') {
-        const pattern = /([^ \n[(<])([?!])/g;
-        const newText = text.replace(pattern, '$1 $2');
-        if (newText !== text) corrections.punctuation = (text.match(pattern) || []).length;
-        return newText;
-      }
-      return text;
+      let count = 0;
+      
+      // On traite le texte ligne par ligne pour plus de précision
+      const lines = text.split('\n');
+      const newLines = lines.map((line) => {
+        let newLine = line;
+
+        // 1. Supprime d'abord tous les espaces avant TOUTE ponctuation pour normaliser
+        // Mais on ne le fait que si ce n'est pas déjà correct pour éviter le ping-pong
+        
+        // Règle . et , (toujours collés)
+        const dotComma = newLine.replace(/\s+([.,])/g, '$1');
+        if (dotComma !== newLine) {
+          // On ne compte qu'une fois par ligne pour ne pas effrayer l'utilisateur
+          newLine = dotComma;
+        }
+
+        // Règle ! ? : ; (dépend de la langue)
+        if (locale === 'fr') {
+          // Français : doit avoir UN espace avant
+          const withSpace = newLine.replace(/(?<!\s)([?!:;])/g, ' $1') // Ajoute si manque
+                                   .replace(/\s{2,}([?!:;])/g, ' $1'); // Réduit si trop
+          newLine = withSpace;
+        } else {
+          // Anglais/Polonais : doit être collé
+          const noSpace = newLine.replace(/\s+([?!:;])/g, '$1');
+          newLine = noSpace;
+        }
+
+        // 2. Règle Genius : suppression des . et , en fin de ligne
+        if (!isSectionTag(newLine)) {
+          newLine = newLine.replace(/[.,]+[^\S\r\n]*$/, '');
+        }
+
+        if (newLine !== line) count++;
+        return newLine;
+      });
+
+      if (count > 0) corrections.punctuation = count;
+      return newLines.join('\n');
     },
   },
   {
@@ -216,30 +274,86 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     progressKey: 'progress_step_quotes',
     execute: (text, corrections, opts) => {
       if (!opts.quoteSpaces) return text;
-      // Nettoie UNIQUEMENT les espaces horizontaux à l'intérieur des guillemets
-      // On évite [^\S\r\n] (espace non-ligne) pour ne pas fusionner de lignes ou manger des tags
+      let totalCount = 0;
       
-      // 1. Espaces après un guillemet ouvrant : (" texte) -> ("texte)
-      // On considère ouvrant si début de ligne ou précédé d'un espace/parenthèse, et suivi d'un caractère
-      const patternOpen = /(^|[\s(\[])"([^\S\r\n]+)(?=\S)/g;
-      
-      // 2. Espaces avant un guillemet fermant : (texte ") -> (texte")
-      // On considère fermant si précédé d'un caractère et suivi d'un espace/ponctuation/fin
-      const patternClose = /(\S)([^\S\r\n]+)"(?=[\s.,;!?)\]]|$)/g;
-      
-      let count = 0;
-      let result = text.replace(patternOpen, (match, prefix) => {
-        count++;
-        return prefix + '"';
+      const lines = text.split('\n');
+      const newLines = lines.map((line) => {
+        let quoteIndex = 0;
+        // On traite chaque guillemet selon sa position (impair = ouvrant, pair = fermant)
+        return line.replace(/"/g, (match, offset) => {
+          quoteIndex++;
+          const isOpening = quoteIndex % 2 !== 0;
+          
+          if (isOpening) {
+            // Ouvrant : on nettoie les espaces qui suivent
+            const after = line.slice(offset + 1);
+            const spacesMatch = after.match(/^ +/);
+            if (spacesMatch && after[spacesMatch[0].length] && after[spacesMatch[0].length] !== ' ') {
+              totalCount++;
+              // On ne renvoie que le guillemet, le replace original s'occupe du reste
+              // Mais attendez, replace remplace SEULEMENT le guillemet.
+              // On doit aussi consommer les espaces.
+            }
+          }
+          return match;
+        });
       });
-      
-      result = result.replace(patternClose, (match, char) => {
-        count++;
-        return char + '"';
+
+      // Correction de la logique : on doit utiliser une approche globale par ligne
+      const finalLines = lines.map(line => {
+        let isOpening = true;
+        let result = "";
+        for (let i = 0; i < line.length; i++) {
+          if (line[i] === '"') {
+            result += '"';
+            if (isOpening) {
+              // On saute les espaces après l'ouvrant
+              while (line[i+1] === ' ') {
+                i++;
+                totalCount++;
+              }
+            } else {
+              // On a déjà ajouté les espaces avant ? Non, on doit les avoir sautés AVANT d'ajouter le guillemet.
+            }
+            isOpening = !isOpening;
+          } else {
+            result += line[i];
+          }
+        }
+        return result;
       });
-      
-      if (count > 0) corrections.quoteSpaces = count;
-      return result;
+
+      // Version finale simplifiée et robuste :
+      const robustLines = lines.map(line => {
+        let open = true;
+        let newLine = "";
+        for (let i = 0; i < line.length; i++) {
+          if (line[i] === '"') {
+            if (open) {
+              // Ouvrant : garde le guillemet et saute les espaces APRÈS
+              newLine += '"';
+              while (i + 1 < line.length && line[i + 1] === ' ') {
+                i++;
+                totalCount++;
+              }
+            } else {
+              // Fermant : saute les espaces AVANT et garde le guillemet
+              while (newLine.endsWith(' ')) {
+                newLine = newLine.slice(0, -1);
+                totalCount++;
+              }
+              newLine += '"';
+            }
+            open = !open;
+          } else {
+            newLine += line[i];
+          }
+        }
+        return newLine;
+      });
+
+      if (totalCount > 0) corrections.quoteSpaces = totalCount;
+      return robustLines.join('\n');
     },
   },
 ];
@@ -255,6 +369,7 @@ export function getDefaultOptions(options: Partial<CorrectionOptions> = {}): Cor
     punctuation: options.punctuation !== false,
     spacing: options.spacing !== false,
     quoteSpaces: options.quoteSpaces !== false,
+    majuscules: options.majuscules !== false,
   };
 }
 
@@ -269,6 +384,7 @@ function initCorrectionsObject(): CorrectionCounts {
     doubleSpaces: 0,
     spacing: 0,
     quoteSpaces: 0,
+    majuscules: 0,
   };
 }
 
