@@ -153,16 +153,22 @@ jobs:
         id: artifacts
         shell: bash
         run: |
-          mapfile -t ZIP_FILES < <(find .output -maxdepth 1 -type f -name "*.zip" | sort)
+          mapfile -t CHROME_ZIPS < <(find .output -maxdepth 1 -type f -name "*-chrome.zip" | sort)
+          mapfile -t FIREFOX_ZIPS < <(find .output -maxdepth 1 -type f -name "*-firefox.zip" | sort)
 
-          if [ "${#ZIP_FILES[@]}" -ne 2 ]; then
-            echo "Expected exactly 2 zip files in .output/, got ${#ZIP_FILES[@]}"
-            printf '%s\n' "${ZIP_FILES[@]}"
+          if [ "${#CHROME_ZIPS[@]}" -ne 1 ] || [ "${#FIREFOX_ZIPS[@]}" -ne 1 ]; then
+            echo "Expected exactly 1 Chrome zip and 1 Firefox zip in .output/."
+            echo "Chrome zips found: ${#CHROME_ZIPS[@]}"
+            printf '%s\n' "${CHROME_ZIPS[@]}"
+            echo "Firefox zips found: ${#FIREFOX_ZIPS[@]}"
+            printf '%s\n' "${FIREFOX_ZIPS[@]}"
+            echo "All zip files in .output/:"
+            find .output -maxdepth 1 -type f -name "*.zip" | sort
             exit 1
           fi
 
-          echo "zip_1=${ZIP_FILES[0]}" >> "$GITHUB_OUTPUT"
-          echo "zip_2=${ZIP_FILES[1]}" >> "$GITHUB_OUTPUT"
+          echo "zip_1=${CHROME_ZIPS[0]}" >> "$GITHUB_OUTPUT"
+          echo "zip_2=${FIREFOX_ZIPS[0]}" >> "$GITHUB_OUTPUT"
 
       - name: Commit version changes
         shell: bash

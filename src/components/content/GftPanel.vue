@@ -147,10 +147,6 @@ function handleFeedback(message: string) {
   showFeedback(message);
 }
 
-function clearFeedback() {
-  // No longer needed internally
-}
-
 function openCustomButtonManager(defaultType: 'structure' | 'cleanup' = 'structure') {
   customManagerDefaultType.value = defaultType;
   showCustomButtonManager.value = true;

@@ -104,7 +104,7 @@ function bindTelemetry() {
       if (!d) return;
 
       // Extract info (handles different YT message formats)
-      const info = d.info || (d.args && d.args[0]);
+      const info = d.info || d.args?.[0];
       
       if (info) {
         if (info.currentTime !== undefined && typeof info.currentTime === 'number') {
@@ -143,7 +143,7 @@ export function useYoutubeControls() {
 
   function togglePlayPause(): 'playing' | 'paused' | null {
     const v = getVideoElement();
-    if (v && v.src && !v.src.includes('blob:')) {
+    if (v?.src && !v.src.includes('blob:')) {
        if (v.paused) {
          v.play().catch(() => {});
          return 'playing';
@@ -180,7 +180,7 @@ export function useYoutubeControls() {
 
   function seekBy(seconds: number): boolean {
     const v = getVideoElement();
-    if (v && v.src && !v.src.includes('blob:')) {
+    if (v?.src && !v.src.includes('blob:')) {
       v.currentTime = Math.max(0, v.currentTime + seconds);
       lastKnownTime = v.currentTime;
       return true;
