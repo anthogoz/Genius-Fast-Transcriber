@@ -123,7 +123,7 @@ const cleanupButtons = computed<CleanupButton[]>(() => {
     id: 'double-spaces',
     labelKey: 'btn_double_spaces_label',
     tooltipKey: 'cleanup_double_spaces_tooltip',
-    action: () => applySingleCorrection({ doubleSpaces: true }, t('btn_double_spaces_label')),
+    action: () => applySingleCorrection({ doubleSpaces: true, quoteSpaces: true }, t('btn_double_spaces_label')),
   });
 
   buttons.push({
@@ -197,6 +197,7 @@ function applySingleCorrection(opts: Record<string, boolean>, itemName: string) 
     punctuation: false,
     doubleSpaces: false,
     spacing: false,
+    quoteSpaces: false,
   };
   const result = applySyncCorrections({ ...disableAll, ...opts });
   if (result.correctionsCount > 0) {
@@ -210,22 +211,36 @@ function applySingleCorrection(opts: Record<string, boolean>, itemName: string) 
 function handleCheckBrackets() {
   const issues = checkBrackets();
   if (issues.length === 0) {
-    emit('feedback', `✅ ${t('feedback_brackets_ok')}`);
+    emit('feedback', t('feedback_brackets_ok'));
   } else {
-    emit('feedback', `⚠️ ${t('feedback_brackets_issue', { count: issues.length })}`);
+    emit('feedback', t('feedback_brackets_issue', { count: issues.length }));
   }
 }
 
 function handleFixAll() {
   const original = getEditorContent();
   const result = previewCorrections();
+  
+  // Toujours vérifier les parenthèses/crochets lors d'un "Tout corriger"
+  const bracketIssues = checkBrackets();
+  
   if (result.correctionsCount === 0 || result.newText === original) {
-    emit('feedback', t('feedback_no_text_corrections'));
+    if (bracketIssues.length > 0) {
+      emit('feedback', t('feedback_brackets_issue', { count: bracketIssues.length }));
+    } else {
+      emit('feedback', t('feedback_no_text_corrections'));
+    }
     return;
   }
+  
   previewOriginal.value = original;
   previewResult.value = result;
   showPreview.value = true;
+  
+  if (bracketIssues.length > 0) {
+    // On notifie quand même pour les brackets même si la preview s'ouvre
+    emit('feedback', t('feedback_brackets_issue', { count: bracketIssues.length }));
+  }
 }
 
 function toggleFindReplace() {

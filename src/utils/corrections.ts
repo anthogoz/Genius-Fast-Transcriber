@@ -22,8 +22,16 @@ export function isSectionTag(line: string): boolean {
 }
 
 export function correctLineSpacing(text: string): { newText: string; correctionsCount: number } {
-  const originalLines = text.split('\n');
-  let correctionsCount = 0;
+  // Sépare d'abord les tags collés sur la même ligne (ex: [Header][Intro])
+  // qui est un problème fréquent lors du copier-coller
+  let internalCount = 0;
+  const preProcessedText = text.replace(/\]([^\S\r\n]*)\[/g, (match) => {
+    internalCount++;
+    return ']\n\n[';
+  });
+
+  const originalLines = preProcessedText.split('\n');
+  let correctionsCount = internalCount;
 
   if (originalLines.length === 0) {
     return { newText: '', correctionsCount: 0 };
@@ -203,6 +211,37 @@ export const CORRECTION_RULES: CorrectionRule[] = [
       return text;
     },
   },
+  {
+    id: 'quoteSpaces',
+    progressKey: 'progress_step_quotes',
+    execute: (text, corrections, opts) => {
+      if (!opts.quoteSpaces) return text;
+      // Nettoie UNIQUEMENT les espaces horizontaux à l'intérieur des guillemets
+      // On évite [^\S\r\n] (espace non-ligne) pour ne pas fusionner de lignes ou manger des tags
+      
+      // 1. Espaces après un guillemet ouvrant : (" texte) -> ("texte)
+      // On considère ouvrant si début de ligne ou précédé d'un espace/parenthèse, et suivi d'un caractère
+      const patternOpen = /(^|[\s(\[])"([^\S\r\n]+)(?=\S)/g;
+      
+      // 2. Espaces avant un guillemet fermant : (texte ") -> (texte")
+      // On considère fermant si précédé d'un caractère et suivi d'un espace/ponctuation/fin
+      const patternClose = /(\S)([^\S\r\n]+)"(?=[\s.,;!?)\]]|$)/g;
+      
+      let count = 0;
+      let result = text.replace(patternOpen, (match, prefix) => {
+        count++;
+        return prefix + '"';
+      });
+      
+      result = result.replace(patternClose, (match, char) => {
+        count++;
+        return char + '"';
+      });
+      
+      if (count > 0) corrections.quoteSpaces = count;
+      return result;
+    },
+  },
 ];
 
 export function getDefaultOptions(options: Partial<CorrectionOptions> = {}): CorrectionOptions {
@@ -215,6 +254,7 @@ export function getDefaultOptions(options: Partial<CorrectionOptions> = {}): Cor
     doubleSpaces: options.doubleSpaces !== false,
     punctuation: options.punctuation !== false,
     spacing: options.spacing !== false,
+    quoteSpaces: options.quoteSpaces !== false,
   };
 }
 
@@ -228,6 +268,7 @@ function initCorrectionsObject(): CorrectionCounts {
     punctuation: 0,
     doubleSpaces: 0,
     spacing: 0,
+    quoteSpaces: 0,
   };
 }
 

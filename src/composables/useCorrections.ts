@@ -17,41 +17,57 @@ export function useCorrections() {
   const { saveState } = useUndoRedo();
   const { locale } = useSettings();
 
-  function highlightContentEditableBracket(position: number) {
+  function highlightContentEditableBrackets(positions: number[]) {
     const editor = state.currentActiveEditor;
-    if (!editor) return;
+    if (!editor || positions.length === 0) return;
 
+    // Trier les positions par ordre décroissant pour ne pas décaler les index lors de l'insertion
+    const sortedPositions = [...positions].sort((a, b) => b - a);
+    
     const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
+    const textNodes: { node: Text; start: number; end: number }[] = [];
     let traversed = 0;
 
     while (walker.nextNode()) {
-      const textNode = walker.currentNode as Text;
-      const value = textNode.nodeValue ?? '';
-      if (position < traversed + value.length) {
-        const localIndex = position - traversed;
-        const parent = textNode.parentNode;
-        if (!parent) return;
+      const node = walker.currentNode as Text;
+      const len = node.nodeValue?.length ?? 0;
+      textNodes.push({ node, start: traversed, end: traversed + len });
+      traversed += len;
+    }
 
-        const before = value.slice(0, localIndex);
-        const char = value[localIndex] ?? '';
-        const after = value.slice(localIndex + 1);
+    for (const pos of sortedPositions) {
+      const target = textNodes.find(tn => pos >= tn.start && pos < tn.end);
+      if (!target) continue;
 
-        const frag = document.createDocumentFragment();
-        if (before) frag.appendChild(document.createTextNode(before));
-        const marker = document.createElement('span');
-        marker.className = 'gft-bracket-highlight';
-        marker.textContent = char;
-        frag.appendChild(marker);
-        if (after) frag.appendChild(document.createTextNode(after));
+      const node = target.node;
+      const localIndex = pos - target.start;
+      const value = node.nodeValue ?? '';
+      const parent = node.parentNode;
+      if (!parent) continue;
 
-        parent.replaceChild(frag, textNode);
-        window.setTimeout(() => {
-          const replacement = document.createTextNode((before ?? '') + char + (after ?? ''));
-          marker.parentNode?.replaceChild(replacement, marker);
-        }, 1800);
-        return;
-      }
-      traversed += value.length;
+      const before = value.slice(0, localIndex);
+      const char = value[localIndex] ?? '';
+      const after = value.slice(localIndex + 1);
+
+      const frag = document.createDocumentFragment();
+      if (before) frag.appendChild(document.createTextNode(before));
+      const marker = document.createElement('span');
+      marker.className = 'gft-bracket-highlight';
+      marker.textContent = char;
+      frag.appendChild(marker);
+      if (after) frag.appendChild(document.createTextNode(after));
+
+      parent.replaceChild(frag, node);
+      
+      // Nettoyage après l'animation
+      window.setTimeout(() => {
+        if (marker.parentNode) {
+          const text = (before ?? '') + char + (after ?? '');
+          marker.parentNode.replaceChild(document.createTextNode(text), marker);
+          // Note: Cela ne restaure pas parfaitement la structure d'origine (nœuds fragmentés)
+          // mais l'éditeur Genius gère généralement bien le nettoyage des nœuds texte adjacents.
+        }
+      }, 2500);
     }
   }
 
@@ -86,16 +102,23 @@ export function useCorrections() {
     const issues = findUnmatchedBracketsAndParentheses(content);
     if (issues.length === 0 || !state.currentActiveEditor) return issues;
 
-    const firstIssue = issues[0];
+    const editor = state.currentActiveEditor as HTMLElement;
+    
+    // Alerte visuelle sur l'éditeur lui-même
+    editor.classList.add('gft-bracket-editor-alert');
+    window.setTimeout(() => {
+      editor.classList.remove('gft-bracket-editor-alert');
+    }, 2500);
+
     if (state.currentEditorType === 'textarea') {
-      const ta = state.currentActiveEditor as HTMLTextAreaElement;
-      // Scroll to the problematic point, but don't select the text
+      const ta = editor as HTMLTextAreaElement;
+      const firstIssue = issues[0];
       const pos = Math.max(0, Math.min(firstIssue.position, ta.value.length - 1));
       ta.focus();
-      // Set the cursor at the position instead of selecting it
-      ta.setSelectionRange(pos, pos);
+      // On ne peut sélectionner qu'un seul élément dans un textarea
+      ta.setSelectionRange(pos, pos + 1);
     } else if (state.currentEditorType === 'contenteditable') {
-      highlightContentEditableBracket(firstIssue.position);
+      highlightContentEditableBrackets(issues.map(i => i.position));
     }
 
     return issues;

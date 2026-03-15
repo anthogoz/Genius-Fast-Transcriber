@@ -44,6 +44,7 @@ export interface CorrectionOptions {
   punctuation: boolean;
   doubleSpaces: boolean;
   spacing: boolean;
+  quoteSpaces: boolean;
 }
 
 export interface CorrectionCounts {
@@ -55,6 +56,7 @@ export interface CorrectionCounts {
   punctuation: number;
   doubleSpaces: number;
   spacing: number;
+  quoteSpaces: number;
 }
 
 export interface CorrectionResult {
