@@ -48,7 +48,9 @@ export default defineContentScript({
     const handleYoutubeAction = (action: 'play' | 'back' | 'forward') => {
       const t = (key: string) => String(i18n.global.t(key));
       if (action === 'play') {
-        if (togglePlayPause()) showFeedback(t('feedback_play'));
+        const result = togglePlayPause();
+        if (result === 'playing') showFeedback(t('feedback_play'));
+        else if (result === 'paused') showFeedback(t('feedback_pause'));
         else showFeedback(`❌ ${t('yt_player_not_found')}`);
       } else if (action === 'back') {
         if (seekBy(-5)) showFeedback('⏪ -5s');
@@ -59,21 +61,8 @@ export default defineContentScript({
       }
     };
 
-    const handleGlobalShortcuts = (e: KeyboardEvent) => {
-      if (!e.altKey || (!e.ctrlKey && !e.metaKey)) return;
-      if (e.code === 'Space') {
-        e.preventDefault();
-        handleYoutubeAction('play');
-      } else if (e.code === 'ArrowLeft') {
-        e.preventDefault();
-        handleYoutubeAction('back');
-      } else if (e.code === 'ArrowRight') {
-        e.preventDefault();
-        handleYoutubeAction('forward');
-      }
-    };
-
-    document.addEventListener('keydown', handleGlobalShortcuts, true);
+    // Global Shortcuts (YouTube) are handled via background.ts -> browser.commands
+    // and received in the onMessage listener above.
 
     browser.runtime.onMessage.addListener((message) => {
       if (message.type === 'GFT_COMMAND') {

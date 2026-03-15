@@ -362,7 +362,6 @@ useKeyboardShortcuts({
     if (!isEditorFocused()) return;
     handleRedo();
   },
-  },
 });
 
 defineExpose({

@@ -152,7 +152,7 @@
   "tuto_step4_title": "4. Historique & Sécurité 🛡️",
   "tuto_step4_content": "• <strong>Annuler/Refaire :</strong> Vos 10 dernières actions sont sauvegardées (Ctrl+Z).<br>• <strong>Sauvegarde Auto :</strong> Brouillons mémorisés en cas de crash.",
   "tuto_step5_title": "5. Contrôle YouTube 📺",
-  "tuto_step5_content": "• <kbd>Ctrl+Alt+Espace</kbd> : Lecture / Pause<br>• <kbd>Ctrl+Alt+← / →</kbd> : Reculer / Avancer (5s)",
+  "tuto_step5_content": "• <kbd>Ctrl+Shift+Espace</kbd> : Lecture / Pause<br>• <kbd>Ctrl+Shift+← / →</kbd> : Reculer / Avancer (5s)",
   "tuto_step6_title": "6. Autres Raccourcis ⌨️",
   "tuto_step6_content": "• <kbd>Ctrl+1-5</kbd> : Tags de structure<br>• <kbd>Ctrl+Shift+C</kbd> : Tout Corriger",
   "tuto_finish_title": "C'est parti ! 🚀",

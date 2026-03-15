@@ -18,13 +18,13 @@ export default defineConfig({
       },
       'seek-forward': {
         suggested_key: {
-          default: 'Alt+Shift+ArrowRight',
+          default: 'Ctrl+Shift+Right',
         },
         description: 'Seek Forward +5s',
       },
       'seek-backward': {
         suggested_key: {
-          default: 'Alt+Shift+ArrowLeft',
+          default: 'Ctrl+Shift+Left',
         },
         description: 'Seek Backward -5s',
       },
