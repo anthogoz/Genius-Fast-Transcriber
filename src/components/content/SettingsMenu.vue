@@ -22,6 +22,7 @@ const emit = defineEmits<{
   close: [];
   toggleStats: [];
   openCustomLibrary: [];
+  openShortcuts: [];
 }>();
 
 function relaunchTutorial() {
@@ -95,6 +96,9 @@ function relaunchTutorial() {
       </button>
       <button type="button" class="gft-settings-menu__item gft-settings-menu__item--btn" @click="emit('openCustomLibrary')">
         {{ t('settings_custom_library') }}
+      </button>
+      <button type="button" class="gft-settings-menu__item gft-settings-menu__item--btn" @click="emit('openShortcuts')">
+        {{ t('settings_shortcuts') }}
       </button>
     </div>
   </Transition>

@@ -17,6 +17,7 @@ import ProgressBar from './ProgressBar.vue';
 import SettingsMenu from './SettingsMenu.vue';
 import StatsDisplay from './StatsDisplay.vue';
 import StructureSection from './StructureSection.vue';
+import ShortcutConfig from './ShortcutConfig.vue';
 
 const props = defineProps<{
   version?: string;
@@ -57,6 +58,7 @@ const structureSection = ref<{
   insertIntroByShortcut: () => void;
   insertOutroByShortcut: () => void;
 } | null>(null);
+const showShortcutConfig = ref(false);
 const cleanupSection = ref<{
   triggerFixAll: () => void;
   triggerDuplicateLine: () => void;
@@ -439,6 +441,7 @@ defineExpose({
             :show-stats="showStats"
             @toggle-stats="showStats = !showStats"
             @open-custom-library="openCustomButtonManager('structure')"
+            @open-shortcuts="showShortcutConfig = true"
             @close="settingsVisible = false"
           />
         </div>
@@ -513,6 +516,11 @@ defineExpose({
       @feedback="handleFeedback"
       @saved="handleCustomButtonsSaved"
       @close="closeCustomButtonManager"
+    />
+
+    <ShortcutConfig
+      :visible="showShortcutConfig"
+      @close="showShortcutConfig = false"
     />
   </div>
 </template>

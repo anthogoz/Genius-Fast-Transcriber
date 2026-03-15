@@ -124,3 +124,28 @@ export interface LyricsStats {
   sections: number;
   characters: number;
 }
+
+export interface KeyboardShortcut {
+  key: string;
+  code: string;
+  ctrlKey?: boolean;
+  shiftKey?: boolean;
+  altKey?: boolean;
+  metaKey?: boolean;
+}
+
+export interface ShortcutSettings {
+  verse: KeyboardShortcut;
+  chorus: KeyboardShortcut;
+  bridge: KeyboardShortcut;
+  intro: KeyboardShortcut;
+  outro: KeyboardShortcut;
+  fixAll: KeyboardShortcut;
+  toggleStats: KeyboardShortcut;
+  duplicateLine: KeyboardShortcut;
+  undo: KeyboardShortcut;
+  redo: KeyboardShortcut;
+  ytPlayPause: KeyboardShortcut;
+  ytSeekBack: KeyboardShortcut;
+  ytSeekForward: KeyboardShortcut;
+}
