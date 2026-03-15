@@ -208,6 +208,7 @@ function handleApply() {
   padding: 8px 18px;
   border-radius: 6px;
   cursor: pointer;
+  font-family: inherit;
   font-weight: 600;
   font-size: 13px;
   height: auto;

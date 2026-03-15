@@ -51,6 +51,9 @@ function insertVerse() {
   border: 1px solid var(--gft-btn-border, #adadad);
   border-radius: 4px;
   overflow: hidden;
+  height: 20px;
+  box-sizing: border-box;
+  font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
 }
 
 .gft-verse-counter__arrow {
@@ -58,13 +61,14 @@ function insertVerse() {
   border: none;
   color: inherit;
   width: 20px;
-  height: 20px;
+  height: 100%;
   cursor: pointer;
   font-size: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: background 0.15s;
+  padding: 0;
 }
 
 .gft-verse-counter__arrow:hover {
@@ -79,13 +83,14 @@ function insertVerse() {
   border: none;
   border-left: 1px solid var(--gft-btn-border, #adadad);
   border-right: 1px solid var(--gft-btn-border, #adadad);
-  padding: 2px 8px;
-  height: 20px;
+  padding: 0 8px;
+  height: 100%;
   cursor: pointer;
   font-weight: 400;
   font-size: 10px;
   transition: opacity 0.15s;
   line-height: 1;
+  font-family: inherit;
 }
 
 .gft-verse-counter__main:hover {

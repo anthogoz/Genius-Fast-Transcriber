@@ -1,5 +1,5 @@
 import type { ExportOptions } from '@/types';
-import { exportToTxt } from '@/utils/export';
+import { exportToTxt, processExportText } from '@/utils/export';
 import { SELECTORS } from './useSongData';
 import { useEditor } from './useEditor';
 import { useGftState } from './useGftState';
@@ -7,18 +7,25 @@ import { useGftState } from './useGftState';
 export function useExport() {
   const { currentSongTitle } = useGftState();
   const { getEditorContent } = useEditor();
+  const { extractSongData } = useSongData();
 
   function getLyricsFromPage(): string {
-    const container = document.querySelector<HTMLElement>(SELECTORS.LYRICS_CONTAINER);
-    if (!container) return '';
+    const containers = Array.from(document.querySelectorAll<HTMLElement>(SELECTORS.LYRICS_CONTAINER));
+    if (containers.length === 0) return '';
 
-    return (container.innerText || container.textContent || '').trim();
+    return containers.map(container => (container.innerText || container.textContent || '').trim()).join('\n\n');
   }
 
   function exportLyrics(options: ExportOptions = {}) {
     const content = getEditorContent().trim() || getLyricsFromPage();
     if (!content.trim()) return;
-    const filename = `${currentSongTitle.value} (GFT Export).txt`;
+
+    let title = currentSongTitle.value;
+    if (!title || title === 'TITRE INCONNU') {
+      title = extractSongData().title;
+    }
+
+    const filename = `${title} (GFT Export).txt`;
     exportToTxt(content, filename, options);
   }
 
@@ -38,7 +45,15 @@ export function useExport() {
     exportLyrics({ removeTags: true, removeSpacing: true });
   }
 
+  function getPreviewText(options: ExportOptions = {}): string {
+    const content = getEditorContent().trim() || getLyricsFromPage();
+    if (!content.trim()) return '';
+    return processExportText(content, options);
+  }
+
   return {
+    getPreviewText,
+    exportLyrics,
     exportStandard,
     exportNoTags,
     exportNoSpacing,

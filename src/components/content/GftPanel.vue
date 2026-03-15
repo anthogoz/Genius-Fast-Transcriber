@@ -13,7 +13,6 @@ import { useUndoRedo } from '@/composables/useUndoRedo';
 import CleanupSection from './CleanupSection.vue';
 import CustomButtonManager from './CustomButtonManager.vue';
 import DraftNotification from './DraftNotification.vue';
-import ExportSection from './ExportSection.vue';
 import FeedbackToast from './FeedbackToast.vue';
 import ProgressBar from './ProgressBar.vue';
 import SettingsMenu from './SettingsMenu.vue';
@@ -179,10 +178,15 @@ let tooltipObserver: MutationObserver | null = null;
 function hydrateTooltips(root: HTMLElement) {
   const elements = root.querySelectorAll<HTMLElement>('[title]');
   elements.forEach((el) => {
-    if (el.dataset.gftTooltipBound === '1') return;
     const title = el.getAttribute('title');
-    if (!title) return;
+    if (!title) return; // Prevent empty titles from overriding
+
+    // Set or update the customized tooltip text
     el.dataset.gftTooltip = title;
+    
+    // Only mark it as bound and remove the native title attribute once we stored it in the dataset.
+    // Notice we do NOT check `if (el.dataset.gftTooltipBound === '1') return;` at the start anymore.
+    // This allows dynamically updated titles (from i18n changes) to be processed.
     el.dataset.gftTooltipBound = '1';
     el.removeAttribute('title');
   });
@@ -259,6 +263,18 @@ onMounted(async () => {
 watch(areTooltipsEnabled, (enabled) => {
   if (!enabled) {
     hideCustomTooltip();
+  }
+});
+
+watch(locale, async () => {
+  // Give Vue + VueI18n time to perform DOM updates 
+  await nextTick();
+  
+  if (panelRef.value) {
+    // Vue resets the `title` properties based on v-bind:title or :title.
+    // We just need to search for newly added `title` attributes (or updated ones)
+    // and transfer them to our custom dataset properties.
+    hydrateTooltips(panelRef.value);
   }
 });
 
@@ -478,7 +494,6 @@ defineExpose({
 
       <StructureSection ref="structureSection" @open-custom-library="openCustomButtonManager" />
       <CleanupSection ref="cleanupSection" @feedback="handleFeedback" @open-custom-library="openCustomButtonManager" />
-      <ExportSection />
 
       <button
         :title="t('global_fix_tooltip')"
@@ -685,6 +700,7 @@ defineExpose({
   display: flex;
   align-items: center;
   justify-content: center;
+  font-family: inherit;
   font-size: 12px;
   transition: background 0.15s;
 }
@@ -745,6 +761,7 @@ defineExpose({
   border: 1px solid var(--gft-btn-primary-border, #f9ff55);
   color: var(--gft-btn-primary-text, #0e0e0e);
   font-weight: 800;
+  font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
   font-size: 13px;
   line-height: 1;
   cursor: pointer;

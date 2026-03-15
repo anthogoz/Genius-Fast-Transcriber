@@ -61,12 +61,18 @@ function pluralize(key: string, count: number): string {
 <style scoped>
 .gft-stats {
   display: flex;
-  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  gap: 2px 6px;
-  font-size: 11px;
-  opacity: 0.7;
-  padding: 6px 0;
+  gap: 6px;
+  font-size: 10.5px;
+  font-weight: 500;
+  padding: 3px 14px;
+  margin: 0 auto 10px auto;
+  border-radius: 20px;
+  width: fit-content;
+  background: var(--gft-btn-bg, rgba(128, 128, 128, 0.1));
+  border: 1px solid var(--gft-btn-border, rgba(128, 128, 128, 0.2));
+  opacity: 0.85;
 }
 
 .gft-stats__item {
@@ -74,6 +80,6 @@ function pluralize(key: string, count: number): string {
 }
 
 .gft-stats__separator {
-  opacity: 0.5;
+  opacity: 0.35;
 }
 </style>

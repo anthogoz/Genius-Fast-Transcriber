@@ -311,13 +311,13 @@ export function renderLyricCardToCanvas(
     logoWidth = logoObj.width * (logoHeight / logoObj.height);
   } else {
     context.save();
-    context.font = '900 36px "Programme Pan", "Arial Black", sans-serif';
+    context.font = '900 36px "Programme", "Arial Black", sans-serif';
     logoWidth = context.measureText('G E N I U S').width;
     context.restore();
   }
 
   const logoX = width - 60 - logoWidth;
-  context.font = `normal ${fontSizeFooter}px "Programme Pan", Arial, sans-serif`;
+  context.font = `normal ${fontSizeFooter}px "Programme", Arial, sans-serif`;
   context.fillStyle = textColor;
   context.textBaseline = 'middle';
 
@@ -358,14 +358,14 @@ export function renderLyricCardToCanvas(
   } else {
     context.save();
     context.textAlign = 'left';
-    context.font = '900 36px "Programme Pan", "Arial Black", sans-serif';
+    context.font = '900 36px "Programme", "Arial Black", sans-serif';
     context.fillStyle = textColor;
     context.fillText('G E N I U S', logoX, height - footerHeight / 2);
     context.restore();
   }
 
   const maxTextWidth = width - 120;
-  context.font = `300 ${fontSizeText}px "Programme Pan", Arial, sans-serif`;
+  context.font = `300 ${fontSizeText}px "Programme", Arial, sans-serif`;
 
   const lines: string[] = [];
   text.split(/\r?\n/).forEach((rawLine) => {

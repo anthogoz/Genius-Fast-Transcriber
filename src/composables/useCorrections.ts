@@ -89,18 +89,13 @@ export function useCorrections() {
     const firstIssue = issues[0];
     if (state.currentEditorType === 'textarea') {
       const ta = state.currentActiveEditor as HTMLTextAreaElement;
+      // Scroll to the problematic point, but don't select the text
       const pos = Math.max(0, Math.min(firstIssue.position, ta.value.length - 1));
       ta.focus();
-      ta.setSelectionRange(pos, Math.min(pos + 1, ta.value.length));
-      ta.classList.add('gft-bracket-editor-alert');
-      window.setTimeout(() => ta.classList.remove('gft-bracket-editor-alert'), 1800);
+      // Set the cursor at the position instead of selecting it
+      ta.setSelectionRange(pos, pos);
     } else if (state.currentEditorType === 'contenteditable') {
       highlightContentEditableBracket(firstIssue.position);
-      state.currentActiveEditor.classList.add('gft-bracket-editor-alert');
-      window.setTimeout(
-        () => state.currentActiveEditor?.classList.remove('gft-bracket-editor-alert'),
-        1800,
-      );
     }
 
     return issues;
