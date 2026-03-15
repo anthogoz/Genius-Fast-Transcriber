@@ -39,7 +39,7 @@ function relaunchTutorial() {
     <div v-if="visible" class="gft-settings-menu" :class="{ 'gft-settings-menu--dark': isDarkMode }" @click.stop>
       
       <label class="gft-settings-menu__item gft-settings-menu__item--toggle">
-        <span class="gft-settings-menu__label">{{ isDarkMode ? t('popup_dark') : t('popup_light') }}</span>
+        <span class="gft-settings-menu__label">{{ t('dark_mode_label') }}</span>
         <div class="gft-toggle" :class="{ 'gft-toggle--active': isDarkMode }">
           <input type="checkbox" v-model="isDarkMode" class="gft-toggle__input" />
           <div class="gft-toggle__track">
@@ -49,7 +49,7 @@ function relaunchTutorial() {
       </label>
 
       <label class="gft-settings-menu__item gft-settings-menu__item--toggle">
-        <span class="gft-settings-menu__label">{{ areTooltipsEnabled ? t('tooltips_disable') : t('tooltips_enable') }}</span>
+        <span class="gft-settings-menu__label">{{ t('tooltips_label') }}</span>
         <div class="gft-toggle" :class="{ 'gft-toggle--active': areTooltipsEnabled }">
           <input type="checkbox" v-model="areTooltipsEnabled" class="gft-toggle__input" />
           <div class="gft-toggle__track">
@@ -59,7 +59,7 @@ function relaunchTutorial() {
       </label>
 
       <label class="gft-settings-menu__item gft-settings-menu__item--toggle">
-        <span class="gft-settings-menu__label">{{ isHeaderFeatEnabled ? t('header_feat_hide') : t('header_feat_show') }}</span>
+        <span class="gft-settings-menu__label">{{ t('header_feat_label') }}</span>
         <div class="gft-toggle" :class="{ 'gft-toggle--active': isHeaderFeatEnabled }">
           <input type="checkbox" v-model="isHeaderFeatEnabled" class="gft-toggle__input" />
           <div class="gft-toggle__track">
@@ -69,7 +69,7 @@ function relaunchTutorial() {
       </label>
 
       <label class="gft-settings-menu__item gft-settings-menu__item--toggle">
-        <span class="gft-settings-menu__label">{{ isTagNewlinesDisabled ? t('newline_enable') : t('newline_disable') }}</span>
+        <span class="gft-settings-menu__label">{{ t('newline_label') }}</span>
         <div class="gft-toggle" :class="{ 'gft-toggle--active': !isTagNewlinesDisabled }">
           <input type="checkbox" :checked="!isTagNewlinesDisabled" @change="isTagNewlinesDisabled = !isTagNewlinesDisabled" class="gft-toggle__input" />
           <div class="gft-toggle__track">
@@ -79,7 +79,7 @@ function relaunchTutorial() {
       </label>
 
       <label class="gft-settings-menu__item gft-settings-menu__item--toggle">
-        <span class="gft-settings-menu__label">{{ showStats ? t('stats_hide') : t('stats_show') }}</span>
+        <span class="gft-settings-menu__label">{{ t('stats_label') }}</span>
         <div class="gft-toggle" :class="{ 'gft-toggle--active': showStats }">
           <input type="checkbox" :checked="showStats" @change="emit('toggleStats')" class="gft-toggle__input" />
           <div class="gft-toggle__track">
