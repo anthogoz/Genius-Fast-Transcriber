@@ -36,7 +36,7 @@ const actions = computed<{ key: ToolbarAction; tooltipKey: string; icon: string 
     baseActions.push({
       key: 'numberToWords',
       tooltipKey: 'toolbar_num_to_words_tooltip',
-      icon: '123→abc',
+      icon: '🔢',
     });
   }
 
@@ -71,7 +71,7 @@ function handleAction(action: ToolbarAction) {
       >
         <span v-if="action.key === 'bold'" style="font-weight: 800;">B</span>
         <span v-else-if="action.key === 'italic'" style="font-style: italic;">I</span>
-        <span v-else-if="action.key === 'numberToWords'">123→abc</span>
+        <span v-else-if="action.key === 'numberToWords'">🔢</span>
         <span v-else-if="action.key === 'adlib'">( )</span>
         <span v-else>{{ action.icon }}</span>
       </button>

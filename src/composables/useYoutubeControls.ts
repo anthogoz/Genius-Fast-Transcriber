@@ -1,160 +1,145 @@
-function getYouTubeIframe(): HTMLIFrameElement | null {
-  const candidates = Array.from(
-    document.querySelectorAll<HTMLIFrameElement>(
-      'iframe[src*="youtube.com"], iframe[src*="youtube-nocookie.com"], iframe[src*="youtu.be"]',
-    ),
-  );
+let lastKnownTime = 0;
+let lastKnownState: number | null = null;
+let telemetryBound = false;
 
-  return (
-    candidates.find((iframe) => {
-      const rect = iframe.getBoundingClientRect();
-      return rect.width > 120 && rect.height > 80;
-    })
-    ?? candidates[0]
-    ?? null
-  );
+function getYouTubeIframe(): HTMLIFrameElement | null {
+  try {
+    const all = Array.from(document.querySelectorAll('iframe'));
+    return all.find(f => {
+      try {
+        const s = f.src || '';
+        return (
+          s.includes('youtube.com/embed/') || 
+          s.includes('youtube-nocookie.com/embed/') || 
+          s.includes('youtu.be/')
+        );
+      } catch { return false; }
+    }) || null;
+  } catch { return null; }
 }
 
 function getVideoElement(): HTMLVideoElement | null {
-  return document.querySelector<HTMLVideoElement>('video');
+  return document.querySelector<HTMLVideoElement>('video') 
+      || document.querySelector<HTMLVideoElement>('audio');
 }
 
-function ensureJsApi(iframe: HTMLIFrameElement) {
+function postCommand(iframe: HTMLIFrameElement, func: string, args: any[] = []) {
+  const win = iframe.contentWindow;
+  if (!win) return;
   try {
-    const src = iframe.getAttribute('src');
-    if (!src) return;
-
-    const url = new URL(src, window.location.href);
-    if (url.searchParams.get('enablejsapi') !== '1') {
-      url.searchParams.set('enablejsapi', '1');
-      url.searchParams.set('origin', window.location.origin);
-      iframe.setAttribute('src', url.toString());
-    }
-  } catch {
-    // Ignore malformed URL or cross-origin edge cases.
-  }
+    const cmd = JSON.stringify({ 
+      event: 'command', 
+      func, 
+      args, 
+      id: 1 
+    });
+    win.postMessage(cmd, '*');
+  } catch {}
 }
 
-function postPlayerCommand(iframe: HTMLIFrameElement, func: string, args: unknown[] = []) {
-  iframe.contentWindow?.postMessage(
-    JSON.stringify({
-      event: 'command',
-      func,
-      args,
-    }),
-    '*',
-  );
-}
-
-let iframeTelemetryBound = false;
-let lastKnownIframeTime: number | null = null;
-let lastKnownIframePlayerState: number | null = null;
-
-function isYoutubeMessageOrigin(origin: string): boolean {
-  return origin.includes('youtube.com') || origin.includes('youtube-nocookie.com');
-}
-
-function bindIframeTelemetry() {
-  if (iframeTelemetryBound) return;
-
-  window.addEventListener('message', (event) => {
-    if (!isYoutubeMessageOrigin(event.origin)) return;
-
-    let payload: unknown = event.data;
-    if (typeof payload === 'string') {
-      try {
-        payload = JSON.parse(payload);
-      } catch {
-        return;
+function bindTelemetry() {
+  if (telemetryBound) return;
+  
+  window.addEventListener('message', (e) => {
+    // Broadening the origin check to catch all variations
+    if (!e.origin || !e.origin.includes('youtube')) return;
+    
+    try {
+      const d = typeof e.data === 'string' ? JSON.parse(e.data) : e.data;
+      
+      // Standard YouTube info delivery
+      if (d && d.event === 'infoDelivery' && d.info) {
+        if (d.info.currentTime !== undefined && typeof d.info.currentTime === 'number') {
+          lastKnownTime = d.info.currentTime;
+        }
+        if (d.info.playerState !== undefined) {
+          lastKnownState = d.info.playerState;
+        }
       }
-    }
-
-    if (!payload || typeof payload !== 'object') return;
-
-    const info = (payload as { info?: { currentTime?: unknown; playerState?: unknown } }).info;
-    if (!info || typeof info !== 'object') return;
-
-    const currentTime = info.currentTime;
-    if (typeof currentTime === 'number' && Number.isFinite(currentTime)) {
-      lastKnownIframeTime = currentTime;
-    }
-
-    const playerState = info.playerState;
-    if (typeof playerState === 'number' && Number.isFinite(playerState)) {
-      lastKnownIframePlayerState = playerState;
-    }
-  });
-
-  iframeTelemetryBound = true;
-}
-
-function seekIframeBy(iframe: HTMLIFrameElement, seconds: number): boolean {
-  ensureJsApi(iframe);
-  bindIframeTelemetry();
-
-  postPlayerCommand(iframe, 'addEventListener', ['onStateChange']);
-  postPlayerCommand(iframe, 'getCurrentTime');
-
-  const seekFromKnownTime = () => {
-    if (lastKnownIframeTime === null) return false;
-
-    const target = Math.max(0, lastKnownIframeTime + seconds);
-    postPlayerCommand(iframe, 'seekTo', [target, true]);
-    lastKnownIframeTime = target;
-    return true;
-  };
-
-  if (seekFromKnownTime()) return true;
-
-  // Best effort: request current time first, then retry seek once telemetry arrives.
-  setTimeout(() => {
-    void seekFromKnownTime();
-  }, 120);
-
-  return true;
+      // Alternate data structure
+      else if (d && d.info) {
+        if (d.info.currentTime !== undefined) lastKnownTime = d.info.currentTime;
+        if (d.info.playerState !== undefined) lastKnownState = d.info.playerState;
+      }
+    } catch {}
+  }, true);
+  
+  telemetryBound = true;
 }
 
 export function useYoutubeControls() {
+  if (typeof window !== 'undefined') {
+    bindTelemetry();
+  }
+
   function togglePlayPause(): boolean {
-    const video = getVideoElement();
-    if (video) {
-      if (video.paused) {
-        void video.play();
-      } else {
-        video.pause();
-      }
+    const v = getVideoElement();
+    if (v) {
+      if (v.paused) v.play().catch(() => {});
+      else v.pause();
       return true;
     }
 
-    const iframe = getYouTubeIframe();
-    if (!iframe) return false;
+    const f = getYouTubeIframe();
+    if (!f) return false;
 
-    ensureJsApi(iframe);
-    bindIframeTelemetry();
-    postPlayerCommand(iframe, 'getPlayerState');
-    if (lastKnownIframePlayerState === 1) {
-      postPlayerCommand(iframe, 'pauseVideo');
+    // Handshake
+    postCommand(f, 'listening');
+    
+    // Toggle
+    if (lastKnownState === 1) { 
+        postCommand(f, 'pauseVideo');
+        lastKnownState = 2;
     } else {
-      postPlayerCommand(iframe, 'playVideo');
+        postCommand(f, 'playVideo');
+        lastKnownState = 1;
     }
+    
+    // Proactive update requests
+    postCommand(f, 'addEventListener', ['onStateChange']);
+    postCommand(f, 'getPlayerState');
+    postCommand(f, 'getCurrentTime');
+    
     return true;
   }
 
   function seekBy(seconds: number): boolean {
-    const video = getVideoElement();
-    if (video) {
-      video.currentTime = Math.max(0, video.currentTime + seconds);
-      return true;
+    const v = getVideoElement();
+    if (v) {
+      const prev = v.currentTime;
+      v.currentTime = Math.max(0, v.currentTime + seconds);
+      return v.currentTime !== prev;
     }
 
-    const iframe = getYouTubeIframe();
-    if (!iframe) return false;
+    const f = getYouTubeIframe();
+    if (!f) return false;
 
-    return seekIframeBy(iframe, seconds);
+    // To seek properly, we need the current time from telemetry.
+    // If telemetry hasn't fired yet, lastKnownTime is 0.
+    // We send getCurrentTime to try to trigger an update.
+    postCommand(f, 'getCurrentTime');
+
+    // Use absolute seek: last_known + offset
+    const target = Math.max(0, lastKnownTime + seconds);
+    postCommand(f, 'seekTo', [target, true]);
+    
+    // Optimistically update cache for double-clicks
+    lastKnownTime = target;
+    
+    return true;
   }
 
-  return {
-    togglePlayPause,
-    seekBy,
-  };
+  // Auto-init on page load if iframe exists
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      const f = getYouTubeIframe();
+      if (f) {
+        postCommand(f, 'listening');
+        postCommand(f, 'addEventListener', ['onStateChange']);
+        postCommand(f, 'getCurrentTime');
+      }
+    }, 1000);
+  }
+
+  return { togglePlayPause, seekBy };
 }

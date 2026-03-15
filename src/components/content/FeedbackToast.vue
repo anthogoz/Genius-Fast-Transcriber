@@ -41,18 +41,16 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <Teleport to="body">
-    <Transition name="gft-toast">
-      <div 
-        v-if="message" 
-        :key="feedbackKey"
-        class="gft-toast gft-u-toast"
-      >
-        <span class="gft-toast__icon">✨</span>
-        <span class="gft-toast__text">{{ message }}</span>
-      </div>
-    </Transition>
-  </Teleport>
+  <Transition name="gft-toast">
+    <div 
+      v-if="message" 
+      :key="feedbackKey"
+      class="gft-toast gft-u-toast"
+    >
+      <span class="gft-toast__icon">✨</span>
+      <span class="gft-toast__text">{{ message }}</span>
+    </div>
+  </Transition>
 </template>
 
 <style scoped>

@@ -362,20 +362,6 @@ useKeyboardShortcuts({
     if (!isEditorFocused()) return;
     handleRedo();
   },
-  onYoutubePlayPause: () => {
-    if (togglePlayPause()) {
-      showFeedback(t('feedback_play'));
-    }
-  },
-  onYoutubeSeekBack: () => {
-    if (seekBy(-5)) {
-      showFeedback('⏪ -5s');
-    }
-  },
-  onYoutubeSeekForward: () => {
-    if (seekBy(5)) {
-      showFeedback('⏩ +5s');
-    }
   },
 });
 

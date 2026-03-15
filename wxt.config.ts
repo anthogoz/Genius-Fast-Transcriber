@@ -7,8 +7,28 @@ export default defineConfig({
     name: '__MSG_extName__',
     description: '__MSG_extDescription__',
     default_locale: 'en',
-    permissions: ['activeTab'],
+    permissions: ['activeTab', 'tabs'],
     host_permissions: ['*://*.genius.com/*'],
+    commands: {
+      'toggle-play': {
+        suggested_key: {
+          default: 'Ctrl+Shift+Space',
+        },
+        description: 'Toggle YouTube Play/Pause',
+      },
+      'seek-forward': {
+        suggested_key: {
+          default: 'Alt+Shift+ArrowRight',
+        },
+        description: 'Seek Forward +5s',
+      },
+      'seek-backward': {
+        suggested_key: {
+          default: 'Alt+Shift+ArrowLeft',
+        },
+        description: 'Seek Backward -5s',
+      },
+    },
     web_accessible_resources: [
       {
         resources: [

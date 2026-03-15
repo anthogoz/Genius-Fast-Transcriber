@@ -29,6 +29,8 @@ export default defineContentScript({
     const { setEditor, setArtists, setSongTitle, state } = useGftState();
     const { extractSongData } = useSongData();
 
+    setLocale(settings.locale.value);
+
     // Global Feedback Toast
     const feedbackContainer = document.createElement('div');
     feedbackContainer.id = 'gft-feedback-root';
@@ -37,7 +39,52 @@ export default defineContentScript({
     feedbackApp.use(i18n);
     feedbackApp.mount(feedbackContainer);
 
-    setLocale(settings.locale.value);
+    // YouTube Controls (Global)
+    const { togglePlayPause, seekBy } = useYoutubeControls();
+    const showFeedback = (msg: string) => {
+      window.dispatchEvent(new CustomEvent('gft-show-feedback', { detail: { message: msg } }));
+    };
+
+    const handleYoutubeAction = (action: 'play' | 'back' | 'forward') => {
+      const t = (key: string) => String(i18n.global.t(key));
+      if (action === 'play') {
+        if (togglePlayPause()) showFeedback(t('feedback_play'));
+        else showFeedback(`❌ ${t('yt_player_not_found')}`);
+      } else if (action === 'back') {
+        if (seekBy(-5)) showFeedback('⏪ -5s');
+        else showFeedback(`❌ ${t('yt_player_not_found')}`);
+      } else if (action === 'forward') {
+        if (seekBy(5)) showFeedback('⏩ +5s');
+        else showFeedback(`❌ ${t('yt_player_not_found')}`);
+      }
+    };
+
+    const handleGlobalShortcuts = (e: KeyboardEvent) => {
+      if (!e.altKey || (!e.ctrlKey && !e.metaKey)) return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        handleYoutubeAction('play');
+      } else if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        handleYoutubeAction('back');
+      } else if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        handleYoutubeAction('forward');
+      }
+    };
+
+    document.addEventListener('keydown', handleGlobalShortcuts, true);
+
+    browser.runtime.onMessage.addListener((message) => {
+      if (message.type === 'GFT_COMMAND') {
+        switch (message.command) {
+          case 'toggle-play': handleYoutubeAction('play'); break;
+          case 'seek-backward': handleYoutubeAction('back'); break;
+          case 'seek-forward': handleYoutubeAction('forward'); break;
+        }
+      }
+    });
+
 
     const GFT_VERSION = browser.runtime.getManifest().version;
     let cleanupFloatingToolbar: (() => void) | null = null;
