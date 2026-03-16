@@ -16,7 +16,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  apply: [correctedText: string];
+  apply: [result: CorrectionResult];
   cancel: [];
 }>();
 
@@ -85,7 +85,7 @@ function updatePreview() {
 watch(options, updatePreview, { deep: true });
 
 function handleApply() {
-  emit('apply', currentResult.value.newText);
+  emit('apply', currentResult.value);
 }
 </script>
 

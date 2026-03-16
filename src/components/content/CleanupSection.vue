@@ -290,12 +290,10 @@ function runCustomCleanup(btn: CustomButton) {
   emit('feedback', t('feedback_replaced', { count: (source.match(pattern) || []).length, item: btn.label }));
 }
 
-function handlePreviewApply(_correctedText: string) {
+function handlePreviewApply(result: CorrectionResult) {
   showPreview.value = false;
-  if (previewResult.value) {
-    applyAndSetCorrections(previewResult.value);
-    emit('feedback', `🚀 ${(t as any)('feedback_summary_correction', previewResult.value.correctionsCount, { count: previewResult.value.correctionsCount })}`);
-  }
+  applyAndSetCorrections(result);
+  emit('feedback', `🚀 ${(t as any)('feedback_summary_correction', result.correctionsCount, { count: result.correctionsCount })}`);
 }
 
 function handlePreviewCancel() {
