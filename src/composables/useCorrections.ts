@@ -162,7 +162,8 @@ export function useCorrections() {
       .map((line) => {
         const trimmed = line.trim();
         if (!trimmed || isSectionTag(trimmed)) return line;
-        return line.replace(/[.,]+[^\S\r\n]*$/, '');
+        const newLine = line.replace(/\.{3,}/g, '…');
+        return newLine.replace(/[.,]+[^\S\r\n]*$/, '');
       })
       .join('\n');
     setEditorContent(newText);

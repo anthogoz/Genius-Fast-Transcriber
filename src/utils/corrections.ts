@@ -289,6 +289,11 @@ export const CORRECTION_RULES: CorrectionRule[] = [
           newLine = noSpace;
         }
 
+        // 1.5 Remplacer les successions de points (...) par l'ellipse (…), partout dans la ligne
+        if (!isSectionTag(newLine)) {
+          newLine = newLine.replace(/\.{3,}/g, '…');
+        }
+
         // 2. Règle Genius : suppression des . et , en fin de ligne
         if (!isSectionTag(newLine)) {
           newLine = newLine.replace(/[.,]+[^\S\r\n]*$/, '');
