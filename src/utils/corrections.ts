@@ -10,23 +10,76 @@ import type {
 export function isSectionTag(line: string): boolean {
   const trimmed = line.trim();
 
+  // On considère comme "Tag" ce qui commence par [ et finit par ]
+  // ou ce qui se termine par une annotation Genius (ID)
   if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-    if (/^\[\?+\]$/.test(trimmed)) return false;
     return true;
   }
 
-  if (/^\[\[.*\]\]\(.*\)$/.test(trimmed)) {
+  // Annotation: [Texte](12345) ou [[Texte]](12345) ou [Texte] (12345)
+  if (/^\[+.*\]+\s*\(\d+\)$/.test(trimmed)) {
     return true;
   }
 
   return false;
 }
 
+/**
+ * Liste des mots-clés typiques de début de section sur Genius
+ */
+const SECTION_KEYWORDS = [
+  'Couplet', 'Verse', 'Refrain', 'Chorus', 'Pont', 'Bridge', 
+  'Intro', 'Outro', 'Pre-Chorus', 'Pré-refrain', 'Post-Chorus', 'Post-refrain',
+  'Hook', 'Instrumental', 'Solo', 'Skit', 'Paroles', 'Słowa', 'Zwrotka', 'Refren', 'Mostek'
+];
+
+/**
+ * Détermine si un tag est une véritable en-tête de section (ex: [Verse])
+ * et non un simple marqueur de texte inconnu [?] ou une ligne de paroles avec tags.
+ */
+export function isHeadingTag(line: string): boolean {
+  const trimmed = line.trim();
+  if (!isSectionTag(line)) return false;
+
+  // 1. On nettoie la ligne de son annotation éventuelle à la fin
+  const withoutAnnotation = trimmed.replace(/\s*\(\d+\)$/, '');
+
+  // 2. On extrait le contenu du premier bloc de crochets
+  // On gère les doubles crochets Genius [[...]]
+  const firstBracketMatch = withoutAnnotation.match(/^\[+([^\]]+)\]+/);
+  if (!firstBracketMatch) return false;
+  
+  const tagInnerContent = firstBracketMatch[1].trim();
+
+  // 3. On vérifie s'il reste du texte "libre" après les tags 
+  const textOutsideTags = withoutAnnotation.replace(/\[+.*?\]+/g, '').trim();
+  if (textOutsideTags.length > 0) return false;
+
+  // 4. Critère de décision : 
+  // On crée une regex pour vérifier que le contenu du tag commence par un mot-clé + limite de mot
+  const keywordPattern = new RegExp(`^(${SECTION_KEYWORDS.join('|')})\\b`, 'i');
+  
+  const startsWithKeyword = keywordPattern.test(tagInnerContent);
+
+  // Si c'est un placeholder pur [?], ce n'est jamais un titre
+  if (/^\?+$/.test(tagInnerContent)) return false;
+
+  return startsWithKeyword;
+}
+
 export function correctLineSpacing(text: string): { newText: string; correctionsCount: number } {
   // Sépare d'abord les tags collés sur la même ligne (ex: [Header][Intro])
   // qui est un problème fréquent lors du copier-coller
   let internalCount = 0;
-  const preProcessedText = text.replace(/\]([^\S\r\n]*)\[/g, (_match) => {
+  // On ne sépare que si le deuxième tag est un vrai titre (évite de séparer [Verse 1][?])
+  const preProcessedText = text.replace(/\]([^\S\r\n]*)\[/g, (match, _spaces, offset, fullText) => {
+    const afterOpenBracket = fullText.slice(offset + match.length - 1);
+    const nextBracketEnd = afterOpenBracket.indexOf(']');
+    if (nextBracketEnd !== -1) {
+      const tagContent = afterOpenBracket.slice(0, nextBracketEnd + 1);
+      if (!isHeadingTag(tagContent)) return match;
+    }
+    
     internalCount++;
     return ']\n\n[';
   });
@@ -47,7 +100,7 @@ export function correctLineSpacing(text: string): { newText: string; corrections
     if (currentLine.trim() !== '') {
       if (i + 1 < originalLines.length) {
         const nextLine = originalLines[i + 1];
-        if (nextLine.trim() !== '' && isSectionTag(nextLine)) {
+        if (nextLine.trim() !== '' && isHeadingTag(nextLine)) {
           linesWithAddedSpacing.push('');
           correctionsCount++;
         }
@@ -77,7 +130,7 @@ export function correctLineSpacing(text: string): { newText: string; corrections
       for (let k = i + 1; k < linesWithAddedSpacing.length; k++) {
         if (linesWithAddedSpacing[k].trim() !== '') {
           hasNextContent = true;
-          if (isSectionTag(linesWithAddedSpacing[k])) {
+          if (isHeadingTag(linesWithAddedSpacing[k])) {
             nextLineIsTag = true;
           }
           break;
@@ -209,6 +262,8 @@ export const CORRECTION_RULES: CorrectionRule[] = [
       // On traite le texte ligne par ligne pour plus de précision
       const lines = text.split('\n');
       const newLines = lines.map((line) => {
+        if (isSectionTag(line)) return line;
+        
         let newLine = line;
 
         // 1. Supprime d'abord tous les espaces avant TOUTE ponctuation pour normaliser
@@ -223,9 +278,10 @@ export const CORRECTION_RULES: CorrectionRule[] = [
 
         // Règle ! ? : ; (dépend de la langue)
         if (locale === 'fr') {
-          // Français : doit avoir UN espace avant
-          const withSpace = newLine.replace(/(?<!\s)([?!:;])/g, ' $1') // Ajoute si manque
-                                   .replace(/\s{2,}([?!:;])/g, ' $1'); // Réduit si trop
+          // Français : doit avoir UN espace avant, sauf si on est juste après un crochet [
+          const withSpace = newLine.replace(/(?<![\s\[])([?!:;])/g, ' $1') // Ajoute si manque, sauf après [
+                                   .replace(/\[\s+([?!:;])/g, '[$1')     // Supprime si déjà là après [ (on ne remet pas le ] ici car il est déjà dans le texte)
+                                   .replace(/\s{2,}([?!:;])/g, ' $1');    // Réduit si trop
           newLine = withSpace;
         } else {
           // Anglais/Polonais : doit être collé
