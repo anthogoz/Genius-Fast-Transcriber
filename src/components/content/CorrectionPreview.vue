@@ -32,6 +32,8 @@ const options = ref<CorrectionOptions>({
   quoteSpaces: true,
   majuscules: true,
   songHeader: true,
+  repetitions: true,
+  tagSeparator: true,
 });
 
 const currentResult = ref<CorrectionResult>(props.correctionResult);
@@ -47,21 +49,24 @@ interface OptionDef {
   labelKey: string;
   statKey: keyof CorrectionCounts;
   statLabelKey: string;
+  icon: string;
   show?: boolean;
 }
 
 const optionDefs = computed<OptionDef[]>(() => [
-  { key: 'yPrime', labelKey: 'preview_opt_yprime', statKey: 'yPrime', statLabelKey: 'preview_stat_yprime' },
-  { key: 'apostrophes', labelKey: 'preview_opt_apostrophes', statKey: 'apostrophes', statLabelKey: 'preview_stat_apostrophes' },
-  { key: 'oeuLigature', labelKey: 'preview_opt_oeu', statKey: 'oeuLigature', statLabelKey: 'preview_stat_oeu' },
-  { key: 'frenchQuotes', labelKey: 'preview_opt_quotes', statKey: 'frenchQuotes', statLabelKey: 'preview_stat_quotes' },
-  { key: 'longDash', labelKey: 'preview_opt_dash', statKey: 'longDash', statLabelKey: 'preview_stat_dash' },
-  { key: 'punctuation', labelKey: 'preview_opt_punctuation', statKey: 'punctuation', statLabelKey: 'preview_stat_punctuation', show: showPunctuation.value },
-  { key: 'doubleSpaces', labelKey: 'preview_opt_spaces', statKey: 'doubleSpaces', statLabelKey: 'preview_stat_spaces' },
-  { key: 'spacing', labelKey: 'preview_opt_spacing', statKey: 'spacing', statLabelKey: 'preview_stat_spacing' },
-  { key: 'quoteSpaces', labelKey: 'preview_opt_quote_spaces', statKey: 'quoteSpaces', statLabelKey: 'preview_stat_quote_spaces' },
-  { key: 'majuscules', labelKey: 'preview_opt_majuscules', statKey: 'majuscules', statLabelKey: 'preview_stat_majuscules' },
-  { key: 'songHeader', labelKey: 'preview_opt_songHeader', statKey: 'songHeader', statLabelKey: 'preview_stat_songHeader' },
+  { key: 'repetitions', labelKey: 'preview_opt_repetitions', statKey: 'repetitions', statLabelKey: 'preview_stat_repetitions', icon: '🔁' },
+  { key: 'tagSeparator', labelKey: 'preview_opt_tag_separator', statKey: 'tagSeparator', statLabelKey: 'preview_stat_tag_separator', icon: '🏷️' },
+  { key: 'songHeader', labelKey: 'preview_opt_songHeader', statKey: 'songHeader', statLabelKey: 'preview_stat_songHeader', icon: '📝' },
+  { key: 'majuscules', labelKey: 'preview_opt_majuscules', statKey: 'majuscules', statLabelKey: 'preview_stat_majuscules', icon: '⇧A' },
+  { key: 'apostrophes', labelKey: 'preview_opt_apostrophes', statKey: 'apostrophes', statLabelKey: 'preview_stat_apostrophes', icon: ' \'' },
+  { key: 'punctuation', labelKey: 'preview_opt_punctuation', statKey: 'punctuation', statLabelKey: 'preview_stat_punctuation', icon: ' !?', show: showPunctuation.value },
+  { key: 'spacing', labelKey: 'preview_opt_spacing', statKey: 'spacing', statLabelKey: 'preview_stat_spacing', icon: '↕️' },
+  { key: 'quoteSpaces', labelKey: 'preview_opt_quote_spaces', statKey: 'quoteSpaces', statLabelKey: 'preview_stat_quote_spaces', icon: ' " ' },
+  { key: 'doubleSpaces', labelKey: 'preview_opt_spaces', statKey: 'doubleSpaces', statLabelKey: 'preview_stat_spaces', icon: ' ␣ ' },
+  { key: 'frenchQuotes', labelKey: 'preview_opt_quotes', statKey: 'frenchQuotes', statLabelKey: 'preview_stat_quotes', icon: ' «» ' },
+  { key: 'longDash', labelKey: 'preview_opt_dash', statKey: 'longDash', statLabelKey: 'preview_stat_dash', icon: ' — ' },
+  { key: 'oeuLigature', labelKey: 'preview_opt_oeu', statKey: 'oeuLigature', statLabelKey: 'preview_stat_oeu', icon: ' Œ ' },
+  { key: 'yPrime', labelKey: 'preview_opt_yprime', statKey: 'yPrime', statLabelKey: 'preview_stat_yprime', icon: ' Y ' },
 ]);
 
 const visibleOptions = computed(() => optionDefs.value.filter((o) => o.show !== false));
@@ -106,7 +111,8 @@ function handleApply() {
               type="checkbox"
               v-model="options[opt.key]"
             />
-            {{ t(opt.labelKey) }}
+            <span class="gft-preview-modal__option-icon">{{ opt.icon }}</span>
+            <span class="gft-preview-modal__option-label">{{ t(opt.labelKey) }}</span>
           </label>
         </div>
       </div>
@@ -167,6 +173,26 @@ function handleApply() {
   font-size: 12px;
   cursor: pointer;
   gap: 6px;
+}
+
+.gft-preview-modal__option-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+  font-weight: bold;
+  font-size: 11px;
+}
+
+.gft-dark-mode .gft-preview-modal__option-icon {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.gft-preview-modal__option-label {
+  flex: 1;
 }
 
 .gft-preview-modal__summary {

@@ -7,8 +7,10 @@ import type {
   SongData,
 } from '@/types';
 
+export const REPEAT_MARKER_REGEX = /\s*[\(（]?\s*[xX×]\s*(\d+)\s*[\)）]?\s*$/;
+
 export function isSectionTag(line: string): boolean {
-  const trimmed = line.trim();
+  const trimmed = line.trim().replace(REPEAT_MARKER_REGEX, '');
 
   // On considère comme "Tag" ce qui commence par [ et finit par ]
   // ou ce qui se termine par une annotation Genius (ID)
@@ -38,8 +40,8 @@ const SECTION_KEYWORDS = [
  * et non un simple marqueur de texte inconnu [?] ou une ligne de paroles avec tags.
  */
 export function isHeadingTag(line: string): boolean {
-  const trimmed = line.trim();
   if (!isSectionTag(line)) return false;
+  const trimmed = line.trim().replace(REPEAT_MARKER_REGEX, '');
 
   // 1. On nettoie la ligne de son annotation éventuelle à la fin
   const withoutAnnotation = trimmed.replace(/\s*\(\d+\)$/, '');
@@ -163,6 +165,76 @@ export function correctLineSpacing(text: string): { newText: string; corrections
 
 export const CORRECTION_RULES: CorrectionRule[] = [
   {
+    id: 'repetitions',
+    progressKey: 'progress_step_repetitions',
+    execute: (text, corrections, opts) => {
+      if (!opts.repetitions) return text;
+      
+      function expand(lines: string[]): { lines: string[]; count: number } {
+        const result: string[] = [];
+        let internalCount = 0;
+
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i];
+          const match = line.match(REPEAT_MARKER_REGEX);
+          
+          if (match) {
+            const num = Number.parseInt(match[1]);
+            if (num > 1 && num <= 10) {
+              const contentToRepeat = line.replace(REPEAT_MARKER_REGEX, '');
+              internalCount++;
+              
+              if (isHeadingTag(contentToRepeat)) {
+                // Section level repetition: [Chorus] x2
+                const blockLines: string[] = [];
+                let j = i + 1;
+                while (j < lines.length && !isHeadingTag(lines[j])) {
+                  blockLines.push(lines[j]);
+                  j++;
+                }
+                
+                // Recursively expand repetitions inside the block
+                const { lines: expandedBlock, count: subCount } = expand(blockLines);
+                internalCount += subCount;
+                
+                // Clean block from trailing empty lines
+                const cleanBlock = [...expandedBlock];
+                while (cleanBlock.length > 0 && cleanBlock[cleanBlock.length - 1].trim() === '') {
+                  cleanBlock.pop();
+                }
+
+                result.push(contentToRepeat.trim());
+                // Repeat the block content `num` times
+                for (let k = 0; k < num; k++) {
+                  if (cleanBlock.length > 0) {
+                    result.push(...cleanBlock);
+                  }
+                }
+                
+                i = j - 1;
+                continue;
+              } else {
+                // Line level repetition: Line text x3
+                for (let k = 0; k < num; k++) {
+                  result.push(contentToRepeat);
+                }
+                continue;
+              }
+            }
+          }
+          result.push(line);
+        }
+        return { lines: result, count: internalCount };
+      }
+
+      const inputLines = text.split('\n');
+      const { lines: finalLines, count } = expand(inputLines);
+      
+      if (count > 0) corrections.repetitions = count;
+      return finalLines.join('\n');
+    },
+  },
+  {
     id: 'majuscules',
     progressKey: 'progress_step_majuscules',
     execute: (text, corrections, opts) => {
@@ -184,6 +256,53 @@ export const CORRECTION_RULES: CorrectionRule[] = [
         return line;
       });
       if (count > 0) corrections.majuscules = count;
+      return newLines.join('\n');
+    },
+  },
+  {
+    id: 'tagSeparator',
+    progressKey: 'progress_step_tag_separator',
+    execute: (text, corrections, opts) => {
+      if (!opts.tagSeparator) return text;
+      const lines = text.split('\n');
+      let count = 0;
+      const newLines = lines.map((line) => {
+        if (!isHeadingTag(line)) return line;
+        
+        // 1. Normalize " - " to " : "
+        // Use spaces around the hyphen to avoid splitting compound tags like "Post-Chorus"
+        const separatorPattern = /(?<=\[)([^\]\-\:]+)\s+[-]\s+([^\]]+)(?=\])/g;
+        let newLine = line.replace(separatorPattern, '$1 : $2');
+        
+        // 2. Normalize multiple artists: [A, B, C] -> [A, B & C]
+        // This only applies if we have a colon separator inside brackets
+        const artistPattern = /\[([^\]]+)\s*:\s*([^\]]+)\]/;
+        const artistMatch = newLine.match(artistPattern);
+        
+        if (artistMatch) {
+          const typePart = artistMatch[1].trim();
+          const artistPart = artistMatch[2].trim();
+          
+          // Split by commas or ampersands, then filter empty strings
+          const artists = artistPart.split(/[,&]|\band\b/i)
+            .map(a => a.trim())
+            .filter(a => a.length > 0);
+          
+          if (artists.length > 1) {
+            const lastArtist = artists.pop();
+            const normalizedArtists = artists.join(', ') + ' & ' + lastArtist;
+            const updatedTag = `[${typePart} : ${normalizedArtists}]`;
+            newLine = newLine.replace(artistPattern, updatedTag);
+          }
+        }
+        
+        if (newLine !== line) {
+          count++;
+          return newLine;
+        }
+        return line;
+      });
+      if (count > 0) corrections.tagSeparator = count;
       return newLines.join('\n');
     },
   },
@@ -294,9 +413,9 @@ export const CORRECTION_RULES: CorrectionRule[] = [
           newLine = newLine.replace(/\.{3,}/g, '…');
         }
 
-        // 2. Règle Genius : suppression des . et , en fin de ligne
+        // 2. Règle Genius : suppression des . , et ; en fin de ligne
         if (!isSectionTag(newLine)) {
-          newLine = newLine.replace(/[.,]+[^\S\r\n]*$/, '');
+          newLine = newLine.replace(/[.,;]+[^\S\r\n]*$/, '');
         }
 
         if (newLine !== line) count++;
@@ -436,6 +555,8 @@ export function getDefaultOptions(options: Partial<CorrectionOptions> = {}): Cor
     quoteSpaces: options.quoteSpaces !== false,
     majuscules: options.majuscules !== false,
     songHeader: options.songHeader !== false,
+    repetitions: options.repetitions !== false,
+    tagSeparator: options.tagSeparator !== false,
   };
 }
 
@@ -452,6 +573,8 @@ function initCorrectionsObject(): CorrectionCounts {
     quoteSpaces: 0,
     majuscules: 0,
     songHeader: 0,
+    repetitions: 0,
+    tagSeparator: 0,
   };
 }
 

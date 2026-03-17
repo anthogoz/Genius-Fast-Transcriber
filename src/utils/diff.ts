@@ -115,7 +115,6 @@ function computeLineDiff(original: string, modified: string): DiffChunk[] {
 }
 
 export function highlightDifferences(originalText: string, correctedText: string): string {
-  const MAX_DP_MATRIX_CELLS = 30_000_000;
 
   function escapeHtml(text: string): string {
     return text
@@ -133,15 +132,46 @@ export function highlightDifferences(originalText: string, correctedText: string
     );
   }
 
-  const matrixCells = (originalText.length + 1) * (correctedText.length + 1);
-  const diffChunks = matrixCells > MAX_DP_MATRIX_CELLS
-    ? computeLineDiff(originalText, correctedText)
-    : computeDiff(originalText, correctedText);
+  // Force line-level diffing for better stability when expanding blocks
+  const diffChunks = computeLineDiff(originalText, correctedText);
 
   let html = '';
 
   for (let k = 0; k < diffChunks.length; k++) {
     const chunk = diffChunks[k];
+    
+    // Check for "modified" lines (removed block followed by added block of same size)
+    if (chunk.type === 'removed' && k + 1 < diffChunks.length && diffChunks[k + 1].type === 'added') {
+      const removedVal = chunk.value.endsWith('\n') ? chunk.value.slice(0, -1) : chunk.value;
+      const addedVal = diffChunks[k+1].value.endsWith('\n') ? diffChunks[k+1].value.slice(0, -1) : diffChunks[k+1].value;
+      
+      const removedLines = removedVal.split('\n');
+      const addedLines = addedVal.split('\n');
+      
+      if (removedLines.length === addedLines.length) {
+        for (let i = 0; i < removedLines.length; i++) {
+          const charDiff = computeDiff(removedLines[i], addedLines[i]);
+          for (const charChunk of charDiff) {
+            const escaped = escapeHtml(charChunk.value);
+            if (charChunk.type === 'removed') {
+              html += `<span style="background-color: #ffcccc; color: #cc0000; text-decoration: line-through; border-radius: 2px;">${escaped}</span>`;
+            } else if (charChunk.type === 'added') {
+              html += `<span style="background-color: #ccffcc; color: #006600; font-weight: bold; border-radius: 2px;">${escaped}</span>`;
+            } else {
+              html += escaped;
+            }
+          }
+          // Add the newline if it's not the last line of the ENTIRE file, 
+          // or if the chunk originally had a newline at this position.
+          if (i < removedLines.length - 1 || chunk.value.endsWith('\n')) {
+            html += '<span style="opacity: 0.5; font-size: 0.8em;">↵</span>\n';
+          }
+        }
+        k++; // Skip the 'added' chunk
+        continue;
+      }
+    }
+
     const escapedValue = formatWithVisibleNewLines(chunk.value);
 
     if (chunk.type === 'removed') {

@@ -47,6 +47,8 @@ export interface CorrectionOptions {
   quoteSpaces: boolean;
   majuscules: boolean;
   songHeader: boolean;
+  repetitions: boolean;
+  tagSeparator: boolean;
 }
 
 export interface CorrectionCounts {
@@ -61,6 +63,8 @@ export interface CorrectionCounts {
   quoteSpaces: number;
   majuscules: number;
   songHeader: number;
+  repetitions: number;
+  tagSeparator: number;
 }
 
 export interface CorrectionResult {

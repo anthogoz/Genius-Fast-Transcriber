@@ -129,6 +129,13 @@ const cleanupButtons = computed<CleanupButton[]>(() => {
   });
 
   buttons.push({
+    id: 'repetitions',
+    labelKey: 'btn_repetitions_label',
+    tooltipKey: 'btn_repetitions_tooltip',
+    action: () => applySingleCorrection({ repetitions: true }, t('btn_repetitions_label')),
+  });
+
+  buttons.push({
     id: 'spacing',
     labelKey: 'btn_spacing_label',
     tooltipKey: 'cleanup_spacing_tooltip',
@@ -208,6 +215,7 @@ function applySingleCorrection(opts: Record<string, boolean>, itemName: string) 
     quoteSpaces: false,
     majuscules: false,
     songHeader: false,
+    repetitions: false,
   };
   const result = applySyncCorrections({ ...disableAll, ...opts });
   if (result.correctionsCount > 0) {
