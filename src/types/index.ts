@@ -64,6 +64,7 @@ export interface CorrectionCounts {
   majuscules: number;
   songHeader: number;
   repetitions: number;
+  bracketSpaces: number;
   tagSeparator: number;
 }
 

@@ -7,7 +7,7 @@ import type {
   SongData,
 } from '@/types';
 
-export const REPEAT_MARKER_REGEX = /\s*[\(（]?\s*[xX×]\s*(\d+)\s*[\)）]?\s*$/;
+export const REPEAT_MARKER_REGEX = /\s*[(（]?\s*[xX×]\s*(\d+)\s*[)）]?\s*$/;
 
 export function isSectionTag(line: string): boolean {
   const trimmed = line.trim().replace(REPEAT_MARKER_REGEX, '');
@@ -179,9 +179,9 @@ export const CORRECTION_RULES: CorrectionRule[] = [
           const match = line.match(REPEAT_MARKER_REGEX);
           
           if (match) {
-            const num = Number.parseInt(match[1]);
+            const num = Number.parseInt(match[1], 10);
             if (num > 1 && num <= 10) {
-              const contentToRepeat = line.replace(REPEAT_MARKER_REGEX, '');
+              const contentToRepeat = line.replace(REPEAT_MARKER_REGEX, '').trim();
               internalCount++;
               
               if (isHeadingTag(contentToRepeat)) {
@@ -203,11 +203,15 @@ export const CORRECTION_RULES: CorrectionRule[] = [
                   cleanBlock.pop();
                 }
 
-                result.push(contentToRepeat.trim());
-                // Repeat the block content `num` times
+                // Repeat the combined content (header + block) `num` times
                 for (let k = 0; k < num; k++) {
+                  result.push(contentToRepeat);
                   if (cleanBlock.length > 0) {
                     result.push(...cleanBlock);
+                  }
+                  // Add a separator line between blocks, but not after the last one
+                  if (k < num - 1) {
+                    result.push('');
                   }
                 }
                 
@@ -269,10 +273,17 @@ export const CORRECTION_RULES: CorrectionRule[] = [
       const newLines = lines.map((line) => {
         if (!isHeadingTag(line)) return line;
         
+        // 0. Preliminary cleanup: apostrophes and spaces inside tags
+        const tagPattern = /\[([^\]]+)\]/g;
+        let newLine = line.replace(tagPattern, (tag) => {
+          // Normalize apostrophes inside tags too
+          return tag.replace(/[''´`ʻ‘’]/g, "'").replace(/(\[|\()\s+|\s+(\]|\))/g, '$1$2');
+        });
+
         // 1. Normalize " - " to " : "
         // Use spaces around the hyphen to avoid splitting compound tags like "Post-Chorus"
-        const separatorPattern = /(?<=\[)([^\]\-\:]+)\s+[-]\s+([^\]]+)(?=\])/g;
-        let newLine = line.replace(separatorPattern, '$1 : $2');
+        const separatorPattern = /(?<=\[)([^\]\-:]+)\s+[-]\s+([^\]]+)(?=\])/g;
+        newLine = newLine.replace(separatorPattern, '$1 : $2');
         
         // 2. Normalize multiple artists: [A, B, C] -> [A, B & C]
         // This only applies if we have a colon separator inside brackets
@@ -290,7 +301,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
           
           if (artists.length > 1) {
             const lastArtist = artists.pop();
-            const normalizedArtists = artists.join(', ') + ' & ' + lastArtist;
+            const normalizedArtists = `${artists.join(', ')} & ${lastArtist}`;
             const updatedTag = `[${typePart} : ${normalizedArtists}]`;
             newLine = newLine.replace(artistPattern, updatedTag);
           }
@@ -324,7 +335,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     progressKey: 'progress_step_apostrophes',
     execute: (text, corrections, opts) => {
       if (!opts.apostrophes) return text;
-      const pattern = /[''´`ʻ]/g;
+      const pattern = /[''´`ʻ‘’]/g;
       const newText = text.replace(pattern, "'");
       if (newText !== text) corrections.apostrophes = (text.match(pattern) || []).length;
       return newText;
@@ -395,12 +406,12 @@ export const CORRECTION_RULES: CorrectionRule[] = [
           newLine = dotComma;
         }
 
-        // Règle ! ? : ; (dépend de la langue)
+        // 1. Appliquer d'abord l'espacement selon la langue
         if (locale === 'fr') {
           // Français : doit avoir UN espace avant, sauf si on est juste après un crochet [
-          const withSpace = newLine.replace(/(?<![\s\[])([?!:;])/g, ' $1') // Ajoute si manque, sauf après [
-                                   .replace(/\[\s+([?!:;])/g, '[$1')     // Supprime si déjà là après [ (on ne remet pas le ] ici car il est déjà dans le texte)
-                                   .replace(/\s{2,}([?!:;])/g, ' $1');    // Réduit si trop
+          const withSpace = newLine.replace(/(?<![\s[])([?!:;])/g, ' $1') // Ajoute si manque, sauf après [
+                                   .replace(/\[\s+([?!:;])/g, '[$1')     // Supprime si déjà là après [
+                                   .replace(/\s+([?!:;])/g, ' $1');    // Normalise à un seul espace
           newLine = withSpace;
         } else {
           // Anglais/Polonais : doit être collé
@@ -414,8 +425,9 @@ export const CORRECTION_RULES: CorrectionRule[] = [
         }
 
         // 2. Règle Genius : suppression des . , et ; en fin de ligne
+        // On le fait en dernier pour s'assurer que les espaces rajoutés par la règle FR sont aussi nettoyés
         if (!isSectionTag(newLine)) {
-          newLine = newLine.replace(/[.,;]+[^\S\r\n]*$/, '');
+          newLine = newLine.replace(/[.,;]+\s*$/, '');
         }
 
         if (newLine !== line) count++;
@@ -448,6 +460,26 @@ export const CORRECTION_RULES: CorrectionRule[] = [
         return result.newText;
       }
       return text;
+    },
+  },
+  {
+    id: 'bracketSpaces',
+    progressKey: 'progress_step_quotes', // Group with quotes for simplicity
+    execute: (text, corrections, opts) => {
+      if (!opts.quoteSpaces) return text; // Group with quoteSpaces option
+      let count = 0;
+      const lines = text.split('\n');
+      const newLines = lines.map(line => {
+        // Supprime les espaces internes des parenthèses ( ) et crochets [ ]
+        const pattern = /([([])\s+|\s+([)\]])/g;
+        const newLine = line.replace(pattern, (_match, open, close) => {
+           count++;
+           return open || close;
+        });
+        return newLine;
+      });
+      if (count > 0) corrections.bracketSpaces = count;
+      return newLines.join('\n');
     },
   },
   {
@@ -510,10 +542,19 @@ export const CORRECTION_RULES: CorrectionRule[] = [
         }
       }
 
-      const expectedHeader = generateSongHeader(songData, locale);
+      let expectedHeader = generateSongHeader(songData, locale);
+      
+      // If tagSeparator is on, apply artist normalization to the header too
+      if (opts.tagSeparator) {
+        const tagRule = CORRECTION_RULES.find(r => r.id === 'tagSeparator');
+        if (tagRule) {
+            const dummyCorrections = initCorrectionsObject();
+            expectedHeader = tagRule.execute(expectedHeader, dummyCorrections, opts, locale);
+        }
+      }
 
       if (headerIndex !== -1) {
-        if (lines[headerIndex].trim() !== expectedHeader) {
+        if (lines[headerIndex].trim() !== expectedHeader.trim()) {
           lines[headerIndex] = expectedHeader;
           corrections.songHeader = 1;
           return lines.join('\n');
@@ -575,6 +616,7 @@ function initCorrectionsObject(): CorrectionCounts {
     songHeader: 0,
     repetitions: 0,
     tagSeparator: 0,
+    bracketSpaces: 0,
   };
 }
 
