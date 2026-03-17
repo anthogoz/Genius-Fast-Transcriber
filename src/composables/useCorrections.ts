@@ -23,7 +23,7 @@ export function useCorrections() {
 
     // Trier les positions par ordre décroissant pour ne pas décaler les index lors de l'insertion
     const sortedPositions = [...positions].sort((a, b) => b - a);
-    
+
     const walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT);
     const textNodes: { node: Text; start: number; end: number }[] = [];
     let traversed = 0;
@@ -36,7 +36,7 @@ export function useCorrections() {
     }
 
     for (const pos of sortedPositions) {
-      const target = textNodes.find(tn => pos >= tn.start && pos < tn.end);
+      const target = textNodes.find((tn) => pos >= tn.start && pos < tn.end);
       if (!target) continue;
 
       const node = target.node;
@@ -58,7 +58,7 @@ export function useCorrections() {
       if (after) frag.appendChild(document.createTextNode(after));
 
       parent.replaceChild(frag, node);
-      
+
       // Nettoyage après l'animation
       window.setTimeout(() => {
         if (marker.parentNode) {
@@ -118,7 +118,7 @@ export function useCorrections() {
     if (issues.length === 0 || !state.currentActiveEditor) return issues;
 
     const editor = state.currentActiveEditor as HTMLElement;
-    
+
     // Alerte visuelle sur l'éditeur lui-même
     editor.classList.add('gft-bracket-editor-alert');
     window.setTimeout(() => {
@@ -133,7 +133,7 @@ export function useCorrections() {
       // On ne peut sélectionner qu'un seul élément dans un textarea
       ta.setSelectionRange(pos, pos + 1);
     } else if (state.currentEditorType === 'contenteditable') {
-      highlightContentEditableBrackets(issues.map(i => i.position));
+      highlightContentEditableBrackets(issues.map((i) => i.position));
     }
 
     return issues;

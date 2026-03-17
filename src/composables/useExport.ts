@@ -10,10 +10,14 @@ export function useExport() {
   const { extractSongData } = useSongData();
 
   function getLyricsFromPage(): string {
-    const containers = Array.from(document.querySelectorAll<HTMLElement>(SELECTORS.LYRICS_CONTAINER));
+    const containers = Array.from(
+      document.querySelectorAll<HTMLElement>(SELECTORS.LYRICS_CONTAINER),
+    );
     if (containers.length === 0) return '';
 
-    return containers.map(container => (container.innerText || container.textContent || '').trim()).join('\n\n');
+    return containers
+      .map((container) => (container.innerText || container.textContent || '').trim())
+      .join('\n\n');
   }
 
   function exportLyrics(options: ExportOptions = {}) {

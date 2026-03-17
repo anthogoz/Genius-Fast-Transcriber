@@ -30,9 +30,27 @@ export function isSectionTag(line: string): boolean {
  * Liste des mots-clés typiques de début de section sur Genius
  */
 const SECTION_KEYWORDS = [
-  'Couplet', 'Verse', 'Refrain', 'Chorus', 'Pont', 'Bridge', 
-  'Intro', 'Outro', 'Pre-Chorus', 'Pré-refrain', 'Post-Chorus', 'Post-refrain',
-  'Hook', 'Instrumental', 'Solo', 'Skit', 'Paroles', 'Słowa', 'Zwrotka', 'Refren', 'Mostek'
+  'Couplet',
+  'Verse',
+  'Refrain',
+  'Chorus',
+  'Pont',
+  'Bridge',
+  'Intro',
+  'Outro',
+  'Pre-Chorus',
+  'Pré-refrain',
+  'Post-Chorus',
+  'Post-refrain',
+  'Hook',
+  'Instrumental',
+  'Solo',
+  'Skit',
+  'Paroles',
+  'Słowa',
+  'Zwrotka',
+  'Refren',
+  'Mostek',
 ];
 
 /**
@@ -78,7 +96,7 @@ export function correctLineSpacing(text: string): { newText: string; corrections
       const tagContent = afterOpenBracket.slice(0, nextBracketEnd + 1);
       if (!isHeadingTag(tagContent)) return match;
     }
-    
+
     internalCount++;
     return ']\n\n[';
   });
@@ -166,7 +184,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     progressKey: 'progress_step_repetitions',
     execute: (text, corrections, opts) => {
       if (!opts.repetitions) return text;
-      
+
       function expand(lines: string[]): { lines: string[]; count: number } {
         const result: string[] = [];
         let internalCount = 0;
@@ -174,13 +192,13 @@ export const CORRECTION_RULES: CorrectionRule[] = [
         for (let i = 0; i < lines.length; i++) {
           const line = lines[i];
           const match = line.match(REPEAT_MARKER_REGEX);
-          
+
           if (match) {
             const num = Number.parseInt(match[1], 10);
             if (num > 1 && num <= 10) {
               const contentToRepeat = line.replace(REPEAT_MARKER_REGEX, '').trim();
               internalCount++;
-              
+
               if (isHeadingTag(contentToRepeat)) {
                 // Section level repetition: [Chorus] x2
                 const blockLines: string[] = [];
@@ -189,11 +207,11 @@ export const CORRECTION_RULES: CorrectionRule[] = [
                   blockLines.push(lines[j]);
                   j++;
                 }
-                
+
                 // Recursively expand repetitions inside the block
                 const { lines: expandedBlock, count: subCount } = expand(blockLines);
                 internalCount += subCount;
-                
+
                 // Clean block from trailing empty lines
                 const cleanBlock = [...expandedBlock];
                 while (cleanBlock.length > 0 && cleanBlock[cleanBlock.length - 1].trim() === '') {
@@ -207,7 +225,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
                     result.push(...cleanBlock);
                   }
                 }
-                
+
                 i = j - 1;
                 continue;
               } else {
@@ -226,7 +244,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
 
       const inputLines = text.split('\n');
       const { lines: finalLines, count } = expand(inputLines);
-      
+
       if (count > 0) corrections.repetitions = count;
       return finalLines.join('\n');
     },
@@ -242,10 +260,10 @@ export const CORRECTION_RULES: CorrectionRule[] = [
       const newLines = lines.map((line) => {
         const trimmed = line.trim();
         if (!trimmed || isSectionTag(trimmed)) return line;
-        
+
         const firstChar = trimmed[0];
         const capitalized = firstChar.toUpperCase() + trimmed.slice(1);
-        
+
         if (line !== capitalized) {
           count++;
           return capitalized;
@@ -265,7 +283,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
       let count = 0;
       const newLines = lines.map((line) => {
         if (!isHeadingTag(line)) return line;
-        
+
         // 0. Preliminary cleanup: apostrophes and spaces inside tags
         const tagPattern = /\[([^\]]+)\]/g;
         let newLine = line.replace(tagPattern, (tag) => {
@@ -277,21 +295,22 @@ export const CORRECTION_RULES: CorrectionRule[] = [
         // Use spaces around the hyphen to avoid splitting compound tags like "Post-Chorus"
         const separatorPattern = /(?<=\[)([^\]\-:]+)\s+[-]\s+([^\]]+)(?=\])/g;
         newLine = newLine.replace(separatorPattern, '$1 : $2');
-        
+
         // 2. Normalize multiple artists: [A, B, C] -> [A, B & C]
         // This only applies if we have a colon separator inside brackets
         const artistPattern = /\[([^\]]+)\s*:\s*([^\]]+)\]/;
         const artistMatch = newLine.match(artistPattern);
-        
+
         if (artistMatch) {
           const typePart = artistMatch[1].trim();
           const artistPart = artistMatch[2].trim();
-          
+
           // Split by commas or ampersands, then filter empty strings
-          const artists = artistPart.split(/[,&]|\band\b/i)
-            .map(a => a.trim())
-            .filter(a => a.length > 0);
-          
+          const artists = artistPart
+            .split(/[,&]|\band\b/i)
+            .map((a) => a.trim())
+            .filter((a) => a.length > 0);
+
           if (artists.length > 1) {
             const lastArtist = artists.pop();
             const normalizedArtists = `${artists.join(', ')} & ${lastArtist}`;
@@ -299,7 +318,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
             newLine = newLine.replace(artistPattern, updatedTag);
           }
         }
-        
+
         if (newLine !== line) {
           count++;
           return newLine;
@@ -381,17 +400,17 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     execute: (text, corrections, opts, locale) => {
       if (!opts.punctuation) return text;
       let count = 0;
-      
+
       // On traite le texte ligne par ligne pour plus de précision
       const lines = text.split('\n');
       const newLines = lines.map((line) => {
         if (isSectionTag(line)) return line;
-        
+
         let newLine = line;
 
         // 1. Supprime d'abord tous les espaces avant TOUTE ponctuation pour normaliser
         // Mais on ne le fait que si ce n'est pas déjà correct pour éviter le ping-pong
-        
+
         // Règle . et , (toujours collés)
         const dotComma = newLine.replace(/\s+([.,])/g, '$1');
         if (dotComma !== newLine) {
@@ -402,9 +421,10 @@ export const CORRECTION_RULES: CorrectionRule[] = [
         // 1. Appliquer d'abord l'espacement selon la langue
         if (locale === 'fr') {
           // Français : doit avoir UN espace avant, sauf si on est juste après un crochet [
-          const withSpace = newLine.replace(/(?<![\s[])([?!:;])/g, ' $1') // Ajoute si manque, sauf après [
-                                   .replace(/\[\s+([?!:;])/g, '[$1')     // Supprime si déjà là après [
-                                   .replace(/\s+([?!:;])/g, ' $1');    // Normalise à un seul espace
+          const withSpace = newLine
+            .replace(/(?<![\s[])([?!:;])/g, ' $1') // Ajoute si manque, sauf après [
+            .replace(/\[\s+([?!:;])/g, '[$1') // Supprime si déjà là après [
+            .replace(/\s+([?!:;])/g, ' $1'); // Normalise à un seul espace
           newLine = withSpace;
         } else {
           // Anglais/Polonais : doit être collé
@@ -462,12 +482,12 @@ export const CORRECTION_RULES: CorrectionRule[] = [
       if (!opts.quoteSpaces) return text; // Group with quoteSpaces option
       let count = 0;
       const lines = text.split('\n');
-      const newLines = lines.map(line => {
+      const newLines = lines.map((line) => {
         // Supprime les espaces internes des parenthèses ( ) et crochets [ ]
         const pattern = /([([])\s+|\s+([)\]])/g;
         const newLine = line.replace(pattern, (_match, open, close) => {
-           count++;
-           return open || close;
+          count++;
+          return open || close;
         });
         return newLine;
       });
@@ -481,12 +501,12 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     execute: (text, corrections, opts) => {
       if (!opts.quoteSpaces) return text;
       let totalCount = 0;
-      
+
       const lines = text.split('\n');
       // Version finale simplifiée et robuste :
-      const robustLines = lines.map(line => {
+      const robustLines = lines.map((line) => {
         let open = true;
-        let newLine = "";
+        let newLine = '';
         for (let i = 0; i < line.length; i++) {
           if (line[i] === '"') {
             if (open) {
@@ -536,13 +556,13 @@ export const CORRECTION_RULES: CorrectionRule[] = [
       }
 
       let expectedHeader = generateSongHeader(songData, locale);
-      
+
       // If tagSeparator is on, apply artist normalization to the header too
       if (opts.tagSeparator) {
-        const tagRule = CORRECTION_RULES.find(r => r.id === 'tagSeparator');
+        const tagRule = CORRECTION_RULES.find((r) => r.id === 'tagSeparator');
         if (tagRule) {
-            const dummyCorrections = initCorrectionsObject();
-            expectedHeader = tagRule.execute(expectedHeader, dummyCorrections, opts, locale);
+          const dummyCorrections = initCorrectionsObject();
+          expectedHeader = tagRule.execute(expectedHeader, dummyCorrections, opts, locale);
         }
       }
 
@@ -565,16 +585,15 @@ export function generateSongHeader(songData: SongData, locale: Locale): string {
   let featStr = '';
   if (songData.featuringArtists.length > 0) {
     featStr =
-      (locale === 'fr' ? ' ft. ' : ' (feat. ') +
-      songData.featuringArtists.join(', ') +
-      (locale === 'pl' ? ')' : '');
+      (locale === 'fr' ? ' ft. ' : ' (feat. ')
+      + songData.featuringArtists.join(', ')
+      + (locale === 'pl' ? ')' : '');
   }
 
   return locale === 'fr'
     ? `[Paroles de "${songData.title}"${featStr}]`
     : `[Słowa do utworu "${songData.title}"${featStr}]`;
 }
-
 
 export function getDefaultOptions(options: Partial<CorrectionOptions> = {}): CorrectionOptions {
   return {

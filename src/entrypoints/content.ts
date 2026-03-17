@@ -67,13 +67,18 @@ export default defineContentScript({
     browser.runtime.onMessage.addListener((message) => {
       if (message.type === 'GFT_COMMAND') {
         switch (message.command) {
-          case 'toggle-play': handleYoutubeAction('play'); break;
-          case 'seek-backward': handleYoutubeAction('back'); break;
-          case 'seek-forward': handleYoutubeAction('forward'); break;
+          case 'toggle-play':
+            handleYoutubeAction('play');
+            break;
+          case 'seek-backward':
+            handleYoutubeAction('back');
+            break;
+          case 'seek-forward':
+            handleYoutubeAction('forward');
+            break;
         }
       }
     });
-
 
     const GFT_VERSION = browser.runtime.getManifest().version;
     let cleanupFloatingToolbar: (() => void) | null = null;
@@ -91,13 +96,13 @@ export default defineContentScript({
         setSongTitle(songData.title);
         setArtists(songData.mainArtists, songData.featuringArtists);
       };
-      
+
       updateMetadata();
       // Observer pour mettre à jour si les données arrivent tardivement ou changent (navigation SPA)
       const metaObserver = new MutationObserver(() => updateMetadata());
       metaObserver.observe(document.head, { childList: true, subtree: true, characterData: true });
       metaObserver.observe(document.body, { childList: true, subtree: true });
-      
+
       initFloatingToolbar(true);
       return;
     }
@@ -308,7 +313,7 @@ export default defineContentScript({
           // Mais plus simple ici : on peut dispatcher un événement custom
           // que GftPanel écoutera, ou utiliser le state global
           window.dispatchEvent(new CustomEvent('gft-show-feedback', { detail: { message: msg } }));
-        }
+        },
       });
 
       function hideToolbar() {
@@ -573,7 +578,7 @@ export default defineContentScript({
         const root = document.createElement('div');
         root.id = GFT_NATIVE_EXPORT_ID;
         root.style.display = 'contents';
-        
+
         container.appendChild(root);
 
         const app = createApp(NativeExportButton, { buttonClass, iconClass, labelClass });

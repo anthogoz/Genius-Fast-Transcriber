@@ -40,11 +40,22 @@
 }
 
 @keyframes gft-shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-4px); }
-  40% { transform: translateX(4px); }
-  60% { transform: translateX(-2px); }
-  80% { transform: translateX(2px); }
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-2px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
 }
 
 #gft-panel-root,
@@ -90,7 +101,7 @@
 .gft-bracket-editor-alert {
   border-color: #ff4040;
   outline: none;
-  animation: 
+  animation:
     gft-bracket-pulse 0.8s ease-in-out infinite,
     gft-shake 0.4s ease-in-out;
 }
@@ -143,7 +154,6 @@
   transform: translateY(0) scale(0.96);
 }
 
-
 .gft-u-btn--sm {
   height: auto;
   padding: 3px 8px;
@@ -193,7 +203,6 @@
   border-color: #ffff64;
   box-shadow: 0 0 0 2px rgba(255, 255, 100, 0.2);
 }
-
 
 .gft-u-pill-control {
   border-radius: 999px;
@@ -246,7 +255,6 @@
   background: rgba(0, 0, 0, 0.35);
 }
 
-
 .gft-u-modal {
   position: fixed;
   top: 50%;
@@ -268,7 +276,6 @@
     transform: translate(-50%, -50%);
   }
 }
-
 
 .gft-u-modal.gft-u-modal--dark {
   background: #2a2a2a;

@@ -41,7 +41,6 @@ body {
   transform: translateY(0) scale(0.97);
 }
 
-
 .gft-u-popup-pill.active {
   border-color: var(--primary);
   background: var(--bg);
@@ -74,7 +73,6 @@ body {
 .gft-u-popup-dashed-btn:active {
   transform: scale(0.98);
 }
-
 
 .gft-u-popup-card {
   background: var(--card-bg);
@@ -143,4 +141,3 @@ body {
 .gft-u-popup-link:active {
   transform: translateY(0) scale(0.97);
 }
-

@@ -19,9 +19,11 @@ const SELECTORS = {
   TWITTER_TITLE_META: 'meta[name="twitter:title"]',
   CREDITS_ARTIST_LIST: 'div[class*="TrackCreditsPage__CreditList"]',
   CREDITS_ARTIST_NAME: 'a[class*="Credit-sc"] span[class*="Name-sc"]',
-  MAIN_ARTISTS_CONTAINER: 'div[class*="HeaderArtistAndTracklist-desktop__Artist"], div[class*="HeaderArtistAndTracklist-desktop__ListArtists"]',
+  MAIN_ARTISTS_CONTAINER:
+    'div[class*="HeaderArtistAndTracklist-desktop__Artist"], div[class*="HeaderArtistAndTracklist-desktop__ListArtists"]',
   MAIN_ARTIST_LINK: 'a[class*="StyledLink"], a[class*="ArtistLink"]',
-  FALLBACK_ARTIST_LINKS: 'a[class*="SongHeader__Artist"], a[data-testid="ArtistLink"], a[class*="HeaderArtistAndTracklist-desktop__Artist"]',
+  FALLBACK_ARTIST_LINKS:
+    'a[class*="SongHeader__Artist"], a[data-testid="ArtistLink"], a[class*="HeaderArtistAndTracklist-desktop__Artist"]',
   TEXTAREA_EDITOR: 'textarea[class*="ExpandingTextarea__Textarea"]',
   DIV_EDITOR: 'div[data-testid="lyrics-input"]',
   CONTROLS_STICKY: 'div[class^="LyricsEdit-desktop__Controls-sc-"]',

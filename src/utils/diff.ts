@@ -92,7 +92,8 @@ function computeLineDiff(original: string, modified: string): DiffChunk[] {
       } else {
         chunks.push({ type: 'common', value: line });
       }
-      i--; j--;
+      i--;
+      j--;
     } else if (j > 0 && (i === 0 || dp[i * (n + 1) + (j - 1)] >= dp[(i - 1) * (n + 1) + j])) {
       const line = `${modifiedLines[j - 1]}${j < n ? '\n' : ''}`;
       if (chunks.length > 0 && chunks[chunks.length - 1].type === 'added') {
@@ -115,7 +116,6 @@ function computeLineDiff(original: string, modified: string): DiffChunk[] {
 }
 
 export function highlightDifferences(originalText: string, correctedText: string): string {
-
   function escapeHtml(text: string): string {
     return text
       .replace(/&/g, '&amp;')
@@ -139,15 +139,21 @@ export function highlightDifferences(originalText: string, correctedText: string
 
   for (let k = 0; k < diffChunks.length; k++) {
     const chunk = diffChunks[k];
-    
+
     // Check for "modified" lines (removed block followed by added block of same size)
-    if (chunk.type === 'removed' && k + 1 < diffChunks.length && diffChunks[k + 1].type === 'added') {
+    if (
+      chunk.type === 'removed'
+      && k + 1 < diffChunks.length
+      && diffChunks[k + 1].type === 'added'
+    ) {
       const removedVal = chunk.value.endsWith('\n') ? chunk.value.slice(0, -1) : chunk.value;
-      const addedVal = diffChunks[k+1].value.endsWith('\n') ? diffChunks[k+1].value.slice(0, -1) : diffChunks[k+1].value;
-      
+      const addedVal = diffChunks[k + 1].value.endsWith('\n')
+        ? diffChunks[k + 1].value.slice(0, -1)
+        : diffChunks[k + 1].value;
+
       const removedLines = removedVal.split('\n');
       const addedLines = addedVal.split('\n');
-      
+
       if (removedLines.length === addedLines.length) {
         for (let i = 0; i < removedLines.length; i++) {
           const charDiff = computeDiff(removedLines[i], addedLines[i]);
@@ -161,7 +167,7 @@ export function highlightDifferences(originalText: string, correctedText: string
               html += escaped;
             }
           }
-          // Add the newline if it's not the last line of the ENTIRE file, 
+          // Add the newline if it's not the last line of the ENTIRE file,
           // or if the chunk originally had a newline at this position.
           if (i < removedLines.length - 1 || chunk.value.endsWith('\n')) {
             html += '<span style="opacity: 0.5; font-size: 0.8em;">↵</span>\n';
@@ -185,4 +191,3 @@ export function highlightDifferences(originalText: string, correctedText: string
 
   return html;
 }
-

@@ -5,11 +5,11 @@ function cleanLyricsText(text: string): string {
   if (!text) return '';
 
   let cleaned = text;
-  
+
   // Supprimer l'en-tête natif de Genius copié avec .innerText du type:
   // "16 Contributors\nVision Lyrics\n"
   cleaned = cleaned.replace(/^\d*\s*Contributors?\s*\n/i, '');
-  
+
   // Supprimer la ligne "Titre Lyrics" qui apparait au tout début
   cleaned = cleaned.replace(/^.*?\sLyrics\s*\n/i, '');
 
