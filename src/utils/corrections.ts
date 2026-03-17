@@ -46,27 +46,24 @@ export function isHeadingTag(line: string): boolean {
   // 1. On nettoie la ligne de son annotation éventuelle à la fin
   const withoutAnnotation = trimmed.replace(/\s*\(\d+\)$/, '');
 
-  // 2. On extrait le contenu du premier bloc de crochets
-  // On gère les doubles crochets Genius [[...]]
-  const firstBracketMatch = withoutAnnotation.match(/^\[+([^\]]+)\]+/);
-  if (!firstBracketMatch) return false;
-  
-  const tagInnerContent = firstBracketMatch[1].trim();
-
-  // 3. On vérifie s'il reste du texte "libre" après les tags 
-  const textOutsideTags = withoutAnnotation.replace(/\[+.*?\]+/g, '').trim();
-  if (textOutsideTags.length > 0) return false;
-
-  // 4. Critère de décision : 
-  // On crée une regex pour vérifier que le contenu du tag commence par un mot-clé + limite de mot
-  const keywordPattern = new RegExp(`^(${SECTION_KEYWORDS.join('|')})\\b`, 'i');
-  
-  const startsWithKeyword = keywordPattern.test(tagInnerContent);
+  // 2. On extrait le contenu des crochets (gère [[...]])
+  const tagMatch = withoutAnnotation.match(/^\[+([^\]]+)\]+/);
+  if (!tagMatch) return false;
+  const tagContent = tagMatch[1].trim();
 
   // Si c'est un placeholder pur [?], ce n'est jamais un titre
-  if (/^\?+$/.test(tagInnerContent)) return false;
+  if (/^\?+$/.test(tagContent)) return false;
 
-  return startsWithKeyword;
+  // 3. On extrait la partie description (avant : ou " - ")
+  // On ne split par le tiret QUE s'il a des espaces pour préserver "Post-Chorus"
+  const tagDescription = tagContent.split(/[:]|(\s+[-]\s+)/)[0].trim();
+
+  // 4. On vérifie si la description contient un mot-clé Genius comme mot entier
+  return SECTION_KEYWORDS.some((keyword) => {
+    const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(^|\\b)${escapedKeyword}(\\b|\\d|$)`, 'i');
+    return regex.test(tagDescription);
+  });
 }
 
 export function correctLineSpacing(text: string): { newText: string; correctionsCount: number } {
@@ -203,15 +200,11 @@ export const CORRECTION_RULES: CorrectionRule[] = [
                   cleanBlock.pop();
                 }
 
-                // Repeat the combined content (header + block) `num` times
+                result.push(contentToRepeat);
+                // Repeat the block content `num` times
                 for (let k = 0; k < num; k++) {
-                  result.push(contentToRepeat);
                   if (cleanBlock.length > 0) {
                     result.push(...cleanBlock);
-                  }
-                  // Add a separator line between blocks, but not after the last one
-                  if (k < num - 1) {
-                    result.push('');
                   }
                 }
                 
