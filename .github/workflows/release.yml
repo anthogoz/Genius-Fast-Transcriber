@@ -205,3 +205,20 @@ jobs:
           files: |
             ${{ steps.artifacts.outputs.zip_1 }}
             ${{ steps.artifacts.outputs.zip_2 }}
+
+      - name: Submit to Firefox Add-ons (AMO)
+        continue-on-error: true
+        env:
+          AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
+          AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+        run: |
+          # Unzip the Firefox build to a temp dir for web-ext
+          mkdir -p /tmp/firefox-ext
+          unzip -q "${{ steps.artifacts.outputs.zip_2 }}" -d /tmp/firefox-ext
+
+          # Submit to AMO for public listing (triggers manual review)
+          npx web-ext sign \
+            --source-dir /tmp/firefox-ext \
+            --channel listed \
+            --api-key "$AMO_JWT_ISSUER" \
+            --api-secret "$AMO_JWT_SECRET"
