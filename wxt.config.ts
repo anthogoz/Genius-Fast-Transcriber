@@ -41,5 +41,14 @@ export default defineConfig({
         matches: ['*://*.genius.com/*'],
       },
     ],
+    // Required by Firefox to load the extension without "corrupted" error.
+    // WXT silently ignores this field in Chrome/MV3 builds.
+    browser_specific_settings: {
+      gecko: {
+        id: 'genius-fast-transcriber@lnkhey',
+        strict_min_version: '109.0',
+      },
+    },
   },
 });
+
