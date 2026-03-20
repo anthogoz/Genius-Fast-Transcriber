@@ -78,3 +78,4 @@ Le projet utilise **Biome** en remplacement d'ESLint/Prettier. Les instructions 
 1. **Pense avant de coder** : Si la modification est lourde, propose d'abord un plan d'action condensé au développeur.
 2. **Ne brise pas l'existant** : Avant de supprimer une fonction apparemment "inutile", s'assurer par une recherche globale (rg/grep) qu'elle n'est pas invoquée conditionnellement ailleurs ou depuis un point d'entrée WXT distant.
 3. **Commentaires clairs** : Laisser de brefs commentaires techniques si le segment résout un problème complexe d'API de DOM de Genius.com, de contournement d'événement React dans le champ d'édition (`contenteditable`), etc.
+4. **Fichiers temporaires** : Ne jamais créer de fichiers poubelles, de logs de commandes ou d'exports de tests à la racine du projet. Utiliser toujours et uniquement le dossier `tmp/` pour garder l'arborescence propre.
