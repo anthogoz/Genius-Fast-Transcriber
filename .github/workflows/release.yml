@@ -218,9 +218,12 @@ jobs:
 
           # Submit to AMO for public listing (triggers manual review).
           # --approval-timeout 0: don't wait for a signed XPI (listed channel = manual review, never instant).
+          # --amo-metadata: AMO requires a license field for listed submissions.
+          echo '{"license": "MIT"}' > /tmp/amo-meta.json
           npx web-ext sign \
             --source-dir /tmp/firefox-ext \
             --channel listed \
             --approval-timeout 0 \
+            --amo-metadata /tmp/amo-meta.json \
             --api-key "$AMO_JWT_ISSUER" \
             --api-secret "$AMO_JWT_SECRET"
