@@ -3,16 +3,16 @@ import { useSettings } from './useSettings';
 import type { KeyboardShortcut } from '@/types';
 
 interface ShortcutHandlers {
-  onVerse: () => void;
-  onChorus: () => void;
-  onBridge: () => void;
-  onIntro: () => void;
-  onOutro: () => void;
-  onFixAll: () => void;
-  onToggleStats: () => void;
-  onDuplicateLine: () => void;
-  onUndo: () => void;
-  onRedo: () => void;
+  onVerse?: () => void;
+  onChorus?: () => void;
+  onBridge?: () => void;
+  onIntro?: () => void;
+  onOutro?: () => void;
+  onFixAll?: () => void;
+  onToggleStats?: () => void;
+  onDuplicateLine?: () => void;
+  onUndo?: () => void;
+  onRedo?: () => void;
   onYoutubePlayPause?: () => void;
   onYoutubeSeekBack?: () => void;
   onYoutubeSeekForward?: () => void;
@@ -36,34 +36,34 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
     try {
       const s = shortcuts.value;
 
-      if (matches(e, s.verse)) {
+      if (matches(e, s.verse) && handlers.onVerse) {
         e.preventDefault();
         handlers.onVerse();
-      } else if (matches(e, s.chorus)) {
+      } else if (matches(e, s.chorus) && handlers.onChorus) {
         e.preventDefault();
         handlers.onChorus();
-      } else if (matches(e, s.bridge)) {
+      } else if (matches(e, s.bridge) && handlers.onBridge) {
         e.preventDefault();
         handlers.onBridge();
-      } else if (matches(e, s.intro)) {
+      } else if (matches(e, s.intro) && handlers.onIntro) {
         e.preventDefault();
         handlers.onIntro();
-      } else if (matches(e, s.outro)) {
+      } else if (matches(e, s.outro) && handlers.onOutro) {
         e.preventDefault();
         handlers.onOutro();
-      } else if (matches(e, s.fixAll)) {
+      } else if (matches(e, s.fixAll) && handlers.onFixAll) {
         e.preventDefault();
         handlers.onFixAll();
-      } else if (matches(e, s.toggleStats)) {
+      } else if (matches(e, s.toggleStats) && handlers.onToggleStats) {
         e.preventDefault();
         handlers.onToggleStats();
-      } else if (matches(e, s.duplicateLine)) {
+      } else if (matches(e, s.duplicateLine) && handlers.onDuplicateLine) {
         e.preventDefault();
         handlers.onDuplicateLine();
-      } else if (matches(e, s.undo)) {
+      } else if (matches(e, s.undo) && handlers.onUndo) {
         e.preventDefault();
         handlers.onUndo();
-      } else if (matches(e, s.redo)) {
+      } else if (matches(e, s.redo) && handlers.onRedo) {
         e.preventDefault();
         handlers.onRedo();
       } else if (matches(e, s.ytPlayPause)) {

@@ -7,7 +7,7 @@ import type {
   SongData,
 } from '@/types';
 
-export const REPEAT_MARKER_REGEX = /\s*[(（]?\s*[xX×]\s*(\d+)\s*[)）]?\s*$/;
+export const REPEAT_MARKER_REGEX = /\s*[[(（]?\s*[xX×]\s*(\d+)\s*[\])）]?\s*$/;
 
 export function isSectionTag(line: string): boolean {
   const trimmed = line.trim().replace(REPEAT_MARKER_REGEX, '');
@@ -278,7 +278,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
   {
     id: 'tagSeparator',
     progressKey: 'progress_step_tag_separator',
-    execute: (text, corrections, opts) => {
+    execute: (text, corrections, opts, locale) => {
       if (!opts.tagSeparator) return text;
       const lines = text.split('\n');
       let count = 0;
@@ -294,8 +294,9 @@ export const CORRECTION_RULES: CorrectionRule[] = [
 
         // 1. Normalize " - " to " : "
         // Use spaces around the hyphen to avoid splitting compound tags like "Post-Chorus"
+        const colonStr = locale === 'fr' ? ' : ' : ': ';
         const separatorPattern = /(?<=\[)([^\]\-:]+)\s+[-]\s+([^\]]+)(?=\])/g;
-        newLine = newLine.replace(separatorPattern, '$1 : $2');
+        newLine = newLine.replace(separatorPattern, `$1${colonStr}$2`);
 
         // 2. Normalize colons and multiple artists: [A: B, C] -> [A : B & C]
         const artistPattern = /\[([^\]:]+)\s*:\s*([^\]]+)\]/g;
@@ -316,7 +317,8 @@ export const CORRECTION_RULES: CorrectionRule[] = [
             normalizedArtists = `${artists.join(', ')} & ${lastArtist}`;
           }
 
-          return `[${typePart} : ${normalizedArtists}]`;
+          const colonStr = locale === 'fr' ? ' : ' : ': ';
+          return `[${typePart}${colonStr}${normalizedArtists}]`;
         });
 
         if (newLine !== line) {
@@ -358,9 +360,9 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     progressKey: 'progress_step_oeu',
     execute: (text, corrections, opts) => {
       if (!opts.oeuLigature) return text;
-      const pattern = /([Oo])eu/g;
-      const newText = text.replace(pattern, (_match, firstLetter: string) =>
-        firstLetter === 'O' ? 'Œu' : 'œu',
+      const pattern = /([Oo])e([ui])/g;
+      const newText = text.replace(pattern, (_match, firstLetter: string, secondLetter: string) =>
+        (firstLetter === 'O' ? 'Œ' : 'œ') + secondLetter,
       );
       if (newText !== text) corrections.oeuLigature = (text.match(pattern) || []).length;
       return newText;
@@ -388,7 +390,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
         if (newText !== text) corrections.longDash = (text.match(pattern) || []).length;
         return newText;
       }
-      const pattern = /[—–]/g;
+      const pattern = /[—–]|--+/g;
       const newText = text.replace(pattern, '-');
       if (newText !== text) corrections.longDash = (text.match(pattern) || []).length;
       return newText;
@@ -424,11 +426,14 @@ export const CORRECTION_RULES: CorrectionRule[] = [
           const withSpace = newLine
             .replace(/(?<![\s[])([?!:;])/g, ' $1') // Ajoute si manque, sauf après [
             .replace(/\[\s+([?!:;])/g, '[$1') // Supprime si déjà là après [
-            .replace(/\s+([?!:;])/g, ' $1'); // Normalise à un seul espace
+            .replace(/\s+([?!:;])/g, ' $1') // Normalise à un seul espace
+            .replace(/([?!:;])(?=[A-Za-z0-9À-ÿŒœ])/g, '$1 '); // Espace APRÈS si suivi d'une lettre
           newLine = withSpace;
         } else {
-          // Anglais/Polonais : doit être collé
-          const noSpace = newLine.replace(/\s+([?!:;])/g, '$1');
+          // Anglais/Polonais : doit être collé avant
+          const noSpace = newLine
+            .replace(/\s+([?!:;])/g, '$1')
+            .replace(/([?!:;])(?=[A-Za-z0-9À-ÿŒœ])/g, '$1 '); // Espace APRÈS si suivi d'une lettre
           newLine = noSpace;
         }
 
@@ -537,6 +542,72 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     },
   },
   {
+    id: 'englishAbbreviations',
+    progressKey: 'progress_step_en_abbreviations',
+    execute: (text, corrections, opts, locale) => {
+      // Seulement si activé et en anglais
+      if (!opts.englishAbbreviations || locale !== 'en') return text;
+      
+      let count = 0;
+      let newText = text;
+
+      // Imma / I'mma -> I'ma
+      const immaPattern = /\bI'?[mM]ma\b/g;
+      const immaMatches = newText.match(immaPattern);
+      if (immaMatches) {
+        count += immaMatches.length;
+        newText = newText.replace(immaPattern, "I'ma");
+      }
+
+      // cause / cuz -> 'cause (ignoring middle of words by using boundaries)
+      const causePattern = /\b(?<!')([Cc]ause|[Cc]uz)\b/g;
+      const causeMatches = newText.match(causePattern);
+      if (causeMatches) {
+        count += causeMatches.length;
+        newText = newText.replace(causePattern, (match) => {
+          // Preserve capitalization for Cause -> 'Cause
+          return match[0] === 'C' ? "'Cause" : "'cause";
+        });
+      }
+
+      // em -> 'em (when preceded by space or as a standalone word, not mid-word)
+      // Genius rule: "catch 'em" not "catch em"
+      const emPattern = /\b(?<!')([Ee]m)\b/g;
+      // We must be careful not to match 'Em' in 'Em (Eminem) if it's capitalized? Usually it's lowercase 'em. Let's do lowercase only or case-insensitive with care.
+      const emMatches = newText.match(emPattern);
+      if (emMatches) {
+        // Actually, matching just \b[Ee]m\b is safe if it's really the word "em", but 'em' is so common.
+        count += emMatches.length;
+        newText = newText.replace(emPattern, (match) => {
+          return match[0] === 'E' ? "'Em" : "'em";
+        });
+      }
+
+      // til / till -> 'til
+      const tilPattern = /\b(?<!')([Tt]ill?)\b/g;
+      const tilMatches = newText.match(tilPattern);
+      if (tilMatches) {
+        count += tilMatches.length;
+        newText = newText.replace(tilPattern, (match) => {
+          return match[0] === 'T' ? "'Til" : "'til";
+        });
+      }
+
+      // bout -> 'bout
+      const boutPattern = /\b(?<!')([Bb]out)\b/g;
+      const boutMatches = newText.match(boutPattern);
+      if (boutMatches) {
+        count += boutMatches.length;
+        newText = newText.replace(boutPattern, (match) => {
+          return match[0] === 'B' ? "'Bout" : "'bout";
+        });
+      }
+
+      if (count > 0) corrections.englishAbbreviations = count;
+      return newText;
+    },
+  },
+  {
     id: 'songHeader',
     progressKey: 'progress_step_songHeader',
     execute: (text, corrections, opts, locale, songData) => {
@@ -619,6 +690,7 @@ export function getDefaultOptions(options: Partial<CorrectionOptions> = {}): Cor
     majuscules: options.majuscules !== false,
     songHeader: options.songHeader !== false,
     repetitions: options.repetitions !== false,
+    englishAbbreviations: options.englishAbbreviations !== false,
     tagSeparator: options.tagSeparator !== false,
   };
 }
@@ -637,6 +709,7 @@ function initCorrectionsObject(): CorrectionCounts {
     majuscules: 0,
     songHeader: 0,
     repetitions: 0,
+    englishAbbreviations: 0,
     tagSeparator: 0,
     bracketSpaces: 0,
   };

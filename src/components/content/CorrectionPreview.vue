@@ -34,6 +34,7 @@ const options = ref<CorrectionOptions>({
   songHeader: true,
   repetitions: true,
   tagSeparator: true,
+  englishAbbreviations: true,
 });
 
 const currentResult = ref<CorrectionResult>(props.correctionResult);
@@ -67,6 +68,7 @@ const optionDefs = computed<OptionDef[]>(() => [
   { key: 'longDash', labelKey: 'preview_opt_dash', statKey: 'longDash', statLabelKey: 'preview_stat_dash', icon: ' — ' },
   { key: 'oeuLigature', labelKey: 'preview_opt_oeu', statKey: 'oeuLigature', statLabelKey: 'preview_stat_oeu', icon: ' Œ ' },
   { key: 'yPrime', labelKey: 'preview_opt_yprime', statKey: 'yPrime', statLabelKey: 'preview_stat_yprime', icon: ' Y ' },
+  { key: 'englishAbbreviations', labelKey: 'preview_opt_en_abbrev', statKey: 'englishAbbreviations', statLabelKey: 'preview_stat_en_abbrev', icon: ' US ', show: locale.value === 'en' },
 ]);
 
 const visibleOptions = computed(() => optionDefs.value.filter((o) => o.show !== false));

@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts';
+import { useYoutubeControls } from '@/composables/useYoutubeControls';
 
 const props = withDefaults(
   defineProps<{
@@ -29,6 +32,26 @@ const handleEvent = (e: any) => {
     show(e.detail.message);
   }
 };
+
+const { t } = useI18n();
+const { togglePlayPause, seekBy } = useYoutubeControls();
+
+useKeyboardShortcuts({
+  onYoutubePlayPause: () => {
+    const result = togglePlayPause();
+    if (result === 'playing') show(t('feedback_play'));
+    else if (result === 'paused') show(t('feedback_pause'));
+    else show(`❌ ${t('yt_player_not_found')}`);
+  },
+  onYoutubeSeekBack: () => {
+    if (seekBy(-5)) show('⏪ -5s');
+    else show(`❌ ${t('yt_player_not_found')}`);
+  },
+  onYoutubeSeekForward: () => {
+    if (seekBy(5)) show('⏩ +5s');
+    else show(`❌ ${t('yt_player_not_found')}`);
+  },
+});
 
 onMounted(() => {
   window.addEventListener('gft-show-feedback', handleEvent);

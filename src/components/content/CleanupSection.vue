@@ -57,6 +57,15 @@ const cleanupButtons = computed<CleanupButton[]>(() => {
     });
   }
 
+  if (locale.value === 'en') {
+    buttons.push({
+      id: 'english-abbreviations',
+      labelKey: 'btn_en_abbrev_label',
+      tooltipKey: 'cleanup_en_abbrev_tooltip',
+      action: () => applySingleCorrection({ englishAbbreviations: true }, "I'ma, 'em"),
+    });
+  }
+
   if (isFr.value) {
     buttons.push({
       id: 'oeu',
@@ -216,6 +225,8 @@ function applySingleCorrection(opts: Record<string, boolean>, itemName: string) 
     majuscules: false,
     songHeader: false,
     repetitions: false,
+    englishAbbreviations: false,
+    tagSeparator: false,
   };
   const result = applySyncCorrections({ ...disableAll, ...opts });
   if (result.correctionsCount > 0) {

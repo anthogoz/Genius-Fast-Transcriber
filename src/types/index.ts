@@ -49,6 +49,7 @@ export interface CorrectionOptions {
   songHeader: boolean;
   repetitions: boolean;
   tagSeparator: boolean;
+  englishAbbreviations: boolean;
 }
 
 export interface CorrectionCounts {
@@ -66,6 +67,7 @@ export interface CorrectionCounts {
   repetitions: number;
   bracketSpaces: number;
   tagSeparator: number;
+  englishAbbreviations: number;
 }
 
 export interface CorrectionResult {
