@@ -267,13 +267,28 @@ jobs:
               if (i === 23) throw new Error('Validation timed out after 2 minutes');
             }
 
-            // Step 3: Create the version on AMO with the required license field
-            console.log('\nCreating version on AMO…');
-            const version = await api('POST', `/addons/addon/${addonId}/versions/`, {
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ upload: uuid, license: 'MIT' }),
-            });
-            console.log(`Version ${version.version} submitted — file status: ${version.file?.status ?? 'awaiting review'}`);
+            // Step 3: Submit to AMO — new version for existing addon, or new addon if first time
+            console.log('\nSubmitting to AMO…');
+            let result;
+            try {
+              // Subsequent versions: addon already exists on AMO
+              result = await api('POST', `/addons/addon/${addonId}/versions/`, {
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ upload: uuid, license: 'MIT' }),
+              });
+              console.log(`Version ${result.version} submitted for review ✓`);
+            } catch (err) {
+              if (!err.message.includes('404')) throw err;
+              // First submission: addon doesn't exist yet on AMO — create it
+              console.log('Addon not found on AMO, creating new addon (first submission)…');
+              result = await api('POST', '/addons/', {
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  version: { upload: uuid, license: 'MIT' },
+                }),
+              });
+              console.log(`Addon created — version ${result.current_version?.version ?? '?'} submitted for review ✓`);
+            }
             console.log('Successfully submitted to AMO for manual review!');
           }
 
