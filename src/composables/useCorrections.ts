@@ -15,7 +15,7 @@ export function useCorrections() {
   const { state } = useGftState();
   const { getEditorContent, setEditorContent } = useEditor();
   const { saveState } = useUndoRedo();
-  const { locale } = useSettings();
+  const { locale, isHeaderFeatEnabled } = useSettings();
 
   function highlightContentEditableBrackets(positions: number[]) {
     const editor = state.currentActiveEditor;
@@ -80,7 +80,7 @@ export function useCorrections() {
     const songData = {
       title: state.currentSongTitle,
       mainArtists: state.currentMainArtists,
-      featuringArtists: state.currentFeaturingArtists,
+      featuringArtists: isHeaderFeatEnabled.value ? state.currentFeaturingArtists : [],
     };
     return applyAllTextCorrectionsAsync(content, locale.value, progressFn, songData);
   }
@@ -90,7 +90,7 @@ export function useCorrections() {
     const songData = {
       title: state.currentSongTitle,
       mainArtists: state.currentMainArtists,
-      featuringArtists: state.currentFeaturingArtists,
+      featuringArtists: isHeaderFeatEnabled.value ? state.currentFeaturingArtists : [],
     };
     return applyAllTextCorrectionsToString(content, locale.value, options, songData);
   }
@@ -100,7 +100,7 @@ export function useCorrections() {
     const songData = {
       title: state.currentSongTitle,
       mainArtists: state.currentMainArtists,
-      featuringArtists: state.currentFeaturingArtists,
+      featuringArtists: isHeaderFeatEnabled.value ? state.currentFeaturingArtists : [],
     };
     return applyAllTextCorrectionsToString(content, locale.value, options, songData);
   }

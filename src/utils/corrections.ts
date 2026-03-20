@@ -46,6 +46,7 @@ const SECTION_KEYWORDS = [
   'Instrumental',
   'Solo',
   'Skit',
+  'Interlude',
   'Paroles',
   'Słowa',
   'Zwrotka',
@@ -284,11 +285,11 @@ export const CORRECTION_RULES: CorrectionRule[] = [
       const newLines = lines.map((line) => {
         if (!isHeadingTag(line)) return line;
 
-        // 0. Preliminary cleanup: apostrophes and spaces inside tags
+        // 0. Preliminary cleanup: spaces inside tags (apostrophes are handled by the apostrophes rule later)
         const tagPattern = /\[([^\]]+)\]/g;
         let newLine = line.replace(tagPattern, (tag) => {
-          // Normalize apostrophes inside tags too
-          return tag.replace(/[''´`ʻ‘’]/g, "'").replace(/(\[|\()\s+|\s+(\]|\))/g, '$1$2');
+          // Normalize spaces inside tags
+          return tag.replace(/(\[|\()\s+|\s+(\]|\))/g, '$1$2');
         });
 
         // 1. Normalize " - " to " : "
@@ -296,28 +297,27 @@ export const CORRECTION_RULES: CorrectionRule[] = [
         const separatorPattern = /(?<=\[)([^\]\-:]+)\s+[-]\s+([^\]]+)(?=\])/g;
         newLine = newLine.replace(separatorPattern, '$1 : $2');
 
-        // 2. Normalize multiple artists: [A, B, C] -> [A, B & C]
-        // This only applies if we have a colon separator inside brackets
-        const artistPattern = /\[([^\]]+)\s*:\s*([^\]]+)\]/;
-        const artistMatch = newLine.match(artistPattern);
+        // 2. Normalize colons and multiple artists: [A: B, C] -> [A : B & C]
+        const artistPattern = /\[([^\]:]+)\s*:\s*([^\]]+)\]/g;
+        newLine = newLine.replace(artistPattern, (_match, typePartRaw, artistPartRaw) => {
+          const typePart = typePartRaw.trim();
+          const artistPart = artistPartRaw.trim();
 
-        if (artistMatch) {
-          const typePart = artistMatch[1].trim();
-          const artistPart = artistMatch[2].trim();
-
-          // Split by commas or ampersands, then filter empty strings
           const artists = artistPart
             .split(/[,&]|\band\b/i)
-            .map((a) => a.trim())
-            .filter((a) => a.length > 0);
+            .map((a: string) => a.trim())
+            .filter((a: string) => a.length > 0);
 
-          if (artists.length > 1) {
+          let normalizedArtists = artistPart;
+          if (artists.length === 1) {
+            normalizedArtists = artists[0];
+          } else if (artists.length > 1) {
             const lastArtist = artists.pop();
-            const normalizedArtists = `${artists.join(', ')} & ${lastArtist}`;
-            const updatedTag = `[${typePart} : ${normalizedArtists}]`;
-            newLine = newLine.replace(artistPattern, updatedTag);
+            normalizedArtists = `${artists.join(', ')} & ${lastArtist}`;
           }
-        }
+
+          return `[${typePart} : ${normalizedArtists}]`;
+        });
 
         if (newLine !== line) {
           count++;
@@ -334,7 +334,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     progressKey: 'progress_step_yprime',
     execute: (text, corrections, opts) => {
       if (!opts.yPrime) return text;
-      const pattern = /\b(Y|y)['''´`ʻ]/g;
+      const pattern = /\b(Y|y)['´`ʻ‘’]/g;
       const newText = text.replace(pattern, (_match, firstLetter: string) =>
         firstLetter === 'Y' ? 'Y ' : 'y ',
       );
@@ -347,7 +347,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     progressKey: 'progress_step_apostrophes',
     execute: (text, corrections, opts) => {
       if (!opts.apostrophes) return text;
-      const pattern = /[''´`ʻ‘’]/g;
+      const pattern = /[´`ʻ‘’]/g;
       const newText = text.replace(pattern, "'");
       if (newText !== text) corrections.apostrophes = (text.match(pattern) || []).length;
       return newText;
