@@ -216,9 +216,11 @@ jobs:
           mkdir -p /tmp/firefox-ext
           unzip -q "${{ steps.artifacts.outputs.zip_2 }}" -d /tmp/firefox-ext
 
-          # Submit to AMO for public listing (triggers manual review)
+          # Submit to AMO for public listing (triggers manual review).
+          # --approval-timeout 0: don't wait for a signed XPI (listed channel = manual review, never instant).
           npx web-ext sign \
             --source-dir /tmp/firefox-ext \
             --channel listed \
+            --approval-timeout 0 \
             --api-key "$AMO_JWT_ISSUER" \
             --api-secret "$AMO_JWT_SECRET"
