@@ -52,6 +52,13 @@ const SECTION_KEYWORDS = [
   'Zwrotka',
   'Refren',
   'Mostek',
+  'Przejście',
+  'Przedrefren',
+  'Zarefren',
+  'Interludium',
+  'Część',
+  'Przyśpiewka',
+  'Wokaliza',
 ];
 
 /**
@@ -373,7 +380,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     progressKey: 'progress_step_quotes',
     execute: (text, corrections, opts) => {
       if (!opts.frenchQuotes) return text;
-      const pattern = /[«»]/g;
+      const pattern = /[«»„”]/g;
       const newText = text.replace(pattern, '"');
       if (newText !== text) corrections.frenchQuotes = (text.match(pattern) || []).length;
       return newText;
