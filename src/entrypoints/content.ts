@@ -84,11 +84,11 @@ export default defineContentScript({
     let cleanupFloatingToolbar: (() => void) | null = null;
     let panelApp: any = null;
 
+    setupMessageListener();
+
     if (!settings.isTutorialCompleted.value) {
       await showOnboarding(ctx);
     }
-
-    setupMessageListener();
 
     if (settings.isLyricCardOnly.value) {
       const updateMetadata = () => {
