@@ -584,9 +584,19 @@ export const CORRECTION_RULES: CorrectionRule[] = [
 export function generateSongHeader(songData: SongData, locale: Locale): string {
   let featStr = '';
   if (songData.featuringArtists.length > 0) {
+    const artists = [...songData.featuringArtists];
+    let artistsFormatted = '';
+    
+    if (artists.length === 1) {
+      artistsFormatted = artists[0];
+    } else {
+      const lastArtist = artists.pop();
+      artistsFormatted = `${artists.join(', ')} & ${lastArtist}`;
+    }
+
     featStr =
       (locale === 'fr' ? ' ft. ' : ' (feat. ')
-      + songData.featuringArtists.join(', ')
+      + artistsFormatted
       + (locale === 'pl' ? ')' : '');
   }
 

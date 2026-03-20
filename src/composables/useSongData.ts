@@ -174,6 +174,20 @@ export function useSongData() {
       return true;
     });
 
+    // Unconditionally sort featuring artists based on visual order
+    const ogDescMeta = document.querySelector<HTMLMetaElement>('meta[property="og:description"]');
+    const referenceText = (ogDescMeta?.content || '') + '\n' + (document.body?.innerText || '');
+    const lowerRef = referenceText.toLowerCase();
+
+    songData.featuringArtists.sort((a, b) => {
+      const idxA = lowerRef.indexOf(a.toLowerCase());
+      const idxB = lowerRef.indexOf(b.toLowerCase());
+      if (idxA === -1 && idxB === -1) return 0;
+      if (idxA === -1) return 1;
+      if (idxB === -1) return -1;
+      return idxA - idxB;
+    });
+
     return songData;
   }
 
