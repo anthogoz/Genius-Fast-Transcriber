@@ -35,3 +35,7 @@ tmp/
 # Extension Description
 Description
 
+# Environnement et Secrets
+.env
+.env.*
+!.env.example
