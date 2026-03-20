@@ -211,19 +211,71 @@ jobs:
         env:
           AMO_JWT_ISSUER: ${{ secrets.AMO_JWT_ISSUER }}
           AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
+          ZIP_FILE: ${{ steps.artifacts.outputs.zip_2 }}
+          ADDON_ID: genius-fast-transcriber@lnkhey
         run: |
-          # Unzip the Firefox build to a temp dir for web-ext
-          mkdir -p /tmp/firefox-ext
-          unzip -q "${{ steps.artifacts.outputs.zip_2 }}" -d /tmp/firefox-ext
+          node << 'EOF'
+          const fs = require('fs');
+          const crypto = require('crypto');
+          const path = require('path');
 
-          # Submit to AMO for public listing (triggers manual review).
-          # --approval-timeout 0: don't wait for a signed XPI (listed channel = manual review, never instant).
-          # AMO API v5 requires license nested under "version" key, not at root level.
-          echo '{"version": {"license": "MIT"}}' > /tmp/amo-meta.json
-          npx web-ext sign \
-            --source-dir /tmp/firefox-ext \
-            --channel listed \
-            --approval-timeout 0 \
-            --amo-metadata /tmp/amo-meta.json \
-            --api-key "$AMO_JWT_ISSUER" \
-            --api-secret "$AMO_JWT_SECRET"
+          const { AMO_JWT_ISSUER: issuer, AMO_JWT_SECRET: secret, ZIP_FILE: zipFile, ADDON_ID: addonId } = process.env;
+          const BASE = 'https://addons.mozilla.org/api/v5';
+
+          // Generate a fresh AMO JWT token (valid 5 min)
+          function jwt() {
+            const now = Math.floor(Date.now() / 1000);
+            const h = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
+            const p = Buffer.from(JSON.stringify({ iss: issuer, jti: crypto.randomUUID(), iat: now, exp: now + 300 })).toString('base64url');
+            const s = crypto.createHmac('sha256', secret).update(`${h}.${p}`).digest('base64url');
+            return `${h}.${p}.${s}`;
+          }
+
+          async function api(method, path, opts = {}) {
+            const res = await fetch(`${BASE}${path}`, {
+              method,
+              headers: { Authorization: `JWT ${jwt()}`, ...opts.headers },
+              body: opts.body,
+            });
+            const text = await res.text();
+            let json;
+            try { json = JSON.parse(text); } catch { json = { raw: text }; }
+            if (!res.ok) throw new Error(`AMO ${method} ${path} → ${res.status}: ${text}`);
+            return json;
+          }
+
+          async function main() {
+            // Step 1: Upload the XPI
+            console.log(`Uploading ${zipFile}…`);
+            const form = new FormData();
+            form.append('upload', new Blob([fs.readFileSync(zipFile)], { type: 'application/zip' }), path.basename(zipFile));
+            form.append('channel', 'listed');
+            const { uuid } = await api('POST', '/addons/upload/', { body: form });
+            console.log(`Upload UUID: ${uuid}`);
+
+            // Step 2: Poll until AMO finishes validating the XPI (up to 2 min)
+            console.log('Waiting for validation…');
+            for (let i = 0; i < 24; i++) {
+              await new Promise(r => setTimeout(r, 5000));
+              const status = await api('GET', `/addons/upload/${uuid}/`);
+              if (status.processed) {
+                if (!status.valid) throw new Error(`Validation failed:\n${JSON.stringify(status.validation, null, 2)}`);
+                console.log('Validation passed ✓');
+                break;
+              }
+              process.stdout.write('.');
+              if (i === 23) throw new Error('Validation timed out after 2 minutes');
+            }
+
+            // Step 3: Create the version on AMO with the required license field
+            console.log('\nCreating version on AMO…');
+            const version = await api('POST', `/addons/addon/${addonId}/versions/`, {
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ upload: uuid, license: 'MIT' }),
+            });
+            console.log(`Version ${version.version} submitted — file status: ${version.file?.status ?? 'awaiting review'}`);
+            console.log('Successfully submitted to AMO for manual review!');
+          }
+
+          main().catch(err => { console.error('ERROR:', err.message); process.exit(1); });
+          EOF
