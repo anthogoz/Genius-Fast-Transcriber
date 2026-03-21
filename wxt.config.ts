@@ -46,12 +46,13 @@ export default defineConfig({
     browser_specific_settings: {
       gecko: {
         id: 'genius-fast-transcriber@lnkhey',
-        strict_min_version: '109.0',
+        // data_collection_permissions introduced in Firefox 140 (desktop) / 142 (Android)
+        strict_min_version: '140.0',
         // Required by AMO since Firefox 138+ for all new extensions.
         // This extension does not collect any personal data.
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data_collection_permissions: {
-          required: [],
+          required: ['none'],
           optional: [],
         },
       } as any,
