@@ -213,6 +213,7 @@ jobs:
           AMO_JWT_SECRET: ${{ secrets.AMO_JWT_SECRET }}
           ZIP_FILE: ${{ steps.artifacts.outputs.zip_2 }}
           ADDON_ID: genius-fast-transcriber@lnkhey
+          ADDON_VERSION: ${{ steps.version.outputs.version }}
         run: |
           node << 'EOF'
           const fs = require('fs');
@@ -267,28 +268,16 @@ jobs:
               if (i === 23) throw new Error('Validation timed out after 2 minutes');
             }
 
-            // Step 3: Submit to AMO — new version for existing addon, or new addon if first time
-            console.log('\nSubmitting to AMO…');
-            let result;
-            try {
-              // Subsequent versions: addon already exists on AMO
-              result = await api('POST', `/addons/addon/${addonId}/versions/`, {
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ upload: uuid, license: 'MIT' }),
-              });
-              console.log(`Version ${result.version} submitted for review ✓`);
-            } catch (err) {
-              if (!err.message.includes('404')) throw err;
-              // First submission: addon doesn't exist yet on AMO — create it
-              console.log('Addon not found on AMO, creating new addon (first submission)…');
-              result = await api('POST', '/addons/', {
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  version: { upload: uuid, license: 'MIT' },
-                }),
-              });
-              console.log(`Addon created — version ${result.current_version?.version ?? '?'} submitted for review ✓`);
-            }
+            // Step 3: PUT /addons/addon/{guid}/versions/{version}/ — upsert (creates addon+version or updates).
+            // @ in addon GUID must be percent-encoded in the URL path.
+            const version = process.env.ADDON_VERSION;
+            const encodedId = encodeURIComponent(addonId);
+            console.log(`\nSubmitting version ${version} to AMO…`);
+            const result = await api('PUT', `/addons/addon/${encodedId}/versions/${version}/`, {
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ upload: uuid, license: 'MIT' }),
+            });
+            console.log(`Version ${result.version ?? version} submitted for review ✓`);
             console.log('Successfully submitted to AMO for manual review!');
           }
 
