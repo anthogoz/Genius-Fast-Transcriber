@@ -269,11 +269,10 @@ jobs:
             }
 
             // Step 3: PUT /addons/addon/{guid}/versions/{version}/ — upsert (creates addon+version or updates).
-            // @ in addon GUID must be percent-encoded in the URL path.
+            // @ is valid in URL paths without encoding — AMO router expects the raw @ character.
             const version = process.env.ADDON_VERSION;
-            const encodedId = encodeURIComponent(addonId);
-            console.log(`\nSubmitting version ${version} to AMO…`);
-            const result = await api('PUT', `/addons/addon/${encodedId}/versions/${version}/`, {
+                        console.log(`\nSubmitting version ${version} to AMO…`);
+            const result = await api('PUT', `/addons/addon/${addonId}/versions/${version}/`, {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ upload: uuid, license: 'MIT' }),
             });
