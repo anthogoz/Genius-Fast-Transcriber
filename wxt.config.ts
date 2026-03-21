@@ -47,7 +47,14 @@ export default defineConfig({
       gecko: {
         id: 'genius-fast-transcriber@lnkhey',
         strict_min_version: '109.0',
-      },
+        // Required by AMO since Firefox 138+ for all new extensions.
+        // This extension does not collect any personal data.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        data_collection_permissions: {
+          required: [],
+          optional: [],
+        },
+      } as any,
     },
   },
 });
