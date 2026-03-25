@@ -87,7 +87,27 @@ export default defineContentScript({
     setupMessageListener();
 
     if (!settings.isTutorialCompleted.value) {
-      await showOnboarding(ctx);
+      const isEligibleForTutorial = () => {
+        return (
+          document.querySelector(SELECTORS.LYRICS_CONTAINER) ||
+          document.querySelector(SELECTORS.TEXTAREA_EDITOR) ||
+          document.querySelector(SELECTORS.DIV_EDITOR) ||
+          document.querySelector(SELECTORS.CONTROLS_STICKY) ||
+          document.querySelector(SELECTORS.GENIUS_HELPER)
+        );
+      };
+
+      if (isEligibleForTutorial()) {
+        void showOnboarding(ctx);
+      } else {
+        const observer = new MutationObserver(() => {
+          if (isEligibleForTutorial()) {
+            observer.disconnect();
+            void showOnboarding(ctx);
+          }
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+      }
     }
 
     if (settings.isLyricCardOnly.value) {
