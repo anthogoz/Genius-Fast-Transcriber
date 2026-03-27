@@ -2,7 +2,87 @@
 
 All notable changes to this project will be documented in this file.
 
-## [4.2.0] — 2026-03-14
+## [4.4.12] — 2026-03-27
+
+### Changed
+- Address dependencies vulnerability and update related packages for security and stability.
+
+## [4.4.11] — 2026-03-21
+
+### Changed
+- Increased Firefox minimum version requirement.
+- Explicitly declared no data collection permissions for Firefox/AMO compliance.
+
+## [4.4.10] — 2026-03-21
+
+### Added
+- `data_collection_permissions` in Firefox manifest configuration for AMO compliance.
+
+## [4.4.9] — 2026-03-21
+
+### Changed
+- Refined the manual GitHub Actions release workflow for version validation, build artifacts, and AMO submission.
+
+## [4.4.7] — 2026-03-21
+
+### Changed
+- Improved manual release workflow behavior for GitHub Releases and Firefox Add-ons publishing.
+
+## [4.4.6] — 2026-03-20
+
+### Changed
+- Updated CI release flow to support manual GitHub release publishing and Firefox Add-ons submission.
+
+## [4.4.5] — 2026-03-20
+
+### Added
+- Manual release workflow for building artifacts, tagging releases, creating GitHub Releases, and publishing to AMO.
+
+## [4.4.4] — 2026-03-20
+
+### Changed
+- Iterative improvements to the manual release workflow for version checks, artifact handling, and Firefox Add-ons submission.
+
+## [4.4.3] — 2026-03-20
+
+### Changed
+- Improved manual release workflow for validated versioning, artifact build, and GitHub/Firefox publication.
+
+## [4.4.2] — 2026-03-20
+
+### Changed
+- Updated manual release automation for version validation, build artifact generation, GitHub Releases, and AMO publication.
+
+## [4.4.1] — 2026-03-20
+
+### Added
+- Firefox-specific manifest settings (extension ID and minimum browser version).
+
+### Changed
+- Improved manual release GitHub Actions workflow for GitHub Releases and Firefox AMO publishing.
+
+## [4.4.0] — 2026-03-20
+
+### Added
+- New correction utilities for section tags, line spacing, repetition expansion, capitalization, and tag separator normalization.
+- Composable for extracting Genius song data used by correction workflows.
+
+### Changed
+- Integrated and expanded cleanup/correction tools with keyboard shortcut support and multilingual coverage.
+- Dependency and formatting maintenance updates for project stability.
+
+## [4.3.0] — 2026-03-15
+
+### Added
+- New settings system with dedicated UI for editor preferences, shortcuts, and tool behavior.
+- Lyric Card creation modal and related UI flows.
+- Expanded localization support across app and content interfaces (French, Polish, English).
+- New structuring/cleanup tooling and verse management capabilities.
+
+### Fixed
+- Polish pluralization logic for 3-form strings.
+
+## [4.2.0] — 2026-03-15
 
 ### Added
 - Manual GitHub Actions release workflow (`.github/workflows/release.yml`) for validated version bumps, build artifacts, and tagged GitHub releases.
