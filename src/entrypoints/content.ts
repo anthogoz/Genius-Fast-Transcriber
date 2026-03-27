@@ -89,11 +89,11 @@ export default defineContentScript({
     if (!settings.isTutorialCompleted.value) {
       const isEligibleForTutorial = () => {
         return (
-          document.querySelector(SELECTORS.LYRICS_CONTAINER) ||
-          document.querySelector(SELECTORS.TEXTAREA_EDITOR) ||
-          document.querySelector(SELECTORS.DIV_EDITOR) ||
-          document.querySelector(SELECTORS.CONTROLS_STICKY) ||
-          document.querySelector(SELECTORS.GENIUS_HELPER)
+          document.querySelector(SELECTORS.LYRICS_CONTAINER)
+          || document.querySelector(SELECTORS.TEXTAREA_EDITOR)
+          || document.querySelector(SELECTORS.DIV_EDITOR)
+          || document.querySelector(SELECTORS.CONTROLS_STICKY)
+          || document.querySelector(SELECTORS.GENIUS_HELPER)
         );
       };
 

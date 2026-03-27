@@ -176,7 +176,7 @@ export function useSongData() {
 
     // Unconditionally sort featuring artists based on visual order
     const ogDescMeta = document.querySelector<HTMLMetaElement>('meta[property="og:description"]');
-    const referenceText = (ogDescMeta?.content || '') + '\n' + (document.body?.innerText || '');
+    const referenceText = `${ogDescMeta?.content || ''}\n${document.body?.innerText || ''}`;
     const lowerRef = referenceText.toLowerCase();
 
     songData.featuringArtists.sort((a, b) => {

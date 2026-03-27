@@ -368,8 +368,10 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     execute: (text, corrections, opts) => {
       if (!opts.oeuLigature) return text;
       const pattern = /([Oo])e([ui])/g;
-      const newText = text.replace(pattern, (_match, firstLetter: string, secondLetter: string) =>
-        (firstLetter === 'O' ? 'Œ' : 'œ') + secondLetter,
+      const newText = text.replace(
+        pattern,
+        (_match, firstLetter: string, secondLetter: string) =>
+          (firstLetter === 'O' ? 'Œ' : 'œ') + secondLetter,
       );
       if (newText !== text) corrections.oeuLigature = (text.match(pattern) || []).length;
       return newText;
@@ -554,7 +556,7 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     execute: (text, corrections, opts, locale) => {
       // Seulement si activé et en anglais
       if (!opts.englishAbbreviations || locale !== 'en') return text;
-      
+
       let count = 0;
       let newText = text;
 
@@ -664,7 +666,7 @@ export function generateSongHeader(songData: SongData, locale: Locale): string {
   if (songData.featuringArtists.length > 0) {
     const artists = [...songData.featuringArtists];
     let artistsFormatted = '';
-    
+
     if (artists.length === 1) {
       artistsFormatted = artists[0];
     } else {
@@ -673,9 +675,7 @@ export function generateSongHeader(songData: SongData, locale: Locale): string {
     }
 
     featStr =
-      (locale === 'fr' ? ' ft. ' : ' (feat. ')
-      + artistsFormatted
-      + (locale === 'pl' ? ')' : '');
+      (locale === 'fr' ? ' ft. ' : ' (feat. ') + artistsFormatted + (locale === 'pl' ? ')' : '');
   }
 
   return locale === 'fr'
