@@ -1,4 +1,4 @@
-export type Locale = 'fr' | 'en' | 'pl';
+export type Locale = 'fr' | 'en' | 'pl' | 'es' | 'de' | 'it' | 'pt' | 'ru';
 
 export type ExtensionMode = 'full' | 'lyric-card-only';
 

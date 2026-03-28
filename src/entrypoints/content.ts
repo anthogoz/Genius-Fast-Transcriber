@@ -638,6 +638,7 @@ export default defineContentScript({
 
             case 'SET_LANGUAGE':
               settings.locale.value = message.language as Locale;
+              settings.transcriptionMode.value = message.language as Locale;
               setLocale(message.language as Locale);
               sendResponse();
               break;

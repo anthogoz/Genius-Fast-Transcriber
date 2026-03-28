@@ -43,7 +43,7 @@ const diffHtml = computed(() =>
   highlightDifferences(props.originalText, currentResult.value.newText),
 );
 
-const showPunctuation = computed(() => locale.value !== 'pl' && locale.value !== 'en');
+const showPunctuation = computed(() => locale.value === 'fr');
 
 interface OptionDef {
   key: keyof CorrectionOptions;

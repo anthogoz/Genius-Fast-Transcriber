@@ -92,7 +92,7 @@ function addArtistsToTag(baseTag: string): string {
 
   const tagPart = baseTag.slice(0, -1);
   const artistsString = formatArtistList(artists);
-  const separator = locale.value === 'en' || locale.value === 'pl' ? ': ' : ' : ';
+  const separator = locale.value === 'fr' ? ' : ' : ': ';
   return `${tagPart}${separator}${artistsString}]`;
 }
 

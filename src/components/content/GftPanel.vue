@@ -6,6 +6,7 @@ import { useDraft } from '@/composables/useDraft';
 import { useEditor } from '@/composables/useEditor';
 import { useGftState } from '@/composables/useGftState';
 import { setLocale } from '@/locales';
+import type { Locale } from '@/types';
 import { useKeyboardShortcuts } from '@/composables/useKeyboardShortcuts';
 import { useSettings } from '@/composables/useSettings';
 import { useYoutubeControls } from '@/composables/useYoutubeControls';
@@ -69,7 +70,7 @@ const panelVersion = computed(() => `v${props.version ?? '?.?.?'}`);
 
 const logoSrc = computed(() => browser.runtime.getURL('icon/16.png' as any));
 
-function updateTranscriptionMode(mode: 'fr' | 'en' | 'pl') {
+function updateTranscriptionMode(mode: Locale) {
   transcriptionMode.value = mode;
   locale.value = mode;
   setLocale(mode);
@@ -403,11 +404,16 @@ defineExpose({
           class="gft-panel__mode-select"
           :title="t('lang_select_title')"
           @click.stop
-          @change="updateTranscriptionMode(($event.target as HTMLSelectElement).value as 'fr' | 'en' | 'pl')"
+          @change="updateTranscriptionMode(($event.target as HTMLSelectElement).value as Locale)"
         >
           <option value="fr">FR</option>
           <option value="en">EN</option>
           <option value="pl">PL</option>
+          <option value="es">ES</option>
+          <option value="de">DE</option>
+          <option value="it">IT</option>
+          <option value="pt">PT</option>
+          <option value="ru">RU</option>
         </select>
         <button
           :title="t('undo_tooltip')"

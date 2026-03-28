@@ -30,35 +30,30 @@ export function isSectionTag(line: string): boolean {
  * Liste des mots-clés typiques de début de section sur Genius
  */
 const SECTION_KEYWORDS = [
-  'Couplet',
-  'Verse',
-  'Refrain',
-  'Chorus',
-  'Pont',
-  'Bridge',
-  'Intro',
-  'Outro',
-  'Pre-Chorus',
-  'Pré-refrain',
-  'Post-Chorus',
-  'Post-refrain',
-  'Hook',
-  'Instrumental',
-  'Solo',
-  'Skit',
-  'Interlude',
-  'Paroles',
-  'Słowa',
-  'Zwrotka',
-  'Refren',
-  'Mostek',
-  'Przejście',
-  'Przedrefren',
-  'Zarefren',
-  'Interludium',
-  'Część',
-  'Przyśpiewka',
-  'Wokaliza',
+  // FR
+  'Couplet', 'Refrain', 'Pont', 'Pré-refrain', 'Post-refrain', 'Paroles',
+  // EN
+  'Verse', 'Chorus', 'Bridge', 'Pre-Chorus', 'Post-Chorus',
+  // Shared
+  'Intro', 'Outro', 'Hook', 'Instrumental', 'Solo', 'Skit', 'Interlude',
+  // PL
+  'Słowa', 'Zwrotka', 'Refren', 'Mostek', 'Przejście',
+  'Przedrefren', 'Zarefren', 'Interludium', 'Część', 'Przyśpiewka', 'Wokaliza',
+  // ES
+  'Verso', 'Estribillo', 'Puente', 'Pre-Estribillo', 'Post-Estribillo',
+  'Interludio', 'Pausa', 'Vocalización', 'Letra',
+  // DE
+  'Strophe', 'Brücke', 'Vor-Refrain', 'Post-Refrain',
+  'Vokalisation', 'Teil', 'Songtext',
+  // IT
+  'Strofa', 'Ritornello', 'Ponte', 'Pre-Ritornello', 'Post-Ritornello',
+  'Strumentale', 'Vocalizzazione', 'Parte', 'Testo',
+  // PT
+  'Refrão', 'Pré-Refrão', 'Pós-Refrão', 'Interlúdio', 'Vocalização',
+  // RU
+  'Куплет', 'Припев', 'Бридж', 'Пре-Припев', 'Пост-Припев',
+  'Интро', 'Аутро', 'Хук', 'Инструментал', 'Скит',
+  'Интерлюдия', 'Часть', 'Вокализ', 'Текст',
 ];
 
 /**
@@ -393,12 +388,21 @@ export const CORRECTION_RULES: CorrectionRule[] = [
     progressKey: 'progress_step_dash',
     execute: (text, corrections, opts, locale) => {
       if (!opts.longDash) return text;
-      if (locale === 'pl') {
+      // PL & RU: " - " → " — " (em-dash)
+      if (locale === 'pl' || locale === 'ru') {
         const pattern = / - /g;
         const newText = text.replace(pattern, ' — ');
         if (newText !== text) corrections.longDash = (text.match(pattern) || []).length;
         return newText;
       }
+      // DE: " - " → " – " (en-dash)
+      if (locale === 'de') {
+        const pattern = / - /g;
+        const newText = text.replace(pattern, ' – ');
+        if (newText !== text) corrections.longDash = (text.match(pattern) || []).length;
+        return newText;
+      }
+      // FR, EN, ES, IT, PT: — – → -
       const pattern = /[—–]|--+/g;
       const newText = text.replace(pattern, '-');
       if (newText !== text) corrections.longDash = (text.match(pattern) || []).length;
@@ -624,12 +628,19 @@ export const CORRECTION_RULES: CorrectionRule[] = [
 
       const lines = text.split('\n');
       let headerIndex = -1;
-      const frPattern = /^\[Paroles de.*\]$/i;
-      const plPattern = /^\[Słowa do.*\]$/i;
+      // Detect existing SEO headers for all supported locales
+      const headerPatterns: RegExp[] = [
+        /^\[Paroles de.*\]$/i,           // FR
+        /^\[Słowa do.*\]$/i,             // PL
+        /^\[Letra de.*\]$/i,             // ES, PT
+        /^\[Songtext zu.*\]$/i,          // DE
+        /^\[Testo di.*\]$/i,             // IT
+        /^\[Текст песни.*\]$/i,          // RU
+      ];
 
       for (let i = 0; i < Math.min(lines.length, 5); i++) {
         const trimmed = lines[i].trim();
-        if (frPattern.test(trimmed) || plPattern.test(trimmed)) {
+        if (headerPatterns.some((p) => p.test(trimmed))) {
           headerIndex = i;
           break;
         }
@@ -674,13 +685,25 @@ export function generateSongHeader(songData: SongData, locale: Locale): string {
       artistsFormatted = `${artists.join(', ')} & ${lastArtist}`;
     }
 
+    // FR uses "ft." inline, others use "(feat. ...)" with closing paren
     featStr =
-      (locale === 'fr' ? ' ft. ' : ' (feat. ') + artistsFormatted + (locale === 'pl' ? ')' : '');
+      locale === 'fr'
+        ? ` ft. ${artistsFormatted}`
+        : ` (feat. ${artistsFormatted})`;
   }
 
-  return locale === 'fr'
-    ? `[Paroles de "${songData.title}"${featStr}]`
-    : `[Słowa do utworu "${songData.title}"${featStr}]`;
+  // Locale-specific header format
+  const headerFormats: Record<string, string> = {
+    fr: `[Paroles de "${songData.title}"${featStr}]`,
+    pl: `[Słowa do utworu "${songData.title}"${featStr}]`,
+    es: `[Letra de "${songData.title}"${featStr}]`,
+    de: `[Songtext zu "${songData.title}"${featStr}]`,
+    it: `[Testo di "${songData.title}"${featStr}]`,
+    pt: `[Letra de "${songData.title}"${featStr}]`,
+    ru: `[Текст песни "${songData.title}"${featStr}]`,
+  };
+
+  return headerFormats[locale] ?? headerFormats.fr;
 }
 
 export function getDefaultOptions(options: Partial<CorrectionOptions> = {}): CorrectionOptions {

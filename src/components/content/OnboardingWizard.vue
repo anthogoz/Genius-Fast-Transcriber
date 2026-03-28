@@ -3,10 +3,11 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { browser } from 'wxt/browser';
 import { useSettings } from '@/composables/useSettings';
+import { setLocale } from '@/locales';
 import type { ExtensionMode, Locale, Theme } from '@/types';
 
 const { t } = useI18n();
-const { locale, mode, theme, isTutorialCompleted } = useSettings();
+const { locale, transcriptionMode, mode, theme, isTutorialCompleted } = useSettings();
 
 const emit = defineEmits<{
   complete: [];
@@ -79,6 +80,7 @@ const logoUrl = browser.runtime.getURL('/icon/128.png');
 
 function chooseLocale(loc: Locale) {
   selectedLocale.value = loc;
+  setLocale(loc);
   if (currentStep.value === 0) currentStep.value = 1;
 }
 
@@ -126,14 +128,20 @@ function finish() {
   mode.value = selectedMode.value;
   theme.value = selectedTheme.value;
   locale.value = selectedLocale.value;
+  transcriptionMode.value = selectedLocale.value;
   isTutorialCompleted.value = true;
   emit('complete');
 }
 
 const locales: { value: Locale; label: string }[] = [
-  { value: 'fr', label: '🇫🇷 Français (FR)' },
-  { value: 'en', label: '🇬🇧 English (EN)' },
-  { value: 'pl', label: '🇵🇱 Polski (PL)' },
+  { value: 'fr', label: '🇫🇷 Français' },
+  { value: 'en', label: '🇬🇧 English' },
+  { value: 'pl', label: '🇵🇱 Polski' },
+  { value: 'es', label: '🇪🇸 Español' },
+  { value: 'de', label: '🇩🇪 Deutsch' },
+  { value: 'it', label: '🇮🇹 Italiano' },
+  { value: 'pt', label: '🇧🇷 Português' },
+  { value: 'ru', label: '🇷🇺 Русский' },
 ];
 </script>
 
@@ -158,8 +166,8 @@ const locales: { value: Locale; label: string }[] = [
             </div>
           </div>
           <p class="gft-onboarding__intro">
-            <strong>Welcome! / Bienvenue ! / Witaj!</strong><br />
-            <span>Please select your language to start.</span>
+            <strong>Welcome! / Bienvenue ! / Willkommen!</strong><br />
+            <span>Select your language to start.</span>
           </p>
           <div class="gft-onboarding__lang-grid">
             <button

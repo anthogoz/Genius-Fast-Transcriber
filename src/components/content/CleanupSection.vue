@@ -44,6 +44,8 @@ interface CleanupButton {
 
 const isFr = computed(() => locale.value === 'fr');
 const isPl = computed(() => locale.value === 'pl');
+const isRu = computed(() => locale.value === 'ru');
+const isDe = computed(() => locale.value === 'de');
 
 const cleanupButtons = computed<CleanupButton[]>(() => {
   const buttons: CleanupButton[] = [];
@@ -75,7 +77,7 @@ const cleanupButtons = computed<CleanupButton[]>(() => {
     });
   }
 
-  if (!isPl.value) {
+  if (!isPl.value && !isRu.value) {
     buttons.push({
       id: 'long-dash',
       labelKey: 'btn_long_dash_label',
@@ -84,7 +86,7 @@ const cleanupButtons = computed<CleanupButton[]>(() => {
     });
   }
 
-  if (locale.value === 'fr') {
+  if (isFr.value) {
     buttons.push({
       id: 'punctuation-spacing',
       labelKey: 'btn_punctuation_spacing_label',
@@ -109,19 +111,25 @@ const cleanupButtons = computed<CleanupButton[]>(() => {
     });
   }
 
-  if (isPl.value) {
+  if (isPl.value || isDe.value) {
     buttons.push({
       id: 'polish-quotes',
       labelKey: 'btn_polish_quotes_label',
       tooltipKey: 'cleanup_polish_quotes_tooltip',
       action: () => applySingleCorrection({ frenchQuotes: true }, '„"'),
     });
+  }
+
+  if (isPl.value || isRu.value) {
     buttons.push({
       id: 'em-dash',
       labelKey: 'btn_em_dash_label',
       tooltipKey: 'cleanup_em_dash_tooltip',
       action: () => applySingleCorrection({ longDash: true }, '—'),
     });
+  }
+
+  if (isPl.value) {
     buttons.push({
       id: 'ellipsis',
       labelKey: 'btn_ellipsis_label',

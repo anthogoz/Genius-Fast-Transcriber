@@ -13,30 +13,59 @@ const emit = defineEmits<{
 }>();
 
 const locales: { id: Locale; label: string }[] = [
-  { id: 'fr', label: 'FR' },
-  { id: 'en', label: 'EN' },
-  { id: 'pl', label: 'PL' },
+  { id: 'fr', label: '🇫🇷 Français' },
+  { id: 'en', label: '🇬🇧 English' },
+  { id: 'pl', label: '🇵🇱 Polski' },
+  { id: 'es', label: '🇪🇸 Español' },
+  { id: 'de', label: '🇩🇪 Deutsch' },
+  { id: 'it', label: '🇮🇹 Italiano' },
+  { id: 'pt', label: '🇧🇷 Português' },
+  { id: 'ru', label: '🇷🇺 Русский' },
 ];
 
-function select(locale: Locale) {
-  if (props.modelValue !== locale) {
-    emit('update:modelValue', locale);
+function onSelect(event: Event) {
+  const value = (event.target as HTMLSelectElement).value as Locale;
+  if (props.modelValue !== value) {
+    emit('update:modelValue', value);
   }
 }
 </script>
 
 <template>
   <div class="gft-u-popup-section-title">{{ t('lang_select_title') }}</div>
-  <div class="gft-u-popup-btn-group">
-    <button
+  <select
+    class="gft-u-popup-select"
+    :value="modelValue"
+    @change="onSelect"
+  >
+    <option
       v-for="loc in locales"
       :key="loc.id"
-      type="button"
-      class="gft-u-popup-pill"
-      :class="{ active: modelValue === loc.id }"
-      @click="select(loc.id)"
+      :value="loc.id"
     >
       {{ loc.label }}
-    </button>
-  </div>
+    </option>
+  </select>
 </template>
+
+<style scoped>
+.gft-u-popup-select {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card-bg);
+  color: var(--text);
+  cursor: pointer;
+  appearance: auto;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+.gft-u-popup-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--accent-shadow);
+}
+</style>

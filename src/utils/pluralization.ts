@@ -7,12 +7,12 @@ import type { Locale } from '@/types';
  */
 export function getPluralForm(count: number, locale: Locale): number {
   const c = Math.abs(count);
-  if (locale === 'pl') {
+  if (locale === 'pl' || locale === 'ru') {
     if (c === 1) return 0;
     if (c % 10 >= 2 && c % 10 <= 4 && (c % 100 < 12 || c % 100 > 14)) return 1;
     return 2;
   }
-  if (locale === 'fr') return c > 1 ? 1 : 0;
+  if (locale === 'fr' || locale === 'es' || locale === 'it' || locale === 'pt') return c > 1 ? 1 : 0;
   return c === 1 ? 0 : 1;
 }
 
@@ -36,6 +36,11 @@ export function formatListWithConjunction(items: string[], locale: Locale): stri
     fr: ' et ',
     en: ' and ',
     pl: ' i ',
+    es: ' y ',
+    de: ' und ',
+    it: ' e ',
+    pt: ' e ',
+    ru: ' и ',
   };
   const conj = conjunctions[locale];
   return itemsCopy.join(', ') + conj + lastItem;
