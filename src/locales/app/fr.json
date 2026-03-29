@@ -369,5 +369,14 @@
   "popup_restart_tutorial": "Relancer le tutoriel",
   "popup_light": "Clair",
   "popup_dark": "Sombre",
-  "header_format": "[Paroles de \"{title}\"{feat}]"
+  "header_format": "[Paroles de \"{title}\"{feat}]",
+  "tuto_progress_config": "Config",
+  "tuto_progress_tutorial": "Tutoriel",
+  "tuto_progress_ready": "Prêt",
+  "tuto_sandbox_placeholder": "Cliquez le bouton ci-dessous pour insérer un tag...",
+  "tuto_sandbox_hint": "🧪 Essayez ! Cliquez le bouton pour voir l'insertion en action :",
+  "tuto_sandbox_btn": "➕ Insérer [Couplet]",
+  "tuto_shortcut_keys": "Raccourci",
+  "tuto_shortcut_action": "Action",
+  "tuto_shortcut_customizable": "Tous les raccourcis sont personnalisables dans les réglages !"
 }

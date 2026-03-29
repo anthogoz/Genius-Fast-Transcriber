@@ -371,5 +371,14 @@
   "preview_stat_majuscules": "заглавная(ых) в начале строки",
   "cleanup_y_tooltip": "Заменить \"y'\" на \"y \" (правило Genius)",
   "cleanup_oeu_tooltip": "Заменить \"oeu\" на специальный символ \"œu\"",
-  "tutorial_link": "❓ Обучение / Помощь"
+  "tutorial_link": "❓ Обучение / Помощь",
+  "tuto_progress_config": "Настройка",
+  "tuto_progress_tutorial": "Обучение",
+  "tuto_progress_ready": "Готово",
+  "tuto_sandbox_placeholder": "Нажмите кнопку ниже, чтобы вставить тег...",
+  "tuto_sandbox_hint": "🧪 Попробуйте! Нажмите кнопку для вставки тега:",
+  "tuto_sandbox_btn": "➕ Вставить [Куплет]",
+  "tuto_shortcut_keys": "Горячая клавиша",
+  "tuto_shortcut_action": "Действие",
+  "tuto_shortcut_customizable": "Все горячие клавиши настраиваемы в параметрах!"
 }

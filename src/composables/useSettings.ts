@@ -12,6 +12,7 @@ const STORAGE_KEYS = {
   tooltipsEnabled: 'gftTooltipsEnabled',
   language: 'gftLanguage',
   tutorialCompleted: 'gftTutorialDone',
+  tutorialStep: 'gftTutorialStep',
   shortcuts: 'gftShortcuts',
 } as const;
 
@@ -38,6 +39,7 @@ const areTooltipsEnabled = ref(true);
 const locale = ref<Locale>('fr');
 const transcriptionMode = ref<Locale>('fr');
 const isTutorialCompleted = ref(false);
+const tutorialStep = ref(0);
 
 const DEFAULT_SHORTCUTS: ShortcutSettings = {
   verse: { key: '1', code: 'Digit1', ctrlKey: true },
@@ -74,6 +76,8 @@ export function useSettings() {
     locale.value = readString(STORAGE_KEYS.language, 'fr');
     transcriptionMode.value = readString(STORAGE_KEYS.transcriptionMode, locale.value);
     isTutorialCompleted.value = readBool(STORAGE_KEYS.tutorialCompleted);
+    const savedStep = localStorage.getItem(STORAGE_KEYS.tutorialStep);
+    tutorialStep.value = savedStep ? Number.parseInt(savedStep, 10) || 0 : 0;
 
     const savedShortcuts = localStorage.getItem(STORAGE_KEYS.shortcuts);
     if (savedShortcuts) {
@@ -105,6 +109,7 @@ export function useSettings() {
     watch(locale, (v) => localStorage.setItem(STORAGE_KEYS.language, v));
     watch(transcriptionMode, (v) => localStorage.setItem(STORAGE_KEYS.transcriptionMode, v));
     watch(isTutorialCompleted, (v) => writeBool(STORAGE_KEYS.tutorialCompleted, v));
+    watch(tutorialStep, (v) => localStorage.setItem(STORAGE_KEYS.tutorialStep, String(v)));
     watch(
       shortcuts,
       (v) => {
@@ -125,6 +130,7 @@ export function useSettings() {
 
   function resetTutorial() {
     isTutorialCompleted.value = false;
+    tutorialStep.value = 0;
   }
 
   function resetShortcuts() {
@@ -141,6 +147,7 @@ export function useSettings() {
     locale,
     transcriptionMode,
     isTutorialCompleted,
+    tutorialStep,
     theme,
     mode,
     shortcuts,

@@ -351,5 +351,14 @@
   "popup_restart_tutorial": "Tutorial neu starten",
   "popup_light": "Hell",
   "popup_dark": "Dunkel",
-  "header_format": "[Songtext zu \"{title}\"{feat}]"
+  "header_format": "[Songtext zu \"{title}\"{feat}]",
+  "tuto_progress_config": "Konfiguration",
+  "tuto_progress_tutorial": "Tutorial",
+  "tuto_progress_ready": "Bereit",
+  "tuto_sandbox_placeholder": "Klicke den Button unten, um einen Tag einzufügen...",
+  "tuto_sandbox_hint": "🧪 Probier es aus! Klicke den Button, um das Einfügen in Aktion zu sehen:",
+  "tuto_sandbox_btn": "➕ [Strophe] einfügen",
+  "tuto_shortcut_keys": "Tastenkürzel",
+  "tuto_shortcut_action": "Aktion",
+  "tuto_shortcut_customizable": "Alle Tastenkürzel sind in den Einstellungen anpassbar!"
 }

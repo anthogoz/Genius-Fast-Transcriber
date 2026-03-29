@@ -359,5 +359,14 @@
   "yt_seek_back": "YouTube Przewiń w tył o 5 sek.",
   "yt_seek_forward": "YouTube Przewiń w przód o 5 sek.",
   "duplicate_line": "📋 Duplikuj linię",
-  "header_format": "[Słowa do utworu \"{title}\"{feat}]"
+  "header_format": "[Słowa do utworu \"{title}\"{feat}]",
+  "tuto_progress_config": "Konfiguracja",
+  "tuto_progress_tutorial": "Samouczek",
+  "tuto_progress_ready": "Gotowe",
+  "tuto_sandbox_placeholder": "Kliknij przycisk poniżej, aby wstawić tag...",
+  "tuto_sandbox_hint": "🧪 Spróbuj! Kliknij przycisk, aby zobaczyć wstawianie w akcji:",
+  "tuto_sandbox_btn": "➕ Wstaw [Zwrotka]",
+  "tuto_shortcut_keys": "Skrót",
+  "tuto_shortcut_action": "Akcja",
+  "tuto_shortcut_customizable": "Wszystkie skróty możesz skonfigurować w ustawieniach!"
 }

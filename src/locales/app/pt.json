@@ -349,5 +349,14 @@
   "popup_restart_tutorial": "Reiniciar tutorial",
   "popup_light": "Claro",
   "popup_dark": "Escuro",
-  "header_format": "[Letra de \"{title}\"{feat}]"
+  "header_format": "[Letra de \"{title}\"{feat}]",
+  "tuto_progress_config": "Config",
+  "tuto_progress_tutorial": "Tutorial",
+  "tuto_progress_ready": "Pronto",
+  "tuto_sandbox_placeholder": "Clique no botão abaixo para inserir uma tag...",
+  "tuto_sandbox_hint": "🧪 Experimente! Clique no botão para ver a inserção em ação:",
+  "tuto_sandbox_btn": "➕ Inserir [Verso]",
+  "tuto_shortcut_keys": "Atalho",
+  "tuto_shortcut_action": "Ação",
+  "tuto_shortcut_customizable": "Todos os atalhos são personalizáveis nas configurações!"
 }

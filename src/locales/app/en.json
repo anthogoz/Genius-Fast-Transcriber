@@ -366,5 +366,14 @@
   "popup_restart_tutorial": "Restart tutorial",
   "popup_light": "Light",
   "popup_dark": "Dark",
-  "header_format": "[Lyrics of \"{title}\"{feat}]"
+  "header_format": "[Lyrics of \"{title}\"{feat}]",
+  "tuto_progress_config": "Config",
+  "tuto_progress_tutorial": "Tutorial",
+  "tuto_progress_ready": "Ready",
+  "tuto_sandbox_placeholder": "Click the button below to insert a tag...",
+  "tuto_sandbox_hint": "🧪 Try it! Click the button to see insertion in action:",
+  "tuto_sandbox_btn": "➕ Insert [Verse]",
+  "tuto_shortcut_keys": "Shortcut",
+  "tuto_shortcut_action": "Action",
+  "tuto_shortcut_customizable": "All shortcuts are customizable in settings!"
 }

@@ -349,5 +349,14 @@
   "popup_restart_tutorial": "Riavvia tutorial",
   "popup_light": "Chiaro",
   "popup_dark": "Scuro",
-  "header_format": "[Testo di \"{title}\"{feat}]"
+  "header_format": "[Testo di \"{title}\"{feat}]",
+  "tuto_progress_config": "Config",
+  "tuto_progress_tutorial": "Tutorial",
+  "tuto_progress_ready": "Pronto",
+  "tuto_sandbox_placeholder": "Clicca il pulsante qui sotto per inserire un tag...",
+  "tuto_sandbox_hint": "🧪 Provalo! Clicca il pulsante per vedere l'inserimento in azione:",
+  "tuto_sandbox_btn": "➕ Inserisci [Strofa]",
+  "tuto_shortcut_keys": "Scorciatoia",
+  "tuto_shortcut_action": "Azione",
+  "tuto_shortcut_customizable": "Tutte le scorciatoie sono personalizzabili nelle impostazioni!"
 }
