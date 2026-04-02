@@ -557,19 +557,64 @@ export default defineContentScript({
       toolbarApp.use(i18n);
       toolbarApp.mount(container);
 
-      const selectionHandler = () => setTimeout(updateToolbarPosition, 10);
-      const hideHandler = () => hideToolbar();
+      // --- Bug fix: prevent toolbar from appearing during drag-selection ---
+      // Track whether the mouse button is held down. While dragging, the toolbar
+      // must stay hidden to avoid stealing focus / collapsing the selection,
+      // which would create an infinite show/hide flicker loop.
+      let isMouseDown = false;
+      let selectionDebounce: number | null = null;
 
-      document.addEventListener('selectionchange', selectionHandler);
-      document.addEventListener('mouseup', selectionHandler);
-      document.addEventListener('keyup', selectionHandler);
-      window.addEventListener('scroll', hideHandler, true);
+      const debouncedUpdate = () => {
+        if (selectionDebounce !== null) clearTimeout(selectionDebounce);
+        selectionDebounce = window.setTimeout(() => {
+          selectionDebounce = null;
+          if (!isMouseDown) updateToolbarPosition();
+        }, 80);
+      };
+
+      const onMouseDown = () => {
+        isMouseDown = true;
+        hideToolbar();
+      };
+
+      const onMouseUp = () => {
+        isMouseDown = false;
+        // Short delay to let the browser finalise the selection range
+        setTimeout(updateToolbarPosition, 30);
+      };
+
+      const onKeyUp = () => {
+        if (!isMouseDown) {
+          setTimeout(updateToolbarPosition, 10);
+        }
+      };
+
+      let scrollRaf: number | null = null;
+      const onScroll = () => {
+        // Au lieu de cacher la barre au scroll, on la fait suivre la sélection.
+        if (!isMouseDown && toolbar.visible) {
+          if (scrollRaf !== null) cancelAnimationFrame(scrollRaf);
+          scrollRaf = requestAnimationFrame(() => {
+            scrollRaf = null;
+            updateToolbarPosition();
+          });
+        }
+      };
+
+      document.addEventListener('selectionchange', debouncedUpdate);
+      document.addEventListener('mousedown', onMouseDown, true);
+      document.addEventListener('mouseup', onMouseUp);
+      document.addEventListener('keyup', onKeyUp);
+      window.addEventListener('scroll', onScroll, true);
 
       cleanupFloatingToolbar = () => {
-        document.removeEventListener('selectionchange', selectionHandler);
-        document.removeEventListener('mouseup', selectionHandler);
-        document.removeEventListener('keyup', selectionHandler);
-        window.removeEventListener('scroll', hideHandler, true);
+        document.removeEventListener('selectionchange', debouncedUpdate);
+        document.removeEventListener('mousedown', onMouseDown, true);
+        document.removeEventListener('mouseup', onMouseUp);
+        document.removeEventListener('keyup', onKeyUp);
+        window.removeEventListener('scroll', onScroll, true);
+        if (selectionDebounce !== null) clearTimeout(selectionDebounce);
+        if (scrollRaf !== null) cancelAnimationFrame(scrollRaf);
         toolbarApp.unmount();
         container.remove();
       };

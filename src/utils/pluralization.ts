@@ -12,7 +12,8 @@ export function getPluralForm(count: number, locale: Locale): number {
     if (c % 10 >= 2 && c % 10 <= 4 && (c % 100 < 12 || c % 100 > 14)) return 1;
     return 2;
   }
-  if (locale === 'fr' || locale === 'es' || locale === 'it' || locale === 'pt') return c > 1 ? 1 : 0;
+  if (locale === 'fr' || locale === 'es' || locale === 'it' || locale === 'pt')
+    return c > 1 ? 1 : 0;
   return c === 1 ? 0 : 1;
 }
 

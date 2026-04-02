@@ -43,4 +43,3 @@ export function setLocale(locale: Locale) {
 export function getLocale(): Locale {
   return i18n.global.locale.value as Locale;
 }
-

@@ -31,29 +31,87 @@ export function isSectionTag(line: string): boolean {
  */
 const SECTION_KEYWORDS = [
   // FR
-  'Couplet', 'Refrain', 'Pont', 'Pré-refrain', 'Post-refrain', 'Paroles',
+  'Couplet',
+  'Refrain',
+  'Pont',
+  'Pré-refrain',
+  'Post-refrain',
+  'Paroles',
   // EN
-  'Verse', 'Chorus', 'Bridge', 'Pre-Chorus', 'Post-Chorus',
+  'Verse',
+  'Chorus',
+  'Bridge',
+  'Pre-Chorus',
+  'Post-Chorus',
   // Shared
-  'Intro', 'Outro', 'Hook', 'Instrumental', 'Solo', 'Skit', 'Interlude',
+  'Intro',
+  'Outro',
+  'Hook',
+  'Instrumental',
+  'Solo',
+  'Skit',
+  'Interlude',
   // PL
-  'Słowa', 'Zwrotka', 'Refren', 'Mostek', 'Przejście',
-  'Przedrefren', 'Zarefren', 'Interludium', 'Część', 'Przyśpiewka', 'Wokaliza',
+  'Słowa',
+  'Zwrotka',
+  'Refren',
+  'Mostek',
+  'Przejście',
+  'Przedrefren',
+  'Zarefren',
+  'Interludium',
+  'Część',
+  'Przyśpiewka',
+  'Wokaliza',
   // ES
-  'Verso', 'Estribillo', 'Puente', 'Pre-Estribillo', 'Post-Estribillo',
-  'Interludio', 'Pausa', 'Vocalización', 'Letra',
+  'Verso',
+  'Estribillo',
+  'Puente',
+  'Pre-Estribillo',
+  'Post-Estribillo',
+  'Interludio',
+  'Pausa',
+  'Vocalización',
+  'Letra',
   // DE
-  'Strophe', 'Brücke', 'Vor-Refrain', 'Post-Refrain',
-  'Vokalisation', 'Teil', 'Songtext',
+  'Strophe',
+  'Brücke',
+  'Vor-Refrain',
+  'Post-Refrain',
+  'Vokalisation',
+  'Teil',
+  'Songtext',
   // IT
-  'Strofa', 'Ritornello', 'Ponte', 'Pre-Ritornello', 'Post-Ritornello',
-  'Strumentale', 'Vocalizzazione', 'Parte', 'Testo',
+  'Strofa',
+  'Ritornello',
+  'Ponte',
+  'Pre-Ritornello',
+  'Post-Ritornello',
+  'Strumentale',
+  'Vocalizzazione',
+  'Parte',
+  'Testo',
   // PT
-  'Refrão', 'Pré-Refrão', 'Pós-Refrão', 'Interlúdio', 'Vocalização',
+  'Refrão',
+  'Pré-Refrão',
+  'Pós-Refrão',
+  'Interlúdio',
+  'Vocalização',
   // RU
-  'Куплет', 'Припев', 'Бридж', 'Пре-Припев', 'Пост-Припев',
-  'Интро', 'Аутро', 'Хук', 'Инструментал', 'Скит',
-  'Интерлюдия', 'Часть', 'Вокализ', 'Текст',
+  'Куплет',
+  'Припев',
+  'Бридж',
+  'Пре-Припев',
+  'Пост-Припев',
+  'Интро',
+  'Аутро',
+  'Хук',
+  'Инструментал',
+  'Скит',
+  'Интерлюдия',
+  'Часть',
+  'Вокализ',
+  'Текст',
 ];
 
 /**
@@ -630,12 +688,12 @@ export const CORRECTION_RULES: CorrectionRule[] = [
       let headerIndex = -1;
       // Detect existing SEO headers for all supported locales
       const headerPatterns: RegExp[] = [
-        /^\[Paroles de.*\]$/i,           // FR
-        /^\[Słowa do.*\]$/i,             // PL
-        /^\[Letra de.*\]$/i,             // ES, PT
-        /^\[Songtext zu.*\]$/i,          // DE
-        /^\[Testo di.*\]$/i,             // IT
-        /^\[Текст песни.*\]$/i,          // RU
+        /^\[Paroles de.*\]$/i, // FR
+        /^\[Słowa do.*\]$/i, // PL
+        /^\[Letra de.*\]$/i, // ES, PT
+        /^\[Songtext zu.*\]$/i, // DE
+        /^\[Testo di.*\]$/i, // IT
+        /^\[Текст песни.*\]$/i, // RU
       ];
 
       for (let i = 0; i < Math.min(lines.length, 5); i++) {
@@ -686,10 +744,7 @@ export function generateSongHeader(songData: SongData, locale: Locale): string {
     }
 
     // FR uses "ft." inline, others use "(feat. ...)" with closing paren
-    featStr =
-      locale === 'fr'
-        ? ` ft. ${artistsFormatted}`
-        : ` (feat. ${artistsFormatted})`;
+    featStr = locale === 'fr' ? ` ft. ${artistsFormatted}` : ` (feat. ${artistsFormatted})`;
   }
 
   // Locale-specific header format
