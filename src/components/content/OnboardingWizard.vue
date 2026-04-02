@@ -100,20 +100,7 @@ const progressPercent = computed(() => {
   return ((currentStep.value + 1) / totalSteps.value) * 100;
 });
 
-// Sandbox state (for step 1 - Structure)
-const sandboxText = ref('');
-const sandboxVerseNum = ref(1);
 
-function sandboxInsertTag() {
-  const tag = `[${t('btn_verse_num').replace(/\d+/, String(sandboxVerseNum.value))}]`;
-  sandboxText.value += (sandboxText.value ? '\n\n' : '') + tag + '\n';
-  sandboxVerseNum.value++;
-}
-
-function initSandbox() {
-  sandboxText.value = '';
-  sandboxVerseNum.value = 1;
-}
 
 // Navigation
 function chooseLocale(loc: Locale) {
@@ -139,11 +126,6 @@ function chooseMode(nextMode: ExtensionMode) {
 
   slideDirection.value = 'left';
   currentStep.value = CONFIG_STEP_COUNT;
-
-  // Reset sandbox when entering tutorial
-  if (nextMode === 'full') {
-    initSandbox();
-  }
 }
 
 function next() {
@@ -154,11 +136,6 @@ function next() {
 
   slideDirection.value = 'left';
   currentStep.value++;
-
-  // Initialize sandbox when arriving at step 1 (Structure)
-  if (currentStep.value === CONFIG_STEP_COUNT) {
-    initSandbox();
-  }
 }
 
 function prev() {
@@ -309,7 +286,7 @@ const shortcutRows = computed(() => [
             <div class="gft-onboarding__content" v-html="t('tuto_lyric_mode_content')" />
           </div>
 
-          <!-- Tutorial step 1: Structure (with sandbox) -->
+          <!-- Tutorial step 1: Structure (removed sandbox test) -->
           <div
             v-else-if="currentTutorialStep && currentTutorialStep.icon === 'structure'"
             key="step-tuto-structure"
@@ -318,27 +295,6 @@ const shortcutRows = computed(() => [
             <div class="gft-onboarding__step-icon gft-onboarding__step-icon--float">🏗️</div>
             <h3>{{ t(currentTutorialStep.titleKey) }}</h3>
             <div class="gft-onboarding__content" v-html="t(currentTutorialStep.contentKey)" />
-
-            <!-- Interactive Sandbox -->
-            <div class="gft-onboarding__sandbox">
-              <p class="gft-onboarding__sandbox-hint">{{ t('tuto_sandbox_hint') }}</p>
-              <div class="gft-onboarding__sandbox-editor">
-                <textarea
-                  v-model="sandboxText"
-                  class="gft-onboarding__sandbox-textarea"
-                  :placeholder="t('tuto_sandbox_placeholder')"
-                  rows="4"
-                  readonly
-                />
-                <button
-                  type="button"
-                  class="gft-onboarding__sandbox-btn"
-                  @click="sandboxInsertTag"
-                >
-                  {{ t('tuto_sandbox_btn') }}
-                </button>
-              </div>
-            </div>
           </div>
 
           <!-- Tutorial step 6: Shortcuts (cheat-sheet table) -->
@@ -649,10 +605,9 @@ const shortcutRows = computed(() => [
    LANGUAGE GRID
    ============================================ */
 .gft-onboarding__lang-grid {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
-  justify-content: center;
 }
 
 /* ============================================
@@ -744,9 +699,12 @@ const shortcutRows = computed(() => [
   gap: 8px;
 }
 
+.gft-onboarding__theme-btn {
+  flex: 1;
+}
+
 .gft-onboarding__theme-btn,
 .gft-onboarding__lang-btn {
-  flex: 1;
   background: var(--card);
   border: 2px solid transparent;
   color: inherit;
@@ -780,6 +738,7 @@ const shortcutRows = computed(() => [
 
 .gft-onboarding__theme-btn--light-preview {
   background: linear-gradient(135deg, #ffffff, #f0f0f0);
+  color: #222;
 }
 
 .gft-onboarding__theme-btn--dark-preview {
