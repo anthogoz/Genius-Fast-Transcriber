@@ -373,7 +373,7 @@ onMounted(() => {
       <div class="gft-lc-row">
         <select
           v-model="imageSource"
-          class="gft-lc-input gft-u-pill-control gft-u-hover-lift"
+          class="gft-lc-input gft-u-pill-control"
           @change="applySelectedSource"
         >
           <option value="ALBUM">{{ t('lc_album_default') }}</option>
@@ -391,7 +391,7 @@ onMounted(() => {
 
         <select
           v-model="format"
-          class="gft-lc-input gft-u-pill-control gft-u-hover-lift"
+          class="gft-lc-input gft-u-pill-control"
           @change="refreshCurrentSelection"
         >
           <option value="1:1">1:1</option>
@@ -474,6 +474,19 @@ onMounted(() => {
   flex-direction: column;
   gap: 10px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: gft-lc-modal-enter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes gft-lc-modal-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.96) translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .gft-lc-modal--dark {
@@ -492,6 +505,7 @@ onMounted(() => {
   cursor: pointer;
   line-height: 1;
   padding: 0;
+  transition: all 0.2s ease;
 }
 
 .gft-lc-modal--dark .gft-lc-close {
@@ -500,6 +514,7 @@ onMounted(() => {
 
 .gft-lc-close:hover {
   color: #000;
+  transform: scale(1.15) rotate(90deg);
 }
 
 .gft-lc-modal--dark .gft-lc-close:hover {
@@ -832,12 +847,22 @@ onMounted(() => {
   color: #000;
   border: none;
   font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.gft-lc-btn--primary:hover {
+  background: #ffff88;
 }
 
 .gft-lc-btn--x {
   background: #000;
   color: #fff;
   border-color: rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+}
+
+.gft-lc-btn--x:hover {
+  background: #222;
 }
 
 @media (max-width: 768px) {
