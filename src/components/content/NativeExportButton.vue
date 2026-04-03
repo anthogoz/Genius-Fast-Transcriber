@@ -42,6 +42,16 @@ function handleDownload() {
   closeModal();
 }
 
+async function handleCopy() {
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error('No clipboard API');
+    await navigator.clipboard.writeText(previewText.value);
+    window.dispatchEvent(new CustomEvent('gft-show-feedback', { detail: { message: `📋 ${t('feedback_copied')}` } }));
+  } catch {
+    window.dispatchEvent(new CustomEvent('gft-show-feedback', { detail: { message: `❌ ${t('lc_error_copy')}` } }));
+  }
+}
+
 watch([optNoTags, optNoSpacing], () => {
   updatePreview();
 });
@@ -92,6 +102,9 @@ watch([optNoTags, optNoSpacing], () => {
             </div>
             
             <div class="gft-export-footer">
+              <button class="gft-btn-secondary" @click="handleCopy" type="button">
+                {{ t('copy') }}
+              </button>
               <button class="gft-btn-download" @click="handleDownload" type="button">
                 {{ t('export_download') }}
               </button>
@@ -109,7 +122,7 @@ watch([optNoTags, optNoSpacing], () => {
   inset: 0;
   backdrop-filter: blur(8px);
   background: rgba(0, 0, 0, 0.6);
-  z-index: 2147483647;
+  z-index: 2147483645;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -219,6 +232,28 @@ watch([optNoTags, optNoSpacing], () => {
   border-top: 1px solid rgba(255,255,255,0.1);
   display: flex;
   justify-content: flex-end;
+  gap: 12px;
+}
+
+.gft-btn-secondary {
+  font-family: inherit;
+  background: transparent;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gft-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.gft-btn-secondary:active {
+  transform: scale(0.97);
 }
 
 .gft-btn-download {

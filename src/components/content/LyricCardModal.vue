@@ -280,7 +280,7 @@ function downloadCard() {
   link.download = `genius_lyric_card_${Date.now()}.png`;
   link.href = canvas.toDataURL('image/png');
   link.click();
-  showFeedback(`✅ ${t('lc_download_done')}`);
+  showFeedback(t('lc_download_done'));
 }
 
 async function shareToX() {
@@ -293,7 +293,7 @@ async function shareToX() {
     return;
   }
 
-  showFeedback(`📋 ${t('lc_share_copying')}`);
+  showFeedback(t('lc_share_copying'));
 
   canvas.toBlob(async (blob) => {
     if (!blob) return;
@@ -302,7 +302,7 @@ async function shareToX() {
       const item = new clipboardCtor({ 'image/png': blob });
       await navigator.clipboard.write([item]);
 
-      showFeedback(`✅ ${t('lc_share_copied')}`);
+      showFeedback(t('lc_share_copied'));
 
       const tweetText = `${props.songTitle} by ${props.artistName}\n\n${window.location.href}\n\n#Genius #Lyrics`;
       const intentUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
