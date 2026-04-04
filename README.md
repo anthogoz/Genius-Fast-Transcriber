@@ -1,103 +1,117 @@
 # 🎵 Genius Fast Transcriber + Lyric Card Maker
 
 [![Version](https://img.shields.io/github/v/release/anthogoz/Genius-Fast-Transcriber?display_name=tag&style=for-the-badge&label=version)](https://github.com/anthogoz/Genius-Fast-Transcriber/releases/latest)
-![Chrome Web Store](https://img.shields.io/badge/Chrome_Web_Store-Available-green.svg?style=for-the-badge&logo=google-chrome)
+![Chrome Web Store](https://img.shields.io/badge/Chrome-Available-green.svg?style=for-the-badge&logo=google-chrome)
+![Firefox Add-ons](https://img.shields.io/badge/Firefox-Available-orange.svg?style=for-the-badge&logo=firefox)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg?style=for-the-badge)
-![Built with](https://img.shields.io/badge/built_with-WXT_+_Vue_+_TypeScript-blueviolet.svg?style=for-the-badge)
+![Built with](https://img.shields.io/badge/built_with-WXT_+_Vue_3_+_TypeScript-blueviolet.svg?style=for-the-badge)
 
-**The ultimate tool for transcribers on Genius.com.**
-Transform your editing experience with a suite of professional tools, a modern interface, smart automations, and full customization.
+**The ultimate toolkit for transcribers and contributors on Genius.com.**
+A browser extension that injects a professional-grade floating panel directly into the Genius lyrics editor — smart tags, one-click typographic cleanup, lyric card generation, custom macros, and much more.
 
 ---
 
 ## 🌟 Why use Genius Fast Transcriber?
 
-🚀 **Save time**: Insert entire structures and fix typography in one click.
-🧠 **Customizable**: Create your own buttons and macros.
-🎨 **Impeccable results**: Your lyrics automatically respect Genius quality standards.
-🌍 **International**: Available in **French**, **English**, and **Polish** (with specific typography rules for each).
-🌙 **Dark Mode by default**: Beautiful dark interface that's easy on the eyes.
+| | |
+|---|---|
+| 🚀 **Save time** | Insert structures and fix typography in a single click. |
+| 🧠 **Customizable** | Create your own buttons, macros, and regex-based tools. |
+| ✨ **Quality assured** | Lyrics automatically respect Genius editorial standards. |
+| 🌍 **8 languages** | FR · EN · PL · ES · DE · IT · PT · RU — with locale-specific typography rules. |
+| 🎨 **Lyric Cards** | Generate shareable lyric images in 1:1, 9:16, and 16:9 formats. |
+| 🌙 **Dark mode** | Beautiful dark interface enabled by default; light mode available. |
+| 🔒 **Safe editing** | Undo/redo history (10 states) + auto-draft backup to local storage. |
 
 ---
 
-## 🔥 Key Features
+## 🔥 Features
 
-### � New in v3.0: Custom Buttons!
-*   **Create your own buttons**: Add your own tags or complex regex cleanup tools.
-*   **Easy Interface**: A simple graphical manager to add/edit buttons.
-*   **Regex Support**: Power users can use Regular Expressions for advanced find/replace.
-*   **Share Presets**: Export your buttons as a code snippet and share them with friends!
+### 🏗️ Structure & Smart Tags
+- **Unified Verse Manager** — Dynamic `[Couplet 1]`, `[Couplet 2]` button with fast ← → navigation.
+- **Artist Detection** — Scans the page for main & featured artists; auto-proposes them for tag credits.
+- **Quick Tags** — `[Refrain]`, `[Intro]`, `[Bridge]`, `[Outro]`, `[Pré-Refrain]`… inserted with correct formatting.
+- **Multi-language tags** — Adapts to English (`[Verse]`, `[Chorus]`), French (`[Couplet]`, `[Refrain]`), Polish (`[Zwrotka]`, `[Refren]`), and more.
 
-### �🏗️ Structure & Smart Tags
-*   **Unified Verse Manager**: A dynamic central button for `[Couplet 1]`, `[Couplet 2]` with fast navigation ← →.
-*   **Artist Detection**: The extension scans the page and proposes artists (Main & Feat) to check for automatic attribution.
-*   **Quick Tags**: `[Refrain]`, `[Intro]`, `[Bridge]`... inserted cleanly with correct credits.
-*   **Multi-language**: Adapts tags to English (`[Verse]`, `[Chorus]`) or French (`[Couplet]`, `[Refrain]`).
+### ✨ Corrections & Quality (Fix All)
+One prominent **Fix All** button that cleans everything in one click:
+- Curly apostrophes `'` → `'`
+- Capitalization at the start of lines
+- Unnecessary final punctuation removed (preserves `...` ellipsis)
+- French quotes `« »` → `"` (or Polish `„"` → `"`)
+- Long dashes `— –` → `-` (or `-` → `—` for Polish)
+- Double spaces removed
+- Proper line spacing between sections
+- **Correction Preview** — Interactive diff view showing every change before applying.
+- **Parenthesis Check** — Detects and highlights unclosed `( )` or `[ ]` in red.
 
-### ✨ Corrections & Quality
-*   **Fix All** ✨: A prominent button that cleans everything in one click:
-    *   Curly apostrophes `'` → `'`
-    *   Capitalization at start of lines
-    *   Removal of unnecessary final punctuation (preserves `...` ellipsis!)
-    *   Correction of spaces `y'` → `y `
-    *   French quotes `«»` → `"` (or Polish `„""` → `"`)
-    *   Long dashes `— –` → `-` (or `-` → `—` for Polish)
-    *   Double spaces removed
-    *   Proper line spacing between sections
-*   **Parenthesis Check**: Detects and highlights in **RED** unclosed or mismatched parentheses `( )` or brackets `[ ]`.
+### 🎨 Lyric Card Maker
+- Select text → generate a beautiful shareable image for Instagram / Twitter / TikTok.
+- Background options: **Album art** or **Artist photo**, fetched automatically.
+- Multiple formats: **1:1**, **9:16**, **16:9**.
+- Live preview before download.
+- **Lyric Card Only Mode** — Hide transcription tools and keep only the card generator.
 
-### 🎨 Creation Tools
-*   **Floating Bar**: Select text, a bar appears to format **Bold**, *Italics*...
-*   **Number to Words Converter**: Select "42" and click the magic button to get "forty-two" (or "quarante-deux" in FR, "czterdzieści dwa" in PL).
-*   **Customizable Lyric Card**: Create beautiful images of lyrics for Instagram/Twitter.
-    *   Choose between **Album Art** or **Artist Image** for the background! 🖼️
-    *   Multiple formats: 16:9, 9:16, 1:1
-    *   Preview before download.
-*   **Lyric Card Only Mode**: Hide the transcription tools to keep only Lyric Card functionality.
+### 🛠️ Custom Button Manager
+- Create your own **insertion buttons** or complex **regex find/replace** tools.
+- Simple graphical manager — no coding required.
+- **Import / Export** — Share button presets as code snippets with other contributors.
+
+### 🔢 Number to Words Converter
+Select a number like `42` and convert it to:
+- 🇫🇷 *quarante-deux* · 🇬🇧 *forty-two* · 🇵🇱 *czterdzieści dwa*
 
 ### 📤 Export & Sharing
-*   **Export as .txt**: Download the song lyrics as a clean text file directly from the Genius toolbar.
-*   **Smart Cleaning**: Automatically removes "Contributors" headers, Genius annotations (hyperlinks), and HTML tags.
-*   **Multiple Formats**:
-    *   **Standard**: Keeps tags and spacing.
-    *   **No Tags**: Removes [Verse], [Chorus], etc.
-    *   **No Spacing**: Removes empty lines.
-    *   **Raw**: Pure text without tags or spacing.
-*   **Intelligent Scraper**: If the editor is closed, GFT automatically scrapes the lyrics from the page.
-
-### 🤖 AI Transcription
-*   **Quick access** to external AI transcription tool directly from the panel footer.
-
-### ❓ Tutorial & Support
-*   **Interactive Tutorial**: A step-by-step guide on first install to choose your language, theme, and mode.
-*   **Relaunch Tutorial**: Access via the settings menu to replay the tutorial at any time.
+- **Export as `.txt`** — Download lyrics as a clean text file directly from the Genius toolbar.
+- **Copy to clipboard** — One-click copy alongside file download.
+- **Smart cleaning** — Automatically strips Contributors headers, Genius hyperlink annotations, and HTML tags.
+- **4 export formats**:
+  - **Standard** — Keeps tags and spacing.
+  - **No Tags** — Removes `[Verse]`, `[Chorus]`, etc.
+  - **No Spacing** — Removes empty lines.
+  - **Raw** — Pure text, no tags or spacing.
+- **Intelligent Scraper** — If the editor is closed, GFT scrapes lyrics from the public page.
 
 ### 📺 YouTube Control
-*   **Control music** without taking your eyes off the editor:
-    *   Play / Pause
-    *   Rewind / Forward 5 seconds
-    *   Compatible with "nocookie" integrations (privacy protection).
+Control the embedded YouTube player without leaving the editor:
+- ▶️ Play / ⏸️ Pause
+- ⏪ Rewind 5s / ⏩ Forward 5s
+- Compatible with `nocookie` privacy embeds.
+
+### 🔍 Find & Replace
+- In-editor find & replace with a **regex toggle** for power users.
+
+### ✏️ Floating Toolbar
+- Select text in the editor → a contextual toolbar appears for **Bold**, *Italic*, and quick formatting.
 
 ### 🛡️ Security & History
-*   **Visual Undo/Redo**: Undo your actions (Ctrl+Z) with a history of 10 states.
-*   **Draft Save**: Your changes are saved locally. A crash? We restore everything.
-*   **Dark Mode**: An interface perfectly adapted to dark theme, enabled by default.
+- **Undo / Redo** — Visual 10-state history with `Ctrl+Z` / `Ctrl+Y`.
+- **Auto Draft** — Periodic local save with `💾` pulse indicator. Crash-proof your work.
+
+### ❓ Onboarding & Tutorial
+- **Interactive wizard** on first install — choose language, theme, and mode.
+- **Replay tutorial** anytime from the settings menu.
+
+### 🤖 AI Transcription
+- Quick-access link to external AI transcription tools directly from the panel footer.
 
 ---
 
-## ⌨️ Pro Keyboard Shortcuts
+## ⌨️ Keyboard Shortcuts
 
 | Shortcut | Action |
 |---|---|
-| `Ctrl + 1` to `5` | Insert structure tags (Verse, Chorus...) |
-| `Ctrl + Shift + C` | **Fix All** (Opens preview) |
+| `Ctrl + 1` to `5` | Insert structure tags (Verse, Chorus…) |
+| `Ctrl + Shift + C` | **Fix All** (opens correction preview) |
 | `Ctrl + D` | Duplicate current line |
 | `Ctrl + Z` | Undo |
 | `Ctrl + Y` | Redo |
-| `Ctrl + Shift + S` | Show/Hide statistics |
-| `Ctrl + Alt + Space` | **Play / Pause** YouTube |
+| `Ctrl + Shift + S` | Show / hide statistics |
+| `Ctrl + Alt + Space` | Play / Pause YouTube |
 | `Ctrl + Alt + ←` | Rewind 5s |
 | `Ctrl + Alt + →` | Forward 5s |
+
+> Shortcuts are customizable from the **Settings** menu inside the panel.
 
 ---
 
@@ -106,50 +120,92 @@ Transform your editing experience with a suite of professional tools, a modern i
 ### Chrome Web Store
 Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/cbldlkiakadclpjfkkafpjomilmmgdjm).
 
+### Firefox Add-ons
+Install from [Firefox Add-ons (AMO)](https://addons.mozilla.org/firefox/addon/genius-fast-transcriber/).
+
 ### Manual (Developer Mode)
 1. Clone or download the repository.
 2. Install dependencies and build:
    ```bash
    npm install
-   npm run build
+   npm run build            # Chrome (Manifest V3)
+   npm run build:firefox    # Firefox
    ```
-3. Go to `chrome://extensions`, enable **Developer mode**.
-4. Click **Load unpacked** and select the `.output/chrome-mv3` folder.
+3. **Chrome** — Go to `chrome://extensions`, enable **Developer mode**, click **Load unpacked** and select `.output/chrome-mv3`.
+4. **Firefox** — Go to `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on** and select `.output/firefox-mv2/manifest.json`.
 
 ---
 
-## Development
+## 🧑‍💻 Development
 
-The project is built with [WXT](https://wxt.dev), [Vue 3](https://vuejs.org), and [TypeScript](https://www.typescriptlang.org).
+The project is built with [WXT](https://wxt.dev) (next-gen browser extension framework), [Vue 3](https://vuejs.org) (Composition API), and [TypeScript](https://www.typescriptlang.org) (strict mode). Linting and formatting are handled by [Biome](https://biomejs.dev).
 
 ```bash
 npm install
-npm run dev          # Start dev server with HMR
-npm run build        # Production build
-npm run zip          # Package for Chrome Web Store
-npm run lint         # Lint the code with Biome
-npm run lint:fix     # Fix linting errors with Biome
-npm run format       # Format the code with Biome
-npm run typecheck    # TypeScript type-checking
+npm run dev              # Chrome dev server with HMR
+npm run dev:firefox      # Firefox dev server with HMR
+npm run build            # Production build (Chrome)
+npm run build:firefox    # Production build (Firefox)
+npm run zip              # Package for Chrome Web Store
+npm run zip:firefox      # Package for Firefox AMO
+npm run lint             # Lint with Biome
+npm run lint:fix         # Auto-fix lint errors
+npm run format           # Format with Biome
+npm run typecheck        # TypeScript type-checking (wxt prepare + vue-tsc)
 ```
 
 ### Project Structure
 
 ```
 src/
-├── entrypoints/          # WXT entrypoints
-│   ├── content/          # Content script (injected on *://*.genius.com/*-lyrics)
-│   └── popup/            # Extension popup
-├── components/           # Vue 3 SFC components
-│   ├── content/          # Panel, toolbar, modals (15 components)
-│   └── popup/            # Mode, theme, language selectors
-├── composables/          # Reactive state management
-├── utils/                # Pure utility functions
-├── types/                # TypeScript type definitions
-├── locales/
-│   └── app/              # In-app translations (vue-i18n)
-│   └── <code>.json       # extName, extDescription (wxt-dev/i18n for manifest)
-│   └── index.ts          # i18n setup and locale registration
+├── entrypoints/              # WXT entry points
+│   ├── content.ts            # Content script — injected on *://*.genius.com/*-lyrics
+│   ├── background.ts         # Service worker
+│   └── popup/                # Extension popup (HTML + Vue mount)
+├── components/
+│   ├── content/              # 18 Vue SFCs injected into the page
+│   │   ├── GftPanel.vue      #   Main floating panel (root component)
+│   │   ├── StructureSection  #   Tag insertion UI
+│   │   ├── CleanupSection    #   Fix All controls
+│   │   ├── CorrectionPreview #   Diff preview modal
+│   │   ├── LyricCardModal    #   Lyric card generator
+│   │   ├── CustomButtonMgr   #   User-defined buttons
+│   │   ├── FloatingToolbar   #   Contextual formatting bar
+│   │   ├── OnboardingWizard  #   First-run tutorial
+│   │   └── ...               #   + 10 more
+│   └── popup/                # 3 popup components (Language, Mode, Theme selectors)
+├── composables/              # 11 reactive composables
+│   ├── useEditor.ts          #   Genius contenteditable interaction
+│   ├── useCorrections.ts     #   Typographic cleanup engine
+│   ├── useSettings.ts        #   Persistent user settings
+│   ├── useSongData.ts        #   Page scraping (cover, artists, metadata)
+│   ├── useLyricCard.ts       #   Card generation logic
+│   ├── useUndoRedo.ts        #   10-state history
+│   ├── useDraft.ts           #   Auto-save drafts
+│   ├── useKeyboardShortcuts  #   Shortcut bindings
+│   ├── useYoutubeControls    #   YouTube iframe API
+│   ├── useExport.ts          #   .txt export
+│   └── useGftState.ts        #   Global panel state
+├── utils/                    # 9 pure utility modules
+│   ├── corrections.ts        #   Correction rules (locale-aware)
+│   ├── numberToWords.ts      #   Number → text conversion
+│   ├── lyricCard.ts          #   Canvas rendering
+│   ├── dom.ts                #   DOM helpers for Genius page
+│   ├── diff.ts               #   Text diff algorithm
+│   └── ...
+├── types/                    # TypeScript type definitions
+└── locales/
+    ├── app/                  # Runtime translations (vue-i18n) — 8 locales
+    │   ├── fr.json
+    │   ├── en.json
+    │   ├── pl.json
+    │   ├── es.json
+    │   ├── de.json
+    │   ├── it.json
+    │   ├── pt.json
+    │   └── ru.json
+    ├── *.json                # Manifest i18n (@wxt-dev/i18n) — 8 locales
+    └── index.ts              # i18n setup & locale registration
 ```
 
 ---
@@ -158,11 +214,29 @@ src/
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, coding standards, and PR workflow.
 
-Additional documentation is available in the [`docs/`](docs/) folder:
+Additional documentation in the [`docs/`](docs/) folder:
 
-- [ROADMAP.md](docs/ROADMAP.md) — Feature ideas and priorities
-- [PUBLISHING.md](docs/PUBLISHING.md) — Chrome Web Store publishing guide
-- [TESTING.md](docs/TESTING.md) — Testing checklist
+| Document | Description |
+|---|---|
+| [ROADMAP.md](docs/ROADMAP.md) | Feature ideas and priorities |
+| [PUBLISHING.md](docs/PUBLISHING.md) | Chrome Web Store & Firefox AMO publishing guide |
+| [TESTING.md](docs/TESTING.md) | Manual testing checklist |
+| [CHANGELOG.md](CHANGELOG.md) | Full version history |
+
+---
+
+## 🌍 Supported Languages
+
+| Language | Tags | Fix All | Number → Words | UI |
+|---|---|---|---|---|
+| 🇫🇷 French | ✅ | ✅ | ✅ | ✅ |
+| 🇬🇧 English | ✅ | ✅ | ✅ | ✅ |
+| 🇵🇱 Polish | ✅ | ✅ | ✅ | ✅ |
+| 🇪🇸 Spanish | — | — | — | ✅ |
+| 🇩🇪 German | — | — | — | ✅ |
+| 🇮🇹 Italian | — | — | — | ✅ |
+| 🇵🇹 Portuguese | — | — | — | ✅ |
+| 🇷🇺 Russian | — | — | — | ✅ |
 
 ---
 
