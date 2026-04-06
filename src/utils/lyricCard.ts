@@ -1,3 +1,5 @@
+import { bgFetch } from '@/utils/bgFetch';
+
 export type ArtistSearchCandidate = {
   name: string;
   image_url: string;
@@ -68,13 +70,12 @@ export function extractArtistImage(albumUrl: string, mainArtists: string[]): str
 export async function searchArtistCandidates(query: string): Promise<ArtistSearchCandidate[]> {
   try {
     const searchUrl = `https://genius.com/api/search/artist?q=${encodeURIComponent(query)}`;
-    const response = await fetch(searchUrl);
-    if (!response.ok) return [];
-
-    const data = (await response.json()) as {
+    const result = await bgFetch<{
       response?: { sections?: Array<{ hits?: Array<{ result?: ArtistSearchCandidate }> }> };
-    };
-    const sections = data.response?.sections;
+    }>(searchUrl);
+    if (!result.ok || !result.body) return [];
+
+    const sections = result.body.response?.sections;
     const hits = sections?.[0]?.hits ?? [];
 
     return hits
@@ -127,12 +128,11 @@ export async function fetchArtistImageFromApi(
       }
 
       if (songId) {
-        const response = await fetch(`https://genius.com/api/songs/${songId}`);
-        if (response.ok) {
-          const data = (await response.json()) as {
-            response?: { song?: { primary_artist?: { image_url?: string } } };
-          };
-          const imageUrl = data.response?.song?.primary_artist?.image_url;
+        const result = await bgFetch<{
+          response?: { song?: { primary_artist?: { image_url?: string } } };
+        }>(`https://genius.com/api/songs/${songId}`);
+        if (result.ok && result.body) {
+          const imageUrl = result.body.response?.song?.primary_artist?.image_url;
           if (imageUrl) return imageUrl;
         }
       }
@@ -152,19 +152,19 @@ export async function fetchArtistImageFromApi(
     if (artistLink?.href) expectedUrl = artistLink.href;
 
     const searchUrl = `https://genius.com/api/search/multi?per_page=5&q=${encodeURIComponent(artistName)}`;
-    const response = await fetch(searchUrl);
-    if (!response.ok) return null;
-
-    const data = (await response.json()) as {
+    const result = await bgFetch<{
       response?: {
         sections?: Array<{
           type?: string;
           hits?: Array<{ result?: { url?: string; name?: string; image_url?: string } }>;
         }>;
       };
-    };
+    }>(searchUrl);
+    if (!result.ok || !result.body) return null;
 
-    const artistSection = data.response?.sections?.find((section) => section.type === 'artist');
+    const artistSection = result.body.response?.sections?.find(
+      (section) => section.type === 'artist',
+    );
     const hits = artistSection?.hits ?? [];
     if (hits.length === 0) return null;
 
