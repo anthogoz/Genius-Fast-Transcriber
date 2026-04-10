@@ -88,6 +88,7 @@ const showFooter = computed(
 );
 const showSkipButton = computed(() => currentStep.value >= CONFIG_STEP_COUNT);
 const logoUrl = browser.runtime.getURL('/icon/128.png');
+const tutoLyricCardGifUrl = browser.runtime.getURL('/images/tutolyriccard.gif');
 
 // Progress bar segments
 const progressPhase = computed(() => {
@@ -330,7 +331,25 @@ const shortcutRows = computed(() => [
             </p>
           </div>
 
-          <!-- Tutorial steps (generic: 2-5) -->
+          <!-- Tutorial step 3: Lyric Card (with GIF demo) -->
+          <div
+            v-else-if="currentTutorialStep && currentTutorialStep.icon === 'palette'"
+            key="step-tuto-lyriccard"
+            class="gft-onboarding__step"
+          >
+            <div class="gft-onboarding__step-icon gft-onboarding__step-icon--float">🎨</div>
+            <h3>{{ t(currentTutorialStep.titleKey) }}</h3>
+            <div class="gft-onboarding__content" v-html="t(currentTutorialStep.contentKey)" />
+            <div class="gft-onboarding__demo-gif">
+              <img
+                :src="tutoLyricCardGifUrl"
+                alt="Lyric Card demo"
+                class="gft-onboarding__demo-gif-img"
+              />
+            </div>
+          </div>
+
+          <!-- Tutorial steps (generic: 2, 4-5) -->
           <div
             v-else-if="currentTutorialStep"
             :key="`step-tuto-${currentStep}`"
@@ -338,7 +357,7 @@ const shortcutRows = computed(() => [
           >
             <div
               class="gft-onboarding__step-icon gft-onboarding__step-icon--float"
-            >{{ currentTutorialStep.icon === 'magic' ? '✨' : currentTutorialStep.icon === 'palette' ? '🎨' : currentTutorialStep.icon === 'shield' ? '🛡️' : currentTutorialStep.icon === 'youtube' ? '📺' : '📖' }}</div>
+            >{{ currentTutorialStep.icon === 'magic' ? '✨' : currentTutorialStep.icon === 'shield' ? '🛡️' : currentTutorialStep.icon === 'youtube' ? '📺' : '📖' }}</div>
             <h3>{{ t(currentTutorialStep.titleKey) }}</h3>
             <div class="gft-onboarding__content" v-html="t(currentTutorialStep.contentKey)" />
           </div>
@@ -860,6 +879,24 @@ const shortcutRows = computed(() => [
   font-size: 13px;
   text-align: center;
   color: var(--muted);
+}
+
+/* ============================================
+   DEMO GIF (Lyric Card step)
+   ============================================ */
+.gft-onboarding__demo-gif {
+  margin-top: 14px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  background: var(--sandbox-bg);
+}
+
+.gft-onboarding__demo-gif-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
 }
 
 /* ============================================

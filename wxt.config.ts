@@ -37,6 +37,7 @@ export default defineConfig({
           'icon/128.png',
           'images/geniuslogowhite.png',
           'images/geniuslogoblack.png',
+          'images/tutolyriccard.gif',
         ],
         matches: ['*://*.genius.com/*'],
       },
