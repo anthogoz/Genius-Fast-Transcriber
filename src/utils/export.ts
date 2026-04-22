@@ -6,12 +6,13 @@ function cleanLyricsText(text: string): string {
 
   let cleaned = text;
 
-  // Supprimer l'en-tête natif de Genius copié avec .innerText du type:
-  // "16 Contributors\nVision Lyrics\n"
-  cleaned = cleaned.replace(/^\d*\s*Contributors?\s*\n/i, '');
-
-  // Supprimer la ligne "Titre Lyrics" qui apparait au tout début
-  cleaned = cleaned.replace(/^.*?\sLyrics\s*\n/i, '');
+  // Supprimer les en-têtes natifs Genius présents avant les paroles.
+  // Ces éléments peuvent être séparés par des \n (innerText) ou concaténés
+  // sans séparateur (extractText DOM). Ex :
+  //   "59 ContributorsTranslationsEnglishPériscope Lyrics[Paroles de...]"
+  //   "16 Contributors\nTranslations\nPériscope Lyrics\n[Paroles de...]"
+  // On utilise une seule regex gourmande qui supprime tout jusqu'à "Lyrics" inclus.
+  cleaned = cleaned.replace(/^.*?\bLyrics\b\s*/i, '');
 
   cleaned = cleaned.replace(/<[^>]*>/g, '');
   cleaned = cleaned.replace(/\[\[(.*?)\]\]\(.*?\)/g, '$1');

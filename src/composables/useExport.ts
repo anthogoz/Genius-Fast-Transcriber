@@ -15,8 +15,36 @@ export function useExport() {
     );
     if (containers.length === 0) return '';
 
+    // Walk the DOM tree to extract text properly:
+    // - <br> -> newline
+    // - Text nodes -> inline content (no spurious newlines)
+    // - Inline elements (<a>, <span>, <i>, <b>) -> recurse into children
+    // This avoids the `innerText` bug where the browser inserts \n between
+    // adjacent inline elements (e.g. annotated <a> tags + plain text commas).
+    function extractText(node: Node): string {
+      if (node.nodeType === Node.TEXT_NODE) {
+        return node.textContent ?? '';
+      }
+
+      if (node.nodeType !== Node.ELEMENT_NODE) return '';
+
+      const el = node as HTMLElement;
+      const tag = el.tagName;
+
+      if (tag === 'BR') return '\n';
+
+      // Skip hidden elements
+      if (el.style.display === 'none' || el.hidden) return '';
+
+      let result = '';
+      for (const child of el.childNodes) {
+        result += extractText(child);
+      }
+      return result;
+    }
+
     return containers
-      .map((container) => (container.innerText || container.textContent || '').trim())
+      .map((container) => extractText(container).trim())
       .join('\n\n');
   }
 
