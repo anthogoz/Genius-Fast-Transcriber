@@ -626,7 +626,9 @@ export default defineContentScript({
       const observer = new MutationObserver(() => {
         if (document.getElementById(GFT_NATIVE_EXPORT_ID)) return;
 
-        const container = document.querySelector('div[class*="StickyToolbar__Left"]');
+        const container =
+          document.querySelector('div[class*="StickyToolbar__Left"]')
+          || document.querySelector('div[class*="StickyToolbar"] > div:first-child');
         if (!container) return;
 
         // Trouver un bouton référence dans le conteneur pour copier son style

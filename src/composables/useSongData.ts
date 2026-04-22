@@ -26,7 +26,7 @@ const SELECTORS = {
     'a[class*="SongHeader__Artist"], a[data-testid="ArtistLink"], a[class*="HeaderArtistAndTracklist-desktop__Artist"]',
   TEXTAREA_EDITOR: 'textarea[class*="LyricsTextareaInput"], form[aria-label="Edit Lyrics Form"] textarea',
   DIV_EDITOR: 'div[data-testid="lyrics-input"]',
-  CONTROLS_STICKY: 'div[class^="LyricsEdit-desktop__Controls-sc-"]',
+  CONTROLS_STICKY: 'div[class*="LyricsEdit-desktop__Controls-sc-"], form[aria-label="Edit Lyrics Form"] div[class*="LyricsEdit-desktop__Controls"]',
   GENIUS_HELPER:
     'div[class*="LyricsEditExplainer__Container-sc-"][class*="LyricsEdit-desktop__Explainer-sc-"]',
   LYRICS_CONTAINER: '[data-lyrics-container="true"]',

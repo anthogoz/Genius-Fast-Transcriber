@@ -11,8 +11,8 @@ function cleanLyricsText(text: string): string {
   // sans séparateur (extractText DOM). Ex :
   //   "59 ContributorsTranslationsEnglishPériscope Lyrics[Paroles de...]"
   //   "16 Contributors\nTranslations\nPériscope Lyrics\n[Paroles de...]"
-  // On utilise une seule regex gourmande qui supprime tout jusqu'à "Lyrics" inclus.
-  cleaned = cleaned.replace(/^.*?\bLyrics\b\s*/i, '');
+  // On utilise [^\[]* pour ne jamais franchir un crochet (début de tag section).
+  cleaned = cleaned.replace(/^[^\[]*?\bLyrics\b\s*/i, '');
 
   cleaned = cleaned.replace(/<[^>]*>/g, '');
   cleaned = cleaned.replace(/\[\[(.*?)\]\]\(.*?\)/g, '$1');
