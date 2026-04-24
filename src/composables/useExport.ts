@@ -43,9 +43,7 @@ export function useExport() {
       return result;
     }
 
-    return containers
-      .map((container) => extractText(container).trim())
-      .join('\n\n');
+    return containers.map((container) => extractText(container).trim()).join('\n\n');
   }
 
   function exportLyrics(options: ExportOptions = {}) {

@@ -174,7 +174,7 @@ const locales: { value: Locale; label: string }[] = [
 // Shortcut cheat-sheet data
 const shortcutRows = computed(() => [
   { keys: 'Ctrl+1', action: t('btn_chorus') },
-  { keys: 'Ctrl+2', action: t('btn_chorus') + ' (2)' },
+  { keys: 'Ctrl+2', action: `${t('btn_chorus')} (2)` },
   { keys: 'Ctrl+3', action: t('btn_pre_chorus') },
   { keys: 'Ctrl+4', action: t('btn_intro') },
   { keys: 'Ctrl+5', action: t('btn_bridge') },
@@ -396,7 +396,7 @@ const shortcutRows = computed(() => [
         <div class="gft-onboarding__progress-track">
           <div
             class="gft-onboarding__progress-fill"
-            :style="{ width: progressPercent + '%' }"
+            :style="{ width: `${progressPercent}%` }"
           />
         </div>
       </div>

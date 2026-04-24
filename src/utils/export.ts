@@ -12,7 +12,7 @@ function cleanLyricsText(text: string): string {
   //   "59 ContributorsTranslationsEnglishPériscope Lyrics[Paroles de...]"
   //   "16 Contributors\nTranslations\nPériscope Lyrics\n[Paroles de...]"
   // On utilise [^\[]* pour ne jamais franchir un crochet (début de tag section).
-  cleaned = cleaned.replace(/^[^\[]*?\bLyrics\b\s*/i, '');
+  cleaned = cleaned.replace(/^[^[]*?\bLyrics\b\s*/i, '');
 
   cleaned = cleaned.replace(/<[^>]*>/g, '');
   cleaned = cleaned.replace(/\[\[(.*?)\]\]\(.*?\)/g, '$1');
