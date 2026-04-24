@@ -2,64 +2,59 @@
 
 All notable changes to this project will be documented in this file.
 
+## [4.5.4] — 2026-04-25
+
+### Changed
+- Address dependencies vulnerability and update related packages for security and stability.
+- Dependabot configuration added for automated dependency updates and security monitoring.
+
+## [4.5.3] — 2026-04-22
+
+### Changed
+- Added song data extraction integration through a dedicated composable and content script entry-point wiring.
+- Improved export utility integration for the new extraction flow.
+
+## [4.5.2] — 2026-04-22
+
+### Added
+- Lyrics export flow with configurable formatting options and DOM-based text extraction.
+- Onboarding wizard stepper for language, theme, and mode selection.
+
+### Changed
+- Improved first-run setup experience with a more guided onboarding flow.
+
+## [4.5.1] — 2026-04-06
+
+### Added
+- Background fetch proxy and lyric card utilities for artist image retrieval and rendering.
+- Manual release workflow for versioning, building, and publishing artifacts.
+
+### Changed
+- Updated README with expanded feature list, multi-browser support details, and formatting improvements.
+
+## [4.5.0] — 2026-04-03
+
+### Added
+- Core song data extraction foundations and initial project infrastructure.
+- Onboarding wizard implementation with multi-language support and configuration flow.
+- Lyric card modal and generation flow with image customization and export capability.
+
 ## [4.4.12] — 2026-03-27
 
 ### Changed
 - Address dependencies vulnerability and update related packages for security and stability.
 
-## [4.4.11] — 2026-03-21
-
-### Changed
-- Increased Firefox minimum version requirement.
-- Explicitly declared no data collection permissions for Firefox/AMO compliance.
-
-## [4.4.10] — 2026-03-21
-
-### Added
-- `data_collection_permissions` in Firefox manifest configuration for AMO compliance.
-
-## [4.4.9] — 2026-03-21
-
-### Changed
-- Refined the manual GitHub Actions release workflow for version validation, build artifacts, and AMO submission.
-
-## [4.4.7] — 2026-03-21
-
-### Changed
-- Improved manual release workflow behavior for GitHub Releases and Firefox Add-ons publishing.
-
-## [4.4.6] — 2026-03-20
-
-### Changed
-- Updated CI release flow to support manual GitHub release publishing and Firefox Add-ons submission.
-
-## [4.4.5] — 2026-03-20
-
-### Added
-- Manual release workflow for building artifacts, tagging releases, creating GitHub Releases, and publishing to AMO.
-
-## [4.4.4] — 2026-03-20
-
-### Changed
-- Iterative improvements to the manual release workflow for version checks, artifact handling, and Firefox Add-ons submission.
-
-## [4.4.3] — 2026-03-20
-
-### Changed
-- Improved manual release workflow for validated versioning, artifact build, and GitHub/Firefox publication.
-
-## [4.4.2] — 2026-03-20
-
-### Changed
-- Updated manual release automation for version validation, build artifact generation, GitHub Releases, and AMO publication.
-
-## [4.4.1] — 2026-03-20
+## [4.4.1 - 4.4.11] — 2026-03-20 to 2026-03-21
 
 ### Added
 - Firefox-specific manifest settings (extension ID and minimum browser version).
+- `data_collection_permissions` in Firefox manifest configuration for AMO compliance.
 
 ### Changed
-- Improved manual release GitHub Actions workflow for GitHub Releases and Firefox AMO publishing.
+- Iterative manual release workflow refinements for version validation, artifact handling, GitHub Releases, and Firefox/AMO submission.
+- Improved CI release behavior for GitHub Releases and Firefox Add-ons publishing.
+- Increased Firefox minimum version requirement.
+- Explicitly declared no data collection permissions for Firefox/AMO compliance.
 
 ## [4.4.0] — 2026-03-20
 
