@@ -37,14 +37,14 @@
   },
   "dependencies": {
     "@wxt-dev/i18n": "^0.2.5",
-    "vue": "^3.5.31",
-    "vue-i18n": "^11.3.0"
+    "vue": "^3.5.33",
+    "vue-i18n": "^11.4.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.9",
+    "@biomejs/biome": "^2.4.13",
     "@wxt-dev/module-vue": "^1.0.3",
-    "typescript": "^5.9.3",
-    "vue-tsc": "^3.2.6",
-    "wxt": "^0.20.20"
+    "typescript": "^6.0.3",
+    "vue-tsc": "^3.2.7",
+    "wxt": "^0.20.25"
   }
 }
