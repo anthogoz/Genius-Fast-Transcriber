@@ -255,6 +255,7 @@
   "global_fix_tooltip": "Применить все текстовые коррекции сразу",
   "draft_found_title": "Черновик найден!",
   "draft_saved_at": "Сохранено в",
+  "draft_label": "Сохранено",
   "draft_btn_restore": "Восстановить",
   "draft_btn_discard": "Удалить",
   "draft_restored": "Черновик успешно восстановлен!",

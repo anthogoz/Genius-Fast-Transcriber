@@ -255,6 +255,7 @@
   "global_fix_tooltip": "Apply all text corrections at once",
   "draft_found_title": "Draft found!",
   "draft_saved_at": "Saved at",
+  "draft_label": "Saved",
   "draft_btn_restore": "Restore",
   "draft_btn_discard": "Discard",
   "draft_restored": "Draft restored successfully!",

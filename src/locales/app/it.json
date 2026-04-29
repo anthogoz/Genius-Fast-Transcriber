@@ -274,6 +274,7 @@
   "global_fix_tooltip": "Applica tutte le correzioni testo in una volta",
   "draft_found_title": "Bozza trovata!",
   "draft_saved_at": "Salvata alle",
+  "draft_label": "Salvato",
   "draft_btn_restore": "Ripristina",
   "draft_btn_discard": "Elimina",
   "draft_restored": "Bozza ripristinata con successo!",

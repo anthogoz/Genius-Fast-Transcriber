@@ -1,5 +1,6 @@
 import { onMounted, onUnmounted } from 'vue';
 import { useSettings } from './useSettings';
+import { useUndoRedo } from './useUndoRedo';
 import type { KeyboardShortcut } from '@/types';
 
 interface ShortcutHandlers {
@@ -20,6 +21,7 @@ interface ShortcutHandlers {
 
 export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
   const { shortcuts } = useSettings();
+  const { canUndo, canRedo } = useUndoRedo();
 
   function matches(e: KeyboardEvent, s: KeyboardShortcut): boolean {
     // On compare le code (ex: KeyZ) ou la touche (ex: z) pour plus de flexibilité
@@ -61,11 +63,18 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
         e.preventDefault();
         handlers.onDuplicateLine();
       } else if (matches(e, s.undo) && handlers.onUndo) {
-        e.preventDefault();
-        handlers.onUndo();
+        // Ne bloquer le undo natif que si GFT a des états dans sa pile.
+        // Sinon, laisser le undo natif du textarea/navigateur fonctionner.
+        if (canUndo()) {
+          e.preventDefault();
+          handlers.onUndo();
+        }
       } else if (matches(e, s.redo) && handlers.onRedo) {
-        e.preventDefault();
-        handlers.onRedo();
+        // Idem pour redo
+        if (canRedo()) {
+          e.preventDefault();
+          handlers.onRedo();
+        }
       } else if (matches(e, s.ytPlayPause)) {
         if (handlers.onYoutubePlayPause) {
           e.preventDefault();

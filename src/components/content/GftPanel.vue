@@ -29,7 +29,7 @@ const { isPanelCollapsed, isDarkMode, locale, transcriptionMode, areTooltipsEnab
 const { getEditorContent, setEditorContent } = useEditor();
 const { currentActiveEditor } = useGftState();
 const { togglePlayPause, seekBy } = useYoutubeControls();
-const { undo, redo, canUndo, canRedo } = useUndoRedo();
+const { undo, redo, canUndo, canRedo, saveState, undoStack } = useUndoRedo();
 const {
   hasDraft,
   draftTimestamp,
@@ -49,6 +49,8 @@ const progressTotal = ref(0);
 const progressMessage = ref('');
 const showProgress = ref(false);
 const showDraftNotification = ref(false);
+const showDraftSaved = ref(false);
+let draftSavedTimer: ReturnType<typeof setTimeout> | null = null;
 const draftTime = ref('');
 const showCustomButtonManager = ref(false);
 const customManagerDefaultType = ref<'structure' | 'cleanup'>('structure');
@@ -126,10 +128,12 @@ function handleUndo() {
   const content = getEditorContent();
   const previous = undo(content);
   if (previous !== null) {
+    // Empêcher l'event input de re-polluer le stack undo
+    skipUndoSnapshot = true;
     setEditorContent(previous);
+    previousSnapshotContent = previous;
+    clearTypingSession();
     showFeedback(t('feedback_undo'));
-  } else {
-    showFeedback(t('feedback_no_changes'));
   }
 }
 
@@ -137,7 +141,10 @@ function handleRedo() {
   const content = getEditorContent();
   const next = redo(content);
   if (next !== null) {
+    skipUndoSnapshot = true;
     setEditorContent(next);
+    previousSnapshotContent = next;
+    clearTypingSession();
     showFeedback(t('feedback_redo'));
   }
 }
@@ -262,6 +269,16 @@ watch(areTooltipsEnabled, (enabled) => {
   }
 });
 
+// Afficher temporairement le badge "Brouillon" quand un draft est sauvegardé
+watch(draftTimestamp, (newVal) => {
+  if (!newVal) return;
+  showDraftSaved.value = true;
+  if (draftSavedTimer) clearTimeout(draftSavedTimer);
+  draftSavedTimer = setTimeout(() => {
+    showDraftSaved.value = false;
+  }, 3000);
+});
+
 watch(locale, async () => {
   // Give Vue + VueI18n time to perform DOM updates 
   await nextTick();
@@ -277,20 +294,95 @@ watch(locale, async () => {
 let boundEditor: HTMLElement | null = null;
 let boundInputHandler: ((event: Event) => void) | null = null;
 
+// --- Undo snapshot par debounce + détection de limites de mots ---
+// Stratégie double :
+// 1. Limites de mot (espace, Entrée) → fin immédiate de la session, snapshot sauvegardé.
+// 2. Debounce 600ms → fallback pour la frappe continue sans espace.
+let previousSnapshotContent: string | null = null;
+let isInTypingSession = false;
+let typingSessionTimer: ReturnType<typeof setTimeout> | null = null;
+let skipUndoSnapshot = false;
+
+function clearTypingSession() {
+  if (typingSessionTimer) {
+    clearTimeout(typingSessionTimer);
+    typingSessionTimer = null;
+  }
+  isInTypingSession = false;
+}
+
+/** Sauvegarde le previousSnapshotContent dans l'undoStack (avec dédup). */
+function flushSnapshotToStack() {
+  if (previousSnapshotContent === null) return;
+  const stack = undoStack.value;
+  // Éviter les doublons si une action GFT vient de sauvegarder le même état
+  if (stack.length === 0 || stack[stack.length - 1] !== previousSnapshotContent) {
+    saveState(previousSnapshotContent);
+  }
+}
+
+function onEditorInputForUndo(event: Event) {
+  // Ignorer les events input déclenchés par setEditorContent lors d'un undo/redo
+  if (skipUndoSnapshot) {
+    skipUndoSnapshot = false;
+    return;
+  }
+
+  const inputEvent = event as InputEvent;
+
+  // Détecter les limites de mot : espace, Entrée, tabulation
+  const isWordBoundary =
+    inputEvent.data === ' ' ||
+    inputEvent.data === '\t' ||
+    inputEvent.inputType === 'insertLineBreak' ||
+    inputEvent.inputType === 'insertParagraph';
+
+  if (!isInTypingSession) {
+    // Nouvelle session de frappe : sauvegarder l'état "avant" dans la pile undo
+    flushSnapshotToStack();
+    isInTypingSession = true;
+  }
+
+  if (isWordBoundary) {
+    // Limite de mot atteinte : terminer la session immédiatement
+    // Le snapshot actuel devient le contenu après le mot complet
+    isInTypingSession = false;
+    previousSnapshotContent = getEditorContent();
+    if (typingSessionTimer) {
+      clearTimeout(typingSessionTimer);
+      typingSessionTimer = null;
+    }
+    return;
+  }
+
+  // Frappe normale : debounce pour capturer les pauses mid-word
+  if (typingSessionTimer) clearTimeout(typingSessionTimer);
+  typingSessionTimer = setTimeout(() => {
+    isInTypingSession = false;
+    previousSnapshotContent = getEditorContent();
+  }, 600);
+}
+// --- Fin undo snapshot ---
+
 function unbindEditorAutoSave() {
   if (boundEditor && boundInputHandler) {
     boundEditor.removeEventListener('input', boundInputHandler);
   }
   boundEditor = null;
   boundInputHandler = null;
+  clearTypingSession();
 }
 
 function bindEditorAutoSave(editor: HTMLElement | null) {
   unbindEditorAutoSave();
   if (!editor) return;
 
-  boundInputHandler = () => {
+  // Initialiser le snapshot avec le contenu actuel de l'éditeur
+  previousSnapshotContent = getEditorContent();
+
+  boundInputHandler = (event: Event) => {
     scheduleAutoSave(() => getEditorContent());
+    onEditorInputForUndo(event);
   };
 
   editor.addEventListener('input', boundInputHandler);
@@ -314,6 +406,7 @@ onBeforeUnmount(() => {
   tooltipEl?.remove();
   tooltipEl = null;
   unbindEditorAutoSave();
+  if (draftSavedTimer) clearTimeout(draftSavedTimer);
   cancelAutoSave();
 });
 
@@ -392,13 +485,16 @@ defineExpose({
         </div>
       </div>
       <div class="gft-panel__header-right" @click.stop>
-        <span
-          v-if="hasDraft"
-          class="gft-panel__draft-indicator"
-          :title="`${t('draft_saved_at')} ${draftTimestamp || ''}`"
-        >
-          💾
-        </span>
+        <Transition name="gft-draft-fade">
+          <span
+            v-if="showDraftSaved"
+            class="gft-panel__draft-badge"
+            :title="`${t('draft_saved_at')} ${draftTimestamp || ''}`"
+          >
+            <span class="gft-panel__draft-dot"></span>
+            {{ t('draft_label') }}
+          </span>
+        </Transition>
         <select
           :value="transcriptionMode"
           class="gft-panel__mode-select"
@@ -671,10 +767,51 @@ defineExpose({
   gap: 6px;
 }
 
-.gft-panel__draft-indicator {
-  font-size: 14px;
+.gft-panel__draft-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 2px 7px 2px 5px;
+  border-radius: 999px;
+  background: rgba(249, 255, 85, 0.12);
+  color: #f9ff55;
+  border: 1px solid rgba(249, 255, 85, 0.25);
   line-height: 1;
-  opacity: 0.65;
+  cursor: default;
+  white-space: nowrap;
+}
+
+.gft-panel:not(.gft-dark-mode) .gft-panel__draft-badge {
+  background: rgba(34, 139, 34, 0.08);
+  color: #1a7a1a;
+  border-color: rgba(34, 139, 34, 0.2);
+}
+
+.gft-panel__draft-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #4ade80;
+  flex-shrink: 0;
+}
+
+.gft-panel:not(.gft-dark-mode) .gft-panel__draft-dot {
+  background: #1a7a1a;
+}
+
+.gft-draft-fade-enter-active {
+  transition: opacity 0.25s ease;
+}
+.gft-draft-fade-leave-active {
+  transition: opacity 0.8s ease;
+}
+.gft-draft-fade-enter-from,
+.gft-draft-fade-leave-to {
+  opacity: 0;
 }
 
 .gft-panel__settings-wrapper {

@@ -276,6 +276,7 @@
   "global_fix_tooltip": "Alle Textkorrekturen auf einmal anwenden",
   "draft_found_title": "Entwurf gefunden!",
   "draft_saved_at": "Gespeichert um",
+  "draft_label": "Gespeichert",
   "draft_btn_restore": "Wiederherstellen",
   "draft_btn_discard": "Verwerfen",
   "draft_restored": "Entwurf erfolgreich wiederhergestellt!",
