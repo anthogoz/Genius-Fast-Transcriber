@@ -103,7 +103,7 @@ function formatTag(tag: string): string {
 function insertTag(tagDef: StructureTag) {
   const baseTag = buildTagText(tagDef.key);
   const withArtists = tagDef.withArtists ? addArtistsToTag(baseTag) : baseTag;
-  insertTextAtCursor(formatTag(withArtists));
+  insertTextAtCursor(tagDef.key === 'btn_unknown' ? withArtists + ' ' : formatTag(withArtists));
   emit('feedback', `${t(tagDef.key)} ${t('feedback_added', 'ajouté !')}`);
 }
 
