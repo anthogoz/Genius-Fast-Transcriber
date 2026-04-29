@@ -291,3 +291,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
   font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
 }
+
+#gft-native-export-root button{align-items:center!important}
+#gft-native-export-root button span{line-height:1.125!important}
