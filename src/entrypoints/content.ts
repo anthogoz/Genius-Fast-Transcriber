@@ -244,18 +244,29 @@ export default defineContentScript({
       const existingPanel = document.getElementById('gft-panel-root');
       if (existingPanel) return;
 
-      const controlsSection = document.querySelector(SELECTORS.CONTROLS_STICKY);
-      const geniusHelper = document.querySelector(SELECTORS.GENIUS_HELPER);
-      if (!controlsSection && !geniusHelper) {
-        const container = document.createElement('div');
-        container.id = 'gft-panel-root';
-        document.body.appendChild(container);
+      const container = document.createElement('div');
+      container.id = 'gft-panel-root';
+
+      // Insérer le panneau dans le ControlsContainer (le wrapper sticky de Genius
+      // qui contient les boutons Save / Cancel). Le panneau hérite ainsi du même
+      // comportement sticky au scroll que les boutons natifs.
+      const controlsContainer = document.querySelector<HTMLElement>(
+        'div[class*="LyricsEdit-desktop__ControlsContainer"]',
+      );
+      if (controlsContainer) {
+        controlsContainer.prepend(container);
         mountVueApp(container);
         return;
       }
 
-      const container = document.createElement('div');
-      container.id = 'gft-panel-root';
+      // Fallback : ancienne logique (Controls internes ou GeniusHelper)
+      const controlsSection = document.querySelector(SELECTORS.CONTROLS_STICKY);
+      const geniusHelper = document.querySelector(SELECTORS.GENIUS_HELPER);
+      if (!controlsSection && !geniusHelper) {
+        document.body.appendChild(container);
+        mountVueApp(container);
+        return;
+      }
 
       if (controlsSection) {
         controlsSection.prepend(container);

@@ -73,6 +73,18 @@
   -webkit-user-select: none;
 }
 
+/*
+ * Le panneau GFT est inséré dans le ControlsContainer de Genius
+ * (au-dessus des boutons Save / Cancel). On rend le conteneur entier sticky
+ * pour que tout le bloc (panneau + boutons + explainer) suive le scroll.
+ */
+div[class*="LyricsEdit-desktop__ControlsContainer"] {
+  position: sticky !important;
+  top: 140px !important;
+  align-self: start !important;
+}
+
+
 .gft-onboarding input,
 .gft-onboarding textarea,
 .gft-lc-modal input,
