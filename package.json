@@ -41,7 +41,7 @@
     "vue-i18n": "^11.4.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.13",
+    "@biomejs/biome": "^2.4.14",
     "@wxt-dev/module-vue": "^1.0.3",
     "typescript": "^6.0.3",
     "vue-tsc": "^3.2.7",
