@@ -9,26 +9,7 @@ export default defineConfig({
     default_locale: 'en',
     permissions: ['activeTab', 'tabs'],
     host_permissions: ['*://*.genius.com/*'],
-    commands: {
-      'toggle-play': {
-        suggested_key: {
-          default: 'Ctrl+Shift+Space',
-        },
-        description: 'Toggle YouTube Play/Pause',
-      },
-      'seek-forward': {
-        suggested_key: {
-          default: 'Ctrl+Shift+Right',
-        },
-        description: 'Seek Forward +5s',
-      },
-      'seek-backward': {
-        suggested_key: {
-          default: 'Ctrl+Shift+Left',
-        },
-        description: 'Seek Backward -5s',
-      },
-    },
+
     web_accessible_resources: [
       {
         resources: [

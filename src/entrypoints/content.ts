@@ -39,46 +39,7 @@ export default defineContentScript({
     feedbackApp.use(i18n);
     feedbackApp.mount(feedbackContainer);
 
-    // YouTube Controls (Global)
-    const { togglePlayPause, seekBy } = useYoutubeControls();
-    const showFeedback = (msg: string) => {
-      window.dispatchEvent(new CustomEvent('gft-show-feedback', { detail: { message: msg } }));
-    };
 
-    const handleYoutubeAction = (action: 'play' | 'back' | 'forward') => {
-      const t = (key: string) => String(i18n.global.t(key));
-      if (action === 'play') {
-        const result = togglePlayPause();
-        if (result === 'playing') showFeedback(t('feedback_play'));
-        else if (result === 'paused') showFeedback(t('feedback_pause'));
-        else showFeedback(`❌ ${t('yt_player_not_found')}`);
-      } else if (action === 'back') {
-        if (seekBy(-5)) showFeedback('⏪ -5s');
-        else showFeedback(`❌ ${t('yt_player_not_found')}`);
-      } else if (action === 'forward') {
-        if (seekBy(5)) showFeedback('⏩ +5s');
-        else showFeedback(`❌ ${t('yt_player_not_found')}`);
-      }
-    };
-
-    // Global Shortcuts (YouTube) are handled via background.ts -> browser.commands
-    // and received in the onMessage listener above.
-
-    browser.runtime.onMessage.addListener((message) => {
-      if (message.type === 'GFT_COMMAND') {
-        switch (message.command) {
-          case 'toggle-play':
-            handleYoutubeAction('play');
-            break;
-          case 'seek-backward':
-            handleYoutubeAction('back');
-            break;
-          case 'seek-forward':
-            handleYoutubeAction('forward');
-            break;
-        }
-      }
-    });
 
     const GFT_VERSION = browser.runtime.getManifest().version;
     let cleanupFloatingToolbar: (() => void) | null = null;
