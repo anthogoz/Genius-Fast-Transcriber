@@ -52,9 +52,9 @@ const DEFAULT_SHORTCUTS: ShortcutSettings = {
   duplicateLine: { key: 'D', code: 'KeyD', ctrlKey: true },
   undo: { key: 'z', code: 'KeyZ', ctrlKey: true },
   redo: { key: 'y', code: 'KeyY', ctrlKey: true },
-  ytPlayPause: { key: ' ', code: 'Space', shiftKey: true, ctrlKey: true },
-  ytSeekBack: { key: 'ArrowLeft', code: 'ArrowLeft', shiftKey: true, ctrlKey: true },
-  ytSeekForward: { key: 'ArrowRight', code: 'ArrowRight', shiftKey: true, ctrlKey: true },
+  ytPlayPause: { key: ' ', code: 'Space', altKey: true, ctrlKey: true },
+  ytSeekBack: { key: 'ArrowLeft', code: 'ArrowLeft', altKey: true, ctrlKey: true },
+  ytSeekForward: { key: 'ArrowRight', code: 'ArrowRight', altKey: true, ctrlKey: true },
 };
 
 const shortcuts = ref<ShortcutSettings>({ ...DEFAULT_SHORTCUTS });

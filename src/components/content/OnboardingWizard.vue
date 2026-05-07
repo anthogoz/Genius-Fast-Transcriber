@@ -181,8 +181,8 @@ const shortcutRows = computed(() => [
   { keys: 'Ctrl+Shift+C', action: t('btn_fix_all_short') },
   { keys: 'Ctrl+D', action: t('btn_duplicate_line_label') },
   { keys: 'Ctrl+Z / Y', action: `${t('undo')} / ${t('redo')}` },
-  { keys: 'Ctrl+Shift+Space', action: t('yt_play_pause') },
-  { keys: 'Ctrl+Shift+←/→', action: t('yt_seek_back').replace(' -5s', '') },
+  { keys: 'Ctrl+Alt+Space', action: t('yt_play_pause') },
+  { keys: 'Ctrl+Alt+←/→', action: t('yt_seek_back').replace(' -5s', '') },
 ]);
 </script>
 

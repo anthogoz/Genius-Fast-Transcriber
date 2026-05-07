@@ -27,7 +27,8 @@ export function useKeyboardShortcuts(handlers: ShortcutHandlers) {
     // On compare le code (ex: KeyZ) ou la touche (ex: z) pour plus de flexibilité
     // Le code est plus précis pour les claviers AZERTY/QWERTY
     const keyMatch = e.key.toLowerCase() === s.key.toLowerCase() || e.code === s.code;
-    const ctrlMatch = !!e.ctrlKey === !!s.ctrlKey || !!e.metaKey === !!s.ctrlKey; // Support Meta (Mac) comme Ctrl
+    // Support Meta (Mac) comme Ctrl : on considère que Ctrl OU Meta enfoncé = "Ctrl"
+    const ctrlMatch = (e.ctrlKey || e.metaKey) === !!s.ctrlKey;
     const shiftMatch = !!e.shiftKey === !!s.shiftKey;
     const altMatch = !!e.altKey === !!s.altKey;
 

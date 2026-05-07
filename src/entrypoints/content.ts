@@ -39,8 +39,6 @@ export default defineContentScript({
     feedbackApp.use(i18n);
     feedbackApp.mount(feedbackContainer);
 
-
-
     const GFT_VERSION = browser.runtime.getManifest().version;
     let cleanupFloatingToolbar: (() => void) | null = null;
     let panelApp: any = null;
