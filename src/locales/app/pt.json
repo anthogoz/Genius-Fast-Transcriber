@@ -359,5 +359,10 @@
   "tuto_sandbox_btn": "➕ Inserir [Verso]",
   "tuto_shortcut_keys": "Atalho",
   "tuto_shortcut_action": "Ação",
-  "tuto_shortcut_customizable": "Todos os atalhos são personalizáveis nas configurações!"
+  "tuto_shortcut_customizable": "Todos os atalhos são personalizáveis nas configurações!",
+  "album_copy_cover_link": "Copiar link da capa",
+  "album_download_cover": "Baixar capa",
+  "album_cover_not_found": "Não foi possível encontrar a imagem da capa.",
+  "album_cover_downloaded": "Capa baixada!",
+  "album_cover_download_error": "Erro ao baixar a capa."
 }

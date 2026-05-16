@@ -376,5 +376,10 @@
   "tuto_sandbox_btn": "➕ Insert [Verse]",
   "tuto_shortcut_keys": "Shortcut",
   "tuto_shortcut_action": "Action",
-  "tuto_shortcut_customizable": "All shortcuts are customizable in settings!"
+  "tuto_shortcut_customizable": "All shortcuts are customizable in settings!",
+  "album_copy_cover_link": "Copy cover link",
+  "album_download_cover": "Download cover image",
+  "album_cover_not_found": "Could not find cover image.",
+  "album_cover_downloaded": "Cover downloaded!",
+  "album_cover_download_error": "Error downloading the cover."
 }

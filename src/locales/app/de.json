@@ -361,5 +361,10 @@
   "tuto_sandbox_btn": "➕ [Strophe] einfügen",
   "tuto_shortcut_keys": "Tastenkürzel",
   "tuto_shortcut_action": "Aktion",
-  "tuto_shortcut_customizable": "Alle Tastenkürzel sind in den Einstellungen anpassbar!"
+  "tuto_shortcut_customizable": "Alle Tastenkürzel sind in den Einstellungen anpassbar!",
+  "album_copy_cover_link": "Cover-Link kopieren",
+  "album_download_cover": "Cover herunterladen",
+  "album_cover_not_found": "Cover-Bild nicht gefunden.",
+  "album_cover_downloaded": "Cover heruntergeladen!",
+  "album_cover_download_error": "Fehler beim Herunterladen des Covers."
 }

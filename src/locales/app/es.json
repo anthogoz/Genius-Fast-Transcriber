@@ -359,5 +359,10 @@
   "tuto_sandbox_btn": "➕ Insertar [Verso]",
   "tuto_shortcut_keys": "Atajo",
   "tuto_shortcut_action": "Acción",
-  "tuto_shortcut_customizable": "¡Todos los atajos son personalizables en ajustes!"
+  "tuto_shortcut_customizable": "¡Todos los atajos son personalizables en ajustes!",
+  "album_copy_cover_link": "Copiar enlace de la portada",
+  "album_download_cover": "Descargar portada",
+  "album_cover_not_found": "No se pudo encontrar la imagen de portada.",
+  "album_cover_downloaded": "¡Portada descargada!",
+  "album_cover_download_error": "Error al descargar la portada."
 }

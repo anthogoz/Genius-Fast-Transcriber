@@ -4,7 +4,7 @@ import '@/assets/content.css';
 import FeedbackToast from '@/components/content/FeedbackToast.vue';
 import FloatingToolbar from '@/components/content/FloatingToolbar.vue';
 import GftPanel from '@/components/content/GftPanel.vue';
-import NativeExportButton from '@/components/content/NativeExportButton.vue';
+import NativeGftButton from '@/components/content/NativeGftButton.vue';
 import OnboardingWizard from '@/components/content/OnboardingWizard.vue';
 import { useEditor } from '@/composables/useEditor';
 import { useGftState } from '@/composables/useGftState';
@@ -88,7 +88,7 @@ export default defineContentScript({
 
     startEditorObserver(ctx);
     initFloatingToolbar(false);
-    initNativeExportButton();
+    initNativeGftButton();
 
     function startEditorObserver(ctx: any) {
       const OBSERVER_DEBOUNCE_MS = 120;
@@ -590,35 +590,33 @@ export default defineContentScript({
       };
     }
 
-    function initNativeExportButton() {
-      const GFT_NATIVE_EXPORT_ID = 'gft-native-export-root';
+    function initNativeGftButton() {
+      const GFT_BUTTON_ID = 'gft-native-btn-root';
 
       const observer = new MutationObserver(() => {
-        if (document.getElementById(GFT_NATIVE_EXPORT_ID)) return;
+        if (document.getElementById(GFT_BUTTON_ID)) return;
 
         const container =
           document.querySelector('div[class*="StickyToolbar__Left"]')
           || document.querySelector('div[class*="StickyToolbar"] > div:first-child');
         if (!container) return;
 
-        // Trouver un bouton référence dans le conteneur pour copier son style
         const referenceButton = container.querySelector('a, button');
         if (!referenceButton) return;
 
         const buttonClass = referenceButton.className;
-        const svgEl = referenceButton.querySelector('svg');
         const spanEl = referenceButton.querySelector('span');
-
-        const iconClass = svgEl?.getAttribute('class') || '';
         const labelClass = spanEl?.className || '';
 
+        const isLyricsPage = /-lyrics(\/|$)/i.test(window.location.pathname);
+
         const root = document.createElement('div');
-        root.id = GFT_NATIVE_EXPORT_ID;
+        root.id = GFT_BUTTON_ID;
         root.style.display = 'contents';
 
         container.appendChild(root);
 
-        const app = createApp(NativeExportButton, { buttonClass, iconClass, labelClass });
+        const app = createApp(NativeGftButton, { buttonClass, labelClass, isLyricsPage });
         app.use(i18n);
         app.mount(root);
       });

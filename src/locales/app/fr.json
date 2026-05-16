@@ -379,5 +379,10 @@
   "tuto_sandbox_btn": "➕ Insérer [Couplet]",
   "tuto_shortcut_keys": "Raccourci",
   "tuto_shortcut_action": "Action",
-  "tuto_shortcut_customizable": "Tous les raccourcis sont personnalisables dans les réglages !"
+  "tuto_shortcut_customizable": "Tous les raccourcis sont personnalisables dans les réglages !",
+  "album_copy_cover_link": "Copier le lien de la cover",
+  "album_download_cover": "Télécharger la cover",
+  "album_cover_not_found": "Impossible de trouver l'image du projet.",
+  "album_cover_downloaded": "Cover téléchargée !",
+  "album_cover_download_error": "Erreur lors du téléchargement de la cover."
 }

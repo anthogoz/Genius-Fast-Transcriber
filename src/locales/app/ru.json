@@ -381,5 +381,10 @@
   "tuto_sandbox_btn": "➕ Вставить [Куплет]",
   "tuto_shortcut_keys": "Горячая клавиша",
   "tuto_shortcut_action": "Действие",
-  "tuto_shortcut_customizable": "Все горячие клавиши настраиваемы в параметрах!"
+  "tuto_shortcut_customizable": "Все горячие клавиши настраиваемы в параметрах!",
+  "album_copy_cover_link": "Скопировать ссылку на обложку",
+  "album_download_cover": "Скачать обложку",
+  "album_cover_not_found": "Не удалось найти изображение обложки.",
+  "album_cover_downloaded": "Обложка скачана!",
+  "album_cover_download_error": "Ошибка при скачивании обложки."
 }

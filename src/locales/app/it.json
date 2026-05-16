@@ -359,5 +359,10 @@
   "tuto_sandbox_btn": "➕ Inserisci [Strofa]",
   "tuto_shortcut_keys": "Scorciatoia",
   "tuto_shortcut_action": "Azione",
-  "tuto_shortcut_customizable": "Tutte le scorciatoie sono personalizzabili nelle impostazioni!"
+  "tuto_shortcut_customizable": "Tutte le scorciatoie sono personalizzabili nelle impostazioni!",
+  "album_copy_cover_link": "Copia link copertina",
+  "album_download_cover": "Scarica copertina",
+  "album_cover_not_found": "Impossibile trovare l'immagine di copertina.",
+  "album_cover_downloaded": "Copertina scaricata!",
+  "album_cover_download_error": "Errore durante il download della copertina."
 }

@@ -369,5 +369,10 @@
   "tuto_sandbox_btn": "➕ Wstaw [Zwrotka]",
   "tuto_shortcut_keys": "Skrót",
   "tuto_shortcut_action": "Akcja",
-  "tuto_shortcut_customizable": "Wszystkie skróty możesz skonfigurować w ustawieniach!"
+  "tuto_shortcut_customizable": "Wszystkie skróty możesz skonfigurować w ustawieniach!",
+  "album_copy_cover_link": "Kopiuj link do okładki",
+  "album_download_cover": "Pobierz okładkę",
+  "album_cover_not_found": "Nie znaleziono obrazu okładki.",
+  "album_cover_downloaded": "Okładka pobrana!",
+  "album_cover_download_error": "Błąd podczas pobierania okładki."
 }
