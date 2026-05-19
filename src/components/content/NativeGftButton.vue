@@ -2,6 +2,7 @@
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useExport } from '@/composables/useExport';
+import { useSettings } from '@/composables/useSettings';
 
 const props = defineProps<{
   buttonClass: string;
@@ -14,6 +15,15 @@ const { t } = useI18n();
 // --- Dropdown state ---
 const isDropdownOpen = ref(false);
 const wrapperRef = ref<HTMLElement | null>(null);
+
+const { isLyricCardOnly } = useSettings();
+
+function toggleMode() {
+  isLyricCardOnly.value = !isLyricCardOnly.value;
+  closeDropdown();
+  showFeedback(t('settings_saved'));
+  setTimeout(() => location.reload(), 300);
+}
 
 // --- Export modal state (lyrics pages only) ---
 const isExportModalOpen = ref(false);
@@ -200,6 +210,15 @@ onBeforeUnmount(() => {
       >
         Export TXT
       </a>
+      <hr class="gft-native-dropdown__divider" />
+      <a
+        class="gft-native-dropdown__item"
+        href="javascript:void(0)"
+        @click.prevent.stop="toggleMode"
+      >
+        <span v-if="isLyricCardOnly">⚡ {{ t('mode_full_title') }}</span>
+        <span v-else>🎨 {{ t('mode_lyric_title') }}</span>
+      </a>
     </div>
 
     <!-- Export TXT modal (lyrics pages only) -->
@@ -318,6 +337,12 @@ onBeforeUnmount(() => {
   background: #f0f0f0;
   text-decoration: none;
   color: #000;
+}
+
+.gft-native-dropdown__divider {
+  margin: 4px 0;
+  border: none;
+  border-top: 1px solid #e0e0e0;
 }
 
 /* ========== Export TXT Modal ========== */

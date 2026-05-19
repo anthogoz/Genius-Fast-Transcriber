@@ -73,17 +73,53 @@
   -webkit-user-select: none;
 }
 
+.gft-u-modal button,
+.gft-u-modal input,
+.gft-u-modal textarea,
+.gft-u-modal select,
+.gft-u-toast button,
+.gft-floating-toolbar button,
+.gft-onboarding button,
+.gft-onboarding input,
+.gft-onboarding textarea,
+.gft-onboarding select,
+.gft-lc-modal button,
+.gft-lc-modal input,
+.gft-lc-modal textarea,
+.gft-lc-modal select,
+.gft-export-modal button,
+.gft-export-modal input,
+.gft-export-modal textarea,
+.gft-export-modal select {
+  font-family: inherit;
+}
+
+#gft-panel-root button,
+#gft-panel-root input,
+#gft-panel-root textarea,
+#gft-panel-root select,
+#gft-toolbar-root button,
+#gft-onboarding-root button,
+#gft-onboarding-root input,
+#gft-onboarding-root textarea,
+#gft-onboarding-root select,
+#gft-lyric-card-modal-root button,
+#gft-lyric-card-modal-root input,
+#gft-lyric-card-modal-root textarea,
+#gft-lyric-card-modal-root select {
+  font-family: inherit;
+}
+
 /*
  * Le panneau GFT est inséré dans le ControlsContainer de Genius
  * (au-dessus des boutons Save / Cancel). On rend le conteneur entier sticky
  * pour que tout le bloc (panneau + boutons + explainer) suive le scroll.
  */
-div[class*="LyricsEdit-desktop__ControlsContainer"] {
+div[class*='LyricsEdit-desktop__ControlsContainer'] {
   position: sticky !important;
   top: 140px !important;
   align-self: start !important;
 }
-
 
 .gft-onboarding input,
 .gft-onboarding textarea,
@@ -304,5 +340,9 @@ div[class*="LyricsEdit-desktop__ControlsContainer"] {
   font-family: 'Programme', 'Programme Pan', Arial, sans-serif;
 }
 
-#gft-native-export-root button{align-items:center!important}
-#gft-native-export-root button span{line-height:1.125!important}
+#gft-native-export-root button {
+  align-items: center !important;
+}
+#gft-native-export-root button span {
+  line-height: 1.125 !important;
+}

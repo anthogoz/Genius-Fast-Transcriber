@@ -83,6 +83,7 @@ export default defineContentScript({
       metaObserver.observe(document.body, { childList: true, subtree: true });
 
       initFloatingToolbar(true);
+      initNativeGftButton();
       return;
     }
 

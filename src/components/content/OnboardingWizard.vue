@@ -83,10 +83,23 @@ const onboardingTitle = computed(() => {
 });
 
 const showHeaderCounter = computed(() => currentStep.value >= CONFIG_STEP_COUNT);
-const showFooter = computed(
-  () => currentStep.value > 0 && !isLyricOnlyFlow.value,
+
+const showPrevButton = computed(() => currentStep.value > 0);
+
+const showSkipButton = computed(
+  () =>
+    currentStep.value >= CONFIG_STEP_COUNT &&
+    !isFinishStep.value &&
+    !isLyricOnlyFlow.value,
 );
-const showSkipButton = computed(() => currentStep.value >= CONFIG_STEP_COUNT);
+
+const showNextButton = computed(() => currentStep.value >= CONFIG_STEP_COUNT);
+
+const nextButtonText = computed(() => {
+  if (isLyricOnlyFlow.value) return t('tuto_lyric_mode_btn');
+  if (isFinishStep.value) return t('tuto_finish');
+  return t('tuto_next');
+});
 const logoUrl = browser.runtime.getURL('/icon/128.png');
 const tutoLyricCardGifUrl = browser.runtime.getURL('/images/tutolyriccard.gif');
 
@@ -401,9 +414,9 @@ const shortcutRows = computed(() => [
         </div>
       </div>
 
-      <div v-if="showFooter" class="gft-onboarding__footer">
+      <div v-if="showPrevButton || showSkipButton || showNextButton" class="gft-onboarding__footer">
         <button
-          v-if="currentStep > 0"
+          v-if="showPrevButton"
           type="button"
           class="gft-onboarding__btn gft-onboarding__btn--secondary"
           @click="prev"
@@ -419,18 +432,13 @@ const shortcutRows = computed(() => [
           {{ t('tuto_skip') }}
         </button>
         <div style="flex: 1" />
-        <button type="button" class="gft-onboarding__btn gft-onboarding__btn--primary" @click="next">
-          {{ isFinishStep ? t('tuto_finish') : t('tuto_next') }}
-        </button>
-      </div>
-
-      <div v-else class="gft-onboarding__footer gft-onboarding__footer--single">
         <button
+          v-if="showNextButton"
           type="button"
           class="gft-onboarding__btn gft-onboarding__btn--primary"
           @click="next"
         >
-          {{ isLyricOnlyFlow ? t('tuto_lyric_mode_btn') : t('tuto_next') }}
+          {{ nextButtonText }}
         </button>
       </div>
     </div>

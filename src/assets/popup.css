@@ -5,6 +5,13 @@ body {
   scroll-behavior: smooth;
 }
 
+button,
+select,
+input,
+textarea {
+  font-family: inherit;
+}
+
 .gft-u-popup-section-title {
   font-size: 10px;
   font-weight: 700;
