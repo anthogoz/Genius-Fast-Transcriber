@@ -472,6 +472,10 @@ export default defineContentScript({
 
       function shouldShowNumberToWords(): boolean {
         if (lyricCardOnly) return false;
+        const currentLocale = settings.locale.value;
+        const isSupported = ['fr', 'en', 'pl'].includes(currentLocale);
+        if (!isSupported) return false;
+
         const selected = getSelectedText().trim();
         return isValidNumber(selected);
       }
@@ -494,9 +498,14 @@ export default defineContentScript({
 
               const value = Number.parseInt(selected, 10);
               let words = '';
-              if (settings.locale.value === 'en') words = numberToEnglishWords(value);
-              else if (settings.locale.value === 'pl') words = numberToPolishWords(value);
-              else words = numberToFrenchWords(value);
+              const currentLocale = settings.locale.value;
+              if (currentLocale === 'en') words = numberToEnglishWords(value);
+              else if (currentLocale === 'pl') words = numberToPolishWords(value);
+              else if (currentLocale === 'fr') words = numberToFrenchWords(value);
+              else {
+                hideToolbar();
+                return;
+              }
 
               insertTextAtCursor(words);
               hideToolbar();
