@@ -7,6 +7,7 @@ import {
   getContrastColor,
   getDominantColor,
   renderLyricCardToCanvas,
+  rgbToHex,
   searchArtistCandidates,
   type ArtistSearchCandidate,
 } from '@/utils/lyricCard';
@@ -34,6 +35,11 @@ const canvasRef = ref<HTMLCanvasElement | null>(null);
 const imageSource = ref('ALBUM');
 const format = ref<'1:1' | '16:9' | '9:16'>('1:1');
 const zoom = ref(1);
+const isAutoColor = ref(true);
+const isDarkLyrics = ref(true);
+const isBlackFooter = ref(false);
+const customColor = ref('#111111');
+const lastDominantSource = ref('');
 const searchQuery = ref('');
 const searchLoading = ref(false);
 const searchResults = ref<ArtistSearchCandidate[]>([]);
@@ -79,6 +85,10 @@ function renderFallback(displayArtistName: string) {
     null,
     format.value,
     zoom.value,
+    isAutoColor.value,
+    isDarkLyrics.value,
+    isBlackFooter.value,
+    customColor.value,
   );
 }
 
@@ -109,11 +119,25 @@ function updateCard(imageUrl: string) {
     window.clearTimeout(timeout);
 
     const dominantColor = getDominantColor(image);
+    const hexColor = rgbToHex(dominantColor);
+    
+    // Assign hex custom color dynamically if the source image itself changed
+    if (lastDominantSource.value !== imageUrl) {
+      customColor.value = hexColor;
+      lastDominantSource.value = imageUrl;
+    }
+
     const contrastColor = getContrastColor(dominantColor);
+
+    let effectiveFooterColor = dominantColor;
+    if (!isAutoColor.value) {
+      effectiveFooterColor = isBlackFooter.value ? '#000000' : customColor.value;
+    }
+    const effectiveTextColor = getContrastColor(effectiveFooterColor);
 
     const logo = new Image();
     const logoPath =
-      contrastColor === 'white' ? '/images/geniuslogowhite.png' : '/images/geniuslogoblack.png';
+      effectiveTextColor === 'white' ? '/images/geniuslogowhite.png' : '/images/geniuslogoblack.png';
     logo.src = browser.runtime.getURL(logoPath);
 
     logo.onload = () => {
@@ -128,6 +152,10 @@ function updateCard(imageUrl: string) {
         logo,
         format.value,
         zoom.value,
+        isAutoColor.value,
+        isDarkLyrics.value,
+        isBlackFooter.value,
+        customColor.value,
       );
     };
 
@@ -143,6 +171,10 @@ function updateCard(imageUrl: string) {
         null,
         format.value,
         zoom.value,
+        isAutoColor.value,
+        isDarkLyrics.value,
+        isBlackFooter.value,
+        customColor.value,
       );
     };
   };
@@ -335,121 +367,197 @@ onMounted(() => {
     <div class="gft-lc-modal" :class="{ 'gft-lc-modal--dark': isDarkMode }">
       <button type="button" class="gft-lc-close" @click="closeModal">&times;</button>
 
-      <h3 class="gft-lc-title">
-        {{ t('lc_modal_title') }}
-        <span class="gft-lc-version">v{{ version }}</span>
-      </h3>
+      <!-- Sleek Header -->
+      <div class="gft-lc-header">
+        <h3 class="gft-lc-title">
+          {{ t('lc_modal_title') }}
+          <span class="gft-lc-version">v{{ version }}</span>
+        </h3>
+      </div>
 
-      <div class="gft-lc-canvas-wrap">
-        <canvas ref="canvasRef" class="gft-lc-canvas" />
+      <!-- Main body flex layout -->
+      <div class="gft-lc-modal-body">
+        
+        <!-- Left: Preview pane containing the canvas wrapper -->
+        <div class="gft-lc-preview-pane">
+          <div class="gft-lc-canvas-wrap">
+            <canvas ref="canvasRef" class="gft-lc-canvas" />
+          </div>
+        </div>
 
-        <button
-          type="button"
-          class="gft-lc-meta-toggle gft-u-hover-lift"
-          :class="{ 'gft-lc-meta-toggle--active': showMetaEditor }"
-          @click="showMetaEditor = !showMetaEditor"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" role="img">
-            <title>{{ t('lc_edit_meta_btn') }}</title>
-            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-          </svg>
-          <span class="gft-lc-meta-toggle-label">{{ t('lc_edit_meta_btn') }}</span>
-        </button>
-
-        <Transition name="gft-lc-meta-fade">
-          <div v-if="showMetaEditor" class="gft-lc-meta-overlay">
-            <div class="gft-lc-meta-field">
-              <label>{{ t('lc_artist_label') }}</label>
-              <input v-model="displayArtist" type="text" spellcheck="false" />
-            </div>
-            <div class="gft-lc-meta-field">
-              <label>{{ t('lc_title_label') }}</label>
-              <input v-model="displayTitle" type="text" spellcheck="false" />
+        <!-- Right: Sleek Sidebar scrollable controls panel -->
+        <div class="gft-lc-sidebar">
+          
+          <!-- Group 1: Metadata inputs -->
+          <div class="gft-lc-group">
+            <div class="gft-lc-group-title">📝 {{ t('lc_edit_meta_btn') }}</div>
+            <div class="gft-lc-group-content">
+              <div class="gft-lc-field">
+                <label class="gft-lc-field-label">{{ t('lc_artist_label') }}</label>
+                <input v-model="displayArtist" type="text" spellcheck="false" class="gft-lc-input-text" />
+              </div>
+              <div class="gft-lc-field">
+                <label class="gft-lc-field-label">{{ t('lc_title_label') }}</label>
+                <input v-model="displayTitle" type="text" spellcheck="false" class="gft-lc-input-text" />
+              </div>
             </div>
           </div>
-        </Transition>
-      </div>
 
-      <div class="gft-lc-row">
-        <select
-          v-model="imageSource"
-          class="gft-lc-input gft-u-pill-control"
-          @change="applySelectedSource"
-        >
-          <option value="ALBUM">{{ t('lc_album_default') }}</option>
-          <option v-for="artist in allArtists" :key="artist" :value="artist">{{ artist }}</option>
-          <option value="MANUAL_SEARCH">{{ t('lc_manual_search') }}</option>
-          <option v-if="currentUploadedImage" value="CUSTOM">{{ t('lc_custom_img') }}</option>
-          <option
-            v-for="(url, key) in filteredArtistImageCache"
-            :key="key"
-            :value="key"
-          >
-            {{ artistImageLabels[key] || key }}
-          </option>
-        </select>
+          <!-- Group 2: Dimension & Source -->
+          <div class="gft-lc-group">
+            <div class="gft-lc-group-title">🖼️ {{ t('lc_format_btn').replace(':', '').trim() }} & Source</div>
+            <div class="gft-lc-group-content">
+              <div class="gft-lc-field">
+                <label class="gft-lc-field-label">Source image</label>
+                <select
+                  v-model="imageSource"
+                  class="gft-lc-input gft-lc-select-full"
+                  @change="applySelectedSource"
+                >
+                  <option value="ALBUM">{{ t('lc_album_default') }}</option>
+                  <option v-for="artist in allArtists" :key="artist" :value="artist">{{ artist }}</option>
+                  <option value="MANUAL_SEARCH">{{ t('lc_manual_search') }}</option>
+                  <option v-if="currentUploadedImage" value="CUSTOM">{{ t('lc_custom_img') }}</option>
+                  <option
+                    v-for="(url, key) in filteredArtistImageCache"
+                    :key="key"
+                    :value="key"
+                  >
+                    {{ artistImageLabels[key] || key }}
+                  </option>
+                </select>
+              </div>
 
-        <select
-          v-model="format"
-          class="gft-lc-input gft-u-pill-control"
-          @change="refreshCurrentSelection"
-        >
-          <option value="1:1">1:1</option>
-          <option value="16:9">16:9</option>
-          <option value="9:16">9:16</option>
-        </select>
+              <!-- Search pane inside Group 2 if showSearch is active -->
+              <Transition name="gft-lc-fade">
+                <div v-if="showSearch" class="gft-lc-search">
+                  <input
+                    v-model="searchQuery"
+                    class="gft-lc-input-text gft-lc-search-input"
+                    type="text"
+                    :placeholder="t('lc_search_placeholder')"
+                    @input="onSearchInput"
+                  />
+                  <div v-if="searchLoading" class="gft-lc-search-state">{{ t('lc_search_searching') }}</div>
+                  <div v-else-if="searchError" class="gft-lc-search-state gft-lc-search-state--error">{{ t('lc_error_search') }}</div>
+                  <div v-else-if="searchQuery && !searchResults.length" class="gft-lc-search-state">{{ t('lc_search_none') }}</div>
 
-        <label class="gft-lc-zoom">
-          <span>{{ zoom.toFixed(1) }}x</span>
-          <input v-model.number="zoom" type="range" min="0.5" max="2" step="0.1" @input="refreshCurrentSelection" />
-        </label>
-      </div>
+                  <div class="gft-lc-search-results-list">
+                    <button
+                      v-for="candidate in searchResults"
+                      :key="candidate.name + candidate.image_url"
+                      type="button"
+                      class="gft-lc-result"
+                      @click="applySearchResult(candidate)"
+                    >
+                      <img :src="candidate.image_url" alt="" />
+                      <span>{{ candidate.name }}</span>
+                    </button>
+                  </div>
+                </div>
+              </Transition>
 
-      <div v-if="showSearch" class="gft-lc-search">
-        <input
-          v-model="searchQuery"
-          class="gft-lc-input"
-          type="text"
-          :placeholder="t('lc_search_placeholder')"
-          @input="onSearchInput"
-        />
+              <div class="gft-lc-field">
+                <label class="gft-lc-field-label">Format de sortie</label>
+                <select
+                  v-model="format"
+                  class="gft-lc-input gft-lc-select-full"
+                  @change="refreshCurrentSelection"
+                >
+                  <option value="1:1">1:1</option>
+                  <option value="16:9">16:9</option>
+                  <option value="9:16">9:16</option>
+                </select>
+              </div>
 
-        <div v-if="searchLoading" class="gft-lc-search-state">{{ t('lc_search_searching') }}</div>
-        <div v-else-if="searchError" class="gft-lc-search-state gft-lc-search-state--error">{{ t('lc_error_search') }}</div>
-        <div v-else-if="searchQuery && !searchResults.length" class="gft-lc-search-state">{{ t('lc_search_none') }}</div>
+              <div class="gft-lc-field">
+                <label class="gft-lc-field-label">
+                  Zoom : <strong>{{ zoom.toFixed(1) }}x</strong>
+                </label>
+                <div class="gft-lc-slider-container">
+                  <input v-model.number="zoom" type="range" min="0.5" max="2" step="0.1" @input="refreshCurrentSelection" class="gft-lc-slider" />
+                </div>
+              </div>
+            </div>
+          </div>
 
-        <button
-          v-for="candidate in searchResults"
-          :key="candidate.name + candidate.image_url"
-          type="button"
-          class="gft-lc-result"
-          @click="applySearchResult(candidate)"
-        >
-          <img :src="candidate.image_url" alt="" />
-          <span>{{ candidate.name }}</span>
-        </button>
-      </div>
+          <!-- Group 3: Design & Style -->
+          <div class="gft-lc-group">
+            <div class="gft-lc-group-title">🎨 Style & Couleurs</div>
+            <div class="gft-lc-group-content">
+              <!-- Toggle Automatic Color -->
+              <label class="gft-lc-toggle-label">
+                <div class="gft-toggle" :class="{ 'gft-toggle--active': isAutoColor }">
+                  <input type="checkbox" v-model="isAutoColor" class="gft-toggle__input" @change="refreshCurrentSelection" />
+                  <div class="gft-toggle__track">
+                    <div class="gft-toggle__thumb"></div>
+                  </div>
+                </div>
+                <span>{{ t('lc_theme_auto') }}</span>
+              </label>
 
-      <div class="gft-lc-row gft-lc-row--actions">
-        <label class="gft-lc-upload gft-u-pill-control gft-u-pill-control--inline gft-u-hover-lift">
-          {{ t('lc_upload_btn') }}
-          <input type="file" accept="image/*" @change="onFileChange" />
-        </label>
+              <!-- Shown only when isAutoColor is false -->
+              <Transition name="gft-lc-fade">
+                <div v-if="!isAutoColor" class="gft-lc-manual-options-list">
+                  <!-- Toggle Dark Lyrics -->
+                  <label class="gft-lc-toggle-label">
+                    <div class="gft-toggle" :class="{ 'gft-toggle--active': isDarkLyrics }">
+                      <input type="checkbox" v-model="isDarkLyrics" class="gft-toggle__input" @change="refreshCurrentSelection" />
+                      <div class="gft-toggle__track">
+                        <div class="gft-toggle__thumb"></div>
+                      </div>
+                    </div>
+                    <span>{{ t('lc_theme_dark_lyrics') }}</span>
+                  </label>
 
-        <button
-          type="button"
-          class="gft-lc-btn gft-u-pill-control gft-u-pill-control--inline gft-u-hover-lift gft-lc-btn--primary"
-          @click="downloadCard"
-        >
-          {{ t('lc_download_btn') }}
-        </button>
-        <button
-          type="button"
-          class="gft-lc-btn gft-u-pill-control gft-u-pill-control--inline gft-u-hover-lift gft-lc-btn--x"
-          @click="shareToX"
-        >
-          {{ t('lc_share_btn') }}
-        </button>
+                  <!-- Toggle Black Footer -->
+                  <label class="gft-lc-toggle-label">
+                    <div class="gft-toggle" :class="{ 'gft-toggle--active': isBlackFooter }">
+                      <input type="checkbox" v-model="isBlackFooter" class="gft-toggle__input" @change="refreshCurrentSelection" />
+                      <div class="gft-toggle__track">
+                        <div class="gft-toggle__thumb"></div>
+                      </div>
+                    </div>
+                    <span>{{ t('lc_theme_black_footer') }}</span>
+                  </label>
+
+                  <!-- Custom Color Picker -->
+                  <label v-if="!isBlackFooter" class="gft-lc-color-picker">
+                    <span>{{ t('lc_theme_custom_color') }}</span>
+                    <input type="color" v-model="customColor" @input="refreshCurrentSelection" />
+                  </label>
+                </div>
+              </Transition>
+            </div>
+          </div>
+
+          <!-- Group 4: Actions -->
+          <div class="gft-lc-group gft-lc-group--actions">
+            <button
+              type="button"
+              class="gft-lc-btn-primary-action gft-u-hover-lift"
+              @click="downloadCard"
+            >
+              {{ t('lc_download_btn') }}
+            </button>
+            <div class="gft-lc-actions-row">
+              <label class="gft-lc-upload-btn-action gft-u-hover-lift">
+                {{ t('lc_upload_btn') }}
+                <input type="file" accept="image/*" @change="onFileChange" />
+              </label>
+
+              <button
+                type="button"
+                class="gft-lc-btn-secondary-action gft-u-hover-lift"
+                @click="shareToX"
+              >
+                {{ t('lc_share_btn') }}
+              </button>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </div>
   </div>
@@ -459,23 +567,30 @@ onMounted(() => {
 .gft-lc-overlay {
   z-index: 2147483640;
   background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
 }
 
 .gft-lc-modal {
   position: relative;
   width: min(1200px, 95vw);
   max-height: 90vh;
-  overflow: hidden auto;
-  background: #fff;
-  color: #222;
-  border-radius: 12px;
-  padding: 30px 20px 20px;
+  background: #ffffff;
+  color: #1a1a1a;
+  border-radius: 16px;
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
   animation: gft-lc-modal-enter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   will-change: transform, opacity;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.gft-lc-modal--dark {
+  background: #1e1e1e;
+  color: #f5f5f5;
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 @keyframes gft-lc-modal-enter {
@@ -489,40 +604,51 @@ onMounted(() => {
   }
 }
 
-.gft-lc-modal--dark {
-  background: #222;
-  color: #eee;
-}
-
 .gft-lc-close {
   position: absolute;
-  top: 10px;
-  right: 15px;
+  top: 18px;
+  right: 20px;
   border: none;
   background: none;
-  color: #666;
+  color: #888;
   font-size: 28px;
   cursor: pointer;
   line-height: 1;
   padding: 0;
   transition: all 0.2s ease;
-}
-
-.gft-lc-modal--dark .gft-lc-close {
-  color: #aaa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
 }
 
 .gft-lc-close:hover {
   color: #000;
-  transform: scale(1.15) rotate(90deg);
+  background: rgba(0, 0, 0, 0.05);
+  transform: rotate(90deg);
 }
 
 .gft-lc-modal--dark .gft-lc-close:hover {
   color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.gft-lc-header {
+  margin-bottom: 20px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding-bottom: 14px;
+}
+
+.gft-lc-modal--dark .gft-lc-header {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
 }
 
 .gft-lc-title {
   margin: 0;
+  font-size: 20px;
+  font-weight: 700;
   display: flex;
   align-items: baseline;
   gap: 8px;
@@ -530,353 +656,527 @@ onMounted(() => {
 
 .gft-lc-version {
   font-size: 11px;
-  color: #aaa;
+  color: #888;
   font-family: monospace;
   font-weight: 400;
 }
 
-.gft-lc-modal--dark .gft-lc-version {
-  color: #888;
+/* Two-column layout */
+.gft-lc-modal-body {
+  display: flex;
+  gap: 24px;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Left: Preview Pane */
+.gft-lc-preview-pane {
+  flex: 1;
+  background: #121212;
+  border-radius: 12px;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.gft-lc-modal--dark .gft-lc-preview-pane {
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.gft-lc-canvas-wrap {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
 }
 
 .gft-lc-canvas {
   max-width: 100%;
   max-height: 60vh;
-  display: block;
-  background: #111;
-}
-
-.gft-lc-canvas-wrap {
-  position: relative;
-  margin-top: 4px;
-  border: 2px solid #555;
+  object-fit: contain;
   border-radius: 8px;
-  display: flex;
-  justify-content: center;
-  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  display: block;
 }
 
-.gft-lc-meta-toggle {
-  position: absolute;
-  bottom: 12px;
-  right: 12px;
-  height: 36px;
-  border-radius: 999px;
-  padding: 0 14px;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+/* Right: Sidebar */
+.gft-lc-sidebar {
+  width: 360px;
+  flex-shrink: 0;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  z-index: 10;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  padding-right: 6px;
+  max-height: calc(90vh - 100px);
 }
 
-.gft-lc-meta-toggle-label {
+/* Custom Scrollbar for Sidebar */
+.gft-lc-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.gft-lc-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.gft-lc-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+.gft-lc-modal--dark .gft-lc-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Parameter Groups */
+.gft-lc-group {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.gft-lc-modal--dark .gft-lc-group {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.gft-lc-group-title {
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.06em;
+  color: #666;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+  padding-bottom: 6px;
+  margin-bottom: 4px;
 }
 
-.gft-lc-meta-toggle:hover, .gft-lc-meta-toggle--active {
-  background: #f9ff55;
-  color: black;
-  border-color: #f9ff55;
+.gft-lc-modal--dark .gft-lc-group-title {
+  color: #aaa;
+  border-bottom-color: rgba(255, 255, 255, 0.04);
 }
 
-.gft-lc-meta-overlay {
-  position: absolute;
-  bottom: 60px;
-  right: 12px;
-  width: min(240px, 80vw);
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 12px;
-  padding: 14px;
+.gft-lc-group-content {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  z-index: 9;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-.gft-lc-meta-field {
+/* Form Fields */
+.gft-lc-field {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
-.gft-lc-meta-field label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 700;
-  opacity: 0.7;
-  color: white;
+.gft-lc-field-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: #666;
 }
 
-.gft-lc-meta-field input {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 6px;
-  padding: 8px 10px;
-  color: white;
-  font-size: 13px;
-  outline: none;
-  transition: border-color 0.2s;
+.gft-lc-modal--dark .gft-lc-field-label {
+  color: #b3b3b3;
 }
 
-.gft-lc-meta-field input:focus {
-  border-color: #f9ff55;
-}
-
-.gft-lc-meta-fade-enter-active,
-.gft-lc-meta-fade-leave-active {
-  transition: all 0.3s ease;
-}
-
-.gft-lc-meta-fade-enter-from,
-.gft-lc-meta-fade-leave-to {
-  opacity: 0;
-  transform: translateY(10px) scale(0.95);
-}
-
-.gft-lc-row {
-  margin-top: 10px;
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
+/* Text inputs and Selects */
+.gft-lc-input-text,
 .gft-lc-input {
-  appearance: none;
-  min-width: 80px;
-  max-width: 250px;
-  padding: 11px 36px 11px 20px;
-  background-color: rgba(128, 128, 128, 0.12);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: calc(100% - 14px) center;
-  outline: none;
-  border: 1px solid rgba(128, 128, 128, 0.2);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  background: #ffffff;
   color: inherit;
   font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
+  font-family: inherit;
+  outline: none;
+  transition: all 0.2s ease;
 }
 
-.gft-lc-input--text-edit {
-  background-image: none;
-  padding-right: 20px;
-  cursor: text;
-  flex: 1;
-}
-
+.gft-lc-modal--dark .gft-lc-input-text,
 .gft-lc-modal--dark .gft-lc-input {
-  background-color: rgba(255, 255, 255, 0.07);
-  border-color: rgba(255, 255, 255, 0.1);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23aaa' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  border-color: rgba(255, 255, 255, 0.15);
+  background: #2b2b2b;
 }
 
-.gft-lc-input:hover {
-  background-color: rgba(128, 128, 128, 0.18);
-  border-color: rgba(128, 128, 128, 0.3);
+.gft-lc-select-full {
+  cursor: pointer !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: calc(100% - 12px) center !important;
+  padding-right: 32px !important;
 }
 
-.gft-lc-modal--dark .gft-lc-input:hover {
-  background-color: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.2);
+.gft-lc-modal--dark .gft-lc-select-full {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23aaa' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E") !important;
 }
 
+.gft-lc-input-text:focus,
 .gft-lc-input:focus {
   border-color: #f9ff55;
-  box-shadow: 0 0 0 2px rgba(249, 255, 85, 0.15);
+  box-shadow: 0 0 0 2px rgba(249, 255, 85, 0.2);
 }
 
-.gft-lc-search .gft-lc-input {
-  max-width: none;
-  width: 100%;
-  border-radius: 999px;
-  padding-right: 20px;
-  background-image: none;
-  cursor: text;
-}
-
-.gft-lc-input option {
-  background: #fff;
-  color: #000;
-}
-
-.gft-lc-modal--dark .gft-lc-input option {
-  background: #333;
-  color: #fff;
-}
-
-.gft-lc-zoom {
+/* Slider Controls */
+.gft-lc-slider-container {
   display: flex;
   align-items: center;
-  gap: 12px;
-  height: 42px;
-  box-sizing: border-box;
-  border-radius: 999px;
-  padding: 4px 16px;
-  background: rgba(128, 128, 128, 0.08);
+  width: 100%;
 }
 
-.gft-lc-zoom span {
-  min-width: 40px;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.gft-lc-zoom input[type='range'] {
+.gft-lc-slider {
   -webkit-appearance: none;
-  width: 120px;
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(128, 128, 128, 0.2);
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.1);
   outline: none;
+  margin: 8px 0;
 }
 
-.gft-lc-zoom input[type='range']::-webkit-slider-thumb {
+.gft-lc-modal--dark .gft-lc-slider {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.gft-lc-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 16px;
   height: 16px;
   border-radius: 50%;
   background: #f9ff55;
   cursor: pointer;
-  box-shadow: 0 0 8px rgba(249, 255, 85, 0.4);
-  transition: all 0.2s;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.1s ease;
+  border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
-.gft-lc-zoom input[type='range']::-webkit-slider-thumb:hover {
+.gft-lc-slider::-webkit-slider-thumb:hover {
   transform: scale(1.2);
-  box-shadow: 0 0 12px rgba(249, 255, 85, 0.6);
 }
 
+/* Manual search dropdown style */
 .gft-lc-search {
-  margin-top: 2px;
-  display: grid;
-  gap: 6px;
-  width: 100%;
-  max-width: 760px;
-  margin-inline: auto;
-  background: rgba(0, 0, 0, 0.1);
-  padding: 10px;
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 8px;
+  padding: 10px;
+  margin-top: -4px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .gft-lc-modal--dark .gft-lc-search {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.05);
 }
 
 .gft-lc-search-state {
-  opacity: 0.75;
+  font-size: 11px;
+  color: #888;
   text-align: center;
-  padding: 6px;
+  padding: 4px;
 }
 
 .gft-lc-search-state--error {
   color: #ff6b6b;
 }
 
+.gft-lc-search-results-list {
+  max-height: 150px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .gft-lc-result {
   display: flex;
   align-items: center;
-  gap: 10px;
-  width: 100%;
-  border: 1px solid transparent;
-  border-radius: 6px;
+  gap: 8px;
   padding: 6px;
-  background: rgba(0, 0, 0, 0.05);
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   color: inherit;
+  font-size: 12px;
   cursor: pointer;
-  transition: background 0.1s;
+  transition: all 0.15s ease;
+  width: 100%;
   text-align: left;
 }
 
 .gft-lc-modal--dark .gft-lc-result {
-  background: rgba(255, 255, 255, 0.05);
+  background: #2b2b2b;
+  border-color: rgba(255, 255, 255, 0.05);
 }
 
 .gft-lc-result:hover {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.gft-lc-modal--dark .gft-lc-result:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(249, 255, 85, 0.08);
+  border-color: rgba(249, 255, 85, 0.3);
 }
 
 .gft-lc-result img {
-  width: 40px;
-  height: 40px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+/* Style & Colors Override Toggles */
+.gft-lc-toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 0;
+}
+
+.gft-lc-manual-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.08);
+  padding-top: 10px;
+  margin-top: 4px;
+}
+
+.gft-lc-modal--dark .gft-lc-manual-options-list {
+  border-top-color: rgba(255, 255, 255, 0.08);
+}
+
+/* Custom Color Picker */
+.gft-lc-color-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 4px 0;
+}
+
+.gft-lc-color-picker input[type="color"] {
+  border: none;
+  background: none;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.gft-lc-color-picker input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.gft-lc-color-picker input[type="color"]::-webkit-color-swatch {
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  box-shadow: inset 0 0 2px rgba(0,0,0,0.2);
+}
+
+/* Toggles styling (Matching premium style) */
+.gft-toggle {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
   flex-shrink: 0;
 }
 
-.gft-lc-row--actions {
+.gft-toggle__input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.gft-toggle__track {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.12);
+  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 20px;
+}
+
+.gft-lc-modal--dark .gft-toggle__track {
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.gft-toggle__thumb {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.gft-toggle--active .gft-toggle__track {
+  background-color: #f9ff55;
+}
+
+.gft-toggle--active .gft-toggle__thumb {
+  transform: translateX(16px);
+  background-color: #000000;
+}
+
+/* Action Group */
+.gft-lc-group--actions {
+  background: transparent;
+  border: none;
+  padding: 0;
+  gap: 10px;
+}
+
+.gft-lc-btn-primary-action {
+  width: 100%;
+  background: #f9ff55;
+  color: #000000;
+  border: none;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(249, 255, 85, 0.25);
+  display: flex;
+  align-items: center;
   justify-content: center;
-  gap: 15px;
+  gap: 8px;
 }
 
-.gft-lc-modal--dark .gft-lc-upload {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+.gft-lc-btn-primary-action:hover {
+  background: #fffc7d;
+  box-shadow: 0 6px 16px rgba(249, 255, 85, 0.4);
 }
 
-.gft-lc-upload input {
+.gft-lc-actions-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.gft-lc-upload-btn-action,
+.gft-lc-btn-secondary-action {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.gft-lc-upload-btn-action {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: inherit;
+  position: relative;
+}
+
+.gft-lc-modal--dark .gft-lc-upload-btn-action {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.gft-lc-upload-btn-action input {
   display: none;
 }
 
-.gft-lc-btn {
-  outline: none;
+.gft-lc-btn-secondary-action {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  color: inherit;
 }
 
-.gft-lc-btn--primary {
-  background: #f9ff55;
-  color: #000;
-  border: none;
-  font-weight: 700;
-  transition: all 0.2s ease;
+.gft-lc-modal--dark .gft-lc-btn-secondary-action {
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
-.gft-lc-btn--primary:hover {
-  background: #ffff88;
+.gft-lc-upload-btn-action:hover,
+.gft-lc-btn-secondary-action:hover {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.25);
 }
 
-.gft-lc-btn--x {
-  background: #000;
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.2);
-  transition: all 0.2s ease;
+.gft-lc-modal--dark .gft-lc-upload-btn-action:hover,
+.gft-lc-modal--dark .gft-lc-btn-secondary-action:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
-.gft-lc-btn--x:hover {
-  background: #222;
+/* Transitions */
+.gft-lc-fade-enter-active,
+.gft-lc-fade-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.gft-lc-fade-enter-from,
+.gft-lc-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 
-@media (max-width: 768px) {
+/* Responsive Stack */
+@media (max-width: 900px) {
   .gft-lc-modal {
-    width: 98vw;
-    padding: 22px 12px 12px;
+    width: 95vw;
+    max-height: 95vh;
   }
 
-  .gft-lc-row {
-    gap: 10px;
+  .gft-lc-modal-body {
+    flex-direction: column;
+    overflow-y: auto;
   }
 
-  .gft-lc-input {
-    max-width: 100%;
+  .gft-lc-sidebar {
+    width: 100%;
+    max-height: none;
+    overflow-y: visible;
+    padding-right: 0;
+  }
+
+  .gft-lc-preview-pane {
+    padding: 12px;
+  }
+
+  .gft-lc-canvas {
+    max-height: 45vh;
   }
 }
 </style>

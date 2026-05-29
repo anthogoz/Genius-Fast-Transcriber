@@ -219,15 +219,50 @@ export function getDominantColor(img: HTMLImageElement): string {
   }
 }
 
-export function getContrastColor(rgbString: string): 'black' | 'white' {
-  const match = rgbString.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
-  if (!match) return 'white';
+export function getContrastColor(colorStr: string): 'black' | 'white' {
+  let r = 0;
+  let g = 0;
+  let b = 0;
 
+  if (colorStr.startsWith('#')) {
+    const cleanHex = colorStr.replace('#', '');
+    const num = Number.parseInt(cleanHex, 16);
+    if (cleanHex.length === 3) {
+      r = ((num >> 8) & 0xf) * 17;
+      g = ((num >> 4) & 0xf) * 17;
+      b = (num & 0xf) * 17;
+    } else {
+      r = (num >> 16) & 0xff;
+      g = (num >> 8) & 0xff;
+      b = num & 0xff;
+    }
+  } else {
+    const match = colorStr.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+    if (!match) return 'white';
+    r = Number.parseInt(match[1] ?? '0', 10);
+    g = Number.parseInt(match[2] ?? '0', 10);
+    b = Number.parseInt(match[3] ?? '0', 10);
+  }
+
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 128 ? 'black' : 'white';
+}
+
+export function rgbToHex(rgbStr: string): string {
+  const match = rgbStr.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+  if (!match) return '#000000';
   const r = Number.parseInt(match[1] ?? '0', 10);
   const g = Number.parseInt(match[2] ?? '0', 10);
   const b = Number.parseInt(match[3] ?? '0', 10);
-  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-  return yiq >= 128 ? 'black' : 'white';
+  return (
+    '#'
+    + [r, g, b]
+      .map((x) => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? `0${hex}` : hex;
+      })
+      .join('')
+  );
 }
 
 export function renderLyricCardToCanvas(
@@ -241,6 +276,10 @@ export function renderLyricCardToCanvas(
   logoObj: HTMLImageElement | null,
   format: '1:1' | '16:9' | '9:16' = '16:9',
   zoom = 1,
+  isAuto = true,
+  isDarkLyrics = true,
+  isBlackFooter = false,
+  customColor = '',
 ) {
   const context = canvas.getContext('2d');
   if (!context) return;
@@ -300,9 +339,13 @@ export function renderLyricCardToCanvas(
     context.fillRect(0, 0, width, height);
   }
 
-  context.fillStyle = footerColor;
+  const effectiveFooterColor = isAuto ? footerColor : isBlackFooter ? '#000000' : customColor;
+
+  const effectiveTextColor = getContrastColor(effectiveFooterColor);
+
+  context.fillStyle = effectiveFooterColor;
   context.fillRect(0, height - footerHeight, width, footerHeight);
-  context.fillStyle = textColor;
+  context.fillStyle = effectiveTextColor;
   context.fillRect(0, height - footerHeight, width, 3);
 
   const logoHeight = 40;
@@ -318,7 +361,7 @@ export function renderLyricCardToCanvas(
 
   const logoX = width - 60 - logoWidth;
   context.font = `normal ${fontSizeFooter}px "Programme", Arial, sans-serif`;
-  context.fillStyle = textColor;
+  context.fillStyle = effectiveTextColor;
   context.textBaseline = 'middle';
 
   const firstPart = `${artistName.toUpperCase()},`;
@@ -359,7 +402,7 @@ export function renderLyricCardToCanvas(
     context.save();
     context.textAlign = 'left';
     context.font = '900 36px "Programme", "Arial Black", sans-serif';
-    context.fillStyle = textColor;
+    context.fillStyle = effectiveTextColor;
     context.fillText('G E N I U S', logoX, height - footerHeight / 2);
     context.restore();
   }
@@ -388,8 +431,22 @@ export function renderLyricCardToCanvas(
 
   const bottomMargin = 35;
   const startY = height - footerHeight - bottomMargin - lines.length * lineHeightText;
-  const lyricsBackgroundColor = textColor === 'white' ? 'white' : 'black';
-  const lyricsTextColor = textColor === 'white' ? 'black' : 'white';
+
+  let lyricsBackgroundColor = 'black';
+  let lyricsTextColor = 'white';
+
+  if (isAuto) {
+    lyricsBackgroundColor = textColor === 'white' ? 'white' : 'black';
+    lyricsTextColor = textColor === 'white' ? 'black' : 'white';
+  } else {
+    if (isDarkLyrics) {
+      lyricsBackgroundColor = 'black';
+      lyricsTextColor = 'white';
+    } else {
+      lyricsBackgroundColor = 'white';
+      lyricsTextColor = 'black';
+    }
+  }
 
   context.textBaseline = 'middle';
   lines.forEach((line, index) => {
