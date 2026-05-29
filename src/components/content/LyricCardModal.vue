@@ -405,10 +405,10 @@ onMounted(() => {
 
           <!-- Group 2: Dimension & Source -->
           <div class="gft-lc-group">
-            <div class="gft-lc-group-title">🖼️ {{ t('lc_format_btn').replace(':', '').trim() }} & Source</div>
+            <div class="gft-lc-group-title">🖼️ {{ t('lc_format_source') }}</div>
             <div class="gft-lc-group-content">
               <div class="gft-lc-field">
-                <label class="gft-lc-field-label">Source image</label>
+                <label class="gft-lc-field-label">{{ t('lc_image_source') }}</label>
                 <select
                   v-model="imageSource"
                   class="gft-lc-input gft-lc-select-full"
@@ -458,7 +458,7 @@ onMounted(() => {
               </Transition>
 
               <div class="gft-lc-field">
-                <label class="gft-lc-field-label">Format de sortie</label>
+                <label class="gft-lc-field-label">{{ t('lc_output_format') }}</label>
                 <select
                   v-model="format"
                   class="gft-lc-input gft-lc-select-full"
@@ -472,7 +472,7 @@ onMounted(() => {
 
               <div class="gft-lc-field">
                 <label class="gft-lc-field-label">
-                  Zoom : <strong>{{ zoom.toFixed(1) }}x</strong>
+                  {{ t('lc_zoom_field') }} : <strong>{{ zoom.toFixed(1) }}x</strong>
                 </label>
                 <div class="gft-lc-slider-container">
                   <input v-model.number="zoom" type="range" min="0.5" max="2" step="0.1" @input="refreshCurrentSelection" class="gft-lc-slider" />
@@ -483,7 +483,7 @@ onMounted(() => {
 
           <!-- Group 3: Design & Style -->
           <div class="gft-lc-group">
-            <div class="gft-lc-group-title">🎨 Style & Couleurs</div>
+            <div class="gft-lc-group-title">🎨 {{ t('lc_style_colors') }}</div>
             <div class="gft-lc-group-content">
               <!-- Toggle Automatic Color -->
               <label class="gft-lc-toggle-label">
