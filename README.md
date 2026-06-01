@@ -123,7 +123,15 @@ Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/cbl
 ### Firefox Add-ons
 Install from [Firefox Add-ons (AMO)](https://addons.mozilla.org/firefox/addon/genius-fast-transcriber/).
 
-### Manual (Developer Mode)
+### Manual Installation
+
+#### Option A: Pre-built Release (Recommended & Easiest)
+1. Go to the [Releases](https://github.com/anthogoz/Genius-Fast-Transcriber/releases) tab and download the latest zip file (e.g. `genius-fast-transcriber-chrome.zip` or `genius-fast-transcriber-firefox.zip`).
+2. Extract the downloaded zip file on your computer.
+3. **Chrome** — Go to `chrome://extensions`, enable **Developer mode** (top right toggle), click **Load unpacked** and select the extracted folder.
+4. **Firefox** — Go to `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on** and select the `manifest.json` file inside the extracted folder.
+
+#### Option B: From Source (Developer Mode)
 1. Clone or download the repository.
 2. Install dependencies and build:
    ```bash
