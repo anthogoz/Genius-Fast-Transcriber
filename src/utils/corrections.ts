@@ -7,7 +7,7 @@ import type {
   SongData,
 } from '@/types';
 
-export const REPEAT_MARKER_REGEX = /\s*[[(（]?\s*[xX×]\s*(\d+)\s*[\])）]?\s*$/;
+export const REPEAT_MARKER_REGEX = /(?:(?:^|[\s[(（])\s*[xX]|\s*×)\s*(\d+)\s*[\])）]?\s*$/;
 
 export function isSectionTag(line: string): boolean {
   const trimmed = line.trim().replace(REPEAT_MARKER_REGEX, '');
@@ -498,13 +498,13 @@ export const CORRECTION_RULES: CorrectionRule[] = [
             .replace(/(?<![\s[])([?!:;])/g, ' $1') // Ajoute si manque, sauf après [
             .replace(/\[\s+([?!:;])/g, '[$1') // Supprime si déjà là après [
             .replace(/\s+([?!:;])/g, ' $1') // Normalise à un seul espace
-            .replace(/([?!:;])(?=[A-Za-z0-9À-ÿŒœ])/g, '$1 '); // Espace APRÈS si suivi d'une lettre
+            .replace(/([?!:;])(?=[\p{L}\p{N}])/gu, '$1 '); // Espace APRÈS si suivi d'une lettre
           newLine = withSpace;
         } else {
           // Anglais/Polonais : doit être collé avant
           const noSpace = newLine
             .replace(/\s+([?!:;])/g, '$1')
-            .replace(/([?!:;])(?=[A-Za-z0-9À-ÿŒœ])/g, '$1 '); // Espace APRÈS si suivi d'une lettre
+            .replace(/([?!:;])(?=[\p{L}\p{N}])/gu, '$1 '); // Espace APRÈS si suivi d'une lettre
           newLine = noSpace;
         }
 

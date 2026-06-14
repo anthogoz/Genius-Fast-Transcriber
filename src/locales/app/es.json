@@ -373,5 +373,11 @@
   "album_download_cover": "Descargar portada",
   "album_cover_not_found": "No se pudo encontrar la imagen de portada.",
   "album_cover_downloaded": "¡Portada descargada!",
-  "album_cover_download_error": "Error al descargar la portada."
+  "album_cover_download_error": "Error al descargar la portada.",
+  "settings_draft_history": "📁 Historial de borradores",
+  "draft_history_title": "📁 Historial de borradores",
+  "draft_history_empty": "No hay borradores guardados en el historial.",
+  "draft_history_char_count": "{count} caracteres",
+  "draft_history_preview": "Vista previa del borrador",
+  "confirm_delete_draft": "¿Eliminar borrador de \"{title}\"?"
 }

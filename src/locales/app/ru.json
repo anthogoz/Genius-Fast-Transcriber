@@ -214,7 +214,7 @@
   "preview_opt_en_abbrev": "US-сленг",
   "preview_opt_quotes": "Кавычки «» → \"",
   "preview_opt_dash": "Длинные тире — – → -",
-  "preview_opt_punctuation": "Space before ? and !",
+  "preview_opt_punctuation": "Пунктуация",
   "preview_opt_spaces": "Двойные пробелы",
   "preview_opt_spacing": "Интервалы (строки)",
   "preview_opt_quote_spaces": "Пробелы в кавычках",
@@ -224,7 +224,7 @@
   "preview_stat_en_abbrev": "US-сокращений",
   "preview_stat_quotes": "французских кавычек",
   "preview_stat_dash": "длинное(ых) тире",
-  "preview_stat_punctuation": "punctuation space(s)",
+  "preview_stat_punctuation": "коррекция(й) пунктуации",
   "preview_stat_spaces": "двойной(ых) пробел(ов)",
   "preview_stat_spacing": "интервал(ов) строк",
   "preview_stat_quote_spaces": "внутренних пробел(ов) кавычек",
@@ -395,5 +395,11 @@
   "album_download_cover": "Скачать обложку",
   "album_cover_not_found": "Не удалось найти изображение обложки.",
   "album_cover_downloaded": "Обложка скачана!",
-  "album_cover_download_error": "Ошибка при скачивании обложки."
+  "album_cover_download_error": "Ошибка при скачивании обложки.",
+  "settings_draft_history": "📁 История черновиков",
+  "draft_history_title": "📁 История черновиков",
+  "draft_history_empty": "В истории нет сохранённых черновиков.",
+  "draft_history_char_count": "{count} символов",
+  "draft_history_preview": "Предпросмотр черновика",
+  "confirm_delete_draft": "Удалить черновик для \"{title}\"?"
 }

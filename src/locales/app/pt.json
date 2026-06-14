@@ -373,5 +373,11 @@
   "album_download_cover": "Baixar capa",
   "album_cover_not_found": "Não foi possível encontrar a imagem da capa.",
   "album_cover_downloaded": "Capa baixada!",
-  "album_cover_download_error": "Erro ao baixar a capa."
+  "album_cover_download_error": "Erro ao baixar a capa.",
+  "settings_draft_history": "📁 Histórico de rascunhos",
+  "draft_history_title": "📁 Histórico de rascunhos",
+  "draft_history_empty": "Nenhum rascunho salvo no histórico.",
+  "draft_history_char_count": "{count} caracteres",
+  "draft_history_preview": "Visualização do rascunho",
+  "confirm_delete_draft": "Excluir rascunho de \"{title}\"?"
 }

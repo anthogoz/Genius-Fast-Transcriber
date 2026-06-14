@@ -373,5 +373,11 @@
   "album_download_cover": "Scarica copertina",
   "album_cover_not_found": "Impossibile trovare l'immagine di copertina.",
   "album_cover_downloaded": "Copertina scaricata!",
-  "album_cover_download_error": "Errore durante il download della copertina."
+  "album_cover_download_error": "Errore durante il download della copertina.",
+  "settings_draft_history": "📁 Cronologia bozze",
+  "draft_history_title": "📁 Cronologia bozze",
+  "draft_history_empty": "Nessuna bozza salvata nella cronologia.",
+  "draft_history_char_count": "{count} caratteri",
+  "draft_history_preview": "Anteprima bozza",
+  "confirm_delete_draft": "Eliminare la bozza di \"{title}\"?"
 }

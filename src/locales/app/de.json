@@ -375,5 +375,11 @@
   "album_download_cover": "Cover herunterladen",
   "album_cover_not_found": "Cover-Bild nicht gefunden.",
   "album_cover_downloaded": "Cover heruntergeladen!",
-  "album_cover_download_error": "Fehler beim Herunterladen des Covers."
+  "album_cover_download_error": "Fehler beim Herunterladen des Covers.",
+  "settings_draft_history": "📁 Entwurfsverlauf",
+  "draft_history_title": "📁 Entwurfsverlauf",
+  "draft_history_empty": "Keine Entwürfe im Verlauf gespeichert.",
+  "draft_history_char_count": "{count} Zeichen",
+  "draft_history_preview": "Entwurfsansicht",
+  "confirm_delete_draft": "Entwurf für \"{title}\" löschen?"
 }

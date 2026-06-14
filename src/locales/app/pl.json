@@ -383,5 +383,11 @@
   "album_download_cover": "Pobierz okładkę",
   "album_cover_not_found": "Nie znaleziono obrazu okładki.",
   "album_cover_downloaded": "Okładka pobrana!",
-  "album_cover_download_error": "Błąd podczas pobierania okładki."
+  "album_cover_download_error": "Błąd podczas pobierania okładki.",
+  "settings_draft_history": "📁 Wersje robocze",
+  "draft_history_title": "📁 Historia szkiców",
+  "draft_history_empty": "Brak zapisanych szkiców w historii.",
+  "draft_history_char_count": "{count} znaków",
+  "draft_history_preview": "Podgląd szkicu",
+  "confirm_delete_draft": "Usunąć szkic dla \"{title}\"?"
 }

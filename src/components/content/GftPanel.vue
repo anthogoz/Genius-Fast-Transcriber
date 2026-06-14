@@ -19,6 +19,7 @@ import SettingsMenu from './SettingsMenu.vue';
 import StatsDisplay from './StatsDisplay.vue';
 import StructureSection from './StructureSection.vue';
 import ShortcutConfig from './ShortcutConfig.vue';
+import DraftHistoryModal from './DraftHistoryModal.vue';
 
 const props = defineProps<{
   version?: string;
@@ -62,6 +63,7 @@ const structureSection = ref<{
   insertOutroByShortcut: () => void;
 } | null>(null);
 const showShortcutConfig = ref(false);
+const showDraftHistory = ref(false);
 const cleanupSection = ref<{
   triggerFixAll: () => void;
   triggerDuplicateLine: () => void;
@@ -165,6 +167,11 @@ function openCustomButtonManager(defaultType: 'structure' | 'cleanup' = 'structu
 
 function closeCustomButtonManager() {
   showCustomButtonManager.value = false;
+}
+
+function handleOpenDraftHistory() {
+  showDraftHistory.value = true;
+  settingsVisible.value = false;
 }
 
 function handleCustomButtonsSaved() {
@@ -544,6 +551,7 @@ defineExpose({
             @toggle-stats="showStats = !showStats"
             @open-custom-library="openCustomButtonManager('structure')"
             @open-shortcuts="showShortcutConfig = true"
+            @open-draft-history="handleOpenDraftHistory"
             @close="settingsVisible = false"
           />
         </div>
@@ -623,6 +631,12 @@ defineExpose({
     <ShortcutConfig
       :visible="showShortcutConfig"
       @close="showShortcutConfig = false"
+    />
+
+    <DraftHistoryModal
+      :visible="showDraftHistory"
+      @feedback="handleFeedback"
+      @close="showDraftHistory = false"
     />
   </div>
 </template>

@@ -23,6 +23,7 @@ const emit = defineEmits<{
   toggleStats: [];
   openCustomLibrary: [];
   openShortcuts: [];
+  openDraftHistory: [];
 }>();
 
 function relaunchTutorial() {
@@ -99,6 +100,9 @@ function relaunchTutorial() {
       </button>
       <button type="button" class="gft-settings-menu__item gft-settings-menu__item--btn" @click="emit('openShortcuts')">
         {{ t('settings_shortcuts') }}
+      </button>
+      <button type="button" class="gft-settings-menu__item gft-settings-menu__item--btn" @click="emit('openDraftHistory')">
+        {{ t('settings_draft_history') }}
       </button>
     </div>
   </Transition>
