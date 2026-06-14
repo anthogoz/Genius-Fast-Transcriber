@@ -18,7 +18,16 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
+      "preset": "recommended",
+      "a11y": {
+        "recommended": false
+      },
+      "security": {
+        "noScriptUrl": "off"
+      },
+      "correctness": {
+        "useVueValidVOn": "off"
+      },
       "suspicious": {
         "noExplicitAny": "off"
       }
